@@ -3,7 +3,7 @@ import React, { useRef, useState, useEffect } from "react";
 import { useControls, button } from "leva";
 
 import { Canvas, useFrame } from "@react-three/fiber";
-import {
+import { 
   OrthographicCamera,
   OrbitControls,
   PerspectiveCamera,
@@ -14,6 +14,8 @@ import {
 import * as THREE from "three";
 import { cameraPosition } from "three/examples/jsm/nodes/Nodes.js";
 import { vizobj } from "../../classes/vizobj";
+import { Showobj } from "./three/Showobj";
+
 
 // function CameraHelper() {
 //   const camera = new THREE.OrthographicCamera(20, -20, 20, -20, 1, 100);
@@ -21,11 +23,11 @@ import { vizobj } from "../../classes/vizobj";
 // }
 
 export default function Experience({
-  onClickCube,
   vizobjs,
+  controlvar
 }: {
-  onClickCube: () => void;
   vizobjs: vizobj[];
+  controlvar: number;
 }) {
   // const [aspectRatio, setAspectRatio] = useState(1);
 
@@ -88,26 +90,7 @@ export default function Experience({
 
       <>
         {vizobjs.map((obj, index) =>
-          obj.color == "green" ? (
-            <mesh
-              key={index}
-              position={[obj.position.x, obj.position.y, 0]}
-              scale={[1, 1, 1]}
-              onClick={onClickCube}
-            >
-              <primitive object={obj.geom} attach="geometry" />
-              <meshBasicMaterial color={obj.color} side={THREE.DoubleSide} />
-            </mesh>
-          ) : (
-            <mesh
-              key={index}
-              position={[obj.position.x, obj.position.y, 0]}
-              scale={[1, 1, 1]}
-            >
-              <primitive object={obj.geom} attach="geometry" />
-              <meshBasicMaterial color={obj.color} side={THREE.DoubleSide} />
-            </mesh>
-          )
+          <Showobj key={index} vizobj={obj} contnum={controlvar} /> // we are prop drilling here so could change to context
         )}
       </>
 
