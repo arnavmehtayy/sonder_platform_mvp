@@ -1,43 +1,25 @@
 import * as THREE from "three";
-import { useEffect, useState } from "react";
-import { Interactobj } from "@/classes/interactobj";
-import { vizobj } from "@/classes/vizobj";
+import { useStore, vizobjsSelector} from "@/app/store"
 
-export function Showobj({ vizobj, contnum }: { vizobj: vizobj, contnum: number }) {
-  const { control } = vizobj;
+export function Showobj({ id }: { id: number }) {
+  const objselector = useStore(vizobjsSelector);
 
-  if (!control) {
     // Handle the no interaction case
+    if(objselector(id).control === null) {
+        console.log("update green")
+    }
     return (
-      <mesh position={[vizobj.position.x, vizobj.position.y, 0]}>
-        <primitive object={vizobj.geom} attach="geometry" />
-        <meshBasicMaterial color={vizobj.color} />
+      <mesh position={[objselector(id).position.x, objselector(id).position.y, 0]}>
+        <primitive object={objselector(id).geom} attach="geometry" />
+        <meshBasicMaterial color={objselector(id).color} />
       </mesh>
     );
-  }
+    // return (
+    //     <mesh position={[vizobjs[id-1].position.x, vizobjs[id-1].position.y, 0]}>
+    //       <primitive object={vizobjs[id-1].geom} attach="geometry" />
+    //       <meshBasicMaterial color={vizobjs[id-1].color} />
+    //     </mesh>
+    //   );
 
-  // Compute transformations based on control.action
-  let position: [number, number, number] = [vizobj.position.x, vizobj.position.y, 0];
-  let scale: [number, number, number] = [1, 1, 1];
-  let rotation: [number, number, number] = [0, 0, 0];
-
-  switch (control.action) {
-    case "scale":
-      scale = [contnum, 1, 1];
-      break;
-    case "rotate":
-      rotation = [contnum, 0, 0];
-      break;
-    case "move":
-      position = [contnum, vizobj.position.y, 0];
-      break;
-  }
-
-  // Render the mesh using computed properties
-  return (
-    <mesh position={position} scale={scale} rotation={rotation}>
-      <primitive object={vizobj.geom} attach="geometry" />
-      <meshBasicMaterial color={vizobj.color} />
-    </mesh>
-  );
+  
 }

@@ -15,6 +15,7 @@ import * as THREE from "three";
 import { cameraPosition } from "three/examples/jsm/nodes/Nodes.js";
 import { vizobj } from "../../classes/vizobj";
 import { Showobj } from "./three/Showobj";
+import { useStore, objectsSelector} from "../store"
 
 
 // function CameraHelper() {
@@ -22,13 +23,7 @@ import { Showobj } from "./three/Showobj";
 //   return <cameraHelper args={[camera]} />;
 // }
 
-export default function Experience({
-  vizobjs,
-  controlvar
-}: {
-  vizobjs: vizobj[];
-  controlvar: number;
-}) {
+export default function Experience() {
   // const [aspectRatio, setAspectRatio] = useState(1);
 
   // useEffect(() => {
@@ -40,6 +35,7 @@ export default function Experience({
   //   }
   // }, []);
   // const aspect = window.innerWidth / window.innerHeight;
+  const objectlist = useStore(objectsSelector);
   const { camera_pos } = useControls("cam", {
     camera_pos: {
       value: [0, 0, 2],
@@ -89,8 +85,8 @@ export default function Experience({
       </mesh> */}
 
       <>
-        {vizobjs.map((obj, index) =>
-          <Showobj key={index} vizobj={obj} contnum={controlvar} /> // we are prop drilling here so could change to context
+        { objectlist.map((obj, index) =>
+          <Showobj key={index} id={obj.id}/> // we are prop drilling here so could change to context
         )}
       </>
 
