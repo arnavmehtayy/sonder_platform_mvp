@@ -12,6 +12,7 @@ import { Interactobj } from "@/classes/interactobj";
 export function Minigame({ page }: { page: number }) {
   const [text, setText] = useState("This is a test question? ");
   const [controller, setcontroller] = useState(0);
+  
   let userTestStatus: vizobj[] = [
     new vizobj(
       new THREE.Vector2(-10, 2),
@@ -22,7 +23,7 @@ export function Minigame({ page }: { page: number }) {
       new THREE.Vector2(2, 2),
       new THREE.PlaneGeometry(4, 4),
       "red",
-      new Interactobj("move", [2, 2], 0)
+      new Interactobj("scale", [2, 2], 0)
     ),
   ];
   return (

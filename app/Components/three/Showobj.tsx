@@ -4,28 +4,7 @@ import { Interactobj } from "@/classes/interactobj";
 import { vizobj } from "@/classes/vizobj";
 
 export function Showobj({ vizobj, contnum }: { vizobj: vizobj, contnum: number }) {
-  const control: Interactobj | null = vizobj.control;
-
-  // State to manage transformations
-  const [position, setPosition] = useState({ x: vizobj.position.x, y: vizobj.position.y, z: 0 });
-  const [scale, setScale] = useState({ x: 1, y: 1, z: 1 });
-  const [rotation, setRotation] = useState({ x: 0, y: 0, z: 0 });
-
-  useEffect(() => {
-    if (control) {
-      switch (control.action) {
-        case "scale":
-          setScale({ x: contnum, y: 1, z: 1 });
-          break;
-        case "rotate":
-          setRotation({ x: 0, y: 0, z: contnum });
-          break;
-        case "move":
-          setPosition({ x: contnum, y: vizobj.position.y, z: 0 });
-          break;
-      }
-    }
-  }, [contnum, control]); // Dependency array includes control and contnum
+  const { control } = vizobj;
 
   if (!control) {
     // Handle the no interaction case
@@ -37,9 +16,26 @@ export function Showobj({ vizobj, contnum }: { vizobj: vizobj, contnum: number }
     );
   }
 
-  // Render the mesh using state variables
+  // Compute transformations based on control.action
+  let position: [number, number, number] = [vizobj.position.x, vizobj.position.y, 0];
+  let scale: [number, number, number] = [1, 1, 1];
+  let rotation: [number, number, number] = [0, 0, 0];
+
+  switch (control.action) {
+    case "scale":
+      scale = [contnum, 1, 1];
+      break;
+    case "rotate":
+      rotation = [contnum, 0, 0];
+      break;
+    case "move":
+      position = [contnum, vizobj.position.y, 0];
+      break;
+  }
+
+  // Render the mesh using computed properties
   return (
-    <mesh position={[position.x, position.y, position.z]} scale={[scale.x, scale.y, scale.z]} rotation={[rotation.x, rotation.y, rotation.z]}>
+    <mesh position={position} scale={scale} rotation={rotation}>
       <primitive object={vizobj.geom} attach="geometry" />
       <meshBasicMaterial color={vizobj.color} />
     </mesh>
