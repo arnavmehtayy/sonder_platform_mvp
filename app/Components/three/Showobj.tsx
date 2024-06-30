@@ -7,7 +7,12 @@ export function Showobj({ id }: { id: number }) {
 
   // Handle the no interaction case
   const obj = objselector(id);
+  if(!obj){
+    console.log("No object found for id: ", id)
+  }
+  
   return (
+    obj ? 
     <mesh
       position={[obj.position.x, obj.position.y, 0]}
       rotation={[obj.rotation.x, obj.rotation.y, obj.rotation.z]}
@@ -15,7 +20,7 @@ export function Showobj({ id }: { id: number }) {
     >
       <primitive object={obj.geom} attach="geometry" />
       <meshBasicMaterial color={obj.color} />
-    </mesh>
+    </mesh> : null
   );
   // return (
   //     <mesh position={[vizobjs[id-1].position.x, vizobjs[id-1].position.y, 0]}>

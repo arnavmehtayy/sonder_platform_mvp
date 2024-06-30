@@ -3,17 +3,16 @@ import React, { useState } from "react";
 import Experience from "./visualexp";
 import Link from "next/link";
 
-import { useStore, objectsSelector, setInteractobjvalueSelector, vizobjsSelector} from "../store"
+import { useStore,setInteractobjvalueSelector, controlsSelector, InteraobjvalueSelector} from "../store"
 
 export function Minigame({ page }: { page: number }) {
   const [text, setText] = useState("This is a test question? ");
-  const setInteractobjvalue = useStore(setInteractobjvalueSelector);
-  const objselector = useStore(vizobjsSelector);
+  const setValue = useStore(setInteractobjvalueSelector);
+  const getControl = useStore(controlsSelector); // selects based on control id
+  const getValue = useStore(InteraobjvalueSelector); // selects based on object id
 
 
-  const test_id: number = 2 // for testing remove soon
-
-  console.log(objselector(test_id).control?.value)
+  const test_id: number = 1 // for testing remove soon
 
   return (
     <>
@@ -42,14 +41,15 @@ export function Minigame({ page }: { page: number }) {
         >
           <input
             type="range"
-            min = {objselector(test_id).control?.range[0].toString()}
-            max= {objselector(test_id).control?.range[1].toString()}
+            min = {getControl(test_id)?.range[0].toString()}
+            max= {getControl(test_id)?.range[1].toString()}
             step={1}
-            value={objselector(test_id).control?.value}
-            onChange={(e) => setInteractobjvalue(test_id, Number(e.target.value))}
+            value={getValue(test_id)}
+            onChange={(e) => {setValue(test_id, Number(e.target.value))}
+          }
             style={{ width: "100%" }}
           />
-          <p>Value: {objselector(test_id).control?.value}</p>
+          <p>Value: {getValue(test_id)}</p>
         </div>
       </div>
     </>

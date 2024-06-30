@@ -5,13 +5,18 @@ import { Interactobj } from "@/classes/interactobj";
 
 type State = {
   vizobjs: vizobj[];
+  controls: Interactobj[] | null;
   setVizobjpos: (id: number, x: number, y: number) => void;
   setVizobjscale: (id: number, scale: THREE.Vector3) => void;
   setVizobjrot: (id: number, rot: THREE.Vector3) => void;
   setInteractobjvalue: (id: number, value: number) => void;
 };
 
-let UserData: vizobj[] = [
+const controlData: Interactobj[] = [new Interactobj(1, 1, "rotate", [-4,4]),
+new Interactobj(1, 1, "move", [-10,10])]
+
+
+const canvasData: vizobj[] = [
   new vizobj(
     1,
     new THREE.Vector2(-10, 2),
@@ -23,16 +28,17 @@ let UserData: vizobj[] = [
   new vizobj(
     2,
     new THREE.Vector2(2, 2),
-    new THREE.Vector3(0, 0, 1),
+    new THREE.Vector3(0, 0, 0),
     new THREE.Vector3(1, 1, 1),
     new THREE.PlaneGeometry(4, 4),
-    "red",
-    new Interactobj("rotate", [-4,4], 0)
+    "red"
   ),
 ];
 
 export const useStore = create<State>((set) => ({
-  vizobjs: UserData,
+  controls: controlData,
+
+  vizobjs: canvasData,
 
   setVizobjpos: (id, x, y) =>
     set((state) => ({
@@ -52,30 +58,53 @@ export const useStore = create<State>((set) => ({
         obj.id === id ? { ...obj, rotation: rot } : obj
       ),
     })),
-  setInteractobjvalue: (id, value) =>
-    set((state) => ({
-      vizobjs: state.vizobjs.map((obj) => {
-        if (obj.id === id && obj.control !== null) {
-          switch (obj.control.action) {
-            case "move":
-              return { ...obj, position: new THREE.Vector2(value, obj.position.y), control: {...obj.control, value: value} }; // Assuming you want to change x and y by the same value
-            case "rotate":
-              return { ...obj, rotation: new THREE.Vector3(obj.rotation.x,obj.rotation.y,value), control: {...obj.control, value: value}  };
-            case "scale":
-              return { ...obj, scale: new THREE.Vector3(value,obj.scale.y,obj.scale.z), control: {...obj.control, value: value}  };
-            default:
-              return obj;
+    setInteractobjvalue: (control_id, value) =>
+      set((state) => ({
+        vizobjs: state.vizobjs.map((viz) => {
+          const control = state.controls?.find((ctrl) => ctrl.id === control_id && ctrl.obj_id === viz.id);
+          
+          if (control) {
+            switch (control.action) {
+              case "move":
+                // Assuming you want to change x position, keep y the same
+                return { ...viz, position: new THREE.Vector2(value, viz.position.y) };
+              case "rotate":
+                // Assuming you want to change the z-axis rotation only
+                return { ...viz, rotation: new THREE.Vector3(viz.rotation.x, viz.rotation.y, value) };
+              case "scale":
+                // Assuming you want to change all axes uniformly
+                return { ...viz, scale: new THREE.Vector3(value, value, value) };
+              default:
+                return viz;
+            }
+          } else {
+            return viz;
           }
-        } else {
-          return obj;
-        }
-      }),
-    }))
-}));
+        }),
+      })),
+  }));
 
 export const objectsSelector = (state: State) => state.vizobjs;
 export const setVizobjposSelector = (state: State) => state.setVizobjpos;
 export const setVizobjscaleSelector = (state: State) => state.setVizobjscale;
 export const setVizobjrotSelector = (state: State) => state.setVizobjrot;
 export const setInteractobjvalueSelector = (state: State) => state.setInteractobjvalue;
-export const vizobjsSelector = (state: State) => (id: number) => state.vizobjs.filter((obj) => obj.id === id)[0];
+export const vizobjsSelector = (state: State) => (id: number) => state.vizobjs.find((obj) => obj.id === id);
+export const controlsSelector = (state: State) => (control_id: number) => state.controls?.find((obj) => obj.obj_id === control_id);
+export const InteraobjvalueSelector = (state: State) => (control_id: number) => {
+  const control = state.controls?.find((ctrl) => ctrl.id === control_id);
+  const viz = state.vizobjs.find((obj) => obj.id === control?.obj_id);
+  if (viz && control) {
+    switch (control.action) {
+      case "move":
+        return viz.position.x;
+      case "rotate":
+        return viz.rotation.z;
+      case "scale":
+        return viz.scale.x;
+      default:
+        return 0;
+    }
+  }
+  return 0; // default
+}
