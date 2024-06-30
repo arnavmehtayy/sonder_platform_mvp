@@ -44,7 +44,7 @@ export function Minigame({ page }: { page: number }) {
             type="range"
             min = {objselector(test_id).control?.range[0].toString()}
             max= {objselector(test_id).control?.range[1].toString()}
-            step={0.1}
+            step={1}
             value={objselector(test_id).control?.value}
             onChange={(e) => setInteractobjvalue(test_id, Number(e.target.value))}
             style={{ width: "100%" }}

@@ -6,8 +6,8 @@ import { Interactobj } from "@/classes/interactobj";
 type State = {
   vizobjs: vizobj[];
   setVizobjpos: (id: number, x: number, y: number) => void;
-  setVizobjscale: (id: number, scale: number) => void;
-  setVizobjrot: (id: number, rot: number) => void;
+  setVizobjscale: (id: number, scale: THREE.Vector3) => void;
+  setVizobjrot: (id: number, rot: THREE.Vector3) => void;
   setInteractobjvalue: (id: number, value: number) => void;
 };
 
@@ -15,15 +15,19 @@ let UserData: vizobj[] = [
   new vizobj(
     1,
     new THREE.Vector2(-10, 2),
+    new THREE.Vector3(0, 0, 0),
+    new THREE.Vector3(1, 1, 1),
     new THREE.PlaneGeometry(4, 4),
     "green"
   ),
   new vizobj(
     2,
     new THREE.Vector2(2, 2),
+    new THREE.Vector3(0, 0, 1),
+    new THREE.Vector3(1, 1, 1),
     new THREE.PlaneGeometry(4, 4),
     "red",
-    new Interactobj("move", [-2, 2], 0)
+    new Interactobj("rotate", [-4,4], 0)
   ),
 ];
 
@@ -56,9 +60,9 @@ export const useStore = create<State>((set) => ({
             case "move":
               return { ...obj, position: new THREE.Vector2(value, obj.position.y), control: {...obj.control, value: value} }; // Assuming you want to change x and y by the same value
             case "rotate":
-              return { ...obj, rotation: value, control: {...obj.control, value: value}  };
+              return { ...obj, rotation: new THREE.Vector3(obj.rotation.x,obj.rotation.y,value), control: {...obj.control, value: value}  };
             case "scale":
-              return { ...obj, scale: value, control: {...obj.control, value: value}  };
+              return { ...obj, scale: new THREE.Vector3(value,obj.scale.y,obj.scale.z), control: {...obj.control, value: value}  };
             default:
               return obj;
           }
