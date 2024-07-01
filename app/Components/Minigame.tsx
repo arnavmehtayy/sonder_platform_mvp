@@ -4,6 +4,7 @@ import Experience from "./visualexp";
 import Link from "next/link";
 
 import { useStore,setInteractobjvalueSelector, controlsSelector, InteraobjvalueSelector} from "../store"
+import NumSlide from "./NumSlider";
 
 export function Minigame({ page }: { page: number }) {
   const [text, setText] = useState("This is a test question? ");
@@ -35,22 +36,8 @@ export function Minigame({ page }: { page: number }) {
           </Link>
         </div>
 
-        <div
-          className="flex justify-end"
-          style={{ width: "300px", margin: "50px auto", textAlign: "center" }}
-        >
-          <input
-            type="range"
-            min = {getControl(test_id)?.range[0].toString()}
-            max= {getControl(test_id)?.range[1].toString()}
-            step={1}
-            value={getValue(test_id)}
-            onChange={(e) => {setValue(test_id, Number(e.target.value))}
-          }
-            style={{ width: "100%" }}
-          />
-          <p>Value: {getValue(test_id)}</p>
-        </div>
+        <NumSlide control_id={1} />
+        <NumSlide control_id={3} />
       </div>
     </>
   );
