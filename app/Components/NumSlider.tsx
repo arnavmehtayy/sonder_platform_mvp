@@ -6,7 +6,7 @@ import {
 } from "../store";
 
 export default function NumSlide({ control_id }: { control_id: number }) {
-  const setValue = useStore(setInteractobjvalueSelector);
+  const setValue = useStore(setInteractobjvalueSelector); // selects based on object id
   const getControl = useStore(controlsSelector); // selects based on control id
   const getValue = useStore(InteraobjvalueSelector); // selects based on object id
 

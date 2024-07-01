@@ -3,20 +3,49 @@ import { vizobj } from "@/classes/vizobj";
 import * as THREE from "three";
 import { Interactobj } from "@/classes/interactobj";
 import { step } from "three/examples/jsm/nodes/Nodes.js";
+import { Influence } from "@/classes/influence";
 
 type State = {
   vizobjs: vizobj[];
   controls: Interactobj[] | null;
+  influences: Influence[] | null;
   setVizobjpos: (id: number, x: number, y: number) => void;
   setVizobjscale: (id: number, scale: THREE.Vector3) => void;
   setVizobjrot: (id: number, rot: THREE.Vector3) => void;
   setInteractobjvalue: (id: number, value: number) => void;
 };
 
-const controlData: Interactobj[] = [
-  new Interactobj({id: 1, obj_id: 2, action: "rotate", range: [-4, 4], step_size: 0.1}),
+const influencesData: Influence[] = [
+  new Influence({
+    influence_id: 1,
+    master_id: 2,
+    worker_id: 1,
+    action: "rotate",
+  }),
+  new Influence({
+    influence_id: 2,
+    master_id: 1,
+    worker_id: 2,
+    action: "move",
+  }),
+];
 
-  new Interactobj({id: 3, obj_id: 1, action: "move", range: [-10, 10], step_size: 2}),
+const controlData: Interactobj[] = [
+  new Interactobj({
+    id: 1,
+    obj_id: 2,
+    action: "rotate",
+    range: [-4, 4],
+    step_size: 0.1,
+  }),
+
+  new Interactobj({
+    id: 3,
+    obj_id: 1,
+    action: "move",
+    range: [-10, 10],
+    step_size: 2,
+  }),
 ];
 
 const canvasData: vizobj[] = [
@@ -40,6 +69,8 @@ const canvasData: vizobj[] = [
 
 export const useStore = create<State>((set) => ({
   controls: controlData,
+
+  influences: influencesData,
 
   vizobjs: canvasData,
 

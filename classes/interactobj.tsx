@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 
-type action_typ = "move" | "rotate" | "scale";
+export type action_typ = "move" | "rotate" | "scale";
 
 export class Interactobj {
 

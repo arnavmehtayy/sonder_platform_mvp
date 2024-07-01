@@ -2,6 +2,15 @@ import * as THREE from "three";
 import { useStore, vizobjsSelector } from "@/app/store";
 import { shallow } from "zustand/shallow";
 
+/*
+  * This component handles the rendering of a single object in the scene.
+  * It takes in an id and renders the object with that id.
+  * If the object is not found, it logs an error to the console.
+  * This component is used in the Experience component.
+
+
+*/
+
 export function Showobj({ id }: { id: number }) {
   const objselector = useStore(vizobjsSelector);
 
@@ -22,10 +31,6 @@ export function Showobj({ id }: { id: number }) {
       <meshBasicMaterial color={obj.color} />
     </mesh> : null
   );
-  // return (
-  //     <mesh position={[vizobjs[id-1].position.x, vizobjs[id-1].position.y, 0]}>
-  //       <primitive object={vizobjs[id-1].geom} attach="geometry" />
-  //       <meshBasicMaterial color={vizobjs[id-1].color} />
-  //     </mesh>
-  //   );
 }
+
+

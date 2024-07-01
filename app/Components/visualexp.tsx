@@ -1,22 +1,21 @@
 "use client";
-import React, { useRef, useState, useEffect } from "react";
-import { useControls, button } from "leva";
-
-import { Canvas, useFrame } from "@react-three/fiber";
+import React from "react";
+import { useControls } from "leva";
+import { Canvas } from "@react-three/fiber";
 import { 
   OrthographicCamera,
   OrbitControls,
-  PerspectiveCamera,
-  MapControls,
-  TransformControls,
   Stats,
 } from "@react-three/drei";
-import * as THREE from "three";
-import { cameraPosition } from "three/examples/jsm/nodes/Nodes.js";
-import { vizobj } from "../../classes/vizobj";
 import { Showobj } from "./three/Showobj";
 import { useStore, objectsSelector} from "../store"
 
+/*
+  * This component is the main visual experience component.
+  * It displays all the objects in the object list
+  * and allows the user to interact with the scene.
+  * The camera position is controlled by the useControls hook.
+*/
 
 // function CameraHelper() {
 //   const camera = new THREE.OrthographicCamera(20, -20, 20, -20, 1, 100);
@@ -24,17 +23,7 @@ import { useStore, objectsSelector} from "../store"
 // }
 
 export default function Experience() {
-  // const [aspectRatio, setAspectRatio] = useState(1);
 
-  // useEffect(() => {
-  //   // This code only runs on the client-side
-  //   if (typeof window !== 'undefined') {
-  //     const aspect = window.innerWidth/window.innerHeight;
-  //     setAspectRatio(aspect);
-  //     console.log(aspect)
-  //   }
-  // }, []);
-  // const aspect = window.innerWidth / window.innerHeight;
   const objectlist = useStore(objectsSelector);
   const { camera_pos } = useControls("cam", {
     camera_pos: {
@@ -47,12 +36,12 @@ export default function Experience() {
     <Canvas>
       <OrthographicCamera
         makeDefault
-        zoom={15}
+        zoom={15} // Zoom level
         // top={20}
         // bottom={-20}
         // left={20 }
         // right={-20 }
-        position={camera_pos}
+        position={camera_pos} // Camera position controls by useControls
       />
 
       <OrbitControls
@@ -86,11 +75,13 @@ export default function Experience() {
 
       <>
         { objectlist.map((obj, index) =>
-          <Showobj key={index} id={obj.id}/> // we are prop drilling here so could change to context
-        )}
+          <Showobj key={index} id={obj.id}/> 
+        )} 
+        {/* Show all objects in the object list */}
       </>
 
-      <Stats />
-    </Canvas>
+      <Stats /> 
+      {/* Display performance stats */}
+    </Canvas> 
   );
 }
