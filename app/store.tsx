@@ -9,9 +9,6 @@ type State = {
   vizobjs: vizobj[];
   controls: Interactobj[] | null;
   influences: Influence[] | null;
-  setVizobjpos: (id: number, x: number, y: number) => void;
-  setVizobjscale: (id: number, scale: THREE.Vector3) => void;
-  setVizobjrot: (id: number, rot: THREE.Vector3) => void;
   setInteractobjvalue: (id: number, value: number) => void;
 };
 
@@ -74,24 +71,6 @@ export const useStore = create<State>((set) => ({
 
   vizobjs: canvasData,
 
-  setVizobjpos: (id, x, y) =>
-    set((state) => ({
-      vizobjs: state.vizobjs.map((obj) =>
-        obj.id === id ? { ...obj, position: new THREE.Vector2(x, y) } : obj
-      ),
-    })),
-  setVizobjscale: (id, scale) =>
-    set((state) => ({
-      vizobjs: state.vizobjs.map((obj) =>
-        obj.id === id ? { ...obj, scale } : obj
-      ),
-    })),
-  setVizobjrot: (id, rot) =>
-    set((state) => ({
-      vizobjs: state.vizobjs.map((obj) =>
-        obj.id === id ? { ...obj, rotation: rot } : obj
-      ),
-    })),
   setInteractobjvalue: (control_id, value) =>
     set((state) => ({
       vizobjs: state.vizobjs.map((viz) => {
@@ -131,12 +110,9 @@ export const useStore = create<State>((set) => ({
 }));
 
 export const objectsSelector = (state: State) => state.vizobjs;
-export const setVizobjposSelector = (state: State) => state.setVizobjpos;
-export const setVizobjscaleSelector = (state: State) => state.setVizobjscale;
-export const setVizobjrotSelector = (state: State) => state.setVizobjrot;
 export const setInteractobjvalueSelector = (state: State) =>
   state.setInteractobjvalue;
-export const vizobjsSelector = (state: State) => (id: number) =>
+export const vizobjsSelector =  (id: number) => (state: State) =>
   state.vizobjs.find((obj) => obj.id === id);
 export const controlsSelector = (state: State) => (control_id: number) =>
   state.controls?.find((obj) => obj.id === control_id);
