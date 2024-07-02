@@ -18,12 +18,14 @@ const influencesData: Influence[] = [
     master_id: 2,
     worker_id: 1,
     action: "rotate",
+    transformation: (value) => value
   }),
   new Influence({
     influence_id: 2,
     master_id: 1,
     worker_id: 2,
     action: "move",
+    transformation: (value) => value
   }),
 ];
 
@@ -31,9 +33,9 @@ const controlData: Interactobj[] = [
   new Interactobj({
     id: 1,
     obj_id: 2,
-    action: "rotate",
-    range: [-4, 4],
-    step_size: 0.1,
+    action: "scale",
+    range: [1, 10],
+    step_size: 1,
   }),
 
   new Interactobj({
