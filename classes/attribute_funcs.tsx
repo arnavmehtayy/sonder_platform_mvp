@@ -1,6 +1,12 @@
 import { Vector2, Vector3 } from "three";
 import { vizobj } from "./vizobj";
 
+/*
+    * This file contains the functions to get and set the attributes of a vizobj.
+    * These functions are used in the ControlObj class to get and set the attributes of an object.
+
+*/
+
 export function get_position(obj: vizobj): Vector2 {
     return obj.position;
 }

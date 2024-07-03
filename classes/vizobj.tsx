@@ -1,14 +1,19 @@
 import * as THREE from "three";
-import { Interactobj } from "./interactobj";
+import { ControlObj } from "./ControlObj";
+
+/*
+  * This class stores the attributes of a visual object in the scene.
+  * This is the ground truth data that is used to render the object in the scene.
+
+*/
 
 export class vizobj {
-  id: number = 0;
+  id: number = 0; // Every object has a unique id
   position: THREE.Vector2;
   rotation: THREE.Vector3;
   scale: THREE.Vector3;
   color: string = "blue";
   geom: THREE.BufferGeometry;
-
 
   constructor(
     id: number = 0,

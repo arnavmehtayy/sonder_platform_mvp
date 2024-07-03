@@ -1,7 +1,7 @@
 import * as THREE from "three";
-import { useStore, vizobjsSelector } from "@/app/store";
+import { useStore, getObjectSelector } from "@/app/store";
 import { shallow } from "zustand/shallow";
-import React, {memo} from "react";
+import React, { memo } from "react";
 
 /*
   * This component handles the rendering of a single object in the scene.
@@ -13,10 +13,8 @@ import React, {memo} from "react";
 
 */
 
-
-
 export const Showobj = memo(({ id }: { id: number }) => {
-  const obj = useStore(vizobjsSelector(id));
+  const obj = useStore(getObjectSelector(id));
 
   if (!obj) {
     console.log("No object found for id Showobj: ", id);
@@ -34,6 +32,3 @@ export const Showobj = memo(({ id }: { id: number }) => {
     </mesh>
   );
 });
-
-
-

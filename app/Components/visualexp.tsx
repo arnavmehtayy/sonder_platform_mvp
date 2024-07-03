@@ -2,20 +2,16 @@
 import React from "react";
 import { useControls } from "leva";
 import { Canvas } from "@react-three/fiber";
-import { 
-  OrthographicCamera,
-  OrbitControls,
-  Stats,
-} from "@react-three/drei";
+import { OrthographicCamera, OrbitControls, Stats } from "@react-three/drei";
 import { Showobj } from "./three/Showobj";
-import { useStore, objectsSelector} from "../store"
+import { useStore, getObjectsSelector } from "../store";
 
 /*
-  * This component is the main visual experience component.
-  * It displays all the objects in the object list
-  * and allows the user to interact with the scene.
-  * The camera position is controlled by the useControls hook.
-*/
+ * This component is the main visual experience component.
+ * It displays all the objects in the object list
+ * and allows the user to interact with the scene.
+ * The camera position is controlled by the useControls hook.
+ */
 
 // function CameraHelper() {
 //   const camera = new THREE.OrthographicCamera(20, -20, 20, -20, 1, 100);
@@ -23,8 +19,7 @@ import { useStore, objectsSelector} from "../store"
 // }
 
 export default function Experience() {
-
-  const objectlist = useStore(objectsSelector);
+  const objectlist = useStore(getObjectsSelector);
   const { camera_pos } = useControls("cam", {
     camera_pos: {
       value: [0, 0, 2],
@@ -74,14 +69,14 @@ export default function Experience() {
       </mesh> */}
 
       <>
-        { objectlist.map((obj, index) =>
-          <Showobj key={index} id={obj.id}/> 
-        )} 
+        {objectlist.map((obj, index) => (
+          <Showobj key={index} id={obj.id} />
+        ))}
         {/* Show all objects in the object list */}
       </>
 
-      <Stats /> 
+      <Stats />
       {/* Display performance stats */}
-    </Canvas> 
+    </Canvas>
   );
 }

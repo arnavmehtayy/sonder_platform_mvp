@@ -1,19 +1,26 @@
 import {
   useStore,
-  setInteractobjvalueSelector,
-  controlsSelector,
-  InteraobjvalueSelector,
+  setControlValueSelector,
+  getControlSelector,
+  getControlValueSelector,
 } from "../store";
 
+/*
+  * This component is a number slider that allows the user to control a numerical value.
+  * It takes in a control_id and renders a slider that controls using the setControlValueSelector
+  * This will update the state of the object that the control is associated with.
+  * DO NOT USE THE set_attribute FUNCTION DIRECTLY. USE THE setControlValueSelector INSTEAD.
+*/
+
 export default function NumSlide({ control_id }: { control_id: number }) {
-  const setValue = useStore(setInteractobjvalueSelector); // selects based on object id
-  const getControl = useStore(controlsSelector); // selects based on control id
-  const getValue = useStore(InteraobjvalueSelector); // selects based on object id
+  const setValue = useStore(setControlValueSelector); // function that sets the value of a control given its control_id
+  // (control_id: number, valueToSet: number) => void;
+  const getControl = useStore(getControlSelector); // get the control object based on its id
+  const getValue = useStore(getControlValueSelector); // gets the value associated with the control based on the control_id
 
   const controller = getControl(control_id);
 
-  return (
-    controller ?
+  return controller ? (
     <div
       className="flex justify-end"
       style={{ width: "300px", margin: "50px auto", textAlign: "center" }}
@@ -30,6 +37,6 @@ export default function NumSlide({ control_id }: { control_id: number }) {
         style={{ width: "100%" }}
       />
       <p>Value: {getValue(control_id)}</p>
-    </div> : null
-  );
+    </div>
+  ) : null;
 }
