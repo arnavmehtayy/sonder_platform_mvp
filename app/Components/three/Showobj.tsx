@@ -14,8 +14,6 @@ import { TransformControls } from "@react-three/drei";
 
 */
 
-
-
 export const Showobj = memo(({ id }: { id: number }) => {
   const obj = useStore(getObjectSelector(id));
   const object_ref = useRef<THREE.Mesh>(null);
@@ -25,7 +23,7 @@ export const Showobj = memo(({ id }: { id: number }) => {
     if (object_ref.current) {
       setControlsEnabled(true);
     }
-  }, [object_ref.current]);  // Enable controls when the object has been loaded i.e has a non-null reference
+  }, [object_ref.current]); // Enable controls when the object has been loaded i.e has a non-null reference
 
   if (!obj) {
     console.log("No object found for id Showobj: ", id);
@@ -49,7 +47,8 @@ export const Showobj = memo(({ id }: { id: number }) => {
           showZ={false}
           object={object_ref.current}
         />
-      )} {/* we are adding object_ref.current to the and condition to keep typescript happy */}
+      )}
+      {/* we are adding object_ref.current to the and condition to keep typescript happy */}
     </>
   );
 });
