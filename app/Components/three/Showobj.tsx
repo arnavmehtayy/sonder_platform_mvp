@@ -133,10 +133,9 @@ export const Showobj = memo(({ id }: { id: number }) => {
         </>
       )} */}
 
-      {controlsEnabled && touch_scale && <GeneralTransformControl mode="scale" vizObjId={id} touchControl={obj.touch_controls.scale}  ref={object_ref}/>}
-      {controlsEnabled && touch_rotate && <GeneralTransformControl mode="rotate" vizObjId={id} touchControl={obj.touch_controls.rotate} ref={object_ref}/>}
-      {controlsEnabled && touch_translate && <GeneralTransformControl mode="translate" vizObjId={id} touchControl={obj.touch_controls.translate}  ref={object_ref}/>}
-      {/* we are adding object_ref.current to the and condition to keep typescript happy */}
+      {controlsEnabled && touch_scale && <GeneralTransformControl mode="scale" vizObjId={id} touchControl={obj.touch_controls.scale}  obj_ref={object_ref}/>}
+      {controlsEnabled && touch_rotate && <GeneralTransformControl mode="rotate" vizObjId={id} touchControl={obj.touch_controls.rotate} obj_ref={object_ref}/>}
+      {controlsEnabled && touch_translate && <GeneralTransformControl mode="translate" vizObjId={id} touchControl={obj.touch_controls.translate}  obj_ref={object_ref}/>}
     </>
   );
 });
