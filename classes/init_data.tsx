@@ -61,5 +61,11 @@ export const canvasData: vizobj[] = [
     geom: new THREE.PlaneGeometry(4, 4),
     position: new THREE.Vector2(8,0),
     color: "red",
-  }),
+    touch_controls: new TouchControl({
+        scale: {
+            direction: [true, true, false],
+            range: [1, 10],
+            step_size: 1,
+        },
+  })}),
 ];

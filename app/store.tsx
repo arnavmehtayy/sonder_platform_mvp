@@ -32,9 +32,11 @@ export const useStore = create<State>((set) => ({
 
   vizobjs: canvasData,
 
-  setVizObj: (id: number, new_obj: vizobj) => set((state) => ({
+  setVizObj: (id: number, new_obj: vizobj) => {set((state) => ({
     vizobjs: state.vizobjs.map((obj) => obj.id === id ? new_obj : obj)
-  })),
+  }))
+},
+
 
   setControlValue: (control_id, value) =>
     set((state) => ({

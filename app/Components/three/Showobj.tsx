@@ -1,9 +1,11 @@
 import * as THREE from "three";
 import { useStore, getObjectSelector, setVizObjSelector } from "@/app/store";
-import { shallow } from "zustand/shallow";
 import React, { memo, useRef, useState, useEffect } from "react";
 import { TransformControls } from "@react-three/drei";
 import { TouchControl } from "@/classes/TouchControl";
+import { useDebouncedCallback } from "use-debounce";
+import { vizobj } from "@/classes/vizobj";
+import { GeneralTransformControl } from "./GeneralTransCont";
 
 /*
   * This component handles the rendering of a single object in the scene.
@@ -35,9 +37,50 @@ export const Showobj = memo(({ id }: { id: number }) => {
     return null;
   }
 
+  const handleTransformationChange = useDebouncedCallback((mode: string) => {
+    if (obj && object_ref.current) {
+      let transformValue: THREE.Vector3;
+      let updatedObj: vizobj;
+      switch (mode) {
+        case "scale":
+          transformValue = object_ref.current.scale;
+          updatedObj = TouchControl.populate_vizobj({
+            vizobj: obj,
+            scale: transformValue,
+          });
+          break;
+        case "rotate":
+          transformValue = new THREE.Vector3(
+            object_ref.current.rotation.x,
+            object_ref.current.rotation.y,
+            object_ref.current.rotation.z
+          );
+          updatedObj = TouchControl.populate_vizobj({
+            vizobj: obj,
+            rotation: transformValue,
+          });
+          break;
+        case "translate":
+          transformValue = object_ref.current.position;
+          updatedObj = TouchControl.populate_vizobj({
+            vizobj: obj,
+            position: transformValue,
+          });
+          break;
+        default:
+          throw new Error("Invalid mode");
+      }
+
+      setVizObj(id, updatedObj);
+    }
+  }, 100);
+
+
+
+
   return (
     <>
-      <mesh
+       <mesh
         position={[obj.position.x, obj.position.y, 0]}
         rotation={[obj.rotation.x, obj.rotation.y, obj.rotation.z]}
         scale={[obj.scale.x, obj.scale.y, obj.scale.z]}
@@ -46,19 +89,12 @@ export const Showobj = memo(({ id }: { id: number }) => {
         <primitive object={obj.geom} attach="geometry" />
         <meshBasicMaterial color={obj.color} />
       </mesh>
+      {/*
       {controlsEnabled && object_ref.current && (
         <>
           {touch_scale ? (
             <TransformControls
-              onObjectChange={() =>
-                setVizObj(
-                  id,
-                  TouchControl.populate_vizobj({
-                    vizobj: obj,
-                    scale: object_ref.current?.scale,
-                  })
-                )
-              }
+              onObjectChange={() => handleTransformationChange("scale")}
               showX={touch_scale.direction[0]}
               showY={touch_scale.direction[1]}
               showZ={touch_scale.direction[2]}
@@ -71,19 +107,7 @@ export const Showobj = memo(({ id }: { id: number }) => {
 
           {touch_rotate ? (
             <TransformControls
-              onObjectChange={() =>
-                setVizObj(
-                  id,
-                  TouchControl.populate_vizobj({
-                    vizobj: obj,
-                    rotation: new THREE.Vector3(
-                      object_ref.current?.rotation.x,
-                      object_ref.current?.rotation.y,
-                      object_ref.current?.rotation.z
-                    ),
-                  })
-                )
-              }
+              onObjectChange={() => handleTransformationChange("rotate")}
               showX={touch_rotate.direction[0]}
               showY={touch_rotate.direction[1]}
               showZ={touch_rotate.direction[2]}
@@ -96,15 +120,7 @@ export const Showobj = memo(({ id }: { id: number }) => {
 
           {touch_translate ? (
             <TransformControls
-              onObjectChange={() =>
-                setVizObj(
-                  id,
-                  TouchControl.populate_vizobj({
-                    vizobj: obj,
-                    position: object_ref.current?.position,
-                  })
-                )
-              }
+              onObjectChange={() => handleTransformationChange("translate")}
               showX={touch_translate.direction[0]}
               showY={touch_translate.direction[1]}
               showZ={touch_translate.direction[2]}
@@ -115,7 +131,11 @@ export const Showobj = memo(({ id }: { id: number }) => {
             />
           ) : null}
         </>
-      )}
+      )} */}
+
+      {controlsEnabled && touch_scale && <GeneralTransformControl mode="scale" vizObjId={id} touchControl={obj.touch_controls.scale}  ref={object_ref}/>}
+      {controlsEnabled && touch_rotate && <GeneralTransformControl mode="rotate" vizObjId={id} touchControl={obj.touch_controls.rotate} ref={object_ref}/>}
+      {controlsEnabled && touch_translate && <GeneralTransformControl mode="translate" vizObjId={id} touchControl={obj.touch_controls.translate}  ref={object_ref}/>}
       {/* we are adding object_ref.current to the and condition to keep typescript happy */}
     </>
   );
