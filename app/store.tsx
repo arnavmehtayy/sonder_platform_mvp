@@ -1,6 +1,6 @@
 import { create } from "zustand";
 import { vizobj } from "@/classes/vizobj";
-import { ControlObj } from "../classes/ControlObj";
+import { SliderControl } from "../classes/SliderControl";
 import { Influence } from "../classes/influence";
 import { influencesData, controlData, canvasData } from "@/classes/init_data";
 
@@ -12,15 +12,17 @@ import { influencesData, controlData, canvasData } from "@/classes/init_data";
  * - getObjectSelector: returns a function that gets an object by id
  * - getControlSelector: returns a function that gets a control by id
  * - getControlValueSelector: returns a function that gets the value of a control by id
+ * - setVizObjSelector: returns a function that sets the value of a vizobj by id
 
  */
 
 // Define the state type
 type State = {
   vizobjs: vizobj[];
-  controls: ControlObj[] | null;
+  controls: SliderControl[] | null;
   influences: Influence[] | null;
   setControlValue: (id: number, value: number) => void;
+  setVizObj: (id: number, new_obj: vizobj) => void;
 };
 
 export const useStore = create<State>((set) => ({
@@ -29,6 +31,10 @@ export const useStore = create<State>((set) => ({
   influences: influencesData,
 
   vizobjs: canvasData,
+
+  setVizObj: (id: number, new_obj: vizobj) => set((state) => ({
+    vizobjs: state.vizobjs.map((obj) => obj.id === id ? new_obj : obj)
+  })),
 
   setControlValue: (control_id, value) =>
     set((state) => ({
@@ -43,6 +49,8 @@ export const useStore = create<State>((set) => ({
 }));
 
 export const getObjectsSelector = (state: State) => state.vizobjs;
+
+export const setVizObjSelector = (state: State) => state.setVizObj;
 
 export const setControlValueSelector = (state: State) => state.setControlValue;
 

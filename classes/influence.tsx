@@ -1,4 +1,4 @@
-import { action_typ } from "./ControlObj";
+import { action_typ } from "./SliderControl";
 
 export class Influence {
   influence_id: number;

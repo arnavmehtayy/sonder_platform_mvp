@@ -1,5 +1,6 @@
 import { Influence } from "./influence";
-import { ControlObj } from "./ControlObj";
+import { SliderControl } from "./SliderControl";
+import { TouchControl } from "./TouchControl";
 import { vizobj } from "./vizobj";
 import * as THREE from "three";
 
@@ -24,16 +25,15 @@ export const influencesData: Influence[] = [
   }),
 ];
 
-export const controlData: ControlObj[] = [
-  new ControlObj({
+export const controlData: SliderControl[] = [
+  new SliderControl({
     id: 1,
     obj_id: 2,
     action: "scale",
-    range: [1, 10],
-    step_size: 1,
+    range: [1, 10]
   }),
 
-  new ControlObj({
+  new SliderControl({
     id: 3,
     obj_id: 1,
     action: "move",
@@ -43,20 +43,23 @@ export const controlData: ControlObj[] = [
 ];
 
 export const canvasData: vizobj[] = [
-  new vizobj(
-    1,
-    new THREE.Vector2(-10, 2),
-    new THREE.Vector3(0, 0, 0),
-    new THREE.Vector3(1, 1, 1),
-    new THREE.PlaneGeometry(4, 4),
-    "green"
-  ),
-  new vizobj(
-    2,
-    new THREE.Vector2(2, 2),
-    new THREE.Vector3(0, 0, 0),
-    new THREE.Vector3(1, 1, 1),
-    new THREE.PlaneGeometry(4, 4),
-    "red"
-  ),
+  new vizobj({
+    id: 1,
+    geom: new THREE.PlaneGeometry(4, 4),
+    color: "green",
+    touch_controls: new TouchControl({
+        translate: {
+            direction: [true, true, false],
+            range: [-10, 10],
+            step_size: 1,
+        },
+    }),
+  }),
+
+  new vizobj({
+    id: 2,
+    geom: new THREE.PlaneGeometry(4, 4),
+    position: new THREE.Vector2(8,0),
+    color: "red",
+  }),
 ];

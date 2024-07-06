@@ -1,5 +1,6 @@
 import * as THREE from "three";
-import { ControlObj } from "./ControlObj";
+import { SliderControl } from "./SliderControl";
+import { TouchControl } from "./TouchControl";
 
 /*
   * This class stores the attributes of a visual object in the scene.
@@ -7,27 +8,31 @@ import { ControlObj } from "./ControlObj";
 
 */
 
+
 export class vizobj {
-  id: number = 0; // Every object has a unique id
+  id: number;
   position: THREE.Vector2;
   rotation: THREE.Vector3;
   scale: THREE.Vector3;
-  color: string = "blue";
+  color: string;
   geom: THREE.BufferGeometry;
+  touch_controls: TouchControl;
 
-  constructor(
-    id: number = 0,
-    position: THREE.Vector2,
-    rotation: THREE.Vector3 = new THREE.Vector3(0, 0, 0),
-    scale: THREE.Vector3 = new THREE.Vector3(1, 1, 1),
-    geom: THREE.BufferGeometry,
-    color: string
-  ) {
-    this.position = position;
-    this.geom = geom;
-    this.color = color;
+  constructor({
+    id,
+    position = new THREE.Vector2(0, 0),
+    rotation = new THREE.Vector3(0, 0, 0),
+    scale = new THREE.Vector3(1, 1, 1),
+    color = 'blue',
+    geom, // geom remains a required parameter
+    touch_controls = new TouchControl(),
+  }: Partial<vizobj> & { geom: THREE.BufferGeometry, id: number }) {
     this.id = id;
+    this.position = position;
     this.rotation = rotation;
     this.scale = scale;
+    this.color = color;
+    this.geom = geom;
+    this.touch_controls = touch_controls;
   }
 }
