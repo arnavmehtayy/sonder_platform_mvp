@@ -6,11 +6,11 @@ import {
 } from "../store";
 
 /*
-  * This component is a number slider that allows the user to control a numerical value.
-  * It takes in a control_id and renders a slider that controls using the setControlValueSelector
-  * This will update the state of the object that the control is associated with.
-  * DO NOT USE THE set_attribute FUNCTION DIRECTLY. USE THE setControlValueSelector INSTEAD.
-*/
+ * This component is a number slider that allows the user to control a numerical value.
+ * It takes in a control_id and renders a slider that controls using the setControlValueSelector
+ * This will update the state of the object that the control is associated with.
+ * DO NOT USE THE set_attribute FUNCTION DIRECTLY. USE THE setControlValueSelector INSTEAD.
+ */
 
 export default function NumSlide({ control_id }: { control_id: number }) {
   const setValue = useStore(setControlValueSelector); // function that sets the value of a control given its control_id
@@ -22,24 +22,21 @@ export default function NumSlide({ control_id }: { control_id: number }) {
 
   return controller ? (
     <div
-      className="flex justify-end"
-      style={{ width: "300px", margin: "50px auto", textAlign: "center" }}
-    >
-      <input
-        type="range"
-        min={controller?.range[0].toString()}
-        max={controller?.range[1].toString()}
-        step={controller.step_size}
-        value={getValue(control_id)}
-        onChange={(e) => {
-          console.log(e.target.value, Number(e.target.value));
-          setValue(control_id, Number(e.target.value));
-        }}
-        style={{ width: "100%" }}
-      />
-      <p>Value: {getValue(control_id)}</p>
-    </div>
+  className="flex flex-col items-center justify-center mx-auto my-12 space-y-4"
+  style={{ width: "300px" }}
+>
+  <input
+    className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer dark:bg-gray-900"
+    type="range"
+    min={controller?.range[0].toString()}
+    max={controller?.range[1].toString()}
+    step={controller.step_size}
+    value={getValue(control_id)}
+    onChange={(e) => {
+      setValue(control_id, Number(e.target.value));
+    }}
+  />
+  <p className="text-lg font-semibold text-blue-600">Value: {getValue(control_id)}</p>
+</div>
   ) : null;
 }
-
-
