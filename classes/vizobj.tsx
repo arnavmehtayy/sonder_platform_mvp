@@ -8,7 +8,6 @@ import { TouchControl } from "./TouchControl";
 
 */
 
-
 export class vizobj {
   id: number;
   position: THREE.Vector2;
@@ -17,16 +16,18 @@ export class vizobj {
   color: string;
   geom: THREE.BufferGeometry;
   touch_controls: TouchControl;
+  param_t: number; // if we have a parametric curve, this is the parameter value
 
   constructor({
     id,
     position = new THREE.Vector2(0, 0),
     rotation = new THREE.Vector3(0, 0, 0),
     scale = new THREE.Vector3(1, 1, 1),
-    color = 'blue',
+    color = "blue",
     geom, // geom remains a required parameter
     touch_controls = new TouchControl(),
-  }: Partial<vizobj> & { geom: THREE.BufferGeometry, id: number }) {
+    param_t = 0,
+  }: Partial<vizobj> & { geom: THREE.BufferGeometry; id: number }) {
     this.id = id;
     this.position = position;
     this.rotation = rotation;
@@ -34,5 +35,6 @@ export class vizobj {
     this.color = color;
     this.geom = geom;
     this.touch_controls = touch_controls;
+    this.param_t = param_t;
   }
 }

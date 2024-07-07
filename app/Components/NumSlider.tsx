@@ -32,6 +32,7 @@ export default function NumSlide({ control_id }: { control_id: number }) {
         step={controller.step_size}
         value={getValue(control_id)}
         onChange={(e) => {
+          console.log(e.target.value, Number(e.target.value));
           setValue(control_id, Number(e.target.value));
         }}
         style={{ width: "100%" }}
@@ -40,3 +41,5 @@ export default function NumSlide({ control_id }: { control_id: number }) {
     </div>
   ) : null;
 }
+
+

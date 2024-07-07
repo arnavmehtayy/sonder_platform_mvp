@@ -15,6 +15,10 @@ export function set_position(obj: vizobj, value: Vector2): vizobj {
     return { ...obj , position: value};
 }
 
+export function set_path_pos(obj: vizobj, value: Vector2, t: number): vizobj {
+    return { ...obj , position: value, param_t: t};
+}
+
 export function get_rotation(obj: vizobj): Vector3 {
     return obj.rotation;
 }

@@ -37,8 +37,8 @@ export const controlData: SliderControl[] = [
     id: 3,
     obj_id: 1,
     action: "move",
-    range: [-10, 10],
-    step_size: 2,
+    range: [-2, 2],
+    step_size: 0.25,
   }),
 ];
 
@@ -53,7 +53,7 @@ export const canvasData: vizobj[] = [
             range: [-10, 10],
             step_size: 1,
         },
-    }),
+    })
   }),
 
   new vizobj({

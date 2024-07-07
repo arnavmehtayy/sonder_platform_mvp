@@ -11,7 +11,8 @@ import * as att_funcs from "./attribute_funcs";
 
 */
 
-export type action_typ = "move" | "rotate" | "scale";
+export type action_typ = "move" | "rotate" | "scale" | "path";
+export type Parametric_curve = ((t: number) => THREE.Vector2) 
 
 export class SliderControl {
   obj_id: number; // This is the id of the object that we want to control
@@ -19,21 +20,25 @@ export class SliderControl {
   action: action_typ; // This is the type of the action that we want for our object
   range: [number, number]; // This is the range of the control
   step_size: number; // This is the step size of the control
+  param_curve: Parametric_curve; // This is the parametric curve that the control should follow
   get_attribute: (obj: vizobj) => number; // Function to get the attribute of the object
   set_attribute: (obj: vizobj, value: number) => vizobj; // Function to set the attribute of the object
+
 
   constructor({
     id,
     obj_id,
     action,
     range,
-    step_size = 1
+    step_size = 1,
+    param_curve = (t: number) => new THREE.Vector2(5 * Math.sin(t),5 * Math.cos(t)), // default to a line
   }: Partial<SliderControl> & { id: number; obj_id: number; action: action_typ; range: [number, number] }) {
     this.id = id;
     this.obj_id = obj_id;
     this.action = action;
     this.range = range;
     this.step_size = step_size;
+    this.param_curve = param_curve;
 
     // Determine attribute functions based on the action type
     switch (this.action) {
@@ -51,6 +56,10 @@ export class SliderControl {
         this.get_attribute = (obj: vizobj) => att_funcs.get_scale(obj).x;
         this.set_attribute = (obj: vizobj, value: number) =>
           att_funcs.set_scale(obj, new THREE.Vector3(value, att_funcs.get_scale(obj).y, att_funcs.get_scale(obj).z));
+        break;
+      case "path": // rewrite this to use the parametric curve
+        this.get_attribute = (obj: vizobj) => obj.param_t ? obj.param_t : 0;
+        this.set_attribute = (obj: vizobj, t: number) => att_funcs.set_path_pos(obj, this.param_curve(t), t);
         break;
     }
   }
