@@ -1,8 +1,8 @@
-import { create } from "zustand";
-import { vizobj } from "@/classes/vizobj";
-import { SliderControl } from "../classes/SliderControl";
-import { Influence } from "../classes/influence";
-import { influencesData, controlData, canvasData } from "@/classes/init_data";
+// import { create } from "zustand";
+// import { vizobj } from "@/classes/vizobj";
+// import { SliderControl } from "../classes/SliderControl";
+// import { Influence } from "../classes/influence";
+// import { influencesData, controlData, canvasData } from "@/classes/init_data";
 
 /*
  * This file is a store that uses zustand to manage the state of the application.
@@ -17,55 +17,67 @@ import { influencesData, controlData, canvasData } from "@/classes/init_data";
  */
 
 // Define the state type
-type State = {
-  vizobjs: vizobj[];
-  controls: SliderControl[] | null;
+import { create } from "zustand";
+import { vizobj } from "@/classes/vizobj";
+import { SliderControl } from "../classes/SliderControl";
+import { Influence } from "../classes/influence";
+import { influencesData, controlData, canvasData } from "@/classes/init_data";
+
+// Define the state type
+export type State = {
+  vizobjs: { [id: number]: vizobj };
+  controls: { [id: number]: SliderControl };
   influences: Influence[] | null;
-  setControlValue: (id: number, value: number) => void;
+  setControlValue: (id: number) => (value: number) => void;
   setVizObj: (id: number, new_obj: vizobj) => void;
 };
 
 export const useStore = create<State>((set) => ({
-  controls: controlData,
+  controls: controlData.reduce((acc, control) => {
+    acc[control.id] = control;
+    return acc;
+  }, {} as { [id: number]: SliderControl }),
 
   influences: influencesData,
 
-  vizobjs: canvasData,
+  vizobjs: canvasData.reduce((acc, obj) => {
+    acc[obj.id] = obj;
+    return acc;
+  }, {} as { [id: number]: vizobj }),
 
-  setVizObj: (id: number, new_obj: vizobj) => {set((state) => ({
-    vizobjs: state.vizobjs.map((obj) => obj.id === id ? new_obj : obj)
-  }))
-},
+  setVizObj: (id: number, new_obj: vizobj) => set((state) => ({
+    vizobjs: { ...state.vizobjs, [id]: new_obj }
+  })),
 
+  setControlValue: (control_id: number) => (value: number) => set((state) => {
+  // Retrieve the control associated with the control_id
+  const control = state.controls[control_id];
 
-  setControlValue: (control_id, value) =>
-    set((state) => ({
-      vizobjs: state.vizobjs.map((viz) => {
-        const control = state.controls?.find(
-          (ctrl) => ctrl.id === control_id && ctrl.obj_id === viz.id
-        );
+  // Check if the control exists and if there is a corresponding vizobj
+  if (control && state.vizobjs[control.obj_id]) {
+    const obj_id = control.obj_id;
+    const viz = state.vizobjs[obj_id];
 
-        return control ? control.set_attribute(viz, value) : viz;
-      }),
-    })),
+    // Update only the specific vizobj affected by the control change
+    return {
+      vizobjs: {
+        ...state.vizobjs,
+        [obj_id]: control.set_attribute(viz, value)
+      }
+    };
+  }
+
+  return state; // Return the current state if no updates are required
+}),
 }));
 
-export const getObjectsSelector = (state: State) => state.vizobjs;
-
+export const getObjectsSelector = (state: State) => Object.values(state.vizobjs);
 export const setVizObjSelector = (state: State) => state.setVizObj;
-
-export const setControlValueSelector = (state: State) => state.setControlValue;
-
-export const getObjectSelector = (id: number) => (state: State) =>
-  state.vizobjs.find((obj) => obj.id === id);
-
-export const getControlSelector = (state: State) => (control_id: number) =>
-  state.controls?.find((obj) => obj.id === control_id);
-
-export const getControlValueSelector =
-  (state: State) => (control_id: number) => {
-    const control = state.controls?.find((ctrl) => ctrl.id === control_id);
-    const viz = state.vizobjs.find((obj) => obj.id === control?.obj_id);
-
-    return viz && control ? control.get_attribute(viz) : 0;
-  };
+export const setControlValueSelector = (control_id: number) => (state: State) => state.setControlValue(control_id);
+export const getObjectSelector = (id: number) => (state: State) => state.vizobjs[id];
+export const getControlSelector = (control_id: number) => (state: State) => state.controls[control_id];
+export const getControlValueSelector = (control_id: number) => (state: State) =>{
+  const control = state.controls[control_id];
+  const viz = state.vizobjs[control?.obj_id];
+  return viz && control ? control.get_attribute(viz) : 0;
+};

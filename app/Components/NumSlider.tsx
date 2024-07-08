@@ -4,6 +4,7 @@ import {
   getControlSelector,
   getControlValueSelector,
 } from "../store";
+import { useShallow } from 'zustand/react/shallow'
 
 /*
  * This component is a number slider that allows the user to control a numerical value.
@@ -13,12 +14,13 @@ import {
  */
 
 export default function NumSlide({ control_id }: { control_id: number }) {
-  const setValue = useStore(setControlValueSelector); // function that sets the value of a control given its control_id
-  // (control_id: number, valueToSet: number) => void;
-  const getControl = useStore(getControlSelector); // get the control object based on its id
-  const getValue = useStore(getControlValueSelector); // gets the value associated with the control based on the control_id
 
-  const controller = getControl(control_id);
+
+  const setValue = useStore(useShallow(setControlValueSelector(control_id))); // function that sets the value of a control given its control_id
+  const controller = useStore(useShallow(getControlSelector(control_id))); // get the control object based on its id
+  const getValue = useStore(useShallow(getControlValueSelector(control_id))); // gets the value associated with the control based on the control_id
+
+  console.log("Controller: ", control_id)
 
   return controller ? (
     <div
@@ -31,12 +33,12 @@ export default function NumSlide({ control_id }: { control_id: number }) {
     min={controller?.range[0].toString()}
     max={controller?.range[1].toString()}
     step={controller.step_size}
-    value={getValue(control_id)}
+    value={getValue}
     onChange={(e) => {
-      setValue(control_id, Number(e.target.value));
+      setValue(Number(e.target.value));
     }}
   />
-  <p className="text-lg font-semibold text-blue-600">Value: {getValue(control_id)}</p>
+  <p className="text-lg font-semibold text-blue-600">Value: {getValue}</p>
 </div>
   ) : null;
 }

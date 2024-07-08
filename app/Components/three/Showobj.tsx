@@ -1,10 +1,6 @@
 import * as THREE from "three";
 import { useStore, getObjectSelector, setVizObjSelector } from "@/app/store";
 import React, { memo, useRef, useState, useEffect } from "react";
-import { TransformControls } from "@react-three/drei";
-import { TouchControl } from "@/classes/TouchControl";
-import { useDebouncedCallback } from "use-debounce";
-import { vizobj } from "@/classes/vizobj";
 import { GeneralTransformControl } from "./GeneralTransCont";
 
 /*
@@ -25,6 +21,7 @@ export const Showobj = memo(({ id }: { id: number }) => {
   const touch_scale = obj?.touch_controls.scale;
   const touch_rotate = obj?.touch_controls.rotate;
   const touch_translate = obj?.touch_controls.translate;
+  // console.log("render Showobj", id);
 
   useEffect(() => {
     if (object_ref.current) {
@@ -33,47 +30,8 @@ export const Showobj = memo(({ id }: { id: number }) => {
   }, [object_ref.current]); // Enable controls when the object has been loaded i.e has a non-null reference
 
   if (!obj) {
-    console.log("No object found for id Showobj: ", id);
     return null;
   }
-
-  const handleTransformationChange = useDebouncedCallback((mode: string) => {
-    if (obj && object_ref.current) {
-      let transformValue: THREE.Vector3;
-      let updatedObj: vizobj;
-      switch (mode) {
-        case "scale":
-          transformValue = object_ref.current.scale;
-          updatedObj = TouchControl.populate_vizobj({
-            vizobj: obj,
-            scale: transformValue,
-          });
-          break;
-        case "rotate":
-          transformValue = new THREE.Vector3(
-            object_ref.current.rotation.x,
-            object_ref.current.rotation.y,
-            object_ref.current.rotation.z
-          );
-          updatedObj = TouchControl.populate_vizobj({
-            vizobj: obj,
-            rotation: transformValue,
-          });
-          break;
-        case "translate":
-          transformValue = object_ref.current.position;
-          updatedObj = TouchControl.populate_vizobj({
-            vizobj: obj,
-            position: transformValue,
-          });
-          break;
-        default:
-          throw new Error("Invalid mode");
-      }
-
-      setVizObj(id, updatedObj);
-    }
-  }, 100);
 
 
 
