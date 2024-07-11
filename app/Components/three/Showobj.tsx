@@ -32,8 +32,7 @@ export const Showobj = memo(({ id }: { id: number }) => {
   if (!obj) {
     return null;
   }
-
-
+    
 
 
   return (

@@ -27,19 +27,28 @@ import { influencesData, controlData, canvasData } from "@/classes/init_data";
 export type State = {
   vizobjs: { [id: number]: vizobj };
   controls: { [id: number]: SliderControl };
-  influences: Influence[] | null;
+  influences: { [id: number]: Influence }; // the ID is the master_id 
   setControlValue: (id: number) => (value: number) => void;
   setVizObj: (id: number, new_obj: vizobj) => void;
 };
 
-export const useStore = create<State>((set) => ({
+
+
+// takes the list of SlideControls and stores them as a dict with the id as the key
+export const useStore = create<State>((set) => ({ 
   controls: controlData.reduce((acc, control) => {
     acc[control.id] = control;
     return acc;
   }, {} as { [id: number]: SliderControl }),
 
-  influences: influencesData,
+  // influences: influencesData, // havent incooperated this yet
+  // store as a dict with the master_id as the key
+  influences: influencesData.reduce((acc, influence) => {
+    acc[influence.master_id] = influence;
+    return acc;
+  }, {} as { [id: number]: Influence }),
 
+  // takes the list of vizobjs and stores them as a dict with the id as the key
   vizobjs: canvasData.reduce((acc, obj) => {
     acc[obj.id] = obj;
     return acc;
@@ -59,10 +68,11 @@ export const useStore = create<State>((set) => ({
     const viz = state.vizobjs[obj_id];
 
     // Update only the specific vizobj affected by the control change
+    // state.setVizObj(obj_id, control.set_attribute(viz, value));
     return {
       vizobjs: {
         ...state.vizobjs,
-        [obj_id]: control.set_attribute(viz, value)
+        [obj_id]: control.set_attribute(viz, value) // note that set_attribute returns a function
       }
     };
   }

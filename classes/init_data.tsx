@@ -15,6 +15,9 @@ export const influencesData: Influence[] = [
     worker_id: 1,
     action: "rotate",
     transformation: (value) => value,
+    get_attribute: () => 1,
+    set_attribute: (value) => value,
+
   }),
   new Influence({
     influence_id: 2,
@@ -22,6 +25,8 @@ export const influencesData: Influence[] = [
     worker_id: 2,
     action: "move",
     transformation: (value) => value,
+    get_attribute: () => 1,
+    set_attribute: (value) => value,
   }),
 ];
 
@@ -30,7 +35,7 @@ export const controlData: SliderControl[] = [
     id: 1,
     obj_id: 2,
     action: "scale",
-    range: [1, 10]
+    range: [1, 10],
   }),
 
   new SliderControl({
@@ -48,24 +53,25 @@ export const canvasData: vizobj[] = [
     geom: new THREE.PlaneGeometry(4, 4),
     color: "green",
     touch_controls: new TouchControl({
-        translate: {
-            direction: [true, true, false],
-            range: [-10, 10],
-            step_size: 1,
-        },
-    })
+      translate: {
+        direction: [true, true, false],
+        range: [-10, 10],
+        step_size: 1,
+      },
+    }),
   }),
 
   new vizobj({
     id: 2,
     geom: new THREE.PlaneGeometry(4, 4),
-    position: new THREE.Vector2(8,0),
+    position: new THREE.Vector2(8, 0),
     color: "red",
     touch_controls: new TouchControl({
-        scale: {
-            direction: [true, true, false],
-            range: [1, 10],
-            step_size: 1,
-        },
-  })}),
+      scale: {
+        direction: [true, true, false],
+        range: [1, 10],
+        step_size: 1,
+      },
+    }),
+  }),
 ];
