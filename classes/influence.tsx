@@ -1,13 +1,15 @@
 import { action_typ } from "./SliderControl";
+import { vizobj } from "./vizobj";
+import { Vector2 } from "three";
 
-export class Influence {
+export class Influence<T> {
   influence_id: number;
   master_id: number;
   worker_id: number;
   action: action_typ;
-  get_attribute: () => number;
-  set_attribute: (value: number) => void;
-  transformation: (value: number) => number;
+  get_attribute: (vizobj: vizobj) => T;
+  set_attribute: (vizobj: vizobj, value: T) => vizobj;
+  transformation: (value: T) => T;
 
   constructor({
     influence_id,
@@ -22,9 +24,9 @@ export class Influence {
     master_id: number;
     worker_id: number;
     action: action_typ; // dont need
-    get_attribute: () => number;
-    set_attribute: (value: number) => void;
-    transformation: (value: number) => number;
+    get_attribute: (vizobj: vizobj) => T;
+    set_attribute: (vizobj: vizobj, value: T) => vizobj;
+    transformation: (value: T) => T;
   }) {
     this.influence_id = influence_id;
     this.master_id = master_id;
@@ -35,7 +37,26 @@ export class Influence {
     this.transformation = transformation;
   }
 
-  static UpdateInfluence(influence: Influence) {
-    influence.set_attribute(influence.get_attribute());
+  static UpdateInfluenceManual(
+    influence: Influence<any>,
+    set_vizobj: (id: number, new_obj: vizobj) => void,
+    worker: vizobj,
+    val: number
+  ) {
+    // const value = new Vector2(-8 + val, 0);
+    const value = new Vector2(5 * Math.cos(val), 5 * Math.sin(val));
+    set_vizobj(influence.worker_id, influence.set_attribute(worker, value));
+  }
+
+  static UpdateInfluence(
+    influence: Influence<any>,
+    set_vizobj: (id: number, new_obj: vizobj) => void,
+    master: vizobj,
+    worker: vizobj
+  ) {
+    // console.log("Updating influence");
+
+    const value = influence.transformation(influence.get_attribute(master));
+    set_vizobj(influence.worker_id, influence.set_attribute(worker, value));
   }
 }

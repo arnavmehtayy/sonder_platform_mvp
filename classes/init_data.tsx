@@ -1,3 +1,5 @@
+import { Vector2, Vector3 } from "three";
+import * as att_funcs from "./attribute_funcs";
 import { Influence } from "./influence";
 import { SliderControl } from "./SliderControl";
 import { TouchControl } from "./TouchControl";
@@ -8,33 +10,32 @@ import * as THREE from "three";
  * This file contains the initial data that initializes the store in the app.
  */
 
-export const influencesData: Influence[] = [
-  new Influence({
+export const influencesData: Influence<any>[] = [
+  new Influence<Vector2>({
     influence_id: 1,
     master_id: 2,
     worker_id: 1,
     action: "rotate",
     transformation: (value) => value,
-    get_attribute: () => 1,
-    set_attribute: (value) => value,
-
+    get_attribute: att_funcs.get_position,
+    set_attribute: (vizobj: vizobj, value: Vector2) => att_funcs.set_position(vizobj, value)
   }),
-  new Influence({
-    influence_id: 2,
-    master_id: 1,
-    worker_id: 2,
-    action: "move",
-    transformation: (value) => value,
-    get_attribute: () => 1,
-    set_attribute: (value) => value,
-  }),
+  //   new Influence({
+  //     influence_id: 2,
+  //     master_id: 1,
+  //     worker_id: 2,
+  //     action: "move",
+  //     transformation: (value) => value,
+  //     get_attribute: () => 1,
+  //     set_attribute: (value) => value,
+  //   }),
 ];
 
 export const controlData: SliderControl[] = [
   new SliderControl({
     id: 1,
     obj_id: 2,
-    action: "scale",
+    action: "move",
     range: [1, 10],
   }),
 
@@ -67,7 +68,7 @@ export const canvasData: vizobj[] = [
     position: new THREE.Vector2(8, 0),
     color: "red",
     touch_controls: new TouchControl({
-      scale: {
+      translate: {
         direction: [true, true, false],
         range: [1, 10],
         step_size: 1,

@@ -21,7 +21,13 @@ export const Showobj = memo(({ id }: { id: number }) => {
   const touch_scale = obj?.touch_controls.scale;
   const touch_rotate = obj?.touch_controls.rotate;
   const touch_translate = obj?.touch_controls.translate;
-  // console.log("render Showobj", id);
+  
+  if(id == 1) {
+    console.log(obj.position)
+  }
+  else {
+    console.log("render Showobj", id);
+  }
 
   useEffect(() => {
     if (object_ref.current) {
