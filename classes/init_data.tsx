@@ -18,7 +18,7 @@ export const influencesData: Influence<any>[] = [
     action: "rotate",
     transformation: (value) => value,
     get_attribute: att_funcs.get_position,
-    set_attribute: (vizobj: vizobj, value: Vector2) => att_funcs.set_position(vizobj, value)
+    set_attribute: (vizobj: vizobj, value: Vector2) => att_funcs.set_position(vizobj, new Vector2(value.x-8, value.y))
   }),
   //   new Influence({
   //     influence_id: 2,

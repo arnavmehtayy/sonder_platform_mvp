@@ -8,7 +8,6 @@ import {
   getObjectSelector,
 } from "../store";
 import { useShallow } from "zustand/react/shallow";
-import InfluenceManage from "./InfluenceManage";
 import { Influence } from "@/classes/influence";
 import { Vector2 } from "three";
 
@@ -25,13 +24,13 @@ export default function NumSlide({ control_id }: { control_id: number }) {
   const getValue = useStore(useShallow(getControlValueSelector(control_id))); // gets the value associated with the control based on the control_id
 
   // TESTING
-  const influence = useStore(getInfluenceSelector(controller.obj_id));
-  const setObj = useStore(setVizObjSelector);
-  const master = useStore(getObjectSelector(controller.obj_id));
-  let worker = null
-  if (influence) {
-    worker = useStore(getObjectSelector(influence.worker_id));
-  }
+  // const influence = useStore(getInfluenceSelector(controller.obj_id));
+  // const setObj = useStore(setVizObjSelector);
+  // const master = useStore(getObjectSelector(controller.obj_id));
+  // let worker = null
+  // if (influence) {
+  //   worker = useStore(getObjectSelector(influence.worker_id));
+  // }
 
   // console.log("Controller: ", control_id)
 
@@ -50,15 +49,15 @@ export default function NumSlide({ control_id }: { control_id: number }) {
           value={getValue}
           onChange={(e) => {
             setValue(Number(e.target.value));
-            if(influence && worker) {
-              Influence.UpdateInfluenceManual(
-                influence,
-                setObj,
-                worker,
-                Number(e.target.value)
-              );
+            // if(influence && worker) {
+            //   Influence.UpdateInfluenceManual(
+            //     influence,
+            //     setObj,
+            //     worker,
+            //     Number(e.target.value)
+            //   );
               
-            }
+            // }
           }}
         />
         <p className="text-lg font-semibold text-blue-600">Value: {getValue}</p>
