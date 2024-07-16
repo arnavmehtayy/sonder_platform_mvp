@@ -64,7 +64,7 @@ export let canvasData: vizobj[] = [
   })
 ];
 
-const num_points = 100;
+const num_points = 400;
 // create a bunch of random points in a line and store it in a list
 let points: Vector2[] = [];
 for (let i = 1; i < num_points; i++) {
@@ -85,7 +85,7 @@ for (let i = 0; i < num_points; i++) {
   canvasData.push(
     new vizobj({
       id: i + num_points,
-      geom: new CustomLine({start: points[i], end: new Vector2(0,0), line_width: 0.1}),
+      geom: new CustomLine({start: points[i], end: new Vector2(0,0), line_width: 0.3}),
       color: "red",
     })
   );

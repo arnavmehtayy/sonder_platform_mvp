@@ -2,7 +2,12 @@ import { create } from "zustand";
 import { vizobj } from "@/classes/vizobj";
 import { SliderControl } from "../classes/SliderControl";
 import { Influence } from "../classes/influence";
-import { influencesData, controlData, canvasData } from "@/classes/init_data_reg";
+import {
+  influencesData,
+  controlData,
+  canvasData,
+} from "@/classes/init_data_reg";
+import { update } from "three/examples/jsm/libs/tween.module.js";
 
 export type State = {
   vizobjs: { [id: number]: vizobj };
@@ -31,23 +36,25 @@ export const useStore = create<State>((set, get) => ({
     return acc;
   }, {} as { [id: number]: vizobj }),
 
-  setVizObj: (id: number, new_obj: vizobj) => set((state) => {
-    const updatedState = {
-      vizobjs: { ...state.vizobjs, [id]: new_obj }
-    };
+  setVizObj: (id: number, new_obj: vizobj) =>
+    set((state) => {
+      const updatedState = {
+        vizobjs: { ...state.vizobjs, [id]: new_obj },
+      };
 
-    const influences = state.influences[id];
-    if (influences) {
-      influences.forEach(influence => {
-        const master = new_obj;
-        const worker = state.vizobjs[influence.worker_id];
-        const value = influence.transformation(influence.get_attribute(master));
-        updatedState.vizobjs[influence.worker_id] = influence.set_attribute(worker, value);
-      });
-    }
+      const influences = state.influences[id];
+      if (influences) {
+        influences.forEach((influence) => {
+          updatedState.vizobjs[influence.worker_id] = Influence.UpdateInfluence(
+            influence,
+            new_obj,
+            state.vizobjs[influence.worker_id]
+          );
+        });
+      }
 
-    return updatedState;
-  }),
+      return updatedState;
+    }),
 
   setControlValue: (control_id: number) => (value: number) => {
     const state = get();
@@ -61,14 +68,20 @@ export const useStore = create<State>((set, get) => ({
   },
 }));
 
-export const getObjectsSelector = (state: State) => Object.values(state.vizobjs);
+export const getObjectsSelector = (state: State) =>
+  Object.values(state.vizobjs);
 export const setVizObjSelector = (state: State) => state.setVizObj;
-export const setControlValueSelector = (control_id: number) => (state: State) => state.setControlValue(control_id);
-export const getObjectSelector = (id: number) => (state: State) => state.vizobjs[id];
-export const getControlSelector = (control_id: number) => (state: State) => state.controls[control_id];
-export const getControlValueSelector = (control_id: number) => (state: State) => {
-  const control = state.controls[control_id];
-  const viz = state.vizobjs[control?.obj_id];
-  return viz && control ? control.get_attribute(viz) : 0;
-};
-export const getInfluenceSelector = (master_id: number) => (state: State) => (master_id in state.influences ? state.influences[master_id] : []);
+export const setControlValueSelector = (control_id: number) => (state: State) =>
+  state.setControlValue(control_id);
+export const getObjectSelector = (id: number) => (state: State) =>
+  state.vizobjs[id];
+export const getControlSelector = (control_id: number) => (state: State) =>
+  state.controls[control_id];
+export const getControlValueSelector =
+  (control_id: number) => (state: State) => {
+    const control = state.controls[control_id];
+    const viz = state.vizobjs[control?.obj_id];
+    return viz && control ? control.get_attribute(viz) : 0;
+  };
+export const getInfluenceSelector = (master_id: number) => (state: State) =>
+  master_id in state.influences ? state.influences[master_id] : [];

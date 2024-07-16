@@ -33,4 +33,13 @@ export class Influence<T> {
     this.transformation = transformation;
   }
 
+  static UpdateInfluence(influence: Influence<any>, master: vizobj, worker: vizobj) {
+    const value = influence.transformation(
+      influence.get_attribute(master)
+    );
+    return influence.set_attribute(
+      worker,
+      value
+    );
+  }
 }
