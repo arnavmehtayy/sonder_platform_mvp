@@ -2,7 +2,7 @@ import { create } from "zustand";
 import { vizobj } from "@/classes/vizobj";
 import { SliderControl } from "../classes/SliderControl";
 import { Influence } from "../classes/influence";
-import { influencesData, controlData, canvasData } from "@/classes/init_data";
+import { influencesData, controlData, canvasData } from "@/classes/init_data_reg";
 
 export type State = {
   vizobjs: { [id: number]: vizobj };

@@ -39,6 +39,7 @@ export function Minigame({ page }: { page: number }) {
         </div>
         <NumSlide control_id={1} />
         {/* Number slider for interactivity using the control_id */}
+        <NumSlide control_id={2} />
         <NumSlide control_id={3} />
       </div>
     </>

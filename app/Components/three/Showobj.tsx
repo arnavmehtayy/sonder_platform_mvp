@@ -1,7 +1,17 @@
 import * as THREE from "three";
 import { useStore, getObjectSelector, setVizObjSelector } from "@/app/store";
-import React, { memo, useRef, useState, useEffect } from "react";
+import { extend } from "@react-three/fiber";
+import React, {
+  memo,
+  useRef,
+  useState,
+  useEffect,
+  useLayoutEffect,
+  LegacyRef,
+} from "react";
 import { GeneralTransformControl } from "./GeneralTransCont";
+import { Vector3 } from "three";
+import { Line } from "@react-three/drei";
 
 /*
   * This component handles the rendering of a single object in the scene.
@@ -21,13 +31,13 @@ export const Showobj = memo(({ id }: { id: number }) => {
   const touch_scale = obj?.touch_controls.scale;
   const touch_rotate = obj?.touch_controls.rotate;
   const touch_translate = obj?.touch_controls.translate;
-  
-  if(id == 1) {
-    console.log(obj.position)
-  }
-  else {
-    console.log("render Showobj", id);
-  }
+
+  // if(id == 1) {
+  //   console.log(obj.position)
+  // }
+  // else {
+  //   console.log("render Showobj", id);
+  // }
 
   useEffect(() => {
     if (object_ref.current) {
@@ -38,20 +48,63 @@ export const Showobj = memo(({ id }: { id: number }) => {
   if (!obj) {
     return null;
   }
-    
+  const points = [];
+  points.push(new THREE.Vector3(-10, 0, 0));
+  points.push(new THREE.Vector3(0, 10, 0));
+  points.push(new THREE.Vector3(10, 0, 0));
 
+  const lineGeometry = new THREE.BufferGeometry().setFromPoints(points);
 
   return (
     <>
-       <mesh
+      {obj.geom instanceof THREE.BufferGeometry ? (
+        <mesh
+          position={[obj.position.x, obj.position.y, 0]}
+          rotation={[obj.rotation.x, obj.rotation.y, obj.rotation.z]}
+          scale={[obj.scale.x, obj.scale.y, obj.scale.z]}
+          ref={object_ref}
+        >
+          <primitive object={obj.geom} attach="geometry" />
+          <meshBasicMaterial color={obj.color} />
+        </mesh>
+      ) : (
+        <mesh
+          position={[obj.position.x, obj.position.y, 0]}
+          rotation={[obj.rotation.x, obj.rotation.y, obj.rotation.z]}
+          scale={[obj.scale.x, obj.scale.y, obj.scale.z]}
+        >
+          <Line
+            points={[
+              [obj.geom.start.x, obj.geom.start.y, 0],
+              [obj.geom.end.x, obj.geom.end.y, 0],
+            ]} // Array of points, Array<Vector3 | Vector2 | [number, number, number] | [number, number] | number>
+            color={obj.color} // Default
+            lineWidth={obj.geom.line_width} // In pixels (default)
+            segments // If true, renders a THREE.LineSegments2. Otherwise, renders a THREE.Line2
+            dashed={false} // Default
+          />
+        </mesh>
+      )}
+      {/* <mesh
         position={[obj.position.x, obj.position.y, 0]}
         rotation={[obj.rotation.x, obj.rotation.y, obj.rotation.z]}
         scale={[obj.scale.x, obj.scale.y, obj.scale.z]}
-        ref={object_ref}
       >
-        <primitive object={obj.geom} attach="geometry" />
-        <meshBasicMaterial color={obj.color} />
-      </mesh>
+        <Line
+          points={[
+            [0, 0, 0],
+            [1, 1, 0],
+            [-1, 1, 0],
+            [0, 0, 0],
+            [1, 2, 1],
+            [2, 2, 2],
+          ]} // Array of points, Array<Vector3 | Vector2 | [number, number, number] | [number, number] | number>
+          color="red" // Default
+          lineWidth={2} // In pixels (default)
+          segments // If true, renders a THREE.LineSegments2. Otherwise, renders a THREE.Line2
+          dashed={false} // Default
+        />
+      </mesh> */}
       {/*
       {controlsEnabled && object_ref.current && (
         <>
@@ -95,10 +148,30 @@ export const Showobj = memo(({ id }: { id: number }) => {
           ) : null}
         </>
       )} */}
-
-      {controlsEnabled && touch_scale && <GeneralTransformControl mode="scale" vizObjId={id} touchControl={obj.touch_controls.scale}  obj_ref={object_ref}/>}
-      {controlsEnabled && touch_rotate && <GeneralTransformControl mode="rotate" vizObjId={id} touchControl={obj.touch_controls.rotate} obj_ref={object_ref}/>}
-      {controlsEnabled && touch_translate && <GeneralTransformControl mode="translate" vizObjId={id} touchControl={obj.touch_controls.translate}  obj_ref={object_ref}/>}
+      {controlsEnabled && touch_scale && (
+        <GeneralTransformControl
+          mode="scale"
+          vizObjId={id}
+          touchControl={obj.touch_controls.scale}
+          obj_ref={object_ref}
+        />
+      )}
+      {controlsEnabled && touch_rotate && (
+        <GeneralTransformControl
+          mode="rotate"
+          vizObjId={id}
+          touchControl={obj.touch_controls.rotate}
+          obj_ref={object_ref}
+        />
+      )}
+      {controlsEnabled && touch_translate && (
+        <GeneralTransformControl
+          mode="translate"
+          vizObjId={id}
+          touchControl={obj.touch_controls.translate}
+          obj_ref={object_ref}
+        />
+      )}
     </>
   );
 });

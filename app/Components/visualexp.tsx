@@ -91,7 +91,7 @@ export default function Experience() {
       </>
 
       <Stats />
-      <Grid position={[0, 0, -1]} rotation={[Math.PI/2, 0,0]} args={gridSize} {...gridConfig} />
+      {/* <Grid position={[0, 0, -1]} rotation={[Math.PI/2, 0,0]} args={gridSize} {...gridConfig} /> */}
       {/* Display performance stats */}
     </Canvas>
   );

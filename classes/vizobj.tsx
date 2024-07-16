@@ -1,6 +1,7 @@
 import * as THREE from "three";
 import { SliderControl } from "./SliderControl";
 import { TouchControl } from "./TouchControl";
+import { CustomLine } from "./customLine";
 
 /*
   * This class stores the attributes of a visual object in the scene.
@@ -14,7 +15,7 @@ export class vizobj {
   rotation: THREE.Vector3;
   scale: THREE.Vector3;
   color: string;
-  geom: THREE.BufferGeometry;
+  geom: THREE.BufferGeometry | CustomLine;
   touch_controls: TouchControl;
   param_t: number; // if we have a parametric curve, this is the parameter value
 
@@ -27,7 +28,7 @@ export class vizobj {
     geom, // geom remains a required parameter
     touch_controls = new TouchControl(),
     param_t = 0,
-  }: Partial<vizobj> & { geom: THREE.BufferGeometry; id: number }) {
+  }: Partial<vizobj> & { geom: THREE.BufferGeometry | CustomLine; id: number }) {
     this.id = id;
     this.position = position;
     this.rotation = rotation;

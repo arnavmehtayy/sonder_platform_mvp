@@ -11,7 +11,7 @@ import * as att_funcs from "./attribute_funcs";
 
 */
 
-export type action_typ = "move" | "rotate" | "scale" | "path";
+export type action_typ = "move" | "rotate" | "scale" | "path" | "custom";
 export type Parametric_curve = ((t: number) => THREE.Vector2) 
 
 export class SliderControl {
@@ -32,6 +32,8 @@ export class SliderControl {
     range,
     step_size = 1,
     param_curve = (t: number) => new THREE.Vector2(5 * Math.sin(t),5 * Math.cos(t)), // default to a line
+    get_attribute = (obj: vizobj) => {console.log("default SliderControl"); return 0}, // this does nothing these are default values
+    set_attribute = (obj: vizobj, value: number) => {console.log("default SliderControl"); return obj },
   }: Partial<SliderControl> & { id: number; obj_id: number; action: action_typ; range: [number, number] }) {
     this.id = id;
     this.obj_id = obj_id;
@@ -60,6 +62,10 @@ export class SliderControl {
       case "path": // rewrite this to use the parametric curve
         this.get_attribute = (obj: vizobj) => obj.param_t ? obj.param_t : 0;
         this.set_attribute = (obj: vizobj, t: number) => att_funcs.set_path_pos(obj, this.param_curve(t), t);
+        break;
+      case "custom":
+        this.get_attribute = get_attribute;
+        this.set_attribute = set_attribute;
         break;
     }
   }
