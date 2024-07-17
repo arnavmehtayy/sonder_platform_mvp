@@ -46,7 +46,7 @@ export default function Experience() {
     <Canvas>
       <OrthographicCamera
         makeDefault
-        zoom={15} // Zoom level
+        zoom={30} // Zoom level
         // top={20}
         // bottom={-20}
         // left={20 }
@@ -59,7 +59,7 @@ export default function Experience() {
         enablePan={true} // Enable panning
         enableZoom={true} // Enable zooming
         maxZoom={100} // Max zoom limit
-        minZoom={5} // Min zoom limit
+        minZoom={30} // Min zoom limit
       />
       {/* <OrbitControls /> */}
       {/* <axesHelper args={[5]} /> */}

@@ -51,8 +51,8 @@ export const controlData: SliderControl[] = [
 
 
 
-const line = new CustomLine({start: new Vector2(0,0), end: new Vector2(50,50)});
-line.set_slope_intercept(0, 0.5, [0,50] )
+const line = new CustomLine({start: new Vector2(0,0), end: new Vector2(50,50), line_width: 5});
+line.set_slope_intercept(0, 0.5, [0,15] )
 
 export let canvasData: vizobj[] = [
   new vizobj({
@@ -64,7 +64,7 @@ export let canvasData: vizobj[] = [
   })
 ];
 
-const num_points = 400;
+const num_points = 30;
 // create a bunch of random points in a line and store it in a list
 let points: Vector2[] = [];
 for (let i = 1; i < num_points; i++) {
@@ -76,7 +76,7 @@ for (let i = 0; i < num_points; i++) {
   canvasData.push(
     new vizobj({
       id: i,
-      geom: new THREE.CircleGeometry(0.3, 32),
+      geom: new THREE.CircleGeometry(0.3, 128),
       position: points[i],
       color: "blue",
     })
@@ -85,7 +85,7 @@ for (let i = 0; i < num_points; i++) {
   canvasData.push(
     new vizobj({
       id: i + num_points,
-      geom: new CustomLine({start: points[i], end: new Vector2(0,0), line_width: 0.3}),
+      geom: new CustomLine({start: points[i], end: new Vector2(0,0), line_width: 2}),
       color: "red",
     })
   );
@@ -95,8 +95,25 @@ for (let i = 0; i < num_points; i++) {
       influence_id: i,
       master_id: 1000,
       worker_id: i + num_points,
-      transformation: (value) => value,
-      get_attribute: att_funcs.get_end_point,
+      transformation: (value, worker, master) => {
+        if(worker.geom instanceof CustomLine) {
+        const slope = value.y
+        const intercept = value.x
+        const x = worker.geom.start.x
+        const y = worker.geom.start.y
+        let perp_slope = 0
+        if(slope != 0) {
+        perp_slope = -1 / slope
+        }
+        const b = y - perp_slope * x
+        const new_x = (b - intercept) / (slope - perp_slope)
+        const new_y = slope * new_x + intercept
+        console.log(perp_slope)
+        return new Vector2(new_x, new_y)
+      }
+      return new Vector2(0,0);
+      },
+      get_attribute: att_funcs.get_slope_intercept,
       set_attribute: att_funcs.set_end_point,
     })
   );

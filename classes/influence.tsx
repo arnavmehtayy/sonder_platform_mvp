@@ -8,7 +8,7 @@ export class Influence<T> {
   worker_id: number;
   get_attribute: (vizobj: vizobj) => T;
   set_attribute: (vizobj: vizobj, value: T) => vizobj;
-  transformation: (value: T) => T;
+  transformation: (value: T, worker: vizobj, master: vizobj) => T;
 
   constructor({
     influence_id,
@@ -23,7 +23,7 @@ export class Influence<T> {
     worker_id: number;
     get_attribute: (vizobj: vizobj) => T;
     set_attribute: (vizobj: vizobj, value: T) => vizobj;
-    transformation: (value: T) => T;
+    transformation: (value: T, worker: vizobj, master: vizobj) => T;
   }) {
     this.influence_id = influence_id;
     this.master_id = master_id;
@@ -35,7 +35,9 @@ export class Influence<T> {
 
   static UpdateInfluence(influence: Influence<any>, master: vizobj, worker: vizobj) {
     const value = influence.transformation(
-      influence.get_attribute(master)
+      influence.get_attribute(master),
+      worker,
+      master
     );
     return influence.set_attribute(
       worker,

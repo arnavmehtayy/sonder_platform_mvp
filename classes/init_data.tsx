@@ -15,7 +15,7 @@ export const influencesData: Influence<any>[] = [
     influence_id: 1,
     master_id: 2,
     worker_id: 1,
-    transformation: (value) => value,
+    transformation: (value, worker, master) => value,
     get_attribute: att_funcs.get_rotation,
     set_attribute: (obj: vizobj, value: Vector3) => {
       return att_funcs.set_position(

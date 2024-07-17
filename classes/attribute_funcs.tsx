@@ -7,6 +7,13 @@ import { CustomLine } from "./customLine";
     * These functions are used in the ControlObj class to get and set the attributes of an object.
 
 */
+export function get_slope_intercept(obj: vizobj): Vector2 {
+    if (obj.geom instanceof CustomLine) {
+        return new Vector2(obj.geom.get_slope_intercept()[0], obj.geom.get_slope_intercept()[1]);
+    }
+    return new Vector2(0,0);
+    }
+
 export function get_end_point(obj: vizobj): Vector2 {
   if (obj.geom instanceof CustomLine) {
     return obj.geom.end;

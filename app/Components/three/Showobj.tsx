@@ -82,7 +82,9 @@ export const Showobj = memo(({ id }: { id: number }) => {
             lineWidth={obj.geom.line_width} // In pixels (default)
             segments // If true, renders a THREE.LineSegments2. Otherwise, renders a THREE.Line2
             dashed={false} // Default
+            {...{linebutt: "round", linecap: "round"}}
           />
+          
         </mesh>
       )}
       {/* <mesh
