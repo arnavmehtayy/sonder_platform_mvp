@@ -136,7 +136,7 @@ export const SelectObjectControl = (obj_id: number) => (state: State) => () =>  
   })
 }
 
-export const DeSelectObjectControl = (obj_id: number) => (state: State) => () => { // may be too expensive redo if necessary
+export const DeSelectObjectControl = (state: State) => (obj_id: number) =>{ // may be too expensive redo if necessary
   Object.values(state.controls).forEach((control) => {
     if(control instanceof SelectControl) {
       state.setControlClick(control.id)(obj_id, "deselect");
