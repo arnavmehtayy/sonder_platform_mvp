@@ -1,27 +1,28 @@
 import { create } from "zustand";
-import { vizobj } from "@/classes/vizobj";
 import { SliderControl } from "../classes/SliderControl";
 import { Influence } from "../classes/influence";
 import {
   influencesData,
   controlData,
   canvasData,
-} from "@/classes/init_data_reg";
-import { update } from "three/examples/jsm/libs/tween.module.js";
+} from "@/classes/init_data";
+import { obj } from "@/classes/obj";
+import { geomobj } from "@/classes/geomobj";
+import { TransformObj } from "@/classes/transformObj";
 
 export type State = {
-  vizobjs: { [id: number]: vizobj };
-  controls: { [id: number]: SliderControl };
-  influences: { [id: number]: Influence<any>[] }; // Changed to an array of influences
+  vizobjs: { [id: number]: obj };
+  controls: { [id: number]: SliderControl<any> };
+  influences: { [id: number]: Influence<any, any, any>[] }; // Changed to an array of influences
   setControlValue: (id: number) => (value: number) => void;
-  setVizObj: (id: number, new_obj: vizobj) => void;
+  setVizObj: (id: number, new_obj: obj) => void;
 };
 
 export const useStore = create<State>((set, get) => ({
   controls: controlData.reduce((acc, control) => {
     acc[control.id] = control;
     return acc;
-  }, {} as { [id: number]: SliderControl }),
+  }, {} as { [id: number]: SliderControl<any> }),
 
   influences: influencesData.reduce((acc, influence) => {
     if (!acc[influence.master_id]) {
@@ -29,14 +30,15 @@ export const useStore = create<State>((set, get) => ({
     }
     acc[influence.master_id].push(influence);
     return acc;
-  }, {} as { [id: number]: Influence<any>[] }),
+  }, {} as { [id: number]: Influence<any,any, any>[] }),
 
   vizobjs: canvasData.reduce((acc, obj) => {
     acc[obj.id] = obj;
     return acc;
-  }, {} as { [id: number]: vizobj }),
+  }, {} as { [id: number]: obj }),
 
-  setVizObj: (id: number, new_obj: vizobj) =>
+  setVizObj: (id: number, new_obj: obj) => {
+    console.log(new_obj)
     set((state) => {
       const updatedState = {
         vizobjs: { ...state.vizobjs, [id]: new_obj },
@@ -52,9 +54,12 @@ export const useStore = create<State>((set, get) => ({
           );
         });
       }
+    
 
       return updatedState;
-    }),
+    }) 
+ // console.log("setVizObj", id, new_obj);
+},
 
   setControlValue: (control_id: number) => (value: number) => {
     const state = get();

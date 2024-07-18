@@ -1,14 +1,14 @@
-import { action_typ } from "./SliderControl";
-import { vizobj } from "./vizobj";
+import { obj } from "./obj";
+import { TransformObj } from "./transformObj";
 import { Vector2 } from "three";
 
-export class Influence<T> {
+export class Influence<T, master_T extends obj, worker_T extends obj> {
   influence_id: number;
   master_id: number;
   worker_id: number;
-  get_attribute: (vizobj: vizobj) => T;
-  set_attribute: (vizobj: vizobj, value: T) => vizobj;
-  transformation: (value: T, worker: vizobj, master: vizobj) => T;
+  get_attribute: (vizobj: master_T) => T;
+  set_attribute: (vizobj: worker_T, value: T) => worker_T;
+  transformation: (value: T, worker: worker_T, master: master_T) => T;
 
   constructor({
     influence_id,
@@ -21,9 +21,9 @@ export class Influence<T> {
     influence_id: number;
     master_id: number;
     worker_id: number;
-    get_attribute: (vizobj: vizobj) => T;
-    set_attribute: (vizobj: vizobj, value: T) => vizobj;
-    transformation: (value: T, worker: vizobj, master: vizobj) => T;
+    get_attribute: (vizobj: master_T) => T;
+    set_attribute: (vizobj: worker_T, value: T) => worker_T;
+    transformation: (value: T, worker: worker_T, master: master_T) => T;
   }) {
     this.influence_id = influence_id;
     this.master_id = master_id;
@@ -33,15 +33,16 @@ export class Influence<T> {
     this.transformation = transformation;
   }
 
-  static UpdateInfluence(influence: Influence<any>, master: vizobj, worker: vizobj) {
+  static UpdateInfluence<T, master_T extends obj, worker_T extends obj>(
+    influence: Influence<T, master_T, worker_T>,
+    master: master_T,
+    worker: worker_T
+  ) {
     const value = influence.transformation(
       influence.get_attribute(master),
       worker,
       master
     );
-    return influence.set_attribute(
-      worker,
-      value
-    );
+    return influence.set_attribute(worker, value);
   }
 }

@@ -1,97 +1,115 @@
-import { Vector2, Vector3 } from "three";
-import { vizobj } from "./vizobj";
-import { CustomLine } from "./customLine";
+import { Line, Vector2, Vector3 } from "three";
+import { TransformObj } from "./transformObj";
+import { LineObj } from "./Lineobj";
 
 /*
     * This file contains the functions to get and set the attributes of a vizobj.
     * These functions are used in the ControlObj class to get and set the attributes of an object.
 
 */
-export function get_slope_intercept(obj: vizobj): Vector2 {
-    if (obj.geom instanceof CustomLine) {
-        return new Vector2(obj.geom.get_slope_intercept()[0], obj.geom.get_slope_intercept()[1]);
-    }
-    return new Vector2(0,0);
-    }
-
-export function get_end_point(obj: vizobj): Vector2 {
-  if (obj.geom instanceof CustomLine) {
-    return obj.geom.end;
-  }
-  return new Vector2(0, 0);
-}
-export function set_end_point(obj: vizobj, value: Vector2): vizobj {
-  if (obj.geom instanceof CustomLine) {
-    const new_geom = obj.geom.set_endpoints(obj.geom.start, value);
-    new_geom.line_width = obj.geom.line_width;
-    return { ...obj, geom: new_geom };
-  }
-  return obj;
-}
-export function get_slope(obj: vizobj): number {
-  if (obj.geom instanceof CustomLine) {
-    return obj.geom.get_slope_intercept()[1];
-  }
-  return 0;
+export function get_slope_intercept(obj: LineObj): Vector2 {
+  return new Vector2(
+    obj.get_slope_intercept()[0],
+    obj.get_slope_intercept()[1]
+  );
 }
 
-export function set_slope(obj: vizobj, value: number): vizobj {
-  if (!(obj.geom instanceof CustomLine)) return obj;
-  const slope_intercept = obj.geom.get_slope_intercept();
+export function get_end_point(obj: LineObj): Vector2 {
+  return obj.end;
+}
+export function set_end_point(
+  obj: LineObj,
+  value: Vector2
+): LineObj {
+  const new_obj = LineObj.set_endpoints(obj, obj.start, value);
+  new_obj.line_width = obj.line_width;
+  return new_obj;
+}
+export function get_slope(obj: LineObj): number {
+  return obj.get_slope_intercept()[1];
+}
+
+export function set_slope( // change
+  obj: LineObj,
+  value: number
+): LineObj {
+  const slope_intercept = obj.get_slope_intercept();
   slope_intercept[1] = value;
-  const new_geom = obj.geom.set_slope_intercept(
+  const new_obj =  LineObj.set_slope_intercept(
+    obj,
     slope_intercept[0],
     slope_intercept[1],
     slope_intercept[2]
   );
-  new_geom.line_width = obj.geom.line_width;
-  return { ...obj, geom: new_geom };
+  new_obj.line_width = obj.line_width;
+  return new_obj;
 }
 
-export function get_intercept(obj: vizobj): number {
-  if (obj.geom instanceof CustomLine) {
-    return obj.geom.get_slope_intercept()[0];
-  }
-  return 0;
+export function get_intercept(obj: LineObj): number {
+  return obj.get_slope_intercept()[0];
 }
 
-export function set_intercept(obj: vizobj, value: number): vizobj {
-  if (!(obj.geom instanceof CustomLine)) return obj;
-  const slope_intercept = obj.geom.get_slope_intercept();
-  slope_intercept[0] = value;
-  const new_geom = obj.geom.set_slope_intercept(
-    slope_intercept[0],
+export function set_intercept( // change
+  obj: LineObj,
+  value: number
+): LineObj {
+  const slope_intercept = obj.get_slope_intercept();
+  const new_obj = LineObj.set_slope_intercept(
+    obj,
+    value,
     slope_intercept[1],
     slope_intercept[2]
   );
-  new_geom.line_width = obj.geom.line_width;
-  return { ...obj, geom: new_geom };
+  new_obj.line_width = obj.line_width;
+  return new_obj;
 }
 
-export function get_position(obj: vizobj): Vector2 {
+export function get_position(obj: TransformObj): Vector2 {
   return obj.position;
 }
 
-export function set_position(obj: vizobj, value: Vector2): vizobj {
-  return { ...obj, position: value };
+export function set_position<T>(
+  obj: TransformObj,
+  value: T
+): TransformObj {
+    const new_obj = Object.assign(Object.create(Object.getPrototypeOf(obj)), obj);
+    new_obj.position = value;
+  return new_obj;
 }
 
-export function set_path_pos(obj: vizobj, value: Vector2, t: number): vizobj {
-  return { ...obj, position: value, param_t: t };
+export function set_path_pos<T>(
+  obj: T,
+  value: Vector2,
+  t: number
+): T {
+    const new_obj = Object.assign(Object.create(Object.getPrototypeOf(obj)), obj);
+    new_obj.position = value;
+    new_obj.param_t = t;
+    return new_obj;
 }
 
-export function get_rotation(obj: vizobj): Vector3 {
+export function get_rotation(obj: TransformObj): Vector3 {
   return obj.rotation;
 }
 
-export function set_rotation(obj: vizobj, value: Vector3): vizobj {
-  return { ...obj, rotation: value };
+export function set_rotation<T>(
+  obj: T,
+  value: Vector3
+): T{
+  const new_obj = Object.assign(Object.create(Object.getPrototypeOf(obj)), obj);
+  new_obj.rotation = value;
+  return new_obj;
 }
 
-export function get_scale(obj: vizobj): Vector3 {
+export function get_scale(obj: TransformObj): Vector3 {
   return obj.scale;
 }
 
-export function set_scale(obj: vizobj, value: Vector3): vizobj {
-  return { ...obj, scale: value };
+export function set_scale<T>(
+  obj: T,
+  value: Vector3
+): T {
+    const new_obj = Object.assign(Object.create(Object.getPrototypeOf(obj)), obj);
+    new_obj.scale = value;
+    return new_obj;
 }

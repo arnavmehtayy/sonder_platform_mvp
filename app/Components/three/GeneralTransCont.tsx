@@ -3,8 +3,9 @@ import { useDebouncedCallback } from "use-debounce";
 import { TransformControls } from "@react-three/drei";
 import * as THREE from "three";
 import { TouchControl } from "@/classes/TouchControl";
-import { vizobj } from "@/classes/vizobj";
 import { useStore, setVizObjSelector, getObjectSelector } from "@/app/store";
+import { TransformObj } from "@/classes/transformObj";
+import { geomobj } from "@/classes/geomobj";
 
 /*
  * This component handles a TranformControl for a single object in the scene.
@@ -19,23 +20,23 @@ type GeneralTransformControlProps = {
   obj_ref: React.RefObject<THREE.Mesh>;
 };
 
-export const GeneralTransformControl = ({
+export default function GeneralTransformControl<T extends TransformObj>({
   mode,
   vizObjId,
   touchControl,
   obj_ref,
-}: GeneralTransformControlProps) => {
+}: GeneralTransformControlProps)  {
   const setVizObj = useStore(setVizObjSelector);
-  const obj = useStore(getObjectSelector(vizObjId));
-
+  const obj = useStore(getObjectSelector(vizObjId)) as T;
   const handleTransformationChange = useDebouncedCallback(() => {
-    if (obj_ref && obj_ref.current && obj) {
+    if (obj_ref && obj_ref.current && obj) { // REMOVE THIS && chain
+      console.log(obj)
       let transformValue: THREE.Vector3;
-      let updatedObj: vizobj;
+      let updatedObj: T;
       switch (mode) {
         case "scale":
           transformValue = obj_ref.current.scale;
-          updatedObj = TouchControl.populate_vizobj({
+          updatedObj = TouchControl.populate_vizobj_general<T>({
             vizobj: obj,
             scale: transformValue,
           });
@@ -46,20 +47,20 @@ export const GeneralTransformControl = ({
             obj_ref.current.rotation.y,
             obj_ref.current.rotation.z
           );
-          updatedObj = TouchControl.populate_vizobj({
+          updatedObj = TouchControl.populate_vizobj_general<T>({
             vizobj: obj,
             rotation: transformValue,
           });
           break;
         case "translate":
           transformValue = obj_ref.current.position;
-          updatedObj = TouchControl.populate_vizobj({
+          updatedObj = TouchControl.populate_vizobj_general<T>({
             vizobj: obj,
             position: transformValue,
           });
           break;
       }
-
+      
       setVizObj(vizObjId, updatedObj);
     }
   }, 100);
