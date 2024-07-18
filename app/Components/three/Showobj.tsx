@@ -60,9 +60,10 @@ export const Showobj = memo(({ id }: { id: number }) => {
         rotation={[obj.rotation.x, obj.rotation.y, obj.rotation.z]}
         scale={[obj.scale.x, obj.scale.y, obj.scale.z]}
         ref={object_ref}
+        
       >
         <primitive object={obj.geom} attach="geometry" />
-        <meshBasicMaterial color={obj.color} />
+        <meshBasicMaterial color={obj.color} side={THREE.DoubleSide} />
       </mesh>
 
       {controlsEnabled && touch_scale && (

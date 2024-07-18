@@ -23,7 +23,7 @@ export default function Experience() {
   const objectlist = useStore(getObjectsSelector);
   const { camera_pos } = useControls("cam", {
     camera_pos: {
-      value: [0, 0, 2],
+      value: [0, 0, 20],
       step: 0.1,
     },
   });
@@ -52,6 +52,8 @@ export default function Experience() {
         // left={20 }
         // right={-20 }
         position={camera_pos} // Camera position controls by useControls
+        near={0.1}
+        far={1000}
       />
 
       <OrbitControls

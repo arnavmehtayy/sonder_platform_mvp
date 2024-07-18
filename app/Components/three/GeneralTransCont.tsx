@@ -62,7 +62,7 @@ export default function GeneralTransformControl({
       
       setVizObj(vizObjId, updatedObj);
     }
-  }, 100);
+  }, 0);
 
   useEffect(() => {
     // This effect ensures that the TransformControls updates when the ref changes
