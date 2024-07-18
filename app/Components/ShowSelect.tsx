@@ -30,8 +30,7 @@ import React from "react";
 
 export function ShowSelect({ control_id }: { control_id: number }) {
   const control = useStore(getControlSelector(control_id)) as SelectControl;
-  const handleRemove= useStore(DeSelectObjectControl);
-
+  const handleRemove = useStore(DeSelectObjectControl);
 
   if (control) {
     return (
@@ -43,7 +42,7 @@ export function ShowSelect({ control_id }: { control_id: number }) {
               className="relative flex items-center justify-center p-2 bg-blue-500 rounded-md shadow"
             >
               <button
-                className="absolute top-0 right-1 text-white"
+                className="hover-button absolute top-0 right-1 text-white hover:text-red-800"
                 onClick={() => handleRemove(id)}
               >
                 &times;
