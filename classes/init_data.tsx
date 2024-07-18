@@ -8,6 +8,8 @@ import * as THREE from "three";
 import { SlideContTrans } from "./SliderContTrans";
 import { geomobj } from "./geomobj";
 import { obj } from "./obj";
+import { Control } from "./Control";
+import { SelectControl } from "./SelectControl";
 
 /*
  * This file contains the initial data that initializes the store in the app.
@@ -34,7 +36,7 @@ export const influencesData: Influence<
 
 ];
 
-export const controlData: SliderControl<any>[] = [
+export const controlData: Control[] = [
   new SlideContTrans<geomobj>({
     id: 1,
     obj_id: 2,
@@ -50,6 +52,14 @@ export const controlData: SliderControl<any>[] = [
     range: [-2, 2],
     step_size: 0.25,
   }),
+  new SelectControl(
+    {
+      id: 4,
+      selectable: [1, 2],
+      isActive: true
+    }
+  )
+
 ];
 
 export const canvasData: obj[] = [
@@ -58,6 +68,7 @@ export const canvasData: obj[] = [
     geom: new THREE.PlaneGeometry(4, 4),
     position: new THREE.Vector2(8, 0),
     color: "green",
+    isClickable: true,
     touch_controls: new TouchControl({
       translate: {
         direction: [true, true, false],
@@ -69,6 +80,7 @@ export const canvasData: obj[] = [
 
   new geomobj({
     id: 2,
+    isClickable: true,
     geom: new THREE.PlaneGeometry(4, 4),
     position: new THREE.Vector2(0, 0),
     color: "red",

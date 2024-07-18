@@ -10,6 +10,7 @@ import {
 import { useShallow } from "zustand/react/shallow";
 import { Influence } from "@/classes/influence";
 import { Vector2 } from "three";
+import { SliderControl } from "@/classes/SliderControl";
 
 /*
  * This component is a number slider that allows the user to control a numerical value.
@@ -20,7 +21,7 @@ import { Vector2 } from "three";
 
 export default function NumSlide({ control_id }: { control_id: number }) {
   const setValue = useStore(useShallow(setControlValueSelector(control_id))); // function that sets the value of a control given its control_id
-  const controller = useStore(useShallow(getControlSelector(control_id))); // get the control object based on its id
+  const controller = useStore(useShallow(getControlSelector(control_id))) as SliderControl<any>; // get the control object based on its id
   const getValue = useStore(useShallow(getControlValueSelector(control_id))); // gets the value associated with the control based on the control_id
 
   // TESTING

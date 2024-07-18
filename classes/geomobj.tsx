@@ -9,6 +9,8 @@ import { TouchControl } from "./TouchControl";
 export class geomobj extends TransformObj {
   color: string;
   geom: THREE.BufferGeometry;
+  isClickable: boolean = false;
+  OnClick: ((obj: geomobj) => void) | undefined;
   constructor({
     id,
     position = new THREE.Vector2(0, 0),
@@ -18,6 +20,8 @@ export class geomobj extends TransformObj {
     geom, // geom remains a required parameter
     touch_controls = new TouchControl(),
     param_t = 0,
+    isClickable = false,
+    OnClick = undefined,
   }: Partial<geomobj> & { geom: THREE.BufferGeometry; id: number }) {
     super({
       position: position,
@@ -29,5 +33,7 @@ export class geomobj extends TransformObj {
     });
     this.geom = geom;
     this.color = color;
+    this.isClickable = isClickable;
+    this.OnClick = OnClick;
   }
 }

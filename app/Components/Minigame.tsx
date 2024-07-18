@@ -3,6 +3,7 @@ import React, { useState } from "react";
 import Experience from "./visualexp";
 import Link from "next/link";
 import NumSlide from "./NumSlider";
+import { ShowSelect } from "./ShowSelect";
 
 /*
  * This component is the main user experience component.
@@ -43,6 +44,7 @@ export function Minigame({ page }: { page: number }) {
         <NumSlide control_id={1} />
         <NumSlide control_id={2} />
         <NumSlide control_id={3} />
+        <ShowSelect control_id={4} />
       </div>
     </>
   );
