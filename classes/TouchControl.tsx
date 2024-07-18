@@ -37,32 +37,11 @@ export class TouchControl {
     scale: THREE.Vector3;
     rotation: THREE.Vector3;
   }> & { vizobj: TransformObj }): TransformObj {
-    // we are fine with any here since we are not touching the geom which is the parameter controlled by T
-    return new TransformObj({id: vizobj.id, position: position
-        ? new THREE.Vector2(position.x, position.y)
-        : vizobj.position,
-      rotation: rotation ? rotation : vizobj.rotation,
-      scale: scale ? scale : vizobj.scale,
-    touch_controls: vizobj.touch_controls,
-    param_t: vizobj.param_t,})
+
     
-  }
-
-  static populate_vizobj_general<T extends TransformObj>({
-        vizobj,
-        position,
-        scale,
-        rotation,
-      }: Partial<{
-        position: THREE.Vector3;
-        scale: THREE.Vector3;
-        rotation: THREE.Vector3;
-      }> & { vizobj: T }): T {
-
     const newObj = Object.assign(Object.create(Object.getPrototypeOf(vizobj)), vizobj);
     // Create a new object with the same prototype as the given object
 
-    // Update the given properties
     if (position) {
       newObj.position = new THREE.Vector2(position.x, position.y);
     }
@@ -74,6 +53,7 @@ export class TouchControl {
     }
 
     return newObj;
-        // we are fine with any here since we are not touching the geom which is the parameter controlled by T
-      }
+    
+  }
+
 }

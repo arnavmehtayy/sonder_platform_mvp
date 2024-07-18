@@ -20,23 +20,22 @@ type GeneralTransformControlProps = {
   obj_ref: React.RefObject<THREE.Mesh>;
 };
 
-export default function GeneralTransformControl<T extends TransformObj>({
+export default function GeneralTransformControl({
   mode,
   vizObjId,
   touchControl,
   obj_ref,
 }: GeneralTransformControlProps)  {
   const setVizObj = useStore(setVizObjSelector);
-  const obj = useStore(getObjectSelector(vizObjId)) as T;
+  const obj = useStore(getObjectSelector(vizObjId)) as TransformObj;
   const handleTransformationChange = useDebouncedCallback(() => {
     if (obj_ref && obj_ref.current && obj) { // REMOVE THIS && chain
-      console.log(obj)
       let transformValue: THREE.Vector3;
-      let updatedObj: T;
+      let updatedObj: TransformObj;
       switch (mode) {
         case "scale":
           transformValue = obj_ref.current.scale;
-          updatedObj = TouchControl.populate_vizobj_general<T>({
+          updatedObj = TouchControl.populate_vizobj({
             vizobj: obj,
             scale: transformValue,
           });
@@ -47,14 +46,14 @@ export default function GeneralTransformControl<T extends TransformObj>({
             obj_ref.current.rotation.y,
             obj_ref.current.rotation.z
           );
-          updatedObj = TouchControl.populate_vizobj_general<T>({
+          updatedObj = TouchControl.populate_vizobj({
             vizobj: obj,
             rotation: transformValue,
           });
           break;
         case "translate":
           transformValue = obj_ref.current.position;
-          updatedObj = TouchControl.populate_vizobj_general<T>({
+          updatedObj = TouchControl.populate_vizobj({
             vizobj: obj,
             position: transformValue,
           });

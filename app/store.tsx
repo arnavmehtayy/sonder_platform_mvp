@@ -38,7 +38,6 @@ export const useStore = create<State>((set, get) => ({
   }, {} as { [id: number]: obj }),
 
   setVizObj: (id: number, new_obj: obj) => {
-    console.log(new_obj)
     set((state) => {
       const updatedState = {
         vizobjs: { ...state.vizobjs, [id]: new_obj },

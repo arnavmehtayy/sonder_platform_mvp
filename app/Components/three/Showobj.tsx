@@ -66,7 +66,7 @@ export const Showobj = memo(({ id }: { id: number }) => {
       </mesh>
 
       {controlsEnabled && touch_scale && (
-        <GeneralTransformControl<geomobj>
+        <GeneralTransformControl
           mode="scale"
           vizObjId={id}
           touchControl={obj.touch_controls.scale}
@@ -74,7 +74,7 @@ export const Showobj = memo(({ id }: { id: number }) => {
         />
       )}
       {controlsEnabled && touch_rotate && (
-        <GeneralTransformControl<geomobj>
+        <GeneralTransformControl
           mode="rotate"
           vizObjId={id}
           touchControl={obj.touch_controls.rotate}
@@ -82,7 +82,7 @@ export const Showobj = memo(({ id }: { id: number }) => {
         />
       )}
       {controlsEnabled && touch_translate && (
-        <GeneralTransformControl<geomobj>
+        <GeneralTransformControl
           mode="translate"
           vizObjId={id}
           touchControl={obj.touch_controls.translate}

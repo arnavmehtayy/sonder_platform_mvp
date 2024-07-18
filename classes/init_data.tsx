@@ -40,7 +40,7 @@ export const controlData: SliderControl<any>[] = [
     obj_id: 2,
     action: "rotate",
     range: [0, 7],
-    step_size: 0.1,
+    step_size: 0.01,
   }),
 
   new SlideContTrans<geomobj>({
