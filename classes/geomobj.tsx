@@ -19,8 +19,8 @@ export class geomobj extends TransformObj {
     color = "blue",
     geom, // geom remains a required parameter
     touch_controls = new TouchControl(),
-    param_t = 0,
-    isClickable = false,
+    param_t = 0, // the parametric parameter if the object is following a parametric object
+    isClickable = true, // if this is false then this object cannot detect a click at all
     OnClick = undefined,
   }: Partial<geomobj> & { geom: THREE.BufferGeometry; id: number }) {
     super({

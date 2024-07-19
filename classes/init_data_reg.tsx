@@ -8,6 +8,9 @@ import * as THREE from "three";
 import { LineObj } from "./Lineobj";
 import { obj } from "./obj";
 import { geomobj } from "./geomobj";
+import { Select } from "@react-three/drei";
+import { SelectControl } from "./SelectControl";
+import { Control } from "./Control";
 
 /*
  * This file contains the initial data that initializes the store in the app.
@@ -15,7 +18,7 @@ import { geomobj } from "./geomobj";
 // (obj, value) => att_funcs.set_position(obj, new Vector2(5 * Math.cos(value.x), 5 * Math.sin(value.y)))
 export const influencesData: Influence<any, any, any>[] = [];
 
-export const controlData: SliderControl<any>[] = [
+export const controlData: Control[] = [
   new SliderControl<LineObj>({
     id: 1,
     obj_id: 1000,
@@ -33,6 +36,16 @@ export const controlData: SliderControl<any>[] = [
     set_attribute: att_funcs.set_intercept,
     get_attribute: att_funcs.get_intercept,
   }),
+
+
+
+  new SelectControl({
+    id: 4,
+    selectable: [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29],
+    isActive: true,
+    capacity: 4,
+  }),
+
 ];
 
 // const positions = new Float32Array([0, 0, 0, 1, 0, 0, 0, 1, 0]);

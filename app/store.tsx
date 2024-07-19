@@ -116,6 +116,12 @@ export const DeSelectObjectControl = (state: State) => (obj_id: number) =>{ // m
   })
 }
 
+export const SetIsActiveControl = (control_id: number) => (state: State) => (val: boolean) => {
+  const control = state.controls[control_id] as SelectControl;
+  const updatedState = control.setIsActive(val)
+  state.setControlClick(control_id, updatedState);
+}
+
 
   
 

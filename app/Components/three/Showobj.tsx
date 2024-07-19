@@ -23,7 +23,6 @@ import { ShowLineObj } from "./ShowLineObj";
 
 export const Showobj = memo(({ id }: { id: number }) => {
   const obj = useStore(getObjectSelector(id));
-
   if (obj instanceof geomobj) {
     return <ShowGeomObj obj={obj} />;
   } else if (obj instanceof LineObj) {
