@@ -36,7 +36,9 @@ export function ShowSelect({ control_id }: { control_id: number }) {
   const [isDark, setIsDark] = useState(false);
 
   useEffect(() => {
+    if(control) {
     setIsActive(isDark);
+    }
   }, []);
 
   const handleClick = () => {

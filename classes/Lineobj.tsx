@@ -54,4 +54,8 @@ export class LineObj extends obj {
     const b = this.start.y - m * this.start.x;
     return [b, m, [this.start.x, this.end.x]];
   }
+
+  get_length(): number {
+    return this.start.distanceTo(this.end);
+  }
 }

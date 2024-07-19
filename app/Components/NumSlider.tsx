@@ -5,6 +5,9 @@ import {
   getControlValueSelector,
   setVizObjSelector,
   getObjectSelector,
+  useControlSelector,
+  useControlValueSelector, 
+  useObjectSelector
 } from "../store";
 import { useShallow } from "zustand/react/shallow";
 import { Influence } from "@/classes/influence";
@@ -20,8 +23,8 @@ import { SliderControl } from "@/classes/SliderControl";
 
 export default function NumSlide({ control_id }: { control_id: number }) {
   const setValue = useStore(useShallow(setControlValueSelector(control_id))); // function that sets the value of a control given its control_id
-  const controller = useStore(useShallow(getControlSelector(control_id))) as SliderControl<any>; // get the control object based on its id
-  const getValue = useStore(useShallow(getControlValueSelector(control_id))); // gets the value associated with the control based on the control_id
+  const controller = useControlSelector(control_id) as SliderControl<any>; // get the control object based on its id
+  const getValue = useControlValueSelector(control_id); // gets the value associated with the control based on the control_id
 
   // TESTING
   // const influence = useStore(getInfluenceSelector(controller.obj_id));
@@ -31,8 +34,6 @@ export default function NumSlide({ control_id }: { control_id: number }) {
   // if (influence) {
   //   worker = useStore(getObjectSelector(influence.worker_id));
   // }
-
-  // console.log("Controller: ", control_id)
 
   return controller ? (
     <div className="bg-white rounded-lg shadow-md p-4">

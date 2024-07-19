@@ -1,0 +1,46 @@
+import React, { useEffect, useState } from "react";
+import { useStore, getScore, getObjectSelector2 } from "../store";
+
+export default function ShowScore({
+  score_id,
+  text,
+}: {
+  score_id: number;
+  text: string;
+}) {
+  const [scoreValue, setScoreValue] = useState(null);
+  const score = getScore(score_id);
+  const get_obj = useStore(getObjectSelector2);
+
+  useEffect(() => {
+    if(score) {
+    const objs = score.obj_id_list.map((obj_id) => get_obj(obj_id));
+    setScoreValue(score.computeValue(objs).toString());
+    }
+  }, [get_obj]);
+
+  return (
+    score ?
+    <div className="bg-white rounded-lg shadow-md p-4 mb-4">
+      <h3 className="text-lg font-semibold text-blue-800 mb-2">{text}</h3>
+      <div className="flex items-center justify-between">
+        <span className="text-gray-600">Score:</span>
+        <span className="text-2xl font-bold text-blue-600">
+          {scoreValue !== null ? (
+            scoreValue
+          ) : (
+            <span className="text-gray-400 text-lg">Calculating...</span>
+          )}
+        </span>
+      </div>
+      {scoreValue !== null && (
+        <div className="mt-2 h-2 bg-blue-200 rounded-full overflow-hidden">
+          <div
+            className="h-full bg-blue-600 rounded-full transition-all duration-500 ease-out"
+            style={{ width: `${Math.min(100, parseFloat(scoreValue))}%` }}
+          ></div>
+        </div>
+      )}
+    </div> : null
+  );
+}

@@ -5,18 +5,30 @@ import {
   influencesData,
   controlData,
   canvasData,
+  scoreData,
 } from "@/classes/init_data_reg";
 import { obj } from "@/classes/obj";
 import { Control } from "@/classes/Control";
 import { SelectControl } from "@/classes/SelectControl";
+import { Score } from "@/classes/Score";
+import { shallow } from "zustand/shallow";
 
-const influences: { [id: number]: Influence<any, any, any>[] } = influencesData.reduce((acc, influence) => {
-  if (!acc[influence.master_id]) {
-    acc[influence.master_id] = [];
-  }
-  acc[influence.master_id].push(influence);
-  return acc;
-}, {} as { [id: number]: Influence<any, any, any>[] });
+const influences: { [id: number]: Influence<any, any, any>[] } =
+  influencesData.reduce((acc, influence) => {
+    if (!acc[influence.master_id]) {
+      acc[influence.master_id] = [];
+    }
+    acc[influence.master_id].push(influence);
+    return acc;
+  }, {} as { [id: number]: Influence<any, any, any>[] });
+
+const scores: { [id: number]: Score<any, any> } = scoreData.reduce(
+  (acc, obj) => {
+    acc[obj.score_id] = obj;
+    return acc;
+  },
+  {} as { [id: number]: Score<any, any> }
+); // this is a dictionary of scores
 
 export type State = {
   vizobjs: { [id: number]: obj };
@@ -80,6 +92,10 @@ export const setControlValueSelector =
   };
 export const getObjectSelector = (id: number) => (state: State) =>
   state.vizobjs[id];
+
+export const getObjectSelector2 =  (state: State) => (id: number) =>
+  state.vizobjs[id];
+
 export const getControlSelector = (control_id: number) => (state: State) =>
   state.controls[control_id];
 export const getControlValueSelector =
@@ -88,7 +104,6 @@ export const getControlValueSelector =
     const viz = state.vizobjs[control?.obj_id];
     return viz && control ? control.get_attribute(viz) : 0;
   };
-
 
 export const SelectObjectControl =
   (obj_id: number) =>
@@ -117,3 +132,25 @@ export const SetIsActiveControl =
     const updatedState = control.setIsActive(val);
     state.setControlClick(control_id, updatedState);
   };
+
+export const getScore = (score_id: number) => { // note score is not stored in the state
+    return scores[score_id];
+}
+
+
+import { useMemo } from 'react';
+
+export const useObjectSelector = (id: number) => {
+  const selector = useMemo(() => getObjectSelector(id), [id]);
+  return useStore(selector, shallow);
+};
+
+export const useControlSelector = (control_id: number) => {
+  const selector = useMemo(() => getControlSelector(control_id), [control_id]);
+  return useStore(selector, shallow);
+};
+
+export const useControlValueSelector = (control_id: number) => {
+  const selector = useMemo(() => getControlValueSelector(control_id), [control_id]);
+  return useStore(selector);
+};

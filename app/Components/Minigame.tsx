@@ -4,6 +4,7 @@ import Experience from "./visualexp";
 import Link from "next/link";
 import NumSlide from "./NumSlider";
 import { ShowSelect } from "./ShowSelect";
+import ShowScore from "./ShowScore";
 
 /*
  * This component is the main user experience component.
@@ -39,6 +40,7 @@ export function Minigame({ page }: { page: number }) {
         <NumSlide control_id={1} />
         <NumSlide control_id={2} />
         <NumSlide control_id={3} />
+        <ShowScore score_id={1} text="MSE: " />
       </div>
 
       {/* Show Selects */}

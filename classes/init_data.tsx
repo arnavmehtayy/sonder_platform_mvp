@@ -10,11 +10,14 @@ import { geomobj } from "./geomobj";
 import { obj } from "./obj";
 import { Control } from "./Control";
 import { SelectControl } from "./SelectControl";
+import { Score } from "./Score";
 
 /*
  * This file contains the initial data that initializes the store in the app.
  */
 // (obj, value) => att_funcs.set_position(obj, new Vector2(5 * Math.cos(value.x), 5 * Math.sin(value.y)))
+export const scoreData: Score<any, any>[] = [];
+
 export const influencesData: Influence<
   any,
   any,
@@ -46,7 +49,7 @@ export const controlData: Control[] = [
   }),
 
   new SlideContTrans<geomobj>({
-    id: 3,
+    id: 2,
     obj_id: 1,
     action: "move",
     range: [-2, 2],

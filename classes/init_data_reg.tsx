@@ -11,12 +11,28 @@ import { geomobj } from "./geomobj";
 import { Select } from "@react-three/drei";
 import { SelectControl } from "./SelectControl";
 import { Control } from "./Control";
-
+import { Score } from "./Score";
 /*
  * This file contains the initial data that initializes the store in the app.
  */
 // (obj, value) => att_funcs.set_position(obj, new Vector2(5 * Math.cos(value.x), 5 * Math.sin(value.y)))
-export const influencesData: Influence<any, any, any>[] = [];
+export const influencesData: Influence<any, any, any>[] = [
+];
+
+export const scoreData: Score<any, any>[] = [
+  new Score<number, LineObj>({
+    score_id: 1,
+    obj_id_list:  [30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59],
+    get_attribute: (obj: LineObj) => att_funcs.get_length(obj),
+    transformation: (vals) => {
+      let sum: number= 0
+      for(let i = 0; i < vals.length; i++) {
+        sum += Math.round(vals[i])
+      }
+      return sum
+    }
+  })
+];
 
 export const controlData: Control[] = [
   new SliderControl<LineObj>({

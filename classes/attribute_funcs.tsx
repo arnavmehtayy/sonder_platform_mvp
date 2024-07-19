@@ -45,6 +45,10 @@ export function set_slope( // change
   return new_obj;
 }
 
+export function get_length(obj: LineObj): number {
+    return obj.get_length();
+    }
+
 export function get_intercept(obj: LineObj): number {
   return obj.get_slope_intercept()[0];
 }
@@ -91,6 +95,8 @@ export function set_path_pos<T>(
 export function get_rotation(obj: TransformObj): Vector3 {
   return obj.rotation;
 }
+
+
 
 export function set_rotation<T>(
   obj: T,
