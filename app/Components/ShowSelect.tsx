@@ -65,7 +65,7 @@ export function ShowSelect({ control_id }: { control_id: number }) {
             >
               <button
                 className="hover-button absolute top-0 right-1 text-white hover:text-red-800"
-                onClick={() => handleRemove(id)}
+                onClick={() => handleRemove(id, control_id)}
               >
                 &times;
               </button>

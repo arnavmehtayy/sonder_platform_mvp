@@ -47,6 +47,7 @@ export function Minigame({ page }: { page: number }) {
         <NumSlide control_id={2} />
         <NumSlide control_id={3} />
         <ShowSelect control_id={4} />
+        <ShowSelect control_id={5} />
       </div>
     </>
   );
