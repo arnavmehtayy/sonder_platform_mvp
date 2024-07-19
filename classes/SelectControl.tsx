@@ -29,7 +29,7 @@ export class SelectControl extends Control {
   }
 
   SelectObj(obj_id: number): SelectControl {
-    if (this.selected.length < this.capacity) {
+    if (this.selected.length < this.capacity && this.isActive) {
       // check if obj_id does not already exist in the array
       if (!this.selected.includes(obj_id) && this.selectable.includes(obj_id)) {
         this.selected.push(obj_id);
@@ -46,7 +46,7 @@ export class SelectControl extends Control {
   }
 
   deselectObj(obj_id: number): SelectControl {
-    if (this.selected.includes(obj_id)) {
+    if (this.selected.includes(obj_id) && this.isActive) {
       this.selected = this.selected.filter((id) => id !== obj_id);
       this.capacity--;
       return this.clone();

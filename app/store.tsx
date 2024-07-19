@@ -76,6 +76,9 @@ export const useStore = create<State>((set, get) => ({
     }
   },
 
+  // setControlClick2: (control_id: number) => (obj_id: number, mode: "select" | "deselect") => {
+  // },
+
   setControlClick:
     (control_id: number) => (obj_id: number, mode: "select" | "deselect") => {
       const control = get().controls[control_id] as SelectControl

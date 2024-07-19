@@ -34,24 +34,35 @@ export function ShowSelect({ control_id }: { control_id: number }) {
 
   if (control) {
     return (
-      <div className="p-4 bg-blue-100 shadow-md rounded-md m-2 border border-gray-300">
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2">
-          {control.selected.map((id: number) => (
-            <div
-              key={id}
-              className="relative flex items-center justify-center p-2 bg-blue-500 rounded-md shadow"
-            >
-              <button
-                className="hover-button absolute top-0 right-1 text-white hover:text-red-800"
-                onClick={() => handleRemove(id)}
-              >
-                &times;
-              </button>
-              {id}
-            </div>
-          ))}
-        </div>
+        <div className="p-5 bg-blue-100 shadow-md rounded-md m-2 border border-gray-300">
+  <div className="flex justify-start mb-4">
+    <button
+      onClick={() => console.log("CLICKED")}
+      className="bg-blue-500 text-white py-2 px-4 rounded-md shadow hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
+    >
+      Select
+    </button>
+  </div>
+  <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+    {control.selected.map((id: number) => (
+      <div
+        key={id}
+        className="relative flex items-center justify-center p-4 bg-blue-500 rounded-md shadow h-40 w-full"
+      >
+        <button
+          className="hover-button absolute top-0 right-1 text-white hover:text-red-800"
+          onClick={() => handleRemove(id)}
+        >
+          &times;
+        </button>
+        {id}
       </div>
+    ))}
+  </div>
+</div>
+
+
+      
     );
   } else {
     return null;
