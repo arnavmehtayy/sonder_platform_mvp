@@ -3,7 +3,6 @@ import {
   setControlValueSelector,
   getControlSelector,
   getControlValueSelector,
-  getInfluenceSelector,
   setVizObjSelector,
   getObjectSelector,
 } from "../store";
@@ -36,33 +35,22 @@ export default function NumSlide({ control_id }: { control_id: number }) {
   // console.log("Controller: ", control_id)
 
   return controller ? (
-    <>
-      <div
-        className="flex flex-col items-center justify-center mx-auto my-12 space-y-4"
-        style={{ width: "300px" }}
-      >
-        <input
-          className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer dark:bg-gray-900"
-          type="range"
-          min={controller?.range[0].toString()}
-          max={controller?.range[1].toString()}
-          step={controller.step_size}
-          value={getValue}
-          onChange={(e) => {
-            setValue(Number(e.target.value));
-            // if(influence && worker) {
-            //   Influence.UpdateInfluenceManual(
-            //     influence,
-            //     setObj,
-            //     worker,
-            //     Number(e.target.value)
-            //   );
-              
-            // }
-          }}
-        />
-        <p className="text-lg font-semibold text-blue-600">Value: {getValue}</p>
+    <div className="bg-white rounded-lg shadow-md p-4">
+      <h3 className="text-lg font-semibold text-blue-800 mb-2">Control {control_id}</h3>
+      <input
+        className="w-full h-2 bg-blue-200 rounded-lg appearance-none cursor-pointer"
+        type="range"
+        min={controller?.range[0].toString()}
+        max={controller?.range[1].toString()}
+        step={controller.step_size}
+        value={getValue}
+        onChange={(e) => setValue(Number(e.target.value))}
+      />
+      <div className="flex justify-between items-center mt-2">
+        <span className="text-sm text-gray-600">{controller?.range[0]}</span>
+        <span className="text-sm font-medium text-blue-600">{getValue}</span>
+        <span className="text-sm text-gray-600">{controller?.range[1]}</span>
       </div>
-    </>
+    </div>
   ) : null;
 }

@@ -2,7 +2,6 @@
 import { Influence } from "@/classes/influence";
 import {
   useStore,
-  getInfluenceSelector,
   setVizObjSelector,
   getObjectSelector,
 } from "../store";

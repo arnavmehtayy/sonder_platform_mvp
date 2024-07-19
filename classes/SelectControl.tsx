@@ -46,7 +46,7 @@ export class SelectControl extends Control {
   }
 
   deselectObj(obj_id: number): SelectControl {
-    if (this.selected.includes(obj_id) && this.isActive) {
+    if (this.selected.includes(obj_id)) {
       this.selected = this.selected.filter((id) => id !== obj_id);
       return this.clone();
     } else {

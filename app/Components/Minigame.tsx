@@ -19,36 +19,48 @@ export function Minigame({ page }: { page: number }) {
   const test_id: number = 1; // for testing remove soon
 
   return (
-    <>
-      <div
-        className="border-solid border-2 border-blue-200 ..."
-        style={{ width: "100vw", height: "80vh" }}
-      >
-        <Experience /> {/* creating the three.js experience to be displayed */}
+    <div className="flex h-screen bg-gray-100">
+  {/* Main Three.js Experience */}
+  <div className="flex-grow bg-black">
+    <Experience /> {/* Three.js experience */}
+  </div>
+
+  {/* Sidebar */}
+  <div className="w-1/3 min-w-[300px] max-w-md bg-blue-50 p-6 overflow-y-auto">
+    <div className="space-y-6">
+      {/* Question */}
+      <div className="bg-white rounded-lg shadow-md p-4">
+        <h2 className="text-xl font-semibold text-blue-800 mb-2">Question:</h2>
+        <p id="question-text" className="text-gray-700">{text}</p>
       </div>
-      <div className="bg-blue-200 shadow-lg rounded-lg p-6 m-2">
-        <div className="text-gray-700 text-lg">
-          <p id="question-text"> {text}</p>
-        </div>
-        <div className="flex justify-end mt-4">
-          <Link
-            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
-            href={`/${Number(page) + 1}`} // Link to the Next page in this case just for testing
-          >
-            Next Question
-          </Link>
-        </div>
-        
-        {/* Number slider for interactivity using the control_id */}
 
-        
-
+      {/* Number Sliders */}
+      <div className="space-y-4">
         <NumSlide control_id={1} />
         <NumSlide control_id={2} />
         <NumSlide control_id={3} />
+      </div>
+
+      {/* Show Selects */}
+      <div className="space-y-4">
         <ShowSelect control_id={4} />
         <ShowSelect control_id={5} />
       </div>
-    </>
+
+      {/* Next Question Button */}
+      <div className="mt-6">
+        <Link
+          className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg transition duration-300 ease-in-out flex items-center justify-center"
+          href={`/${Number(page) + 1}`}
+        >
+          Next Question
+          <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 ml-2" viewBox="0 0 20 20" fill="currentColor">
+            <path fillRule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clipRule="evenodd" />
+          </svg>
+        </Link>
+      </div>
+    </div>
+  </div>
+</div>
   );
 }
