@@ -13,7 +13,7 @@ import { SelectControl } from "@/classes/SelectControl";
 import { Score } from "@/classes/Score";
 import { shallow } from "zustand/shallow";
 
-const influences: { [id: number]: Influence<any, any, any>[] } =
+const influences: { [id: number]: Influence<any,  obj,  obj>[] } =
   influencesData.reduce((acc, influence) => {
     if (!acc[influence.master_id]) {
       acc[influence.master_id] = [];

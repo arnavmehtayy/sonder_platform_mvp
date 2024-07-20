@@ -1,13 +1,8 @@
 import {
   useStore,
   setControlValueSelector,
-  getControlSelector,
-  getControlValueSelector,
-  setVizObjSelector,
-  getObjectSelector,
   useControlSelector,
   useControlValueSelector, 
-  useObjectSelector
 } from "../store";
 import { useShallow } from "zustand/react/shallow";
 import { Influence } from "@/classes/influence";
