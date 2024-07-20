@@ -22,7 +22,7 @@ import { SliderControl } from "@/classes/SliderControl";
  */
 
 export default function NumSlide({ control_id }: { control_id: number }) {
-  const setValue = useStore(useShallow(setControlValueSelector(control_id))); // function that sets the value of a control given its control_id
+  const setValue = useStore(setControlValueSelector(control_id)); // function that sets the value of a control given its control_id
   const controller = useControlSelector(control_id) as SliderControl<any>; // get the control object based on its id
   const getValue = useControlValueSelector(control_id); // gets the value associated with the control based on the control_id
 
@@ -34,6 +34,7 @@ export default function NumSlide({ control_id }: { control_id: number }) {
   // if (influence) {
   //   worker = useStore(getObjectSelector(influence.worker_id));
   // }
+
 
   return controller ? (
     <div className="bg-white rounded-lg shadow-md p-4">

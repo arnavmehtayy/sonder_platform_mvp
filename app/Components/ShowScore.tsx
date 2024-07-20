@@ -27,7 +27,7 @@ export default function ShowScore({
         <span className="text-gray-600">Score:</span>
         <span className="text-2xl font-bold text-blue-600">
           {scoreValue !== null ? (
-            scoreValue
+            score.to_string(scoreValue)
           ) : (
             <span className="text-gray-400 text-lg">Calculating...</span>
           )}
@@ -37,7 +37,7 @@ export default function ShowScore({
         <div className="mt-2 h-2 bg-blue-200 rounded-full overflow-hidden">
           <div
             className="h-full bg-blue-600 rounded-full transition-all duration-500 ease-out"
-            style={{ width: `${Math.min(100, parseFloat(scoreValue))}%` }}
+            style={{ width: `${Math.min(100, parseFloat(scoreValue)/1)}%` }}
           ></div>
         </div>
       )}

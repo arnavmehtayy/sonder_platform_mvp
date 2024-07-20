@@ -5,18 +5,22 @@ export class Score<Score_T, obj_T extends obj> {
   obj_id_list: number[]; // these are the objects that will be used to compute the store
   get_attribute: (obj: obj_T) => number; // Function to get the attribute of the object
   transformation: (vals: number[]) => Score_T;
+  to_string: (score: Score_T) => string;
 
   constructor({
     score_id,
     obj_id_list,
     get_attribute,
     transformation,
+    to_string
   }: {
     score_id: number
     obj_id_list: number[];
     get_attribute: (obj: obj_T) => number;
     transformation: (vals: number[]) => Score_T;
+    to_string: (score: Score_T) => string;
   }) {
+    this.to_string = to_string;
     this.score_id = score_id;
     this.obj_id_list = obj_id_list;
     this.get_attribute = get_attribute;
@@ -36,4 +40,6 @@ export class Score<Score_T, obj_T extends obj> {
   ): boolean {
     return Math.abs(comparer(this.computeValue(obj_list), target)) < 0.1;
   }
+
+  
 }
