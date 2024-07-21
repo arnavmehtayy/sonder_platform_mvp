@@ -6,6 +6,9 @@ import NumSlide from "./NumSlider";
 import { ShowSelect } from "./ShowSelect";
 import ShowScore from "./ShowScore";
 
+import 'katex/dist/katex.min.css';
+import Latex from 'react-latex-next';
+
 /*
  * This component is the main user experience component.
  * It displays the visual experience (three.js) and the question for the user to answer
@@ -16,6 +19,16 @@ import ShowScore from "./ShowScore";
 export function Minigame({ page }: { page: number }) {
   console.log("Page: ", page);
   const [text, setText] = useState("This is a test question? ");
+
+  const latexText = `
+  \\[
+  \\begin{aligned}
+    \\text{Find the value of } & \\int_0^1 x^2 \\, dx: \\\\
+    \\int_0^1 x^2 \\, dx & = \\left[ \\frac{x^3}{3} \\right]_0^1 \\\\
+    & = \\frac{1}{3}
+  \\end{aligned}
+  \\]
+`;
 
   const test_id: number = 1; // for testing remove soon
 
@@ -32,7 +45,7 @@ export function Minigame({ page }: { page: number }) {
           {/* Question */}
           <div className="bg-white rounded-lg shadow-md p-3 md:p-4">
             <h2 className="text-lg md:text-xl font-semibold text-blue-800 mb-2">Question:</h2>
-            <p id="question-text" className="text-gray-700">{text}</p>
+            <p id="question-text" className="text-gray-700"> <Latex> {latexText} </Latex> </p>
           </div>
           
           {/* Number Sliders */}
