@@ -6,75 +6,119 @@ import {
   controlData,
   canvasData,
   scoreData,
-} from "@/classes/init_data_reg";
+} from "@/classes/init_data";
+
+import { initDataSets } from "@/classes/init_datasets";
 import { obj } from "@/classes/obj";
 import { Control } from "@/classes/Control";
 import { SelectControl } from "@/classes/SelectControl";
 import { Score } from "@/classes/Score";
 import { shallow } from "zustand/shallow";
 
-const influences: { [id: number]: Influence<any,  obj,  obj>[] } =
-  influencesData.reduce((acc, influence) => {
-    if (!acc[influence.master_id]) {
-      acc[influence.master_id] = [];
-    }
-    acc[influence.master_id].push(influence);
-    return acc;
-  }, {} as { [id: number]: Influence<any, any, any>[] });
 
-const scores: { [id: number]: Score<any, any> } = scoreData.reduce(
-  (acc, obj) => {
-    acc[obj.score_id] = obj;
-    return acc;
-  },
-  {} as { [id: number]: Score<any, any> }
-); // this is a dictionary of scores
+  export type State = {
+    question: string;
+    vizobjs: { [id: number]: obj };
+    controls: { [id: number]: Control };
+    influences: { [id: number]: Influence<any, obj, obj>[] };
+    scores: { [id: number]: Score<any, any> };
+    setVizObj: (id: number, new_obj: obj) => void;
+    setControlClick: (control_id: number, new_obj: Control) => void;
+    reset: (dataSetKey: keyof typeof initDataSets) => void;
+  };
+  
+  export const useStore = create<State>((set, get) => ({
+    question: "",
+    controls: {},
+    vizobjs: {},
+    influences: {},
+    scores: {},
+    
+    setVizObj: (id: number, new_obj: obj) => {
+      set((state) => {
+        const updatedState = {
+          vizobjs: { ...state.vizobjs, [id]: new_obj },
+        };
+  
+        const masterInfluences = state.influences[id];
+        if (masterInfluences) {
+          masterInfluences.forEach((influence: Influence<any, any, any>) => {
+            updatedState.vizobjs[influence.worker_id] = Influence.UpdateInfluence(
+              influence,
+              new_obj,
+              state.vizobjs[influence.worker_id]
+            );
+          });
+        }
+  
+        return updatedState;
+      });
+    },
+  
+    setControlClick: (control_id: number, new_obj: Control) => {
+      set((state) => {
+        return { controls: { ...state.controls, [control_id]: new_obj } };
+      });
+    },
+  
+    reset: (dataSetKey: keyof typeof initDataSets) => {
+      const dataSet = initDataSets[dataSetKey];
+      set({
+        question: dataSet.question,
 
-export type State = {
-  vizobjs: { [id: number]: obj };
-  controls: { [id: number]: Control };
-  setVizObj: (id: number, new_obj: obj) => void;
-  setControlClick: (control_id: number, new_obj: Control) => void;
-};
+        controls: dataSet.controlData.reduce((acc, control) => {
+          acc[control.id] = control;
+          return acc;
+        }, {} as { [id: number]: Control }),
+  
+        vizobjs: dataSet.canvasData.reduce((acc, obj) => {
+          acc[obj.id] = obj;
+          return acc;
+        }, {} as { [id: number]: obj }),
+  
+        influences: dataSet.influencesData.reduce((acc, influence) => {
+          if (!acc[influence.master_id]) {
+            acc[influence.master_id] = [];
+          }
+          acc[influence.master_id].push(influence);
+          return acc;
+        }, {} as { [id: number]: Influence<any, obj, obj>[] }),
+  
+        scores: dataSet.scoreData.reduce((acc, score) => {
+          acc[score.score_id] = score;
+          return acc;
+        }, {} as { [id: number]: Score<any, any> }),
+      });
 
-export const useStore = create<State>((set, get) => ({
-  controls: controlData.reduce((acc, control) => {
-    acc[control.id] = control;
-    return acc;
-  }, {} as { [id: number]: Control }),
+      set((state) => {
+        const updatedVizobjs = { ...state.vizobjs };
 
-  vizobjs: canvasData.reduce((acc, obj) => {
-    acc[obj.id] = obj;
-    return acc;
-  }, {} as { [id: number]: obj }),
+      Object.keys(updatedVizobjs).forEach((objId) => {
+        const masterObj = updatedVizobjs[Number(objId)];
+        const masterInfluences = state.influences[Number(objId)];
+        if (masterInfluences) {
+          masterInfluences.forEach((influence) => {
+            updatedVizobjs[influence.worker_id] = Influence.UpdateInfluence(
+              influence,
+              masterObj,
+              updatedVizobjs[influence.worker_id]
+            );
+          });
+        }
+      });
 
-  setVizObj: (id: number, new_obj: obj) => {
-    set((state) => {
-      const updatedState = {
-        vizobjs: { ...state.vizobjs, [id]: new_obj },
-      };
-
-      const masterInfluences = influences[id];
-      if (masterInfluences) {
-        masterInfluences.forEach((influence) => {
-          updatedState.vizobjs[influence.worker_id] = Influence.UpdateInfluence(
-            influence,
-            new_obj,
-            state.vizobjs[influence.worker_id]
-          );
-        });
-      }
-
-      return updatedState;
-    });
-  },
-
-  setControlClick: (control_id: number, new_obj: Control) => {
-    set((state) => {
-      return { controls: { ...state.controls, [control_id]: new_obj } };
-    });
-  },
-}));
+      return { vizobjs: updatedVizobjs };
+  
+        return { vizobjs: updatedVizobjs };
+      });
+    },
+  }));
+  
+  // Update getScore to use the state
+  export const getScore = (score_id: number) => {
+    const scores = useStore.getState().scores;
+    return scores[score_id];
+  };
 
 export const getObjectsSelector = (state: State) =>
   Object.values(state.vizobjs);
@@ -133,9 +177,9 @@ export const SetIsActiveControl =
     state.setControlClick(control_id, updatedState);
   };
 
-export const getScore = (score_id: number) => { // note score is not stored in the state
-    return scores[score_id];
-}
+// export const getScore = (score_id: number) => { // note score is not stored in the state
+//     return scores[score_id];
+// }
 
 
 import { useMemo } from 'react';
@@ -154,3 +198,5 @@ export const useControlValueSelector = (control_id: number) => {
   const selector = useMemo(() => getControlValueSelector(control_id), [control_id]);
   return useStore(selector);
 };
+
+export const getQuestionSelector = (state: State) => state.question;

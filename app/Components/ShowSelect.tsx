@@ -54,10 +54,10 @@ export function ShowSelect({ control_id }: { control_id: number }) {
           <button
             onClick={handleClick}
             className={`${
-              control.isActive ? "bg-blue-600" : "bg-gray-400"
+              isDark ? "bg-blue-600" : "bg-gray-400"
             } text-white py-1 px-3 rounded-md text-sm font-medium transition duration-300 ease-in-out`}
           >
-            {control.isActive ? "Active" : "Inactive"}
+            {isDark ? "Active" : "Inactive"}
           </button>
         </div>
         <div className="grid grid-cols-3 gap-2">
