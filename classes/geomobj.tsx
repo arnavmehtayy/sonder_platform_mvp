@@ -51,17 +51,16 @@ export class geomobj extends TransformObj {
         objectRef: React.RefObject<THREE.Mesh>;
     }): React.ReactElement {
         return (
-        <mesh
+            <mesh
             position={[this.position.x, this.position.y, 0]}
             rotation={[this.rotation.x, this.rotation.y, this.rotation.z]}
             scale={[this.scale.x, this.scale.y, this.scale.z]}
             ref={objectRef}
             onClick={this.isClickable ? onClickSelect : undefined}
-        >
-            <bufferGeometry attach="geometry" {...this.geom} />
-            <meshBasicMaterial attach="material" color={this.color} />
-            {children}
-        </mesh>
+          >
+            <primitive object={this.geom} attach="geometry" />
+            <meshBasicMaterial color={this.color} side={THREE.DoubleSide} />
+          </mesh>
         );
     }
 }
