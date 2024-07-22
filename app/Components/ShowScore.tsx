@@ -3,10 +3,8 @@ import { useStore, getScore, getObjectSelector2 } from "../store";
 
 export default function ShowScore({
   score_id,
-  text,
 }: {
   score_id: number;
-  text: string;
 }) {
   const [scoreValue, setScoreValue] = useState(null);
   const score = getScore(score_id);

@@ -4,7 +4,8 @@ import Experience from "./visualexp";
 import Link from "next/link";
 import ShowControl from "./ShowControl";
 import ShowScore from "./ShowScore";
-import { useStore, getQuestionSelector } from "../store";
+import { useStore, getQuestionSelector, getStateName} from "../store";
+import { initDataSets } from "@/classes/init_datasets";
 
 import "katex/dist/katex.min.css";
 import Latex from "react-latex-next";
@@ -22,6 +23,7 @@ export function Minigame({ page }: { page: number }) {
   const [resetInput, setResetInput] = useState("");
   const reset = useStore((state) => state.reset); // Assuming you have a reset function in your store
   const question: string = useStore(getQuestionSelector);
+  const state_name = useStore(getStateName);
 
 //   const latexText = `
 //   \\[
@@ -65,16 +67,17 @@ export function Minigame({ page }: { page: number }) {
 
           {/* Number Sliders */}
           <div className="space-y-3 md:space-y-4">
-            <ShowControl control_id={1} />
+            {/* <ShowControl control_id={1} />
             <ShowControl control_id={2} />
-            <ShowControl control_id={3} />
-            <ShowScore score_id={1} text="MSE: " />
+            <ShowControl control_id={3} /> */}
+            <ShowScore score_id={1} />
           </div>
 
           {/* Show Selects */}
           <div className="space-y-3 md:space-y-4">
-          <ShowControl control_id={4} />
-          <ShowControl control_id={5} />
+            { state_name ? initDataSets[state_name].controlData.map((control) => (<ShowControl control_id={control.id} key={control.id} />)) : null }
+          {/* <ShowControl control_id={4} />
+          <ShowControl control_id={5} /> */}
           </div>
 
           {/* Reset State Input and Button */}
