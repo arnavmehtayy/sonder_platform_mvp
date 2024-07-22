@@ -6,6 +6,8 @@ import { OrthographicCamera, OrbitControls, Stats, Grid } from "@react-three/dre
 import { Showobj} from "./three/Showobj";
 import { useStore, getObjectsSelector } from "../store";
 import * as THREE from "three";
+import { Bloom, Noise, Glitch, ToneMapping, Vignette, EffectComposer } from '@react-three/postprocessing'
+import { PlacementProvider, PlacementControl, PlacementActivationButton } from './three/PlacementControl'
 
 /*
  * This component is the main visual experience component.
@@ -43,7 +45,16 @@ export default function Experience() {
   })
 
   return (
+    <>
+    
+    <PlacementProvider>
     <Canvas>
+    {/* <EffectComposer>
+      <Bloom luminanceThreshold={0.6} luminanceSmoothing={0.9} height={300} />
+      <Noise opacity={0.02} />
+      <ToneMapping adaptive={true} />
+      <Vignette eskil={false} offset={0.1} darkness={1.1} />
+    </EffectComposer> */}
       <OrthographicCamera
         makeDefault
         zoom={15} // Zoom level
@@ -85,6 +96,8 @@ export default function Experience() {
         <meshBasicMaterial color="red" side={THREE.DoubleSide} />
       </mesh> */}
 
+      <PlacementControl gridSize={[10, 10]} cellSize={1} />
+
       <>
         {objectlist.map((obj, index) => (
           <Showobj key={index} id={obj.id} />
@@ -96,5 +109,8 @@ export default function Experience() {
       {/* <Grid position={[0, 0, -1]} rotation={[Math.PI/2, 0,0]} args={gridSize} {...gridConfig} /> */}
       {/* Display performance stats */}
     </Canvas>
+    <PlacementActivationButton />
+    </PlacementProvider>
+    </>
   );
 }

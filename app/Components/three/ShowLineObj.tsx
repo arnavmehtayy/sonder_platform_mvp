@@ -8,6 +8,8 @@ import {
     SelectObjectControl,
   } from "@/app/store";
 
+import { EffectComposer, Bloom, Noise, ToneMapping, Vignette } from '@react-three/postprocessing'
+
 
  
 
@@ -25,6 +27,7 @@ export function ShowLineObj({obj}: {obj: LineObj}) {
 
 
     return (
+        
         obj.getMesh({ children: null, onClickSelect: onClickSelect, objectRef: object_ref})
         // <mesh position={[0, 0, 0]} rotation={[0, 0, 0]} scale={[1, 1, 1]}>
         //   <Line

@@ -11,6 +11,7 @@ import { obj } from "@/classes/obj";
 import { ShowGeomObj } from "./ShowgeomObj";
 import { ShowLineObj } from "./ShowLineObj";
 
+
 /*
   * This component handles the rendering of a single object in the scene.
   * It takes in an id and renders the object with that id.
@@ -24,7 +25,7 @@ import { ShowLineObj } from "./ShowLineObj";
 export const Showobj = memo(({ id }: { id: number }) => {
   const obj = useStore(getObjectSelector(id));
   if (obj instanceof geomobj) {
-    return <ShowGeomObj obj={obj} />;
+    return  <ShowGeomObj obj={obj} />;
   } else if (obj instanceof LineObj) {
     return <ShowLineObj obj={obj} />;
   } else {
