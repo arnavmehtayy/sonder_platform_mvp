@@ -109,7 +109,6 @@ import { shallow } from "zustand/shallow";
 
       return { vizobjs: updatedVizobjs };
   
-        return { vizobjs: updatedVizobjs };
       });
     },
   }));
@@ -200,3 +199,5 @@ export const useControlValueSelector = (control_id: number) => {
 };
 
 export const getQuestionSelector = (state: State) => state.question;
+
+export const getNameSelector = (state: State) => (id: number) => state.vizobjs[id].name;

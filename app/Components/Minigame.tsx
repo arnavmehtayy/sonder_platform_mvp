@@ -2,8 +2,7 @@
 import React, { useState } from "react";
 import Experience from "./visualexp";
 import Link from "next/link";
-import NumSlide from "./NumSlider";
-import { ShowSelect } from "./ShowSelect";
+import ShowControl from "./ShowControl";
 import ShowScore from "./ShowScore";
 import { useStore, getQuestionSelector } from "../store";
 
@@ -20,20 +19,19 @@ import Latex from "react-latex-next";
 
 export function Minigame({ page }: { page: number }) {
   console.log("Page: ", page);
-  const [text, setText] = useState("This is a test question? ");
   const [resetInput, setResetInput] = useState("");
   const reset = useStore((state) => state.reset); // Assuming you have a reset function in your store
   const question: string = useStore(getQuestionSelector);
 
-  const latexText = `
-  \\[
-  \\begin{aligned}
-    \\text{Find the value of } & \\int_0^1 x^2 \\, dx: \\\\
-    \\int_0^1 x^2 \\, dx & = \\left[ \\frac{x^3}{3} \\right]_0^1 \\\\
-    & = \\frac{1}{3}
-  \\end{aligned}
-  \\]
-`;
+//   const latexText = `
+//   \\[
+//   \\begin{aligned}
+//     \\text{Find the value of } & \\int_0^1 x^2 \\, dx: \\\\
+//     \\int_0^1 x^2 \\, dx & = \\left[ \\frac{x^3}{3} \\right]_0^1 \\\\
+//     & = \\frac{1}{3}
+//   \\end{aligned}
+//   \\]
+// `;
 
   const test_id: number = 1; // for testing remove soon
 
@@ -67,16 +65,16 @@ export function Minigame({ page }: { page: number }) {
 
           {/* Number Sliders */}
           <div className="space-y-3 md:space-y-4">
-            <NumSlide control_id={1} />
-            <NumSlide control_id={2} />
-            <NumSlide control_id={3} />
+            <ShowControl control_id={1} />
+            <ShowControl control_id={2} />
+            <ShowControl control_id={3} />
             <ShowScore score_id={1} text="MSE: " />
           </div>
 
           {/* Show Selects */}
           <div className="space-y-3 md:space-y-4">
-            <ShowSelect control_id={4} />
-            <ShowSelect control_id={5} />
+          <ShowControl control_id={4} />
+          <ShowControl control_id={5} />
           </div>
 
           {/* Reset State Input and Button */}

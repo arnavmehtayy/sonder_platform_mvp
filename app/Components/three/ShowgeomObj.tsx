@@ -6,7 +6,6 @@ import { ThreeEvent } from "@react-three/fiber";
 import {
     useStore,
     SelectObjectControl,
-    DeSelectObjectControl
   } from "@/app/store";
 
 export function ShowGeomObj({ obj }: { obj: geomobj }) {
@@ -26,12 +25,13 @@ export function ShowGeomObj({ obj }: { obj: geomobj }) {
   }, [object_ref.current]);
 
   const onClickSelect = (event:  ThreeEvent<MouseEvent>) => {
-    console.log("CLICKED"); add_obj(); event.stopPropagation();
+    add_obj(); 
+    event.stopPropagation();
   }
 
   return (
     <>
-      <mesh
+      {/* <mesh
         position={[obj.position.x, obj.position.y, 0]}
         rotation={[obj.rotation.x, obj.rotation.y, obj.rotation.z]}
         scale={[obj.scale.x, obj.scale.y, obj.scale.z]}
@@ -40,7 +40,9 @@ export function ShowGeomObj({ obj }: { obj: geomobj }) {
       >
         <primitive object={obj.geom} attach="geometry" />
         <meshBasicMaterial color={obj.color} side={THREE.DoubleSide} />
-      </mesh>
+      </mesh> */}
+
+      {obj.getMesh({ children: null, onClickSelect: onClickSelect, objectRef: object_ref})}
 
       {controlsEnabled && touch_scale && (
         <GeneralTransformControl

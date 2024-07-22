@@ -16,9 +16,8 @@ import { SliderControl } from "@/classes/SliderControl";
  * DO NOT USE THE set_attribute FUNCTION DIRECTLY. USE THE setControlValueSelector INSTEAD.
  */
 
-export default function NumSlide({ control_id }: { control_id: number }) {
+export default function NumSlide({control, control_id }: { control: SliderControl<any> | null, control_id: number }) {
   const setValue = useStore(setControlValueSelector(control_id)); // function that sets the value of a control given its control_id
-  const controller = useControlSelector(control_id) as SliderControl<any>; // get the control object based on its id
   const getValue = useControlValueSelector(control_id); // gets the value associated with the control based on the control_id
 
   // TESTING
@@ -31,22 +30,22 @@ export default function NumSlide({ control_id }: { control_id: number }) {
   // }
 
 
-  return controller ? (
+  return control ? (
     <div className="bg-white rounded-lg shadow-md p-4">
       <h3 className="text-lg font-semibold text-blue-800 mb-2">Control {control_id}</h3>
       <input
         className="w-full h-2 bg-blue-200 rounded-lg appearance-none cursor-pointer"
         type="range"
-        min={controller?.range[0].toString()}
-        max={controller?.range[1].toString()}
-        step={controller.step_size}
+        min={control?.range[0].toString()}
+        max={control?.range[1].toString()}
+        step={control.step_size}
         value={getValue}
         onChange={(e) => setValue(Number(e.target.value))}
       />
       <div className="flex justify-between items-center mt-2">
-        <span className="text-sm text-gray-600">{controller?.range[0]}</span>
+        <span className="text-sm text-gray-600">{control?.range[0]}</span>
         <span className="text-sm font-medium text-blue-600">{getValue}</span>
-        <span className="text-sm text-gray-600">{controller?.range[1]}</span>
+        <span className="text-sm text-gray-600">{control?.range[1]}</span>
       </div>
     </div>
   ) : null;

@@ -24,8 +24,9 @@ export class TransformObj extends obj {
     scale = new THREE.Vector3(1, 1, 1),
     touch_controls = new TouchControl(),
     param_t = 0,
+    name = "TransformObj",
   }: Partial<TransformObj> & { id: number }) {
-    super({ id: id });
+    super({ id: id, name: name});
     this.position = position;
     this.rotation = rotation;
     this.scale = scale;

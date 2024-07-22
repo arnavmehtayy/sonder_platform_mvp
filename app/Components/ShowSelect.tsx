@@ -3,6 +3,7 @@ import {
   getControlSelector,
   DeSelectObjectControl,
   SetIsActiveControl,
+  getNameSelector
 } from "@/app/store";
 import { SelectControl } from "@/classes/SelectControl";
 import React, { useEffect, useState } from "react";
@@ -29,11 +30,11 @@ import React, { useEffect, useState } from "react";
 //     }
 //   }
 
-export function ShowSelect({ control_id }: { control_id: number }) {
-  const control = useStore(getControlSelector(control_id)) as SelectControl;
+export function ShowSelect({ control, control_id }: { control : SelectControl, control_id: number }) {;
   const handleRemove = useStore(DeSelectObjectControl);
   const setIsActive = useStore(SetIsActiveControl(control_id));
   const [isDark, setIsDark] = useState(false);
+  const getName = useStore(getNameSelector);
 
   useEffect(() => {
     if(control) {
@@ -74,7 +75,7 @@ export function ShowSelect({ control_id }: { control_id: number }) {
                   <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
                 </svg>
               </button>
-              <span className="text-blue-800 font-medium">{id}</span>
+              <span className="text-blue-800 font-medium">{getName(id)}</span>
             </div>
           ))}
         </div>

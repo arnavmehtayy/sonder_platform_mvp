@@ -1,6 +1,7 @@
 import { TransformObj } from "./transformObj";
 import * as THREE from "three";
 import { TouchControl } from "./TouchControl";
+import { ThreeEvent } from "react-three-fiber";
 
 /*
     * This class creates a geometric object on the scene (Any object that is rendered using THREE.BufferGeometry).
@@ -36,4 +37,31 @@ export class geomobj extends TransformObj {
     this.isClickable = isClickable;
     this.OnClick = OnClick;
   }
+
+    getMesh({
+        children,
+        onClickSelect = (event:  ThreeEvent<MouseEvent>) => {},
+        objectRef,
+    }: Partial<{
+        children: React.ReactElement | null;
+        onClickSelect: (event:  ThreeEvent<MouseEvent>) => void;
+        objectRef: React.RefObject<THREE.Mesh>;
+    }> & {
+        children: React.ReactElement | null;
+        objectRef: React.RefObject<THREE.Mesh>;
+    }): React.ReactElement {
+        return (
+        <mesh
+            position={[this.position.x, this.position.y, 0]}
+            rotation={[this.rotation.x, this.rotation.y, this.rotation.z]}
+            scale={[this.scale.x, this.scale.y, this.scale.z]}
+            ref={objectRef}
+            onClick={this.isClickable ? onClickSelect : undefined}
+        >
+            <bufferGeometry attach="geometry" {...this.geom} />
+            <meshBasicMaterial attach="material" color={this.color} />
+            {children}
+        </mesh>
+        );
+    }
 }

@@ -22,7 +22,7 @@ export default function ShowScore({
   return (
     score ?
     <div className="bg-white rounded-lg shadow-md p-4 mb-4">
-      <h3 className="text-lg font-semibold text-blue-800 mb-2">{text}</h3>
+      <h3 className="text-lg font-semibold text-blue-800 mb-2">{score.text}</h3>
       <div className="flex items-center justify-between">
         <span className="text-gray-600">Score:</span>
         <span className="text-2xl font-bold text-blue-600">
