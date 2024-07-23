@@ -72,6 +72,13 @@ export const initDataSets: { [key: string]: data_type } = {
                 text: "Hello World",
                 position: new Vector2(-4, -4),
                 color: "blue",
+                touch_controls: new TouchControl({
+                    translate: {
+                        direction: [true, true, false],
+                        range: [-10, 10],
+                        step_size: 1,
+                    },
+                }),
             }),
 
             new geomobj({
