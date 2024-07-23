@@ -172,9 +172,10 @@ export const initDataSets: { [key: string]: data_type } = {
         placement: new Placement({
             grid: [30,30],
             cellSize: 5,
-            object_ids: [60],
+            object_ids: [60, 5555],
             geometry: new THREE.CircleGeometry(0.3, 128),
             gridVectors: [new Vector2(2,2), new Vector2(3,3), new Vector2(1,0), new Vector2(2,0)],
+            text: "This is testing placement"
         }),
     },
     set2: {

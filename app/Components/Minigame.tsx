@@ -25,6 +25,7 @@ export function Minigame({ page }: { page: number }) {
   const reset = useStore((state) => state.reset);
   const question: string = useStore(getQuestionSelector);
   const state_name = useStore(getStateName);
+  const placement = useStore(getPlacementSelector);
 
 //   const latexText = `
 //   \\[
@@ -84,6 +85,7 @@ export function Minigame({ page }: { page: number }) {
           <ShowControl control_id={5} /> */}
           </div>
 
+          {placement ? <ShowPlacement /> : null}
           {/* Reset State Input and Button */}
           <div className="mt-4 md:mt-6 flex items-center space-x-2">
             <input
@@ -101,7 +103,7 @@ export function Minigame({ page }: { page: number }) {
             </button>
           </div>
           
-          <ShowPlacement />
+          
           
         </div>
       </div>
