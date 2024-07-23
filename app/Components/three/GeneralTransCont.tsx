@@ -70,7 +70,7 @@ export default function GeneralTransformControl({
   }, [obj_ref, handleTransformationChange]);
 
   if (!touchControl || !obj_ref.current) {
-    console.log("No object found for id GeneralTransformControl: ", vizObjId);
+    // console.log("No object found for id GeneralTransformControl: ", vizObjId);
     return null;
   }
 

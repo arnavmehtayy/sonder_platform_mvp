@@ -116,7 +116,7 @@ export default function Experience() {
           <PlacementControl
             gridSize={placement.grid}
             cellSize={placement.cellSize}
-            obj_id={placement.object_id}
+            obj_ids={placement.object_ids}
             geom={placement.geometry}
             GridVectors={placement.gridVectors}
           />

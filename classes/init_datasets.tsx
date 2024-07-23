@@ -114,7 +114,7 @@ export const initDataSets: { [key: string]: data_type } = {
         placement: new Placement({
             grid: [20, 20],
             cellSize: 5,
-            object_id: 999,
+            object_ids: [999],
             geometry: new THREE.PlaneGeometry(1, 1),
         }),
     },
@@ -172,9 +172,9 @@ export const initDataSets: { [key: string]: data_type } = {
         placement: new Placement({
             grid: [30,30],
             cellSize: 5,
-            object_id: 60,
+            object_ids: [60],
             geometry: new THREE.CircleGeometry(0.3, 128),
-            gridVectors: [new Vector3(2,2), new Vector3(3,3), new Vector3(1,0), new Vector3(2,0)],
+            gridVectors: [new Vector2(2,2), new Vector2(3,3), new Vector2(1,0), new Vector2(2,0)],
         }),
     },
     set2: {

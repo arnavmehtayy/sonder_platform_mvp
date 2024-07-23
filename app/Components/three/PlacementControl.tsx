@@ -6,7 +6,7 @@ import { Selection, Select, EffectComposer, DotScreen, HueSaturation, Bloom } fr
 import { geomobj } from '@/classes/geomobj';
 
 
-const PlacementMarker = ({ position, onClick } : {position: THREE.Vector3, onClick: () => void}) => {
+const PlacementMarker = ({ position, onClick } : {position: THREE.Vector2, onClick: () => void}) => {
     const ref = useRef<THREE.Group>(null);
     
     useFrame((state) => {
@@ -16,7 +16,7 @@ const PlacementMarker = ({ position, onClick } : {position: THREE.Vector3, onCli
     });
   
     return (
-      <group ref={ref} position={position}>
+      <group ref={ref} position={[position.x, position.y, 0 ]}>
         <mesh onClick={onClick}>
           <circleGeometry args={[0.3, 32]} />
           <meshBasicMaterial color="cyan" transparent opacity={0.2} />
@@ -53,43 +53,56 @@ export const PlacementProvider = ({ children } : {children: React.ReactNode}) =>
 export const usePlacementMode = () => useContext(PlacementContext);
 
 type PlacementControlProps = {
-  GridVectors?: THREE.Vector3[];
-  gridSize?: [number, number];
-  cellSize?: number;
-  obj_id: number;
-  geom: THREE.BufferGeometry;
-}
-
-export const PlacementControl = ({ 
-  GridVectors = [],
-  gridSize = [20, 20], 
-  cellSize = 5,
-  obj_id = 999,
-  geom = new THREE.PlaneGeometry(4, 4),
-
-} : Partial<PlacementControlProps>)   => {
-  const { isPlacementMode, setIsPlacementMode } = usePlacementMode();
-  const [placementPositions, setPlacementPositions] = useState<THREE.Vector3[]>([]);
-  const addObject = useStore(setVizObjSelector);
-  const { scene } = useThree();
+    GridVectors?: THREE.Vector2[];
+    gridSize?: [number, number];
+    cellSize?: number;
+    obj_ids: number[];
+    geom: THREE.BufferGeometry;
+    onPlacement: (remainingPlacements: number) => void;
+  }
+  
+  export const PlacementControl = ({ 
+    GridVectors = [],
+    gridSize = [20, 20], 
+    cellSize = 5,
+    obj_ids = [],
+    geom = new THREE.PlaneGeometry(4, 4),
+  } : Partial<PlacementControlProps>) => {
+    const { isPlacementMode, setIsPlacementMode } = usePlacementMode();
+    const [placementPositions, setPlacementPositions] = useState<THREE.Vector2[]>([]);
+    const [remainingPlacements, setRemainingPlacements] = useState(obj_ids.length);
+    const addObject = useStore(setVizObjSelector);
+    const { scene } = useThree();
 
   const createPlacementPositions = () => {
-    const positions: THREE.Vector3[] = GridVectors;
+    setRemainingPlacements(obj_ids.length);
+    const positions: THREE.Vector2[] = GridVectors;
     for (let x = 0; x <= gridSize[0]; x += cellSize) {
       for (let y = 0; y <= gridSize[1]; y += cellSize) {
-        positions.push(new THREE.Vector3(x - gridSize[0]/2, y - gridSize[1]/2, 0));
+        positions.push(new THREE.Vector2(x - gridSize[0]/2, y - gridSize[1]/2));
         // console.log("Position: ", positions[positions.length - 1])
       }
     }
     setPlacementPositions(positions);
   };
 
-  const handlePlacement = (position: THREE.Vector3, obj_id: number, geom: THREE.BufferGeometry) => {
-    addObject(
-      obj_id, // Generate a unique ID
-      new geomobj({id: obj_id, position: new THREE.Vector2(position.x, position.y), geom: geom, color: 'blue'}),
-    );
-    setIsPlacementMode(false); // turn the button off after the object has been placed
+  const handlePlacement = (position: THREE.Vector2) => {
+    if (remainingPlacements > 0) {
+      const obj_id = obj_ids[obj_ids.length - remainingPlacements];
+      addObject(
+        obj_id,
+        new geomobj({id: obj_id, position: position, geom: geom, color: 'blue'}),
+      );
+      // console.log(obj_id, " placed at ", position.x, position.y, remainingPlacements)
+      const newRemainingPlacements = remainingPlacements - 1;
+      setRemainingPlacements(newRemainingPlacements);
+      
+      if (newRemainingPlacements === 0) {
+        setIsPlacementMode(false);
+      }
+    }
+    
+
   };
   
 
@@ -113,7 +126,7 @@ export const PlacementControl = ({
             <PlacementMarker
               key={index}
               position={position}
-              onClick={() => handlePlacement(position, obj_id, geom)}
+              onClick={() => handlePlacement(position)}
             />
           ))}
         </>
@@ -123,15 +136,26 @@ export const PlacementControl = ({
 };
 
 // New component for the placement activation button
-export const PlacementActivationButton: React.FC = () => {
-  const { isPlacementMode, setIsPlacementMode } = usePlacementMode();
-
-  return (
-    <button 
-    className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg transition duration-300 ease-in-out flex items-center justify-center text-sm md:text-base"
-      onClick={() => setIsPlacementMode(!isPlacementMode)}
-    >
-      {isPlacementMode ? 'Cancel Placement' : 'Activate Placement'}
-    </button>
-  );
-};
+  
+export const PlacementActivationButton = ({totalPlacements }: { totalPlacements?: number }) => {
+    const { isPlacementMode, setIsPlacementMode } = usePlacementMode();
+  
+    return (
+      <div className="flex items-center">
+        <span className="text-sm text-gray-600 mr-2">
+          {totalPlacements} placements
+        </span>
+        <button
+          onClick={() => setIsPlacementMode(!isPlacementMode)}
+          className={`
+            ${isPlacementMode ? "bg-blue-600 hover:bg-blue-700" : "bg-gray-400 hover:bg-gray-500"}
+            text-white py-1 px-3 rounded-md text-sm font-medium transition duration-300 ease-in-out
+            flex items-center
+          `}
+        >
+          <span className={`w-2 h-2 rounded-full ${isPlacementMode ? "bg-green-400" : "bg-red-400"} mr-2`}></span>
+          {isPlacementMode ? "Active" : "Inactive"}
+        </button>
+      </div>
+    );
+  };

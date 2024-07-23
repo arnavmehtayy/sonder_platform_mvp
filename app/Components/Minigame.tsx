@@ -10,6 +10,7 @@ import { initDataSets } from "@/classes/init_datasets";
 import "katex/dist/katex.min.css";
 import Latex from "react-latex-next";
 import { PlacementProvider, PlacementControl, PlacementActivationButton} from './three/PlacementControl'
+import ShowPlacement from "./ShowPlacement";
 
 /*
  * This component is the main user experience component.
@@ -21,10 +22,9 @@ import { PlacementProvider, PlacementControl, PlacementActivationButton} from '.
 export function Minigame({ page }: { page: number }) {
   console.log("Page: ", page);
   const [resetInput, setResetInput] = useState("");
-  const reset = useStore((state) => state.reset); // Assuming you have a reset function in your store
+  const reset = useStore((state) => state.reset);
   const question: string = useStore(getQuestionSelector);
   const state_name = useStore(getStateName);
-  const placement = useStore(getPlacementSelector);
 
 //   const latexText = `
 //   \\[
@@ -100,9 +100,9 @@ export function Minigame({ page }: { page: number }) {
               Reset State
             </button>
           </div>
-          <div className="mt-4 md:mt-6 flex items-center space-x-2">
-              {placement ? <PlacementActivationButton /> : null} 
-          </div>
+          
+          <ShowPlacement />
+          
         </div>
       </div>
     </div>
