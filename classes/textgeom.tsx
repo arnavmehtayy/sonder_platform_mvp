@@ -52,7 +52,7 @@ export default class TextGeom extends geomobj {
       <group
         ref={objectRef}
         position={[this.position.x, this.position.y, 0]}
-        onClick={this.isClickable ? onClickSelect : undefined}
+        onPointerDown={this.isClickable ? onClickSelect : undefined}
         rotation={[this.rotation.x, this.rotation.y, this.rotation.z]}
         scale={[this.scale.x, this.scale.y, this.scale.z]}
       >

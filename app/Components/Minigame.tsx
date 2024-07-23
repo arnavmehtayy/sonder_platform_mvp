@@ -47,7 +47,7 @@ export function Minigame({ page }: { page: number }) {
   };
 
   return (
-    <PlacementProvider>
+    <PlacementProvider length={placement?.object_ids.length || 0}>
     <div className="flex flex-col md:flex-row h-screen bg-gray-100">
       {/* Main Three.js Experience */}
       <div className="flex-grow bg-black h-1/2 md:h-full">

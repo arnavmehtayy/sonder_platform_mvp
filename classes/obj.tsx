@@ -34,7 +34,7 @@ export class obj {
         rotation={[0, 0, 0]}
         scale={[1, 1, 1]}
         ref={objectRef}
-        onClick={this.isClickable ? onClickSelect : undefined}
+        onPointerDown={this.isClickable ? onClickSelect : undefined}
       >
         {children}
       </mesh>

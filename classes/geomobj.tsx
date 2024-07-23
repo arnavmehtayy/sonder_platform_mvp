@@ -56,7 +56,7 @@ export class geomobj extends TransformObj {
             rotation={[this.rotation.x, this.rotation.y, this.rotation.z]}
             scale={[this.scale.x, this.scale.y, this.scale.z]}
             ref={objectRef}
-            onClick={this.isClickable ? onClickSelect : undefined}
+            onPointerDown={this.isClickable ? onClickSelect : undefined}
           >
             <primitive object={this.geom} attach="geometry" />
             <meshBasicMaterial color={this.color} side={THREE.DoubleSide} />
