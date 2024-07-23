@@ -15,6 +15,7 @@ import { SlideContTrans } from "./SliderContTrans";
 import { TransformObj } from "./transformObj";
 import { Score } from "./Score";
 import Placement from "./Placement";
+import TextGeom from "./textgeom";
 
 type data_type = {
     question : string;
@@ -65,6 +66,14 @@ export const initDataSets: { [key: string]: data_type } = {
             })
         ],
         canvasData: [
+            new TextGeom({
+                geom: new THREE.PlaneGeometry(4, 4),
+                id: 89,
+                text: "Hello World",
+                position: new Vector2(-4, -4),
+                color: "blue",
+            }),
+
             new geomobj({
                 id: 1,
                 geom: new THREE.PlaneGeometry(4, 4),

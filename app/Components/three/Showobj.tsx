@@ -10,6 +10,8 @@ import { TransformObj } from "@/classes/transformObj";
 import { obj } from "@/classes/obj";
 import { ShowGeomObj } from "./ShowgeomObj";
 import { ShowLineObj } from "./ShowLineObj";
+import ShowTextGeom from "./ShowTextGeom";
+import textgeom from "@/classes/textgeom";
 
 
 /*
@@ -28,7 +30,11 @@ export const Showobj = memo(({ id }: { id: number }) => {
     return  <ShowGeomObj obj={obj} />;
   } else if (obj instanceof LineObj) {
     return <ShowLineObj obj={obj} />;
-  } else {
+  } else if(obj instanceof textgeom) {
+    return <ShowTextGeom obj={obj} />;
+
+  }
+  else {
     console.error(`Object with id ${id} not found`); 
     return null;
   }
