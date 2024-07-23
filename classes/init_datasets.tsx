@@ -14,7 +14,7 @@ import { SelectControl } from "./SelectControl";
 import { SlideContTrans } from "./SliderContTrans";
 import { TransformObj } from "./transformObj";
 import { Score } from "./Score";
-
+import Placement from "./Placement";
 
 type data_type = {
     question : string;
@@ -22,6 +22,7 @@ type data_type = {
     controlData: Control[];
     canvasData: obj[];
     scoreData: Score<any, any>[];
+    placement: Placement | null;
 };
 
 export const initDataSets: { [key: string]: data_type } = {
@@ -94,6 +95,12 @@ export const initDataSets: { [key: string]: data_type } = {
             }),
         ],
         scoreData: [],
+        placement: new Placement({
+            grid: [20, 20],
+            cellSize: 5,
+            object_id: 999,
+            geometry: new THREE.PlaneGeometry(1, 1),
+        }),
     },
     set1: {
         question: "This is set1",
@@ -134,7 +141,7 @@ export const initDataSets: { [key: string]: data_type } = {
             new Score<number, LineObj>({
                 text: "Mean Squared Error",
                 score_id: 1,
-                obj_id_list: [30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59],
+                obj_id_list: [30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,61],
                 get_attribute: (obj: LineObj) => att_funcs.get_length(obj),
                 to_string: (val) => (Math.round(val * 10) / 10).toString(),
                 transformation: (vals) => {
@@ -146,6 +153,13 @@ export const initDataSets: { [key: string]: data_type } = {
                 }
             })
         ],
+        placement: new Placement({
+            grid: [30,30],
+            cellSize: 5,
+            object_id: 60,
+            geometry: new THREE.CircleGeometry(0.3, 128),
+            gridVectors: [new Vector3(2,2), new Vector3(3,3), new Vector3(1,0), new Vector3(2,0)],
+        }),
     },
     set2: {
         question: "",
@@ -153,6 +167,7 @@ export const initDataSets: { [key: string]: data_type } = {
         controlData: [],
         canvasData: [],
         scoreData: [],
+        placement: null,
     },
 };
 
@@ -164,7 +179,7 @@ let line = new LineObj({
     line_width: 5,
     color: "white",
 });
-line = LineObj.set_slope_intercept(line, 0, 0.5, [0, 15]);
+line = LineObj.set_slope_intercept(line, 0, 0.5, [-30, 30]);
 
 // Add the line to canvasData
 initDataSets.set1.canvasData.push(line);
@@ -197,16 +212,18 @@ for (let i = 0; i < num_points; i++) {
         })
     );
 
-    initDataSets.set1.influencesData.push(
-        new Influence<any, LineObj, LineObj>({
-            influence_id: i,
-            master_id: 1000,
-            worker_id: i + num_points,
-            transformation: (value, worker, master) => {
-                const slope = value.y;
-                const intercept = value.x;
-                const x = worker.start.x;
-                const y = worker.start.y;
+
+
+        initDataSets.set1.influencesData.push(
+            new Influence<any, LineObj, LineObj>({
+                influence_id: i,
+                master_id: 1000,
+                worker_id: i + num_points,
+                transformation: (value, worker, master) => {
+                    const slope = value.y;
+                    const intercept = value.x;
+                    const x = worker.start.x;
+                    const y = worker.start.y;
                 let perp_slope = 0;
                 if (slope != 0) {
                     perp_slope = -1 / slope;
@@ -224,3 +241,51 @@ for (let i = 0; i < num_points; i++) {
         })
     );
 }
+initDataSets.set1.canvasData.push(
+    new LineObj({
+        id: 61,
+        start: new Vector2(0,0),
+        end: new Vector2(1, 1),
+        line_width: 2,
+        color: "red",
+    })
+);
+
+initDataSets.set1.influencesData.push(
+    new Influence<any, LineObj, LineObj>({
+        influence_id: 60,
+        master_id: 1000,
+        worker_id: 61,
+        transformation: (value, worker, master) => {
+            const slope = value.y;
+            const intercept = value.x;
+            const x = worker.start.x;
+            const y = worker.start.y;
+        let perp_slope = 0;
+        if (slope != 0) {
+            perp_slope = -1 / slope;
+        }
+        const b = y - perp_slope * x;
+        let new_x = worker.start.x;
+        if(slope != 0) {
+            new_x = (b - intercept) / (slope - perp_slope);
+        }
+        const new_y = slope * new_x + intercept;
+        return new Vector2(new_x, new_y);
+    },
+    get_attribute: att_funcs.get_slope_intercept,
+    set_attribute: att_funcs.set_end_point,
+}))
+
+initDataSets.set1.influencesData.push(
+    new Influence<Vector2, geomobj, LineObj>({
+        influence_id: 60,
+        master_id: 60,
+        worker_id: 61,
+        transformation: (value, worker, master) => {
+ return value;
+    },
+    get_attribute: (obj: geomobj) => att_funcs.get_position(obj),
+    set_attribute: (obj: LineObj, value) => att_funcs.set_start_point(obj, value),
+}))
+

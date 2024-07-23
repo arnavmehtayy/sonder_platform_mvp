@@ -18,6 +18,7 @@ import { shallow } from "zustand/shallow";
 export type State = {
   state_name: keyof typeof initDataSets | null;
   question: string;
+  placement: Placement | null;
   vizobjs: { [id: number]: obj };
   controls: { [id: number]: Control };
   influences: { [id: number]: Influence<any, obj, obj>[] };
@@ -25,6 +26,7 @@ export type State = {
   setVizObj: (id: number, new_obj: obj) => void;
   setControlClick: (control_id: number, new_obj: Control) => void;
   reset: (dataSetKey: keyof typeof initDataSets) => void;
+  updateInfluences: (id: number) => void;
 };
 
 export const useStore = create<State>((set, get) => ({
@@ -34,6 +36,7 @@ export const useStore = create<State>((set, get) => ({
   vizobjs: {},
   influences: {},
   scores: {},
+  placement: null,
 
   setVizObj: (id: number, new_obj: obj) => {
     set((state) => {
@@ -63,10 +66,14 @@ export const useStore = create<State>((set, get) => ({
   },
 
   reset: (dataSetKey: keyof typeof initDataSets) => {
+
     const dataSet = initDataSets[dataSetKey];
     set({
+
       question: dataSet.question,
       state_name: dataSetKey,
+      placement: dataSet.placement,
+
 
       controls: dataSet.controlData.reduce((acc, control) => {
         acc[control.id] = control;
@@ -108,6 +115,25 @@ export const useStore = create<State>((set, get) => ({
           });
         }
       });
+
+      return { vizobjs: updatedVizobjs };
+    });
+  },
+  updateInfluences: (id: number) => {
+    set((state) => {
+      const updatedVizobjs = { ...state.vizobjs };
+      const masterObj = updatedVizobjs[id];
+      const masterInfluences = state.influences[id];
+
+      if (masterInfluences) {
+        masterInfluences.forEach((influence) => {
+          updatedVizobjs[influence.worker_id] = Influence.UpdateInfluence(
+            influence,
+            masterObj,
+            updatedVizobjs[influence.worker_id]
+          );
+        });
+      }
 
       return { vizobjs: updatedVizobjs };
     });
@@ -184,6 +210,7 @@ export const SetIsActiveControl =
 // }
 
 import { useMemo } from "react";
+import Placement from "@/classes/Placement";
 
 export const useObjectSelector = (id: number) => {
   const selector = useMemo(() => getObjectSelector(id), [id]);
@@ -209,3 +236,9 @@ export const getNameSelector = (state: State) => (id: number) =>
   state.vizobjs[id].name;
 
 export const getStateName = (state: State) => state.state_name;
+
+export const getPlacementSelector = (state: State) => state.placement;
+
+export const UpdateInfluenceSelector = (master_id: number) => (state: State) => {
+  state.updateInfluences(master_id);
+}

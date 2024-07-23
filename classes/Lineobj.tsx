@@ -51,6 +51,8 @@ export class LineObj extends obj {
     return new LineObj({ ...obj, start: start, end: end });
   }
 
+
+
   get_slope_intercept(): [number, number, [number, number]] {
     if (this.end.x - this.start.x === 0) {
       return [this.start.y, 0, [this.start.x, this.end.x]];

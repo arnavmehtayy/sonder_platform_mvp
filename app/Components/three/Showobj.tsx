@@ -29,7 +29,7 @@ export const Showobj = memo(({ id }: { id: number }) => {
   } else if (obj instanceof LineObj) {
     return <ShowLineObj obj={obj} />;
   } else {
-    console.error(`Object with id ${id} not found`);
+    console.error(`Object with id ${id} not found`); 
     return null;
   }
 });

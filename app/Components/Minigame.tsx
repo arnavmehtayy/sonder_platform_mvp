@@ -4,12 +4,12 @@ import Experience from "./visualexp";
 import Link from "next/link";
 import ShowControl from "./ShowControl";
 import ShowScore from "./ShowScore";
-import { useStore, getQuestionSelector, getStateName} from "../store";
+import { useStore, getQuestionSelector, getStateName, getPlacementSelector} from "../store";
 import { initDataSets } from "@/classes/init_datasets";
 
 import "katex/dist/katex.min.css";
 import Latex from "react-latex-next";
-
+import { PlacementProvider, PlacementControl, PlacementActivationButton} from './three/PlacementControl'
 
 /*
  * This component is the main user experience component.
@@ -24,6 +24,7 @@ export function Minigame({ page }: { page: number }) {
   const reset = useStore((state) => state.reset); // Assuming you have a reset function in your store
   const question: string = useStore(getQuestionSelector);
   const state_name = useStore(getStateName);
+  const placement = useStore(getPlacementSelector);
 
 //   const latexText = `
 //   \\[
@@ -45,10 +46,13 @@ export function Minigame({ page }: { page: number }) {
   };
 
   return (
+    <PlacementProvider>
     <div className="flex flex-col md:flex-row h-screen bg-gray-100">
       {/* Main Three.js Experience */}
       <div className="flex-grow bg-black h-1/2 md:h-full">
+      
         <Experience /> {/* Three.js experience */}
+      
       </div>
 
       {/* Sidebar */}
@@ -96,8 +100,12 @@ export function Minigame({ page }: { page: number }) {
               Reset State
             </button>
           </div>
+          <div className="mt-4 md:mt-6 flex items-center space-x-2">
+              {placement ? <PlacementActivationButton /> : null} 
+          </div>
         </div>
       </div>
     </div>
+    </PlacementProvider>
   );
 }
