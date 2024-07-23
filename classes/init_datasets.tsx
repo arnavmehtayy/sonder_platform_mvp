@@ -61,7 +61,7 @@ export const initDataSets: { [key: string]: data_type } = {
             }),
             new SelectControl({
                 id: 4,
-                selectable: [1, 2],
+                selectable: [1, 2, 89],
                 isActive: false
             })
         ],
@@ -69,7 +69,7 @@ export const initDataSets: { [key: string]: data_type } = {
             new TextGeom({
                 geom: new THREE.PlaneGeometry(4, 4),
                 id: 89,
-                text: "Hello World",
+                text: "Arnav",
                 position: new Vector2(-4, -4),
                 color: "blue",
                 touch_controls: new TouchControl({
