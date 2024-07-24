@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Experience from "./visualexp";
 import Link from "next/link";
 import ShowControl from "./ShowControl";
@@ -19,7 +19,7 @@ import ShowPlacement from "./ShowPlacement";
  * It uses the NumSlide component to display the number slider for interactivity
  */
 
-export function Minigame({ page }: { page: number }) {
+export function Minigame({ page }: { page: keyof typeof initDataSets}) {
   console.log("Page: ", page);
   const [resetInput, setResetInput] = useState("");
   const reset = useStore((state) => state.reset);
@@ -38,6 +38,11 @@ export function Minigame({ page }: { page: number }) {
 // `;
 
   const test_id: number = 1; // for testing remove soon
+
+  useEffect(() => {
+    reset(page);
+  }, []
+)
 
   const handleReset = () => {
     if (resetInput) {
@@ -87,7 +92,7 @@ export function Minigame({ page }: { page: number }) {
 
           {placement ? <ShowPlacement /> : null}
           {/* Reset State Input and Button */}
-          <div className="mt-4 md:mt-6 flex items-center space-x-2">
+          {/* <div className="mt-4 md:mt-6 flex items-center space-x-2">
             <input
               type="text"
               value={resetInput}
@@ -101,7 +106,7 @@ export function Minigame({ page }: { page: number }) {
             >
               Reset State
             </button>
-          </div>
+          </div> */}
           
           
           

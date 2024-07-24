@@ -5,6 +5,7 @@
 import React from "react";
 import * as THREE from "three";
 import { ThreeEvent } from "@react-three/fiber";
+import { useFrame } from "@react-three/fiber";
 
 export class obj {
   id: number;
@@ -18,16 +19,25 @@ export class obj {
 
   getMesh({
     children,
-    onClickSelect = (event:  ThreeEvent<MouseEvent>) => {},
+    onClickSelect = (event: ThreeEvent<MouseEvent>) => {},
     objectRef,
   }: Partial<{
     children: React.ReactElement | null;
-    onClickSelect: (event:  ThreeEvent<MouseEvent>) => void;
+    onClickSelect: (event: ThreeEvent<MouseEvent>) => void;
     objectRef: React.RefObject<THREE.Mesh>;
   }> & {
     children: React.ReactElement;
     objectRef: React.RefObject<THREE.Mesh>;
   }): React.ReactElement {
+
+    // useFrame((state) => {
+    //     if (objectRef.current) {
+    //       objectRef.current.scale.setScalar(
+    //         1.5 + Math.sin(state.clock.elapsedTime * 3) * 0.5
+    //       );
+    //     }
+    //   });
+
     return (
       <mesh
         position={[0, 0, 0]}
@@ -37,7 +47,7 @@ export class obj {
         onPointerDown={this.isClickable ? onClickSelect : undefined}
       >
         {children}
-      </mesh>
-    );
+      </mesh>)
+    
   }
 }

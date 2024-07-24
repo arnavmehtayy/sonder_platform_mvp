@@ -8,8 +8,8 @@ const ExperienceManager: React.FC = () => {
   const reset = useStore((state) => state.reset);
 
   const experiences = [
-    { name: 'Experience 1', slides: ['default', 'set1', 'set2'] },
-    { name: 'Experience 2', slides: ['set3', 'set4', 'set5'] },
+    { name: 'Experience 1', slides: ['default', 'set1', 'set1'] },
+    { name: 'Experience 2', slides: ['set1', 'default', 'set1'] },
     // Add more experiences as needed
   ];
 
@@ -38,10 +38,9 @@ const ExperienceManager: React.FC = () => {
       reset(prevExperience.slides[prevExperience.slides.length - 1]);
     }
   };
-
   return (
     <div>
-      <Minigame page={currentSlide} />
+      <Minigame page={experiences[currentExperience].slides[currentSlide]} />
       <div className="fixed bottom-4 right-4 space-x-2">
         <button
           onClick={goToPreviousSlide}
