@@ -1,9 +1,11 @@
-import { RefObject, ReactElement, JSXElementConstructor } from "react";
+import { RefObject, ReactElement, JSXElementConstructor, useRef } from "react";
 import { obj } from "./obj";
 import { Vector2 } from "three";
 import * as THREE from "three";
 import { Line } from "@react-three/drei";
 import { ThreeEvent } from "@react-three/fiber";
+import { useFrame } from "@react-three/fiber";
+
 
 /*
     * This class is used to render a Line object in the scene.
@@ -26,7 +28,7 @@ export class LineObj extends obj {
     line_width = 2,
     color = "white",
     name = "Line",
-    isClickable = true,
+    isClickable = false,
   }: Partial<LineObj> & { id: number }) {
     super({ id: id, name: name });
     this.start = start;
@@ -77,9 +79,18 @@ export class LineObj extends obj {
   }> & {
     objectRef: RefObject<THREE.Mesh>;
   }): ReactElement<any, string | JSXElementConstructor<any>> {
+    const line_mat = useRef<any>()
+    // useFrame((state) => {
+    //     if (line_mat.current && this.isClickable) {
+    //       line_mat.current.color = "red"
+    //     }
+      
+    // });
+
     return super.getMesh({
       children: (
         <Line
+        ref= {line_mat}
           points={[
             [this.start.x, this.start.y, 0],
             [this.end.x, this.end.y, 0],

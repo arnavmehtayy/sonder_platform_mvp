@@ -211,6 +211,10 @@ export const DeSelectObjectControl =
 export const SetIsActiveControl =
   (control_id: number) => (state: State) => (val: boolean) => {
     const control = state.controls[control_id] as SelectControl;
+      control.selectable.forEach((obj_id) => {
+        const updatedState = obj.setObjectisClickable(state.vizobjs[obj_id], val)
+        state.setVizObj(obj_id, updatedState)
+      })
     const updatedState = control.setIsActive(val);
     state.setControlClick(control_id, updatedState);
   };

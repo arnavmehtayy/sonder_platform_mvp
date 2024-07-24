@@ -10,11 +10,20 @@ import { useFrame } from "@react-three/fiber";
 export class obj {
   id: number;
   name: string;
-  isClickable: boolean = true;
+  isClickable: boolean = false;
 
   constructor({ id, name }: { id: number; name: string }) {
     this.id = id;
     this.name = name;
+  }
+
+  static setObjectisClickable(obj: obj, isClickable: boolean): obj {
+    const newObj = Object.assign(
+      Object.create(Object.getPrototypeOf(obj)),
+      obj
+    );
+    obj.isClickable = isClickable;
+    return obj;
   }
 
   getMesh({
@@ -30,14 +39,6 @@ export class obj {
     objectRef: React.RefObject<THREE.Mesh>;
   }): React.ReactElement {
 
-    // useFrame((state) => {
-    //     if (objectRef.current) {
-    //       objectRef.current.scale.setScalar(
-    //         1.5 + Math.sin(state.clock.elapsedTime * 3) * 0.5
-    //       );
-    //     }
-    //   });
-
     return (
       <mesh
         position={[0, 0, 0]}
@@ -47,7 +48,7 @@ export class obj {
         onPointerDown={this.isClickable ? onClickSelect : undefined}
       >
         {children}
-      </mesh>)
-    
+      </mesh>
+    );
   }
 }

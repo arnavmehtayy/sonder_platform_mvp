@@ -1,4 +1,5 @@
 import { Control } from "./Control";
+import { obj } from "./obj";
 
 export class SelectControl extends Control {
   selectable: number[]; // This is the list of id's of selectable values
@@ -22,6 +23,7 @@ export class SelectControl extends Control {
     this.isActive = isActive;
     this.capacity = capacity;
   }
+
 
   setIsActive(state: boolean) : SelectControl {
     this.isActive = state;
