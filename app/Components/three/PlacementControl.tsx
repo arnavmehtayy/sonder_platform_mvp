@@ -1,7 +1,7 @@
 import React, { useState, useContext, useMemo, useRef } from "react";
 import { useThree, useFrame } from "@react-three/fiber";
 import * as THREE from "three";
-import { useStore, setVizObjSelector, DeleteVizObjSelector } from "@/app/store";
+import { useStore, setVizObjSelector, DeleteVizObjSelector, getPlacementSelector } from "@/app/store";
 import {
   Selection,
   Select,
@@ -49,6 +49,11 @@ type PlacementContextType = {
   setIsPlacementMode: React.Dispatch<React.SetStateAction<boolean>>;
   remainingPlacements: number;
   setRemainingPlacements: React.Dispatch<React.SetStateAction<number>>;
+  objectsOnScene: number
+  setObjectOnScene: React.Dispatch<React.SetStateAction<number>>
+  showResetButton: boolean;
+  setShowResetButton: React.Dispatch<React.SetStateAction<boolean>>;
+  resetPlacements: () => void;
 };
 
 // Create the context with an initial value
@@ -57,6 +62,11 @@ const PlacementContext = React.createContext<PlacementContextType>({
   setIsPlacementMode: () => {},
   remainingPlacements: 0,
   setRemainingPlacements: () => {},
+    objectsOnScene: 0,
+    setObjectOnScene: () => {},
+    showResetButton: false,
+    setShowResetButton: () => {},
+    resetPlacements: () => {},
 });
 
 export const PlacementProvider = ({
@@ -68,6 +78,20 @@ export const PlacementProvider = ({
 }) => {
   const [isPlacementMode, setIsPlacementMode] = useState(false);
   const [remainingPlacements, setRemainingPlacements] = useState(length);
+  const [objectsOnScene, setObjectOnScene] = useState(0)
+  const [showResetButton, setShowResetButton] = useState(false);
+  const placement = useStore(getPlacementSelector)
+  const deleteObject = useStore(DeleteVizObjSelector)
+
+  const resetPlacements = () => {
+    setRemainingPlacements(length);
+    setObjectOnScene(0);
+    setShowResetButton(false);
+    placement?.object_ids.forEach((id) => { deleteObject(id) })
+    
+        
+    };
+
   return (
     <PlacementContext.Provider
       value={{
@@ -75,6 +99,11 @@ export const PlacementProvider = ({
         setIsPlacementMode,
         remainingPlacements,
         setRemainingPlacements,
+        objectsOnScene,
+        setObjectOnScene,
+        showResetButton,
+        setShowResetButton,
+        resetPlacements,
       }}
     >
       {children}
@@ -105,6 +134,9 @@ export const PlacementControl = ({
     setIsPlacementMode,
     remainingPlacements,
     setRemainingPlacements,
+    objectsOnScene,
+    setObjectOnScene,
+    setShowResetButton
   } = usePlacementMode();
   const [placementPositions, setPlacementPositions] = useState<THREE.Vector2[]>(
     []
@@ -130,8 +162,11 @@ export const PlacementControl = ({
 
   const handlePlacement = (position: THREE.Vector2) => {
     if (remainingPlacements > 0) {
+        setShowResetButton(true); 
       const obj_id = obj_ids[obj_ids.length - remainingPlacements];
-      deleteObject(obj_id)
+      if(!deleteObject(obj_id)) {
+        setObjectOnScene(o => o + 1)
+      }
       addObject(
         obj_id,
         new geomobj({
@@ -187,41 +222,61 @@ export const PlacementControl = ({
 // New component for the placement activation button
 
 export const PlacementActivationButton = ({
-  totalPlacements,
-}: {
-  totalPlacements?: number;
-}) => {
-  const {
-    isPlacementMode,
-    setIsPlacementMode,
-    remainingPlacements,
-    setRemainingPlacements,
-  } = usePlacementMode();
-
-  return (
-    <div className="flex items-center">
-      <span className="text-sm text-gray-600 mr-2">
-        {remainingPlacements}/{totalPlacements} remaining
-      </span>
+    totalPlacements,
+  }: {
+    totalPlacements?: number;
+  }) => {
+    const {
+      isPlacementMode,
+      setIsPlacementMode,
+      objectsOnScene,
+    } = usePlacementMode();
+  
+    return (
+      <div className="flex flex-col items-end space-y-2">
+        <div className="flex items-center space-x-2">
+          <span className="text-sm text-gray-600">
+            {objectsOnScene}/{totalPlacements} placed
+          </span>
+          <button
+            onClick={() => setIsPlacementMode(!isPlacementMode)}
+            className={`
+              ${
+                isPlacementMode
+                  ? "bg-blue-600 hover:bg-blue-700"
+                  : "bg-gray-400 hover:bg-gray-500"
+              }
+              text-white py-1 px-3 rounded-md text-sm font-medium transition duration-300 ease-in-out
+              flex items-center
+            `}
+          >
+            <span
+              className={`w-2 h-2 rounded-full ${
+                isPlacementMode ? "bg-green-400" : "bg-red-400"
+              } mr-2`}
+            ></span>
+            {isPlacementMode ? "Active" : "Inactive"}
+          </button>
+        </div>
+        <ResetButton />
+      </div>
+    );
+  };
+  
+  export const ResetButton = () => {
+    const { showResetButton, resetPlacements } = usePlacementMode();
+  
+    if (!showResetButton) return null;
+  
+    return (
       <button
-        onClick={() => setIsPlacementMode(!isPlacementMode)}
-        className={`
-            ${
-              isPlacementMode
-                ? "bg-blue-600 hover:bg-blue-700"
-                : "bg-gray-400 hover:bg-gray-500"
-            }
-            text-white py-1 px-3 rounded-md text-sm font-medium transition duration-300 ease-in-out
-            flex items-center
-          `}
+        onClick={resetPlacements}
+        className="bg-red-500 hover:bg-red-600 text-white py-1 px-3 rounded-md text-sm font-medium transition duration-300 ease-in-out flex items-center"
       >
-        <span
-          className={`w-2 h-2 rounded-full ${
-            isPlacementMode ? "bg-green-400" : "bg-red-400"
-          } mr-2`}
-        ></span>
-        {isPlacementMode ? "Active" : "Inactive"}
+        <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+        </svg>
+        Reset
       </button>
-    </div>
-  );
-};
+    );
+  };

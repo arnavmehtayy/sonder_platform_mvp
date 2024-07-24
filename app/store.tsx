@@ -26,7 +26,7 @@ export type State = {
   setVizObj: (id: number, new_obj: obj) => void;
   setControlClick: (control_id: number, new_obj: Control) => void;
   reset: (dataSetKey: keyof typeof initDataSets) => void;
-  deleteVizObj: (id: number) => void;
+  deleteVizObj: (id: number) => boolean;
   updateInfluences: (id: number) => void;
 };
 
@@ -61,12 +61,16 @@ export const useStore = create<State>((set, get) => ({
   },
 
   deleteVizObj: (id: number) => {
-    set((state) => {
-      const updatedVizobjs = { ...state.vizobjs };
-      delete updatedVizobjs[id];
-      return { vizobjs: updatedVizobjs }
-  }
-)},
+    if (id in get().vizobjs) {
+      set((state) => {
+        const updatedVizobjs = { ...state.vizobjs };
+        delete updatedVizobjs[id];
+        return { vizobjs: updatedVizobjs };
+      });
+      return true;
+    }
+    return false;
+  },
 
   setControlClick: (control_id: number, new_obj: Control) => {
     set((state) => {
@@ -75,14 +79,11 @@ export const useStore = create<State>((set, get) => ({
   },
 
   reset: (dataSetKey: keyof typeof initDataSets) => {
-
     const dataSet = initDataSets[dataSetKey];
     set({
-
       question: dataSet.question,
       state_name: dataSetKey,
       placement: dataSet.placement,
-
 
       controls: dataSet.controlData.reduce((acc, control) => {
         acc[control.id] = control;
@@ -248,10 +249,11 @@ export const getStateName = (state: State) => state.state_name;
 
 export const getPlacementSelector = (state: State) => state.placement;
 
-export const UpdateInfluenceSelector = (master_id: number) => (state: State) => {
-  state.updateInfluences(master_id);
-}
+export const UpdateInfluenceSelector =
+  (master_id: number) => (state: State) => {
+    state.updateInfluences(master_id);
+  };
 
-export const DeleteVizObjSelector = (state: State) => (id: number) =>  {
-  state.deleteVizObj(id);
-}
+export const DeleteVizObjSelector = (state: State) => (id: number) => {
+  return state.deleteVizObj(id);
+};
