@@ -1,7 +1,7 @@
 import React, { useState, useContext, useMemo, useRef } from "react";
 import { useThree, useFrame } from "@react-three/fiber";
 import * as THREE from "three";
-import { useStore, setVizObjSelector } from "@/app/store";
+import { useStore, setVizObjSelector, DeleteVizObjSelector } from "@/app/store";
 import {
   Selection,
   Select,
@@ -110,7 +110,7 @@ export const PlacementControl = ({
     []
   );
   const addObject = useStore(setVizObjSelector);
-  const { scene } = useThree();
+  const deleteObject = useStore(DeleteVizObjSelector)
 
   const createPlacementPositions = () => {
     const positions: THREE.Vector2[] = [];
@@ -131,6 +131,7 @@ export const PlacementControl = ({
   const handlePlacement = (position: THREE.Vector2) => {
     if (remainingPlacements > 0) {
       const obj_id = obj_ids[obj_ids.length - remainingPlacements];
+      deleteObject(obj_id)
       addObject(
         obj_id,
         new geomobj({
@@ -139,6 +140,7 @@ export const PlacementControl = ({
           geom: geom,
           color: "blue",
         })
+        
       );
       // console.log(obj_id, " placed at ", position.x, position.y, remainingPlacements)
       const newRemainingPlacements = remainingPlacements - 1;
@@ -155,8 +157,8 @@ export const PlacementControl = ({
       setRemainingPlacements(obj_ids.length);
       createPlacementPositions();
     } else {
-      setRemainingPlacements(0);
-      setPlacementPositions([]);
+      // setRemainingPlacements(0);
+      // setPlacementPositions([]);
     }
   }, [isPlacementMode]);
 

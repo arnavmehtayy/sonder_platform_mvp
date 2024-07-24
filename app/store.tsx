@@ -26,6 +26,7 @@ export type State = {
   setVizObj: (id: number, new_obj: obj) => void;
   setControlClick: (control_id: number, new_obj: Control) => void;
   reset: (dataSetKey: keyof typeof initDataSets) => void;
+  deleteVizObj: (id: number) => void;
   updateInfluences: (id: number) => void;
 };
 
@@ -58,6 +59,14 @@ export const useStore = create<State>((set, get) => ({
       return updatedState;
     });
   },
+
+  deleteVizObj: (id: number) => {
+    set((state) => {
+      const updatedVizobjs = { ...state.vizobjs };
+      delete updatedVizobjs[id];
+      return { vizobjs: updatedVizobjs }
+  }
+)},
 
   setControlClick: (control_id: number, new_obj: Control) => {
     set((state) => {
@@ -241,4 +250,8 @@ export const getPlacementSelector = (state: State) => state.placement;
 
 export const UpdateInfluenceSelector = (master_id: number) => (state: State) => {
   state.updateInfluences(master_id);
+}
+
+export const DeleteVizObjSelector = (state: State) => (id: number) =>  {
+  state.deleteVizObj(id);
 }
