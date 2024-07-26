@@ -120,6 +120,7 @@ type PlacementControlProps = {
   obj_ids: number[];
   geom: THREE.BufferGeometry;
   onPlacement: (remainingPlacements: number) => void;
+  color: string;
 };
 
 export const PlacementControl = ({
@@ -128,6 +129,7 @@ export const PlacementControl = ({
   cellSize = 5,
   obj_ids = [],
   geom = new THREE.PlaneGeometry(4, 4),
+  color = "blue"
 }: Partial<PlacementControlProps>) => {
   const {
     isPlacementMode,
@@ -173,7 +175,7 @@ export const PlacementControl = ({
           id: obj_id,
           position: position,
           geom: geom,
-          color: "blue",
+          color: color,
         })
         
       );

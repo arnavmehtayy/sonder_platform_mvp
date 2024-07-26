@@ -102,6 +102,7 @@ export default function Experience() {
             obj_ids={placement.object_ids}
             geom={placement.geometry}
             GridVectors={placement.gridVectors}
+            color={placement.color}
           />
         ) : null}
 

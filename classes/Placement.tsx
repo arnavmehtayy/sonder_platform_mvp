@@ -6,6 +6,8 @@ export default class Placement {
   geometry: THREE.BufferGeometry;
   gridVectors: THREE.Vector2[];
   text: string;
+  color: string;
+
 
   constructor({
     object_ids,
@@ -14,6 +16,7 @@ export default class Placement {
     geometry = new THREE.PlaneGeometry(4, 4),
     gridVectors = [],
     text = "Click to place objects",
+    color = "blue"
   }: Partial<Placement> & { object_ids: number[] }) {
     this.object_ids = object_ids;
     this.grid = grid;
@@ -21,5 +24,6 @@ export default class Placement {
     this.geometry = geometry;
     this.gridVectors = gridVectors;
     this.text = text;  
+    this.color = color
   }
 }

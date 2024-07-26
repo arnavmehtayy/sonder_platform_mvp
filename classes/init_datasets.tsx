@@ -175,7 +175,8 @@ export const initDataSets: { [key: string]: data_type } = {
             object_ids: [60, 5555],
             geometry: new THREE.CircleGeometry(0.3, 128),
             gridVectors: [new Vector2(2,2), new Vector2(3,3), new Vector2(1,0), new Vector2(2,0)],
-            text: "This is testing placement"
+            text: "This is testing placement",
+            color: "white"
         }),
     },
     set2: {
@@ -194,7 +195,7 @@ let line = new LineObj({
     start: new Vector2(0, 0),
     end: new Vector2(0, 0),
     line_width: 5,
-    color: "white",
+    color: "red",
 });
 line = LineObj.set_slope_intercept(line, 0, 0.5, [-30, 30]);
 
@@ -213,9 +214,9 @@ for (let i = 0; i < num_points; i++) {
     initDataSets.set1.canvasData.push(
         new geomobj({
             id: i,
-            geom: new THREE.CircleGeometry(0.3, 128),
+            geom: new THREE.CircleGeometry(0.23, 128),
             position: points[i],
-            color: "blue",
+            color: "white",
         })
     );
 
@@ -224,8 +225,8 @@ for (let i = 0; i < num_points; i++) {
             id: i + num_points,
             start: points[i],
             end: new Vector2(0, 0),
-            line_width: 2,
-            color: "red",
+            line_width: 3,
+            color: "gray",
         })
     );
 
@@ -264,7 +265,7 @@ initDataSets.set1.canvasData.push(
         start: new Vector2(0,0),
         end: new Vector2(1, 1),
         line_width: 2,
-        color: "red",
+        color: "gray",
     })
 );
 
