@@ -1,3 +1,5 @@
+'use client'
+
 import React, { useState } from 'react';
 import { Minigame } from './Minigame';
 import { useStore } from '../store';

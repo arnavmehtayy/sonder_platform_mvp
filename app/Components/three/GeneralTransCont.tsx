@@ -6,6 +6,7 @@ import { TouchControl } from "@/classes/TouchControl";
 import { useStore, setVizObjSelector, getObjectSelector } from "@/app/store";
 import { TransformObj } from "@/classes/transformObj";
 import { geomobj } from "@/classes/geomobj";
+import { useIsMobile } from "@/app/useIsMobile";
 
 /*
  * This component handles a TranformControl for a single object in the scene.
@@ -74,6 +75,9 @@ export default function GeneralTransformControl({
     return null;
   }
 
+  const isMobile = useIsMobile();
+
+
   return (
     <TransformControls
       onObjectChange={handleTransformationChange}
@@ -85,7 +89,7 @@ export default function GeneralTransformControl({
       translationSnap={touchControl.step_size}
       rotationSnap={touchControl.step_size}
       scaleSnap={touchControl.step_size}
-      size={1}
+      size={isMobile ? 2 : 1}
     />
   );
 };
