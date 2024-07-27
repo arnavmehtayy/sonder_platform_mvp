@@ -64,6 +64,11 @@ export const initDataSets: { [key: string]: data_type } = {
                 id: 4,
                 selectable: [1, 2, 89],
                 isActive: false
+            }),
+            new SelectControl({
+                id: 5,
+                selectable: [],
+                isActive: false
             })
         ],
         canvasData: [

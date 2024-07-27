@@ -72,35 +72,32 @@ export class LineObj extends obj {
     children = null,
     onClickSelect,
     objectRef,
+    material = null,
   }: Partial<{
     children: React.ReactElement | null;
-    onClickSelect: (event:  ThreeEvent<MouseEvent>) => void;
+    onClickSelect: (event: ThreeEvent<MouseEvent>) => void;
     objectRef: RefObject<THREE.Mesh>;
+    material: THREE.MeshBasicMaterial | null;
   }> & {
     objectRef: RefObject<THREE.Mesh>;
   }): ReactElement<any, string | JSXElementConstructor<any>> {
-    const line_mat = useRef<any>()
-    // useFrame((state) => {
-    //     if (line_mat.current && this.isClickable) {
-    //       line_mat.current.color = "red"
-    //     }
-      
-    // });
+    const line_mat = useRef<any>();
 
     return super.getMesh({
       children: (
         <Line
-        ref= {line_mat}
+          ref={line_mat}
           points={[
             [this.start.x, this.start.y, 0],
             [this.end.x, this.end.y, 0],
-          ]} // Array of points, Array<Vector3 | Vector2 | [number, number, number] | [number, number] | number>
-          color={this.color} // Default
-          lineWidth={this.line_width} // In pixels (default)
-          segments // If true, renders a THREE.LineSegments2. Otherwise, renders a THREE.Line2
-          dashed={false} // Default
+          ]}
+          color={material ? material.color : this.color}
+          lineWidth={this.line_width}
+          segments
+          dashed={false}
           {...{ linebutt: "round", linecap: "round" }}
-        />
+        >
+        </Line>
       ),
       onClickSelect: onClickSelect,
       objectRef: objectRef,

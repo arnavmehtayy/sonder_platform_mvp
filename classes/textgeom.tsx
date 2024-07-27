@@ -40,10 +40,12 @@ export default class TextGeom extends geomobj {
     children,
     onClickSelect = (event: ThreeEvent<MouseEvent>) => {},
     objectRef,
+    material = null,
   }: Partial<{
     children: React.ReactElement | null;
     onClickSelect: (event: ThreeEvent<MouseEvent>) => void;
     objectRef: React.RefObject<any>;
+    material: THREE.Material | null;
   }> & {
     children: React.ReactElement | null;
     objectRef: React.RefObject<THREE.Mesh>;
@@ -58,7 +60,11 @@ export default class TextGeom extends geomobj {
       >
         <mesh>
           <primitive object={this.geom} attach="geometry" />
+          {material ? (
+          <primitive object={material} attach="material" />
+        ) : (
           <meshBasicMaterial color={this.color} side={THREE.DoubleSide} />
+        )}
         </mesh>
 
         <Text color="white" anchorX="center" anchorY="middle">

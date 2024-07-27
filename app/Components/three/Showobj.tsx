@@ -28,6 +28,8 @@ import ShowAxis from "./ShowAxis";
 
 export const Showobj = memo(({ id }: { id: number }) => {
   const obj = useStore(getObjectSelector(id));
+  const selectionModeActive = useStore((state) => state.isSelectActive);
+
   if (obj instanceof geomobj) {
     return  <ShowGeomObj obj={obj} />;
   } else if (obj instanceof LineObj) {

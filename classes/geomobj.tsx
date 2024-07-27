@@ -38,29 +38,35 @@ export class geomobj extends TransformObj {
     this.OnClick = OnClick;
   }
 
-    getMesh({
-        children,
-        onClickSelect = (event:  ThreeEvent<MouseEvent>) => {},
-        objectRef,
-    }: Partial<{
-        children: React.ReactElement | null;
-        onClickSelect: (event:  ThreeEvent<MouseEvent>) => void;
-        objectRef: React.RefObject<THREE.Mesh>;
-    }> & {
-        children: React.ReactElement | null;
-        objectRef: React.RefObject<THREE.Mesh>;
-    }): React.ReactElement {
-        return (
-            <mesh
-            position={[this.position.x, this.position.y, 0]}
-            rotation={[this.rotation.x, this.rotation.y, this.rotation.z]}
-            scale={[this.scale.x, this.scale.y, this.scale.z]}
-            ref={objectRef}
-            onPointerDown={this.isClickable ? onClickSelect : undefined}
-          >
-            <primitive object={this.geom} attach="geometry" />
-            <meshBasicMaterial color={this.color} side={THREE.DoubleSide} />
-          </mesh>
-        );
-    }
+  getMesh({
+    children,
+    onClickSelect = (event: ThreeEvent<MouseEvent>) => {},
+    objectRef,
+    material = null,
+  }: Partial<{
+    children: React.ReactElement | null;
+    onClickSelect: (event: ThreeEvent<MouseEvent>) => void;
+    objectRef: React.RefObject<THREE.Mesh>;
+    material: THREE.Material | null;
+  }> & {
+    children: React.ReactElement | null;
+    objectRef: React.RefObject<THREE.Mesh>;
+  }): React.ReactElement {
+    return (
+      <mesh
+        position={[this.position.x, this.position.y, 0]}
+        rotation={[this.rotation.x, this.rotation.y, this.rotation.z]}
+        scale={[this.scale.x, this.scale.y, this.scale.z]}
+        ref={objectRef}
+        onPointerDown={this.isClickable ? onClickSelect : undefined}
+      >
+        <primitive object={this.geom} attach="geometry" />
+        {material ? (
+          <primitive object={material} attach="material" />
+        ) : (
+          <meshBasicMaterial color={this.color} side={THREE.DoubleSide} />
+        )}
+      </mesh>
+    );
+  }
 }

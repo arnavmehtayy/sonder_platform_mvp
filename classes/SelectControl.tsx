@@ -31,7 +31,6 @@ export class SelectControl extends Control {
   }
 
   SelectObj(obj_id: number): SelectControl {
-    console.log(this.capacity, this.selected.length)
     if (this.selected.length < this.capacity && this.isActive) {
       // check if obj_id does not already exist in the array
       if (!this.selected.includes(obj_id) && this.selectable.includes(obj_id)) {

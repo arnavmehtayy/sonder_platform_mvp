@@ -1,4 +1,4 @@
-import React, { useRef, useState, useEffect } from "react";
+import React, { useRef, useState, useEffect, useMemo } from "react";
 import * as THREE from "three";
 import GeneralTransformControl from "./GeneralTransCont";
 import { geomobj } from "@/classes/geomobj";
@@ -17,6 +17,7 @@ export function ShowGeomObj({ obj }: { obj: geomobj }) {
   const touch_rotate = obj?.touch_controls.rotate;
   const touch_translate = obj?.touch_controls.translate;
   const id = obj.id;
+  const selectionModeActive = useStore((state) => state.isSelectActive);
 
   useEffect(() => {
     if (object_ref.current) {
@@ -28,6 +29,19 @@ export function ShowGeomObj({ obj }: { obj: geomobj }) {
     add_obj(); 
     event.stopPropagation();
   }
+
+  const material = useMemo(() => {
+    const mat = new THREE.MeshBasicMaterial({
+      color: obj.color,
+      side: THREE.DoubleSide,
+    });
+
+    if (selectionModeActive && !obj.isClickable) {
+        mat.color.setHSL(0, 0, mat.color.getHSL({ h: 0, s: 0, l: 0 }).l * 0.2);
+    }
+
+    return mat;
+  }, [obj.color, selectionModeActive, obj.isClickable]);
 
   return (
     <>
@@ -42,7 +56,12 @@ export function ShowGeomObj({ obj }: { obj: geomobj }) {
         <meshBasicMaterial color={obj.color} side={THREE.DoubleSide} />
       </mesh> */}
 
-      {obj.getMesh({ children: null, onClickSelect: onClickSelect, objectRef: object_ref})}
+{obj.getMesh({
+        children: null,
+        onClickSelect: onClickSelect,
+        objectRef: object_ref,
+        material: material,
+      })}
 
       {controlsEnabled && touch_scale && (
         <GeneralTransformControl

@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useDebouncedCallback } from "use-debounce";
 import { TransformControls } from "@react-three/drei";
 import * as THREE from "three";
@@ -29,6 +29,14 @@ export default function GeneralTransformControl({
 }: GeneralTransformControlProps)  {
   const setVizObj = useStore(setVizObjSelector);
   const obj = useStore(getObjectSelector(vizObjId)) as TransformObj;
+  const [isReady, setIsReady] = useState(false);
+
+  useEffect(() => { // checking if we can attach a tranform to our object that is its ref is non-null
+    if (obj_ref.current && obj_ref.current.parent) {
+      setIsReady(true);
+    }
+  }, [obj_ref]);
+
   const handleTransformationChange = useDebouncedCallback(() => {
     if (obj_ref && obj_ref.current && obj) { // REMOVE THIS && chain
       let transformValue: THREE.Vector3;
@@ -77,6 +85,9 @@ export default function GeneralTransformControl({
 
   const isMobile = useIsMobile();
 
+  if (!isReady || !touchControl || !obj_ref.current) {
+    return null;
+  }
 
   return (
     <TransformControls

@@ -28,6 +28,8 @@ export type State = {
   reset: (dataSetKey: keyof typeof initDataSets) => void;
   deleteVizObj: (id: number) => boolean;
   updateInfluences: (id: number) => void;
+  isSelectActive: boolean
+  setSelectActive: (val: boolean) => void
 };
 
 export const useStore = create<State>((set, get) => ({
@@ -38,6 +40,11 @@ export const useStore = create<State>((set, get) => ({
   influences: {},
   scores: {},
   placement: null,
+  isSelectActive: false,
+
+  setSelectActive: (val: boolean) => {
+    set({ isSelectActive: val });
+  },
 
   setVizObj: (id: number, new_obj: obj) => {
     set((state) => {
@@ -84,6 +91,7 @@ export const useStore = create<State>((set, get) => ({
       question: dataSet.question,
       state_name: dataSetKey,
       placement: dataSet.placement,
+      isSelectActive: false,
 
       controls: dataSet.controlData.reduce((acc, control) => {
         acc[control.id] = control;
@@ -217,6 +225,7 @@ export const SetIsActiveControl =
       })
     const updatedState = control.setIsActive(val);
     state.setControlClick(control_id, updatedState);
+    state.setSelectActive(val)
   };
 
 // export const getScore = (score_id: number) => { // note score is not stored in the state
