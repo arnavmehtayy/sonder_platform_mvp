@@ -16,6 +16,7 @@ import { TransformObj } from "./transformObj";
 import { Score } from "./Score";
 import Placement from "./Placement";
 import TextGeom from "./textgeom";
+import CoordinateAxis from "./CoordinateAxis";
 
 type data_type = {
     question : string;
@@ -152,7 +153,8 @@ export const initDataSets: { [key: string]: data_type } = {
             }),
             
         ],
-        canvasData: [],
+        canvasData: [new CoordinateAxis({id: 99999})
+        ],
         scoreData: [
             new Score<number, LineObj>({
                 text: "Mean Squared Error",

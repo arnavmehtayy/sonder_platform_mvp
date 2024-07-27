@@ -11,8 +11,8 @@ export default class Placement {
 
   constructor({
     object_ids,
-    grid = [10, 10],
-    cellSize = 1,
+    grid = [0, 0],
+    cellSize = 0,
     geometry = new THREE.PlaneGeometry(4, 4),
     gridVectors = [],
     text = "Click to place objects",

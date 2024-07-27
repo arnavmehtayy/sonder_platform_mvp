@@ -35,8 +35,8 @@ export class obj {
     onClickSelect: (event: ThreeEvent<MouseEvent>) => void;
     objectRef: React.RefObject<THREE.Mesh>;
   }> & {
-    children: React.ReactElement;
-    objectRef: React.RefObject<THREE.Mesh>;
+    children: React.ReactElement | null;
+    objectRef: React.RefObject<any>;
   }): React.ReactElement {
 
     return (

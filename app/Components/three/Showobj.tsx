@@ -12,6 +12,8 @@ import { ShowGeomObj } from "./ShowgeomObj";
 import { ShowLineObj } from "./ShowLineObj";
 import ShowTextGeom from "./ShowTextGeom";
 import textgeom from "@/classes/textgeom";
+import CoordinateAxis from "@/classes/CoordinateAxis";
+import ShowAxis from "./ShowAxis";
 
 
 /*
@@ -32,7 +34,9 @@ export const Showobj = memo(({ id }: { id: number }) => {
     return <ShowLineObj obj={obj} />;
   } else if(obj instanceof textgeom) {
     return <ShowTextGeom obj={obj} />;
-
+  }
+  else if(obj instanceof CoordinateAxis) {
+    return <ShowAxis obj={obj} />;
   }
   else {
     console.error(`Object with id ${id} not found`); 

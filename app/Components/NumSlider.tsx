@@ -38,7 +38,7 @@ export default function NumSlide({ control, control_id }: { control: SliderContr
         />
         <div className="flex justify-between items-center mt-2">
           <span className="text-sm text-gray-600">{control.range[0]}</span>
-          <span className="text-sm font-medium text-blue-600">{getValue}</span>
+          <span className="text-sm font-medium text-blue-600">{getValue.toFixed(2)}</span>
           <span className="text-sm text-gray-600">{control.range[1]}</span>
         </div>
       </div>
