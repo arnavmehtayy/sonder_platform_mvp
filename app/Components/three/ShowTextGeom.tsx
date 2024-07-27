@@ -4,24 +4,12 @@ import { useStore, SelectObjectControl } from "@/app/store";
 import { ThreeEvent } from "@react-three/fiber";
 import * as THREE from "three";
 
-export default function ShowTextGeom({obj}: {obj: textgeom}) {
+export default function ShowTextGeom({obj, material}: {obj: textgeom, material: THREE.MeshBasicMaterial}) {
     const object_ref = useRef<THREE.Mesh>(null);
     const add_obj = useStore(SelectObjectControl(obj.id));
     const selectionModeActive = useStore((state) => state.isSelectActive);
 
-    const material = useMemo(() => {
-      const mat = new THREE.MeshBasicMaterial({
-        color: obj.color,
-        side: THREE.DoubleSide,
-      });
-  
-      if (selectionModeActive && !obj.isClickable) {
-        mat.color.setHSL(0, 0, mat.color.getHSL({ h: 0, s: 0, l: 0 }).l * 0.1);
-        mat.transparent = true;
-        mat.opacity = 0.3;
-      }
-        return mat;
-      }, [obj.color, selectionModeActive, obj.isClickable]);
+    
 
     const onClickSelect = (event:  ThreeEvent<MouseEvent>) => {
         add_obj(); 

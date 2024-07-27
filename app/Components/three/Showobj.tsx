@@ -14,6 +14,8 @@ import ShowTextGeom from "./ShowTextGeom";
 import textgeom from "@/classes/textgeom";
 import CoordinateAxis from "@/classes/CoordinateAxis";
 import ShowAxis from "./ShowAxis";
+import coloredObj from "@/classes/coloredObj";
+import {ShowColoredobj} from "./ShowColoredObj";
 
 
 /*
@@ -30,16 +32,10 @@ export const Showobj = memo(({ id }: { id: number }) => {
   const obj = useStore(getObjectSelector(id));
   const selectionModeActive = useStore((state) => state.isSelectActive);
 
-  if (obj instanceof geomobj) {
-    return  <ShowGeomObj obj={obj} />;
-  } else if (obj instanceof LineObj) {
-    return <ShowLineObj obj={obj} />;
-  } else if(obj instanceof textgeom) {
-    return <ShowTextGeom obj={obj} />;
+  if(obj instanceof coloredObj) {
+    return <ShowColoredobj obj={obj} />;
   }
-  else if(obj instanceof CoordinateAxis) {
-    return <ShowAxis obj={obj} />;
-  }
+
   else {
     console.error(`Object with id ${id} not found`); 
     return null;

@@ -10,24 +10,12 @@ import {
 
 import { EffectComposer, Bloom } from '@react-three/postprocessing'
 
-export function ShowLineObj({obj}: {obj: LineObj}) {
+export function ShowLineObj({obj, material}: {obj: LineObj, material: THREE.MeshBasicMaterial}) {
     const object_ref = useRef<THREE.Mesh>(null);
     const add_obj = useStore(SelectObjectControl(obj.id));
     const selectionModeActive = useStore((state) => state.isSelectActive);
 
-    const material = useMemo(() => {
-        const mat = new THREE.MeshBasicMaterial({
-            color: obj.color,
-            side: THREE.DoubleSide,
-          });
     
-        if (selectionModeActive && !obj.isClickable) {
-          mat.color.setHSL(0, 0, mat.color.getHSL({ h: 0, s: 0, l: 0 }).l * 0.1);
-          mat.transparent = true;
-        mat.opacity = 0.3;
-        }
-          return mat;
-        }, [obj.color, obj.line_width, selectionModeActive, obj.isClickable]);
 
     const onClickSelect = (event: ThreeEvent<MouseEvent>) => {
         add_obj(); 

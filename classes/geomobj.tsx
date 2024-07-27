@@ -2,13 +2,13 @@ import { TransformObj } from "./transformObj";
 import * as THREE from "three";
 import { TouchControl } from "./TouchControl";
 import { ThreeEvent } from "react-three-fiber";
+import coloredObj from "./coloredObj";
 
 /*
     * This class creates a geometric object on the scene (Any object that is rendered using THREE.BufferGeometry).
 */
 
 export class geomobj extends TransformObj {
-  color: string;
   geom: THREE.BufferGeometry;
   isClickable: boolean = false;
   OnClick: ((obj: geomobj) => void) | undefined;
@@ -31,9 +31,9 @@ export class geomobj extends TransformObj {
       touch_controls: touch_controls,
       param_t: param_t,
       id: id,
+      color: color,
     });
     this.geom = geom;
-    this.color = color;
     this.isClickable = isClickable;
     this.OnClick = OnClick;
   }

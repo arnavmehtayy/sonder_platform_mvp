@@ -2,6 +2,7 @@ import * as THREE from "three";
 import { SliderControl } from "./SliderControl";
 import { TouchControl } from "./TouchControl";
 import { obj } from "./obj";
+import coloredObj from "./coloredObj";
 
 /*
   * This class stores the position, scale and rotation attributes of an object in the scene.
@@ -10,7 +11,7 @@ import { obj } from "./obj";
 
 */
 
-export class TransformObj extends obj {
+export class TransformObj extends coloredObj {
   position: THREE.Vector2;
   rotation: THREE.Vector3;
   scale: THREE.Vector3;
@@ -24,9 +25,10 @@ export class TransformObj extends obj {
     scale = new THREE.Vector3(1, 1, 1),
     touch_controls = new TouchControl(),
     param_t = 0,
+    color = "white",
     name = "TransformObj",
   }: Partial<TransformObj> & { id: number }) {
-    super({ id: id, name: name});
+    super({ id: id, name: name, color: color});
     this.position = position;
     this.rotation = rotation;
     this.scale = scale;

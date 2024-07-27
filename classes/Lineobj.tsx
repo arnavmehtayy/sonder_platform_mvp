@@ -5,6 +5,7 @@ import * as THREE from "three";
 import { Line } from "@react-three/drei";
 import { ThreeEvent } from "@react-three/fiber";
 import { useFrame } from "@react-three/fiber";
+import coloredObj from "./coloredObj";
 
 
 /*
@@ -15,11 +16,10 @@ import { useFrame } from "@react-three/fiber";
 
 */
 
-export class LineObj extends obj {
+export class LineObj extends coloredObj {
   start: Vector2;
   end: Vector2;
   line_width: number = 2;
-  color: string;
 
   constructor({
     id,
@@ -30,7 +30,7 @@ export class LineObj extends obj {
     name = "Line",
     isClickable = false,
   }: Partial<LineObj> & { id: number }) {
-    super({ id: id, name: name });
+    super({ id: id, name: name, color: color });
     this.start = start;
     this.end = end;
     this.line_width = line_width;
