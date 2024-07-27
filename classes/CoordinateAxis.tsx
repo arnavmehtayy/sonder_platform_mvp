@@ -56,10 +56,12 @@ export default class CoordinateAxis extends geomobj {
     children,
     onClickSelect = (event: ThreeEvent<MouseEvent>) => {},
     objectRef,
+    material = null,
   }: Partial<{
     children: React.ReactElement | null;
     onClickSelect: (event: ThreeEvent<MouseEvent>) => void;
     objectRef: React.RefObject<THREE.Mesh>;
+    material: THREE.MeshBasicMaterial | null;
   }> & {
     children: React.ReactElement | null;
     objectRef: React.RefObject<any>;
@@ -98,7 +100,7 @@ export default class CoordinateAxis extends geomobj {
             key={`x-${i}`}
             position={[i, -this.tickSize - this.fontSize / 2, 0]}
             fontSize={this.fontSize}
-            color={this.color}
+            color={material ? material.color : this.color}
             anchorX="center"
             anchorY="top"
           >
@@ -110,7 +112,7 @@ export default class CoordinateAxis extends geomobj {
             key={`y-${i}`}
             position={[-this.tickSize - this.fontSize / 2, i, 0]}
             fontSize={this.fontSize}
-            color={this.color}
+            color={material ? material.color : this.color}
             anchorX="right"
             anchorY="middle"
           >
@@ -120,6 +122,8 @@ export default class CoordinateAxis extends geomobj {
       }
     }
 
+    
+
     return (
       <group
         ref={objectRef}
@@ -128,13 +132,13 @@ export default class CoordinateAxis extends geomobj {
         scale={[this.scale.x, this.scale.y, this.scale.z]}
       >
         {ticksX.map((points, i) => (
-          <Line key={`xtick-${i}`} points={points} color={this.color} lineWidth={this.lineWidth} />
+          <Line key={`xtick-${i}`} points={points} color={material ? material.color : this.color} lineWidth={this.lineWidth} />
         ))}
         {ticksY.map((points, i) => (
-          <Line key={`ytick-${i}`} points={points} color={this.color} lineWidth={this.lineWidth} />
+          <Line key={`ytick-${i}`} points={points} color={material ? material.color : this.color} lineWidth={this.lineWidth} />
         ))}
-        <Line points={xAxisPoints} color={this.color} lineWidth={this.lineWidth} />
-        <Line points={yAxisPoints} color={this.color} lineWidth={this.lineWidth} />
+        <Line points={xAxisPoints} color={material ? material.color : this.color} lineWidth={this.lineWidth} />
+        <Line points={yAxisPoints} color={material ? material.color : this.color} lineWidth={this.lineWidth} />
         {/* <Line points={ticksX} color={this.color} lineWidth={this.lineWidth} />
         <Line points={ticksY} color={this.color} lineWidth={this.lineWidth} /> */}
         {labelsX}

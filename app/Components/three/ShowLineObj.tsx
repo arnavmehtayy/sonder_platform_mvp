@@ -22,7 +22,9 @@ export function ShowLineObj({obj}: {obj: LineObj}) {
           });
     
         if (selectionModeActive && !obj.isClickable) {
-          mat.color.setHSL(0, 0, mat.color.getHSL({ h: 0, s: 0, l: 0 }).l * 0.2);
+          mat.color.setHSL(0, 0, mat.color.getHSL({ h: 0, s: 0, l: 0 }).l * 0.1);
+          mat.transparent = true;
+        mat.opacity = 0.3;
         }
           return mat;
         }, [obj.color, obj.line_width, selectionModeActive, obj.isClickable]);

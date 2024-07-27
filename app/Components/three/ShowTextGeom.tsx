@@ -16,13 +16,14 @@ export default function ShowTextGeom({obj}: {obj: textgeom}) {
       });
   
       if (selectionModeActive && !obj.isClickable) {
-        mat.color.setHSL(0, 0, mat.color.getHSL({ h: 0, s: 0, l: 0 }).l * 0.2);
+        mat.color.setHSL(0, 0, mat.color.getHSL({ h: 0, s: 0, l: 0 }).l * 0.1);
+        mat.transparent = true;
+        mat.opacity = 0.3;
       }
         return mat;
       }, [obj.color, selectionModeActive, obj.isClickable]);
 
     const onClickSelect = (event:  ThreeEvent<MouseEvent>) => {
-        console.log("clicked")
         add_obj(); 
         event.stopPropagation();
       }

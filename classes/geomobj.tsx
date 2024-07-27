@@ -47,7 +47,7 @@ export class geomobj extends TransformObj {
     children: React.ReactElement | null;
     onClickSelect: (event: ThreeEvent<MouseEvent>) => void;
     objectRef: React.RefObject<THREE.Mesh>;
-    material: THREE.Material | null;
+    material: THREE.MeshBasicMaterial | null;
   }> & {
     children: React.ReactElement | null;
     objectRef: React.RefObject<THREE.Mesh>;

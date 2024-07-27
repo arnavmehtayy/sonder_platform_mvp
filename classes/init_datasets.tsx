@@ -146,13 +146,13 @@ export const initDataSets: { [key: string]: data_type } = {
             }),
             new SelectControl({
                 id: 4,
-                selectable: [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29, 1000],
+                selectable: [26,27,28,29, 1000],
                 isActive: false,
                 capacity: 4,
             }),
             new SelectControl({
                 id: 5,
-                selectable:[50,51,52,54,56], // [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29],
+                selectable:[26, 27], // [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29],
                 isActive: false,
                 capacity: 1,
             }),
