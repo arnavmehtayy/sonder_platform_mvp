@@ -114,5 +114,5 @@ export function Minigame({ page }: { page: keyof typeof initDataSets}) {
       </div>
     </div>
     </PlacementProvider>
-  );
+  );  
 }

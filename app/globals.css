@@ -17,6 +17,8 @@
 }
 
 
+
+
 html {
   -webkit-overflow-scrolling: touch;
   overflow-y: scroll;
@@ -30,27 +32,18 @@ html {
   overscroll-behavior: none;
 }
 body {
-  color: rgb(var(--foreground-rgb));
-  background: linear-gradient(
-      to bottom,
-      transparent,
-      rgb(var(--background-end-rgb))
-    )
-    rgb(var(--background-start-rgb));
-
-    -webkit-overflow-scrolling: touch;
-    overflow: hidden;
-  position: fixed;
   height: 100%;
   width: 100%;
-  touch-action: none;
-  overscroll-behavior-y: contain;
-  overflow-x: hidden;
-  overscroll-behavior: none;
-  overflow-y: scroll;
-  
-  
-}
+  overflow: auto;
+  &::-webkit-scrollbar {
+    width: 0.7rem;
+    max-height: 2rem;
+    &-thumb {
+      background-color:rgba(255, 255, 255, 0.6);
+    }
+  }
+  }
+
 
 @layer utilities {
   .text-balance {
