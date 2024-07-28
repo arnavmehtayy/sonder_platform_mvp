@@ -3,9 +3,9 @@ import { preventZoom } from '@/app/preventZoom';
 import { useEffect } from 'react';
 
 export default function Home() {
-  useEffect(() => {
-    preventZoom();
-  }, []);
+  // useEffect(() => {
+  //   preventZoom();
+  // }, []);
   // document.body.style.overflow= "hidden"
   return (
     <main>
