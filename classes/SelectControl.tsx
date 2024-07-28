@@ -30,30 +30,30 @@ export class SelectControl extends Control {
     return this.clone();
   }
 
-  SelectObj(obj_id: number): SelectControl {
+  SelectObj(obj_id: number): [SelectControl, boolean] {
     if (this.selected.length < this.capacity && this.isActive) {
       // check if obj_id does not already exist in the array
       if (!this.selected.includes(obj_id) && this.selectable.includes(obj_id)) {
         this.selected.push(obj_id);
-        return this.clone();
+        return [this.clone(), true];
       } else {
         console.log("Object already selected or not selectable");
       }
     } else {
       console.log("Cannot select more than capacity");
     }
-    return this
+    return [this, false]
     
   }
 
-  deselectObj(obj_id: number): SelectControl {
+  deselectObj(obj_id: number): [SelectControl, boolean] {
     if (this.selected.includes(obj_id)) {
       this.selected = this.selected.filter((id) => id !== obj_id);
-      return this.clone();
+      return [this.clone(), true];
     } else {
       console.log("Object was never selected");
     }
-    return this
+    return [this, false]
     
   }
 

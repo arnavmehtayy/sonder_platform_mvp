@@ -193,14 +193,22 @@ export const getControlValueSelector =
     return viz && control ? control.get_attribute(viz) : 0;
   };
 
-export const SelectObjectControl =
+export const SelectObjectControl = // this
   (obj_id: number) =>
   (state: State) =>
   () => // may be too expensive redo if necessary
   {
     Object.values(state.controls).forEach((control) => {
       if (control instanceof SelectControl) {
-        const updatedState = control.SelectObj(obj_id);
+        const select_obj = control.SelectObj(obj_id);
+        const updatedState = select_obj[0];
+        // new code
+        if(select_obj[1]) {
+        const new_obj = Object.assign(Object.create(Object.getPrototypeOf(state.vizobjs[obj_id])), state.vizobjs[obj_id]);
+        new_obj.isClickable = false;
+        state.setVizObj(obj_id, new_obj); 
+        }
+        // new code
         state.setControlClick(control.id, updatedState);
       }
     });
@@ -211,7 +219,13 @@ export const DeSelectObjectControl =
     // may be too expensive redo if necessary
     const control = state.controls[control_id] as SelectControl;
     if (obj_id in state.vizobjs) {
-      const updatedState = control.deselectObj(obj_id);
+      const select_obj = control.deselectObj(obj_id);
+      const updatedState = select_obj[0]
+      if(select_obj[1]) {
+      const new_obj = Object.assign(Object.create(Object.getPrototypeOf(state.vizobjs[obj_id])), state.vizobjs[obj_id]);
+      new_obj.isClickable = true;
+      state.setVizObj(obj_id, new_obj); 
+      }
       state.setControlClick(control.id, updatedState); // updates the state of the control with the added object
     }
   };
@@ -220,8 +234,10 @@ export const SetIsActiveControl =
   (control_id: number) => (state: State) => (val: boolean) => {
     const control = state.controls[control_id] as SelectControl;
       control.selectable.forEach((obj_id) => {
+        if(!control.selected.includes(obj_id)) {
         const updatedState = obj.setObjectisClickable(state.vizobjs[obj_id], val)
         state.setVizObj(obj_id, updatedState)
+       }
       })
     const updatedState = control.setIsActive(val);
     state.setControlClick(control_id, updatedState);

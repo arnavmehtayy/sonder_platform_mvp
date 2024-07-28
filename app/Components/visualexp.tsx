@@ -68,7 +68,7 @@ export default function Experience() {
       <Canvas>
         <OrthographicCamera
           makeDefault
-          zoom={15}
+          zoom={30}
           position={[0, 0, 20]}
           near={0.1}
           far={1000}
@@ -79,7 +79,7 @@ export default function Experience() {
           enablePan={true}
           enableZoom={true}
           maxZoom={100}
-          minZoom={1}
+          minZoom={20}
           dampingFactor={0.3} // Disable damping
           zoomSpeed={0.8}
           panSpeed={0.7}
