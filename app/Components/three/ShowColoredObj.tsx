@@ -18,7 +18,7 @@ import coloredObj from "@/classes/coloredObj";
 
 
 
-export const ShowColoredobj = memo(({ obj }: { obj: coloredObj }) => {
+export const ShowColoredobj = memo(function ShowColoredobj({ obj }: {obj: coloredObj}) {
     const selectionModeActive = useStore((state) => state.isSelectActive);
 
     const material = useMemo(() => {

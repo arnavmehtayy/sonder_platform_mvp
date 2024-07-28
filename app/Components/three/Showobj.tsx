@@ -28,7 +28,7 @@ import {ShowColoredobj} from "./ShowColoredObj";
 
 */
 
-export const Showobj = memo(({ id }: { id: number }) => {
+export const Showobj = memo(function Showobj({ id }: {id: number}) {
   const obj = useStore(getObjectSelector(id));
   const selectionModeActive = useStore((state) => state.isSelectActive);
 

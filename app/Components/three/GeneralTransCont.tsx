@@ -30,6 +30,7 @@ export default function GeneralTransformControl({
   const setVizObj = useStore(setVizObjSelector);
   const obj = useStore(getObjectSelector(vizObjId)) as TransformObj;
   const [isReady, setIsReady] = useState(false);
+  const isMobile = useIsMobile();
 
   useEffect(() => { // checking if we can attach a tranform to our object that is its ref is non-null
     if (obj_ref.current && obj_ref.current.parent) {
@@ -83,7 +84,7 @@ export default function GeneralTransformControl({
     return null;
   }
 
-  const isMobile = useIsMobile();
+
 
   if (!isReady || !touchControl || !obj_ref.current) {
     return null;
