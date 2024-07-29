@@ -4,16 +4,17 @@ import Experience from "./visualexp";
 import Link from "next/link";
 import ShowControl from "./ShowControl";
 import ShowScore from "./ShowScore";
-import { useStore, getQuestionSelector, getStateName, getPlacementSelector } from "../store";
+import { useStore, getQuestionSelector, getStateName, getPlacementSelector, UpdateValidationSelector } from "../store";
 import { initDataSets } from "@/classes/init_datasets";
 import "katex/dist/katex.min.css";
 import Latex from "react-latex-next";
 import { PlacementProvider, PlacementControl, PlacementActivationButton } from './three/PlacementControl';
 import ShowPlacement from "./ShowPlacement";
 import "./style.css";
+import ValidationComponent from "./ShowValid";
 
 export function Minigame({ page }: { page: keyof typeof initDataSets }) {
-  console.log("Page: ", page);
+  // console.log("Page: ", page);
   const [resetInput, setResetInput] = useState("");
   const reset = useStore((state) => state.reset);
   const question: string = useStore(getQuestionSelector);
@@ -21,6 +22,11 @@ export function Minigame({ page }: { page: keyof typeof initDataSets }) {
   const placement = useStore(getPlacementSelector);
 
   const test_id: number = 1; // for testing remove soon
+
+  // testing
+  const validationInstance = useStore((state) => state.validation);
+  const updateValidation = useStore(UpdateValidationSelector);
+
 
   useEffect(() => {
     reset(page);
@@ -67,6 +73,9 @@ export function Minigame({ page }: { page: keyof typeof initDataSets }) {
             </div>
 
             {placement ? <ShowPlacement /> : null}
+
+            {/* Add the ValidationComponent here */}
+            <ValidationComponent validation={validationInstance} updater={updateValidation} />
           </div>
         </div>
       </div>

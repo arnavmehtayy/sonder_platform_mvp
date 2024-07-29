@@ -79,7 +79,7 @@ export default function Experience() {
           enablePan={true}
           enableZoom={true}
           maxZoom={100}
-          minZoom={20}
+          minZoom={17}
           dampingFactor={0.3} // Disable damping
           zoomSpeed={0.8}
           panSpeed={0.7}

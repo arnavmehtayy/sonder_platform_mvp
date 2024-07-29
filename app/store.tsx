@@ -14,8 +14,10 @@ import { Control } from "@/classes/Control";
 import { SelectControl } from "@/classes/SelectControl";
 import { Score } from "@/classes/Score";
 import { shallow } from "zustand/shallow";
+import * as THREE from "three";
 
 export type State = {
+  validation: Validation;
   state_name: keyof typeof initDataSets | null;
   question: string;
   placement: Placement | null;
@@ -28,11 +30,13 @@ export type State = {
   reset: (dataSetKey: keyof typeof initDataSets) => void;
   deleteVizObj: (id: number) => boolean;
   updateInfluences: (id: number) => void;
-  isSelectActive: boolean
-  setSelectActive: (val: boolean) => void
+  isSelectActive: boolean;
+  setSelectActive: (val: boolean) => void;
+  updateValidation: () => void;
 };
 
 export const useStore = create<State>((set, get) => ({
+  validation: new Validation_test(),
   state_name: null,
   question: "",
   controls: {},
@@ -44,6 +48,22 @@ export const useStore = create<State>((set, get) => ({
 
   setSelectActive: (val: boolean) => {
     set({ isSelectActive: val });
+  },
+
+  updateValidation: () => {
+    set((state) => {
+      if (state.validation instanceof Validation_obj) {
+        return {
+          validation: state.validation.computeValidity(
+            state.vizobjs[state.validation.obj_id] as TransformObj
+          ),
+        };
+      } else {
+        return {
+          validation: state.validation.computeValidity(null),
+        };
+      }
+    });
   },
 
   setVizObj: (id: number, new_obj: obj) => {
@@ -92,6 +112,7 @@ export const useStore = create<State>((set, get) => ({
       state_name: dataSetKey,
       placement: dataSet.placement,
       isSelectActive: false,
+      validation: dataSet.validation,
 
       controls: dataSet.controlData.reduce((acc, control) => {
         acc[control.id] = control;
@@ -194,25 +215,29 @@ export const getControlValueSelector =
   };
 
 export const SelectObjectControl = // this
-  (obj_id: number) =>
-  (state: State) =>
-  () => // may be too expensive redo if necessary
-  {
-    Object.values(state.controls).forEach((control) => {
-      if (control instanceof SelectControl) {
-        const select_obj = control.SelectObj(obj_id);
-        const updatedState = select_obj[0];
-        // new code
-        if(select_obj[1]) {
-        const new_obj = Object.assign(Object.create(Object.getPrototypeOf(state.vizobjs[obj_id])), state.vizobjs[obj_id]);
-        new_obj.isClickable = false;
-        state.setVizObj(obj_id, new_obj); 
+
+    (obj_id: number) =>
+    (state: State) =>
+    () => // may be too expensive redo if necessary
+    {
+      Object.values(state.controls).forEach((control) => {
+        if (control instanceof SelectControl) {
+          const select_obj = control.SelectObj(obj_id);
+          const updatedState = select_obj[0];
+          // new code
+          if (select_obj[1]) {
+            const new_obj = Object.assign(
+              Object.create(Object.getPrototypeOf(state.vizobjs[obj_id])),
+              state.vizobjs[obj_id]
+            );
+            new_obj.isClickable = false;
+            state.setVizObj(obj_id, new_obj);
+          }
+          // new code
+          state.setControlClick(control.id, updatedState);
         }
-        // new code
-        state.setControlClick(control.id, updatedState);
-      }
-    });
-  };
+      });
+    };
 
 export const DeSelectObjectControl =
   (state: State) => (obj_id: number, control_id: number) => {
@@ -220,11 +245,14 @@ export const DeSelectObjectControl =
     const control = state.controls[control_id] as SelectControl;
     if (obj_id in state.vizobjs) {
       const select_obj = control.deselectObj(obj_id);
-      const updatedState = select_obj[0]
-      if(select_obj[1]) {
-      const new_obj = Object.assign(Object.create(Object.getPrototypeOf(state.vizobjs[obj_id])), state.vizobjs[obj_id]);
-      new_obj.isClickable = true;
-      state.setVizObj(obj_id, new_obj); 
+      const updatedState = select_obj[0];
+      if (select_obj[1]) {
+        const new_obj = Object.assign(
+          Object.create(Object.getPrototypeOf(state.vizobjs[obj_id])),
+          state.vizobjs[obj_id]
+        );
+        new_obj.isClickable = true;
+        state.setVizObj(obj_id, new_obj);
       }
       state.setControlClick(control.id, updatedState); // updates the state of the control with the added object
     }
@@ -233,15 +261,18 @@ export const DeSelectObjectControl =
 export const SetIsActiveControl =
   (control_id: number) => (state: State) => (val: boolean) => {
     const control = state.controls[control_id] as SelectControl;
-      control.selectable.forEach((obj_id) => {
-        if(!control.selected.includes(obj_id)) {
-        const updatedState = obj.setObjectisClickable(state.vizobjs[obj_id], val)
-        state.setVizObj(obj_id, updatedState)
-       }
-      })
+    control.selectable.forEach((obj_id) => {
+      if (!control.selected.includes(obj_id)) {
+        const updatedState = obj.setObjectisClickable(
+          state.vizobjs[obj_id],
+          val
+        );
+        state.setVizObj(obj_id, updatedState);
+      }
+    });
     const updatedState = control.setIsActive(val);
     state.setControlClick(control_id, updatedState);
-    state.setSelectActive(val)
+    state.setSelectActive(val);
   };
 
 // export const getScore = (score_id: number) => { // note score is not stored in the state
@@ -250,6 +281,10 @@ export const SetIsActiveControl =
 
 import { useMemo } from "react";
 import Placement from "@/classes/Placement";
+import Validation from "@/classes/Validation";
+import Validation_test from "@/classes/Validation_test";
+import Validation_obj from "@/classes/Validation_obj";
+import { TransformObj } from "@/classes/transformObj";
 
 export const useObjectSelector = (id: number) => {
   const selector = useMemo(() => getObjectSelector(id), [id]);
@@ -285,4 +320,8 @@ export const UpdateInfluenceSelector =
 
 export const DeleteVizObjSelector = (state: State) => (id: number) => {
   return state.deleteVizObj(id);
+};
+
+export const UpdateValidationSelector = (state: State) => () => {
+  state.updateValidation();
 };

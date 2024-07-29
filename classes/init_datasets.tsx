@@ -17,6 +17,9 @@ import { Score } from "./Score";
 import Placement from "./Placement";
 import TextGeom from "./textgeom";
 import CoordinateAxis from "./CoordinateAxis";
+import Validation from "./Validation";
+import Validation_obj from "./Validation_obj";
+import Validation_test from "./Validation_test";
 
 type data_type = {
     question : string;
@@ -25,11 +28,31 @@ type data_type = {
     canvasData: obj[];
     scoreData: Score<any, any>[];
     placement: Placement | null;
+    validation: Validation
 };
 
 export const initDataSets: { [key: string]: data_type } = {
     default: {
         question: "This is default",
+        validation: 
+        // new Validation_obj<THREE.Vector2>(
+        //     {
+        //       obj_id: 1,
+        //       answer: new THREE.Vector2(0,0),
+        //       get_attribute: att_funcs.get_position,
+        //         error: 0.1,
+        
+        //     }
+        //   ),
+        new Validation_obj<number>(
+            {
+                obj_id: 2,
+                answer: 3.14,
+                get_attribute: (obj: TransformObj) => obj.rotation.z,
+                error: 0.1,
+            }
+        ),
+
         influencesData: [
             new Influence<[Vector3, Vector2], TransformObj, TransformObj>({
                 influence_id: 1,
@@ -125,7 +148,9 @@ export const initDataSets: { [key: string]: data_type } = {
         }),
     },
     set1: {
+
         question: "This is set1",
+        validation: new Validation_test(),
         influencesData: [],
         controlData: [
             new SliderControl<LineObj>({
@@ -188,6 +213,7 @@ export const initDataSets: { [key: string]: data_type } = {
     },
     set2: {
         question: "",
+        validation: new Validation_test(),
         influencesData: [],
         controlData: [],
         canvasData: [],
