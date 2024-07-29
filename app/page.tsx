@@ -1,10 +1,9 @@
 "use client";
 import React, { useState, useEffect } from "react";
-import {Minigame} from "./Components/Minigame";
-import ExperienceManager from "./Components/ExperienceManager"
+import { Minigame } from "./Components/Minigame";
+import ExperienceManager from "./Components/ExperienceManager";
 import { preventZoom } from "./preventZoom";
-import ExperienceHub from '@/app/Components/MainMenu/ExperienceHub'
-
+import ExperienceHub from "@/app/Components/MainMenu/ExperienceHub";
 
 
 export default function Home() {
@@ -13,9 +12,14 @@ export default function Home() {
   }, []);
   // document.body.style.overflow= "hidden"
   return (
-    <main className="overflow-y-auto">
+    <main>
+      <style>{`body, html { touch-action: auto;
+    overflow-y: scroll;
+    overflow: auto;
+    height: 100%;
+  width: 100%; }`}</style>
+
       <ExperienceHub />
     </main>
   );
-   
 }

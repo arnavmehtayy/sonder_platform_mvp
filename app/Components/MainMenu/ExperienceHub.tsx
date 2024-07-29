@@ -52,41 +52,39 @@ const ExperienceHub = () => {
   
 
   return (
-    <div className="min-h-screen flex flex-col bg-gradient-to-b from-neutral-800 to-neutral-800">
-      <div className="flex-grow overflow-y-auto">
-        <div className="max-w-7xl mx-auto py-16 px-4 sm:px-6 lg:px-8">
-          <motion.h1
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
-            className="text-4xl font-extrabold text-center text-white mb-4"
-          >
-            Interactive Experiences
-          </motion.h1>
-          <motion.p
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.2 }}
-            className="text-xl text-center text-white mb-12"
-          >
-            Dive into a world of 3D visualizations and simulations
-          </motion.p>
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.4 }}
-            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
-          >
-            {experiences.map((experience, index) => (
-              <ExperienceCard
-                key={experience.key}
-                name={experience.name}
-                slides={experience.slides}
-                index={index}
-              />
-            ))}
-          </motion.div>
-        </div>
+    <div className="min-h-screen bg-gradient-to-b from-neutral-800 to-neutral-800 overflow-auto">
+      <div className="max-w-7xl mx-auto py-16 px-4 sm:px-6 lg:px-8">
+        <motion.h1
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+          className="text-4xl font-extrabold text-center text-white mb-4"
+        >
+          Interactive Experiences
+        </motion.h1>
+        <motion.p
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.2 }}
+          className="text-xl text-center text-white mb-12"
+        >
+          Dive into a world of 3D visualizations and simulations
+        </motion.p>
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.4 }}
+          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
+        >
+          {experiences.map((experience, index) => (
+            <ExperienceCard
+              key={experience.key}
+              name={experience.name}
+              slides={experience.slides}
+              index={index}
+            />
+          ))}
+        </motion.div>
       </div>
     </div>
   );

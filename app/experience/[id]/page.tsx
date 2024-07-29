@@ -5,6 +5,7 @@ import { initDataSets } from "@/classes/init_datasets";
 import Link from 'next/link';
 import CurvedBackButton from '@/app/Components/BackButton';
 
+
 export default function ExperiencePage({ params }: { params: { id: string } }) {
   const experienceIndex = parseInt(params.id, 10) - 1;
   const experienceKey = Object.keys(initDataSets)[experienceIndex];

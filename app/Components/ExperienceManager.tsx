@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import { Minigame } from './Minigame';
 import { useStore } from '../store';
 
+
 const ExperienceManager: React.FC = () => {
   const [currentExperience, setCurrentExperience] = useState(0);
   const [currentSlide, setCurrentSlide] = useState(0);
