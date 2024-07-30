@@ -13,7 +13,7 @@ export default function ShowScore({
   useEffect(() => {
     if(score) {
     const objs = score.obj_id_list.map((obj_id) => get_obj(obj_id));
-    setScoreValue(score.computeValue(objs).toString());
+    setScoreValue(score.computeValue(objs));
     }
   }, [get_obj]);
 

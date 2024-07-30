@@ -1,7 +1,9 @@
+import { obj } from "./obj";
+
 export default abstract class Validation {
     is_valid: boolean;
 
-    abstract computeValidity(obj: any): Validation;
+    abstract computeValidity(obj: any | obj[]): Validation 
 
     constructor({is_valid }: {
         is_valid: boolean;

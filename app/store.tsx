@@ -14,6 +14,7 @@ import { Control } from "@/classes/Control";
 import { SelectControl } from "@/classes/SelectControl";
 import { Score } from "@/classes/Score";
 import { shallow } from "zustand/shallow";
+import Validation_score from "@/classes/Validation_score";
 import * as THREE from "three";
 
 export type State = {
@@ -63,6 +64,15 @@ export const useStore = create<State>((set, get) => ({
         return {
           validation: state.validation.computeValidity(
             state.controls[state.validation.control_id] as SelectControl
+          ),
+        };
+      }
+      else if(state.validation instanceof Validation_score) { // this condition badly coded and Im not proud of it 
+        const objs: obj[] = state.scores[state.validation.score_id].obj_id_list.map((id) => state.vizobjs[id]);
+        const value = state.scores[state.validation.score_id].computeValue(objs);
+        return {
+          validation: state.validation.computeValidity(
+            value
           ),
         };
       }

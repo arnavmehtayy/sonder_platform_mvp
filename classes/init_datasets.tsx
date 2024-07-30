@@ -21,6 +21,7 @@ import Validation from "./Validation";
 import Validation_obj from "./Validation_obj";
 import Validation_test from "./Validation_test";
 import Validation_select from "./Validation_select";
+import Validation_score from "./Validation_score";
 
 type data_type = {
     question : string;
@@ -150,7 +151,15 @@ export const initDataSets: { [key: string]: data_type } = {
     set1: {
 
         question: "This is set1",
-        validation: new Validation_test(),
+        validation: new Validation_score<number, obj>(
+            {
+                target_score: 30,
+                relation: "<=",
+                score_id: 1,
+                comparator: (a, b) => a-b,
+                error: 1
+           }
+        ),
         influencesData: [],
         controlData: [
             new SliderControl<LineObj>({
