@@ -20,6 +20,7 @@ import CoordinateAxis from "./CoordinateAxis";
 import Validation from "./Validation";
 import Validation_obj from "./Validation_obj";
 import Validation_test from "./Validation_test";
+import Validation_select from "./Validation_select";
 
 type data_type = {
     question : string;
@@ -44,14 +45,13 @@ export const initDataSets: { [key: string]: data_type } = {
         
         //     }
         //   ),
-        new Validation_obj<number>(
+        new Validation_select(
             {
-                obj_id: 2,
-                answer: 3.14,
-                get_attribute: (obj: TransformObj) => obj.rotation.z,
-                error: 0.1,
+                answer: [2],
+                control_id: 4
             }
-        ),
+        )
+        ,
 
         influencesData: [
             new Influence<[Vector3, Vector2], TransformObj, TransformObj>({

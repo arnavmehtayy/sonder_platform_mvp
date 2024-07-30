@@ -48,7 +48,7 @@ export function Minigame({ page }: { page: keyof typeof initDataSets }) {
         </div>
 
         {/* Sidebar */}
-        <div className="w-full md:w-1/3 md:min-w-[300px] md:max-w-md bg-blue-50 p-4 md:p-6 overflow-y-auto h-1/2 md:h-full">
+        <div className="w-full md:w-1/3 md:min-w-[300px] md:max-w-md bg-blue-50 p-4 overflow-y-auto h-1/2 md:h-full" style={{ height: '100lvh' }}>
           <div className="space-y-4 md:space-y-6">
             {/* Question */}
             <div className="bg-white rounded-lg shadow-md p-3 md:p-4">
@@ -76,9 +76,16 @@ export function Minigame({ page }: { page: keyof typeof initDataSets }) {
 
             {/* Add the ValidationComponent here */}
             <ValidationComponent validation={validationInstance} updater={updateValidation} />
+            <br/>
+            <br/>
+            <br/>
+
           </div>
         </div>
       </div>
-    </PlacementProvider>
+      </PlacementProvider>
+    
+    
+    
   );
 }

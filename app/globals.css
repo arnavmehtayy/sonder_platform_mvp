@@ -17,9 +17,7 @@
 }
 
 
-
-
-html {
+/* html {
   -webkit-overflow-scrolling: touch;
   overflow-y: scroll;
     overflow: hidden;
@@ -32,17 +30,68 @@ html {
   overscroll-behavior: none;
 }
 body {
+  color: rgb(var(--foreground-rgb));
+  background: linear-gradient(
+      to bottom,
+      transparent,
+      rgb(var(--background-end-rgb))
+    )
+    rgb(var(--background-start-rgb));
+
+    -webkit-overflow-scrolling: touch;
+    overflow: hidden;
+  position: fixed;
   height: 100%;
   width: 100%;
-  overflow: auto;
-  &::-webkit-scrollbar {
-    width: 0.7rem;
-    max-height: 2rem;
-    &-thumb {
-      background-color:rgba(255, 255, 255, 0.6);
-    }
-  }
-  }
+  touch-action: none;
+  overscroll-behavior-y: contain;
+  overflow-x: hidden;
+  overscroll-behavior: none;
+  overflow-y: scroll;
+  
+  
+} */
+
+html {
+  -webkit-overflow-scrolling: touch;
+  overflow-y: scroll;
+  overflow: hidden;
+  position: fixed;
+  height: 100dvh; /* ✅ Do this! */
+  width: 100%;
+  touch-action: none;
+  overscroll-behavior-y: contain;
+  overflow-x: hidden;
+  overscroll-behavior: none;
+}
+
+body {
+  color: rgb(var(--foreground-rgb));
+  background: linear-gradient(
+      to bottom,
+      transparent,
+      rgb(var(--background-end-rgb))
+    )
+    rgb(var(--background-start-rgb));
+  -webkit-overflow-scrolling: touch;
+  overflow-y: scroll;
+  position: fixed;
+  height: 100dvh; /* ✅ Do this! */
+  width: 100%;
+  touch-action: none;
+  overscroll-behavior-y: contain;
+  overflow-x: hidden;
+  overscroll-behavior: none;
+  
+  /* Add padding to account for the Safari toolbar */
+}
+
+.content-container {
+  min-height: 100vh;
+  padding-bottom: calc(env(safe-area-inset-bottom) + 2rem);
+  box-sizing: border-box;
+}
+
 
 
 @layer utilities {

@@ -58,7 +58,16 @@ export const useStore = create<State>((set, get) => ({
             state.vizobjs[state.validation.obj_id] as TransformObj
           ),
         };
-      } else {
+      } 
+      else if(state.validation instanceof Validation_select) {
+        return {
+          validation: state.validation.computeValidity(
+            state.controls[state.validation.control_id] as SelectControl
+          ),
+        };
+      }
+      
+      else {
         return {
           validation: state.validation.computeValidity(null),
         };
@@ -285,6 +294,7 @@ import Validation from "@/classes/Validation";
 import Validation_test from "@/classes/Validation_test";
 import Validation_obj from "@/classes/Validation_obj";
 import { TransformObj } from "@/classes/transformObj";
+import Validation_select from "@/classes/Validation_select";
 
 export const useObjectSelector = (id: number) => {
   const selector = useMemo(() => getObjectSelector(id), [id]);
