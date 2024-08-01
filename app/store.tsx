@@ -233,30 +233,44 @@ export const getControlValueSelector =
     return viz && control ? control.get_attribute(viz) : 0;
   };
 
-export const SelectObjectControl = // this
+  export const SelectObjectControl =
+  (obj_id: number) =>
+  (state: State) =>
+  () => {
+    Object.values(state.controls).forEach((control) => {
+      if (control instanceof SelectControl) {
+        const [updatedControl, wasSelected] = control.SelectObj(obj_id);
+        if (wasSelected) {
+          // Update the control state
+          state.setControlClick(control.id, updatedControl);
 
-    (obj_id: number) =>
-    (state: State) =>
-    () => // may be too expensive redo if necessary
-    {
-      Object.values(state.controls).forEach((control) => {
-        if (control instanceof SelectControl) {
-          const select_obj = control.SelectObj(obj_id);
-          const updatedState = select_obj[0];
-          // new code
-          if (select_obj[1]) {
-            const new_obj = Object.assign(
-              Object.create(Object.getPrototypeOf(state.vizobjs[obj_id])),
-              state.vizobjs[obj_id]
-            );
-            new_obj.isClickable = false;
-            state.setVizObj(obj_id, new_obj);
+          // Update the object's clickable state
+          const new_obj = Object.assign(
+            Object.create(Object.getPrototypeOf(state.vizobjs[obj_id])),
+            state.vizobjs[obj_id]
+          );
+          new_obj.isClickable = false;
+          state.setVizObj(obj_id, new_obj);
+
+          // If capacity is reached, deactivate the control
+          if (updatedControl.selected.length >= updatedControl.capacity) {
+            const deactivatedControl = updatedControl.setIsActive(false);
+            state.setControlClick(control.id, deactivatedControl);
+            state.setSelectActive(false);
+
+            // Make all unselected objects clickable again
+            updatedControl.selectable.forEach((selectableId) => {
+              if (!updatedControl.selected.includes(selectableId)) {
+                const obj1 = state.vizobjs[selectableId];
+                const updatedObj = obj.setObjectisClickable(obj1, true);
+                state.setVizObj(selectableId, updatedObj);
+              }
+            });
           }
-          // new code
-          state.setControlClick(control.id, updatedState);
         }
-      });
-    };
+      }
+    });
+  };
 
 export const DeSelectObjectControl =
   (state: State) => (obj_id: number, control_id: number) => {

@@ -25,9 +25,10 @@ export class SelectControl extends Control {
   }
 
 
-  setIsActive(state: boolean) : SelectControl {
-    this.isActive = state;
-    return this.clone();
+  setIsActive(state: boolean): SelectControl {
+    const clone = this.clone();
+    clone.isActive = state;
+    return clone;
   }
 
   SelectObj(obj_id: number): [SelectControl, boolean] {
