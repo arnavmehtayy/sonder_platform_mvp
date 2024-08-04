@@ -43,7 +43,7 @@ const ExperienceManager: React.FC = () => {
   };
   return (
     <div>
-      <Minigame page={experiences[currentExperience].slides[currentSlide]} />
+      {/* <Minigame page={experiences[currentExperience].slides[currentSlide]} /> */}
       <div className="fixed bottom-4 right-4 space-x-2">
         <button
           onClick={goToPreviousSlide}

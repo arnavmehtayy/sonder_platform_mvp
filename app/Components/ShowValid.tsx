@@ -6,8 +6,9 @@ const ValidationComponent = ({ validation, updater } : {validation: Validation, 
     const [isChecked, setIsChecked] = useState(false);
   
     const handleCheck = () => {
-      updater();
       setIsChecked(true);
+      updater();
+      
     };
   
     return (

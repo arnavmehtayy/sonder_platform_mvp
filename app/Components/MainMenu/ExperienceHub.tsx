@@ -14,7 +14,7 @@ const ExperienceCard = ({ name, slides, index }: { name: string; slides: string[
       whileTap={{ scale: 0.95 }}
       className="h-full"
     >
-      <Link href={`/experience/${index + 1}`} className="block h-full">
+      <Link href={`/experience/${index + 1}/0`} className="block h-full">
         <div
           className="bg-white rounded-lg shadow-lg overflow-hidden h-full transition-all duration-300 hover:shadow-xl"
           onMouseEnter={() => setIsHovered(true)}

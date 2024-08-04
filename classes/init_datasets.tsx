@@ -34,8 +34,8 @@ type data_type = {
 };
 
 export const experiences = [
-    { name: 'Experience 1', slides: ['default', 'set1', 'set1'] },
-    { name: 'Experience 2', slides: ['set1', 'default', 'set1'] },
+    { name: 'Experience 1', slides: ['default', 'set1'] },
+    { name: 'Experience 2', slides: ['set1', 'default'] },
     { name: 'Experience 3', slides: ['set1', 'set1', 'default'] }
     // Add more experiences as needed
   ];
@@ -53,12 +53,13 @@ export const initDataSets: { [key: string]: data_type } = {
         
         //     }
         //   ),
-        new Validation_select(
-            {
-                answer: [2],
-                control_id: 4
-            }
-        )
+        // new Validation_select(
+        //     {
+        //         answer: [2],
+        //         control_id: 4
+        //     }
+        // )
+        new Validation_test()
         ,
 
         influencesData: [

@@ -6,7 +6,6 @@ export default class Validation_test extends Validation {
    }
 
     computeValidity(): Validation_test {
-        this.is_valid = !this.is_valid
-        return this
+        return this.set_valid(!this.is_valid) as Validation_test
     }
 }
