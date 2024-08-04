@@ -58,7 +58,7 @@ export default function Thank_you_page({ params }: { params: { id: string } }) {
                             We hope you enjoyed this visual learning journey. Your exploration of complex concepts through interactive visualizations is just beginning!
                         </p>
 
-                        <h2 className="text-2xl font-semibold text-[#0077BE] mb-6 text-center">What's Next?</h2>
+                        <h2 className="text-2xl font-semibold text-[#0077BE] mb-6 text-center">What&apos;s Next?</h2>
 
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
                             <NextStepCard
@@ -87,7 +87,7 @@ export default function Thank_you_page({ params }: { params: { id: string } }) {
 
                     <div className="mt-6 pt-4 border-t border-gray-200 text-center">
                         <p className="text-sm text-gray-600 max-w-2xl mx-auto">
-                            Thank you for being part of our learning community. We're dedicated to making your educational journey both interactive and inspiring.
+                            Thank you for being part of our learning community. We&apos;re dedicated to making your educational journey both interactive and inspiring.
                         </p>
                     </div>
                 </div>
