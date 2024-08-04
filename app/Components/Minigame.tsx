@@ -83,9 +83,11 @@ export function Minigame({
               </p>
             </div>
 
-            {/* Number Sliders */}
+            {/* Scores */}
             <div className="space-y-3 md:space-y-4">
-              <ShowScore score_id={1} />
+              {state_name ? initDataSets[state_name].scoreData.map((score) => (
+              <ShowScore key={score.score_id} score_id={score.score_id} />
+              )) : null}
             </div>
 
             {/* Show Selects */}
@@ -110,7 +112,7 @@ export function Minigame({
                   href={
                     currentSlideIndex < experience.slides.length - 1
                       ? `/experience/${experienceId}/${currentSlideIndex + 1}`
-                      : `/experience/${experienceId}/thank-you`
+                      : `/experience/thank-you/${experienceId}`
                   }
                   className="block w-full mt-4 px-4 py-2 bg-blue-600 text-white text-center rounded-md hover:bg-blue-700 transition-colors duration-300"
                 >

@@ -301,6 +301,7 @@ export const SetIsActiveControl =
           val
         );
         state.setVizObj(obj_id, updatedState);
+        console.log(obj_id)
       }
     });
     const updatedState = control.setIsActive(val);

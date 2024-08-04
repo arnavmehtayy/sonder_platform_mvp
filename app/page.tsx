@@ -4,6 +4,7 @@ import { Minigame } from "./Components/Minigame";
 import ExperienceManager from "./Components/ExperienceManager";
 import { preventZoom } from "./preventZoom";
 import ExperienceHub from "@/app/Components/MainMenu/ExperienceHub";
+import { Analytics } from '@vercel/analytics/react';
 
 
 export default function Home() {
@@ -20,6 +21,7 @@ export default function Home() {
   width: 100%; }`}</style>
 
       <ExperienceHub />
+      <Analytics />
     </main>
   );
 }

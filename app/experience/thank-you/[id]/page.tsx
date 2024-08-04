@@ -1,4 +1,10 @@
-export default function thank_you_page() {
+'use client'
+
+import React from 'react';
+import { useParams } from 'next/navigation';
+
+export default function thank_you_page({id}: {id: number}) {
+    const params = useParams();
     return (
         <main>
             <style>{`body, html { touch-action: auto;
@@ -8,6 +14,7 @@ export default function thank_you_page() {
   width: 100%; }`}</style>
 
             <h1> Thank you! </h1>
+            <h1> {params.id} </h1>
         </main>
     );
 }
