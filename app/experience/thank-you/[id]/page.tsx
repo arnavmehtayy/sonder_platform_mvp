@@ -3,7 +3,7 @@
 import React from 'react';
 import { useParams } from 'next/navigation';
 
-export default function thank_you_page({id}: {id: number}) {
+export default function Thank_you_page({id}: {id: number}) {
     const params = useParams();
     return (
         <main>
