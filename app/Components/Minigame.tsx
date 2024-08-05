@@ -23,6 +23,7 @@ import ShowPlacement from "./ShowPlacement";
 import "./style.css";
 import ValidationComponent from "./ShowValid";
 import { useRouter } from "next/router";
+import {FeedbackComponent} from "./MainMenu/FeedbackComponent";
 
 export function Minigame({
   experienceId,

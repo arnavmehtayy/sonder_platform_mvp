@@ -46,7 +46,7 @@ export default function Thank_you_page({ params }: { params: { id: string } }) {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6 }}
-                className="w-full max-w-6xl bg-white bg-opacity-50 backdrop-blur-xl rounded-3xl shadow-2xl overflow-hidden flex flex-col"
+                className="w-full max-w-6xl bg-white bg-opacity-50 backdrop-blur-xl rounded-3xl shadow-2xl flex flex-col"
             >
                 <div className="bg-gradient-to-r from-[#0077BE] to-[#00A9C1] px-6 py-8 text-center">
                     <h1 className="text-4xl font-bold text-white mb-2">Thank You!</h1>

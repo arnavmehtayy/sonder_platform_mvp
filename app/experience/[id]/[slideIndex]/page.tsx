@@ -6,6 +6,7 @@ import { Minigame } from '@/app/Components/Minigame';
 import { experiences } from "@/classes/init_datasets";
 import CurvedBackButton from '@/app/Components/BackButton';
 import { useParams } from 'next/navigation';
+import { FeedbackComponent } from '@/app/Components/MainMenu/FeedbackComponent';
 
 export default function ExperiencePage() {
   const params = useParams();
@@ -28,14 +29,14 @@ export default function ExperiencePage() {
 
   return (
     <div className="flex flex-col h-screen">
-      <div className="p-4">
-        <CurvedBackButton />
-      </div>
+      
       <div className="flex-grow">
+        <CurvedBackButton />
         <Minigame 
           experienceId={experienceId}
           currentSlideIndex={Number(slideIndex)}
         />
+        <FeedbackComponent />
       </div>
     </div>
   );
