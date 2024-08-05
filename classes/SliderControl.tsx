@@ -9,7 +9,6 @@ export class SliderControl<T extends obj> extends Control {
   step_size: number; // This is the step size of the control
   get_attribute: (obj: T) => number; // Function to get the attribute of the object
   set_attribute: (obj: T, value: number) => T; // Function to set the attribute of the object
-
   constructor({
     id,
     obj_id,
@@ -23,12 +22,14 @@ export class SliderControl<T extends obj> extends Control {
       console.log("default SliderControl");
       return obj;
     },
+    desc = "slider control",
+    text = "this is a slider control",
   }: Partial<SliderControl<T>> & {
     id: number;
     obj_id: number;
     range: [number, number];
   }) {
-    super({id: id});
+    super({id: id, desc, text: text});
     this.obj_id = obj_id;
     this.range = range;
     this.step_size = step_size;

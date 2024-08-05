@@ -29,13 +29,15 @@ export class SlideContTrans<T extends TransformObj> extends SliderControl<T> {
     step_size = 1,
     param_curve = (t: number) =>
       new THREE.Vector2(5 * Math.sin(t), 5 * Math.cos(t)), // default to a line
+    desc = "slider control trans",
+    text = "this is a slider control trans",
   }: Partial<SlideContTrans<T>> & {
     id: number;
     obj_id: number;
     action: action_typ;
     range: [number, number];
   }) {
-    super({ id: id, obj_id: obj_id, range: range, step_size: step_size })
+    super({ id: id, obj_id: obj_id, range: range, step_size: step_size, desc: desc, text: text });
     this.action = action;
     this.param_curve = param_curve;
 

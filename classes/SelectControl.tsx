@@ -13,11 +13,13 @@ export class SelectControl extends Control {
     selected = [],
     isActive = false,
     capacity = 1,
+    desc = "select control",
+    text = "this is a select control",
   }: Partial<SelectControl> & {
     id: number;
     selectable: number[];
   }) {
-    super({ id: id });
+    super({ id: id, desc: desc, text: text });
     this.selectable = selectable;
     this.selected = selected;
     this.isActive = isActive;

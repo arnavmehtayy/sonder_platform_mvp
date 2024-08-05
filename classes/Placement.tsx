@@ -7,6 +7,7 @@ export default class Placement {
   gridVectors: THREE.Vector2[];
   text: string;
   color: string;
+  desc: string;
 
 
   constructor({
@@ -16,8 +17,10 @@ export default class Placement {
     geometry = new THREE.PlaneGeometry(4, 4),
     gridVectors = [],
     text = "Click to place objects",
+    desc = "placement",
     color = "blue"
   }: Partial<Placement> & { object_ids: number[] }) {
+    this.desc = desc
     this.object_ids = object_ids;
     this.grid = grid;
     this.cellSize = cellSize;
