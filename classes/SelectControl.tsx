@@ -53,8 +53,9 @@ export class SelectControl extends Control {
 
   deselectObj(obj_id: number): [SelectControl, boolean] {
     if (this.selected.includes(obj_id)) {
-      this.selected = this.selected.filter((id) => id !== obj_id);
-      return [this.clone(), true];
+      const new_selected = this.clone();
+      new_selected.selected = new_selected.selected.filter((id: number) => id !== obj_id);
+      return [new_selected, true];
     } else {
       console.log("Object was never selected");
     }

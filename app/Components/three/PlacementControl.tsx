@@ -1,7 +1,7 @@
 import React, { useState, useContext, useMemo, useRef } from "react";
 import { useThree, useFrame } from "@react-three/fiber";
 import * as THREE from "three";
-import { useStore, setVizObjSelector, DeleteVizObjSelector, getPlacementSelector } from "@/app/store";
+import { useStore, setVizObjSelector, DeleteVizObjSelector, getPlacementSelector, UpdateAllInfluencesSelector } from "@/app/store";
 import {
   Selection,
   Select,
@@ -82,6 +82,8 @@ export const PlacementProvider = ({
   const [showResetButton, setShowResetButton] = useState(false);
   const placement = useStore(getPlacementSelector)
   const deleteObject = useStore(DeleteVizObjSelector)
+  const updateAllInfluences = useStore(UpdateAllInfluencesSelector)
+
 
   const resetPlacements = () => {
     setRemainingPlacements(length);
@@ -145,6 +147,7 @@ export const PlacementControl = ({
   );
   const addObject = useStore(setVizObjSelector);
   const deleteObject = useStore(DeleteVizObjSelector)
+  const updateAllInfluences = useStore(UpdateAllInfluencesSelector);
 
   const createPlacementPositions = () => {
     const positions: THREE.Vector2[] = [];
@@ -180,6 +183,7 @@ export const PlacementControl = ({
         
       );
       // console.log(obj_id, " placed at ", position.x, position.y, remainingPlacements)
+      updateAllInfluences()
       const newRemainingPlacements = remainingPlacements - 1;
       setRemainingPlacements(newRemainingPlacements);
 

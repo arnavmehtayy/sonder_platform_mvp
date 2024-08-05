@@ -35,6 +35,7 @@ export type State = {
   isSelectActive: boolean;
   setSelectActive: (val: boolean) => void;
   updateValidations: () => void;
+  updateAllInfluences: () => void;
 };
 
 export const useStore = create<State>((set, get) => ({
@@ -47,6 +48,30 @@ export const useStore = create<State>((set, get) => ({
   scores: {},
   placement: null,
   isSelectActive: false,
+  updateAllInfluences: () => {
+    set((state) => {
+      const updatedVizobjs = { ...state.vizobjs };
+
+      Object.keys(state.influences).forEach((masterId) => {
+        const masterObj = updatedVizobjs[Number(masterId)];
+        const masterInfluences = state.influences[Number(masterId)];
+        
+        if (masterInfluences) {
+          masterInfluences.forEach((influence) => {
+            updatedVizobjs[influence.worker_id] = Influence.UpdateInfluence(
+              influence,
+              masterObj,
+              updatedVizobjs[influence.worker_id]
+            );
+          });
+        }
+      });
+
+      return { vizobjs: updatedVizobjs };
+    });
+  },
+
+  
 
   setSelectActive: (val: boolean) => {
     set({ isSelectActive: val });
@@ -82,6 +107,7 @@ export const useStore = create<State>((set, get) => ({
         vizobjs: { ...state.vizobjs, [id]: new_obj },
       };
 
+
       const masterInfluences = state.influences[id];
       if (masterInfluences) {
         masterInfluences.forEach((influence: Influence<any, any, any>) => {
@@ -93,8 +119,10 @@ export const useStore = create<State>((set, get) => ({
         });
       }
 
+
       return updatedState;
     });
+    
   },
 
   deleteVizObj: (id: number) => {
@@ -107,6 +135,7 @@ export const useStore = create<State>((set, get) => ({
       return true;
     }
     return false;
+    
   },
 
   setControlClick: (control_id: number, new_obj: Control) => {
@@ -116,6 +145,7 @@ export const useStore = create<State>((set, get) => ({
   },
 
   reset: (dataSetKey: keyof typeof initDataSets) => {
+    console.log(initDataSets[dataSetKey].controlData);
     const dataSet = initDataSets[dataSetKey];
     set({
       question: dataSet.question,
@@ -353,3 +383,5 @@ export const UpdateValidationSelector = (state: State) => () => {
 };
 
 export const getValidationsSelector = (state: State) => state.validations;
+
+export const UpdateAllInfluencesSelector = (state: State) => state.updateAllInfluences;
