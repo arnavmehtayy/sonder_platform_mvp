@@ -8,11 +8,18 @@ import {
 } from "@/app/store";
 import { SelectControl } from "@/classes/SelectControl";
 
-export function ShowSelect({ control, control_id }: { control: SelectControl, control_id: number }) {
+export function ShowSelect({control_id }: { control_id: number }) {
   const handleRemove = useStore(DeSelectObjectControl);
   const setIsActive = useStore(SetIsActiveControl(control_id));
   const getName = useStore(getNameSelector);
+  const control = useStore(getControlSelector(control_id)) as SelectControl;
   const [isDark, setIsDark] = useState(control.isActive);
+
+  useEffect(() => {
+    setIsActive(false);
+    setIsDark(false);
+  }
+  , []);
 
   useEffect(() => {
     setIsActive(isDark);
