@@ -21,13 +21,13 @@ const NextStepCard: React.FC<NextStepCardProps> = ({ title, description, linkTex
             <div>
                 <div className="flex items-center mb-2">
                     <div className="bg-[#E6F3F5] p-2 rounded-full mr-3">
-                        {React.cloneElement(icon as React.ReactElement, { className: "text-[#0077BE] w-5 h-5" })}
+                        {React.cloneElement(icon as React.ReactElement, { className: "text-blue-800 w-5 h-5" })}
                     </div>
-                    <h3 className="text-lg font-semibold text-[#0077BE]">{title}</h3>
+                    <h3 className="text-lg font-semibold text-blue-800">{title}</h3>
                 </div>
                 <p className="text-gray-600 text-sm mb-4">{description}</p>
             </div>
-            <Link href={href} target="_blank" rel="noopener noreferrer" className="inline-flex items-center text-[#00A9C1] font-medium hover:text-[#0077BE] transition-colors duration-300 text-sm">
+            <Link href={href} target="_blank" rel="noopener noreferrer" className="inline-flex items-center text-blue-800 font-medium hover:text-[#0077BE] transition-colors duration-300 text-sm">
                 {linkText}
                 <svg className="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
@@ -48,7 +48,7 @@ export default function Thank_you_page({ params }: { params: { id: string } }) {
                 transition={{ duration: 0.6 }}
                 className="w-full max-w-6xl bg-white bg-opacity-50 backdrop-blur-xl rounded-3xl shadow-2xl flex flex-col"
             >
-                <div className="bg-gradient-to-r from-[#0077BE] to-[#00A9C1] px-6 py-8 text-center">
+                <div className="bg-gradient-to-r from-blue-800 to-[#00A9C1] px-6 py-8 text-center">
                     <h1 className="text-4xl font-bold text-white mb-2">Thank You!</h1>
                     <p className="text-xl text-[#E6F3F5]">For Completing Experience {id}</p>
                 </div>
@@ -58,7 +58,7 @@ export default function Thank_you_page({ params }: { params: { id: string } }) {
                             We hope you enjoyed this visual learning journey. Your exploration of complex concepts through interactive visualizations is just beginning!
                         </p>
 
-                        <h2 className="text-2xl font-semibold text-[#0077BE] mb-6 text-center">What&apos;s Next?</h2>
+                        <h2 className="text-2xl font-semibold text-blue-800 mb-6 text-center">What&apos;s Next?</h2>
 
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
                             <NextStepCard

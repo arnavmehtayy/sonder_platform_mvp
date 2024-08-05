@@ -80,7 +80,7 @@ export const FeedbackComponent = () => {
         <DialogHeader>
           <DialogTitle> We want to improve for you!</DialogTitle>
           <DialogDescription>
-            Share your feedback or suggest a new topic for our interactive visuals.
+            Share your feedback or suggest a new topic for an interactive visual.
           </DialogDescription>
         </DialogHeader>
         <Textarea
