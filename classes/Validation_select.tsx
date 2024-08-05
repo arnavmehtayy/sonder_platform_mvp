@@ -8,13 +8,14 @@ export default class Validation_select extends Validation {
 
     constructor({
         answer,
-        control_id
-    }: {
+        control_id,
+        desc = "validation_select"
+    }: Partial<Validation_select> & {
         
         answer: number[],
         control_id: number
     }) {
-        super({ is_valid: false })
+        super({ is_valid: false , desc: desc})
         this.answer = answer
         this.control_id = control_id
     }

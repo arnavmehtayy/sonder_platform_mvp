@@ -1,3 +1,4 @@
+
 import { create } from "zustand";
 import { SliderControl } from "../classes/SliderControl";
 import { Influence } from "../classes/influence";
@@ -18,7 +19,7 @@ import Validation_score from "@/classes/Validation_score";
 import * as THREE from "three";
 
 export type State = {
-  validation: Validation;
+  validations: Validation[];
   state_name: keyof typeof initDataSets | null;
   question: string;
   placement: Placement | null;
@@ -33,11 +34,11 @@ export type State = {
   updateInfluences: (id: number) => void;
   isSelectActive: boolean;
   setSelectActive: (val: boolean) => void;
-  updateValidation: () => void;
+  updateValidations: () => void;
 };
 
 export const useStore = create<State>((set, get) => ({
-  validation: new Validation_test(),
+  validations: [],
   state_name: null,
   question: "",
   controls: {},
@@ -51,37 +52,27 @@ export const useStore = create<State>((set, get) => ({
     set({ isSelectActive: val });
   },
 
-  updateValidation: () => {
+  updateValidations: () => {
     set((state) => {
-      if (state.validation instanceof Validation_obj) {
-        return {
-          validation: state.validation.computeValidity(
-            state.vizobjs[state.validation.obj_id] as TransformObj
-          ),
-        };
-      } 
-      else if(state.validation instanceof Validation_select) {
-        return {
-          validation: state.validation.computeValidity(
-            state.controls[state.validation.control_id] as SelectControl
-          ),
-        };
-      }
-      else if(state.validation instanceof Validation_score) { // this condition badly coded and Im not proud of it 
-        const objs: obj[] = state.scores[state.validation.score_id].obj_id_list.map((id) => state.vizobjs[id]);
-        const value = state.scores[state.validation.score_id].computeValue(objs);
-        return {
-          validation: state.validation.computeValidity(
-            value
-          ),
-        };
-      }
-      
-      else {
-        return {
-          validation: state.validation.computeValidity(null),
-        };
-      }
+      const updatedValidations = state.validations.map((validation) => {
+        if (validation instanceof Validation_obj) {
+          return validation.computeValidity(
+            state.vizobjs[validation.obj_id] as TransformObj
+          );
+        } else if (validation instanceof Validation_select) {
+          return validation.computeValidity(
+            state.controls[validation.control_id] as SelectControl
+          );
+        } else if (validation instanceof Validation_score) {
+          const objs: obj[] = state.scores[validation.score_id].obj_id_list.map((id) => state.vizobjs[id]);
+          const value = state.scores[validation.score_id].computeValue(objs);
+          return validation.computeValidity(value);
+        } else {
+          return validation.computeValidity(null);
+        }
+      });
+
+      return { validations: updatedValidations };
     });
   },
 
@@ -131,7 +122,7 @@ export const useStore = create<State>((set, get) => ({
       state_name: dataSetKey,
       placement: dataSet.placement,
       isSelectActive: false,
-      validation: dataSet.validation,
+      validations: dataSet.validations,
 
       controls: dataSet.controlData.reduce((acc, control) => {
         acc[control.id] = control;
@@ -358,5 +349,7 @@ export const DeleteVizObjSelector = (state: State) => (id: number) => {
 };
 
 export const UpdateValidationSelector = (state: State) => () => {
-  state.updateValidation();
+  state.updateValidations();
 };
+
+export const getValidationsSelector = (state: State) => state.validations;

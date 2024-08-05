@@ -20,13 +20,14 @@ export default class Validation_score<
     error,
     relation,
     comparator = (a, b) => (a > b ? 1 : a < b ? -1 : 0),
+    desc = "validation_score",
   }: Partial<Validation_score<score_T, obj_T>> & {
     score_id: number;
     target_score: number;
     error: number;
     relation: relation;
   }) {
-    super({ is_valid: false });
+    super({ is_valid: false, desc: desc });
     this.score_id = score_id;
     this.target_score = target_score;
     this.error = error;

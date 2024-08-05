@@ -37,7 +37,7 @@ export const Showobj = memo(function Showobj({ id }: {id: number}) {
   }
 
   else {
-    console.error(`Object with id ${id} not found`); 
+    // console.error(`Object with id ${id} not found`); 
     return null;
   }
 });

@@ -41,8 +41,8 @@ export function Minigame({
 
   // const router = useRouter();
   const experience = experiences[experienceId - 1];
-  const validationInstance = useStore((state) => state.validation);
   const updateValidation = useStore(UpdateValidationSelector);
+  const validationInstance = useStore((state) => state.validations);
 
   const handleValidationUpdate = () => {
     updateValidation();
@@ -55,8 +55,8 @@ export function Minigame({
   
 
   useEffect(() => {
-    console.log("Page: ", page);
     reset(page);
+    console.log("Resetting page", page);
   }, []);
 
 
@@ -105,10 +105,10 @@ export function Minigame({
             {/* Add the ValidationComponent here */}
             <div className="mt-auto">
               <ValidationComponent
-                validation={validationInstance}
+                validations={validationInstance}
                 updater={handleValidationUpdate}
               />
-              {validationInstance.is_valid && (
+              {validationInstance.every(v => v.is_valid) && (
                 <Link
                   href={
                     currentSlideIndex < experience.slides.length - 1

@@ -32,11 +32,13 @@ export class SelectControl extends Control {
   }
 
   SelectObj(obj_id: number): [SelectControl, boolean] {
+    
     if (this.selected.length < this.capacity && this.isActive) {
       // check if obj_id does not already exist in the array
       if (!this.selected.includes(obj_id) && this.selectable.includes(obj_id)) {
-        this.selected.push(obj_id);
-        return [this.clone(), true];
+        const new_selected = this.clone();
+        new_selected.selected.push(obj_id);
+        return [new_selected, true];
       } else {
         console.log("Object already selected or not selectable");
       }

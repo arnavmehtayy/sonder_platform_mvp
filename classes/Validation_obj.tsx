@@ -21,13 +21,14 @@ export default class Validation_obj<T extends value_typ> extends Validation {
     get_attribute,
     error = 0.1,
     relation = "==",
+    desc = "validation_obj",
   }: Partial<Validation_obj<T>> & {
     obj_id: number;
     answer: T;
     get_attribute: (obj: TransformObj) => T;
     error: number;
   }) {
-    super({ is_valid: false });
+    super({ is_valid: false, desc: desc });
     this.answer = answer;
     this.obj_id = obj_id;
     this.get_attribute = get_attribute;

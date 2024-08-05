@@ -30,7 +30,7 @@ type data_type = {
     canvasData: obj[];
     scoreData: Score<any, any>[];
     placement: Placement | null;
-    validation: Validation
+    validations: Validation[]
 };
 
 export const experiences = [
@@ -43,7 +43,7 @@ export const experiences = [
 export const initDataSets: { [key: string]: data_type } = {
     default: {
         question: "This is default",
-        validation: 
+        validations: 
         // new Validation_obj<THREE.Vector2>(
         //     {
         //       obj_id: 1,
@@ -59,7 +59,7 @@ export const initDataSets: { [key: string]: data_type } = {
         //         control_id: 4
         //     }
         // )
-        new Validation_test()
+        [new Validation_test()]
         ,
 
         influencesData: [
@@ -95,11 +95,6 @@ export const initDataSets: { [key: string]: data_type } = {
             new SelectControl({
                 id: 4,
                 selectable: [1, 2, 89],
-                isActive: false
-            }),
-            new SelectControl({
-                id: 5,
-                selectable: [],
                 isActive: false
             })
         ],
@@ -159,7 +154,7 @@ export const initDataSets: { [key: string]: data_type } = {
     set1: {
 
         question: "This is set1",
-        validation: new Validation_score<number, obj>(
+        validations: [new Validation_score<number, obj>(
             {
                 target_score: 30,
                 relation: "<=",
@@ -168,6 +163,16 @@ export const initDataSets: { [key: string]: data_type } = {
                 error: 1
            }
         ),
+
+        new Validation_select(
+            {
+                answer: [1000],
+                control_id: 4
+            }
+        )
+
+    
+    ],
         influencesData: [],
         controlData: [
             new SliderControl<LineObj>({
@@ -230,7 +235,7 @@ export const initDataSets: { [key: string]: data_type } = {
     },
     set2: {
         question: "",
-        validation: new Validation_test(),
+        validations: [new Validation_test()],
         influencesData: [],
         controlData: [],
         canvasData: [],
