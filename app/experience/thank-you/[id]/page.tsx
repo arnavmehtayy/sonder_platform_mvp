@@ -2,7 +2,7 @@
 import React from 'react';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
-import { Calendar, FileText, Lightbulb } from 'lucide-react';
+import { Calendar, FileText, Lightbulb, Home } from 'lucide-react';
 
 interface NextStepCardProps {
     title: string;
@@ -83,6 +83,13 @@ export default function Thank_you_page({ params }: { params: { id: string } }) {
                                 icon={<Lightbulb />}
                             />
                         </div>
+                    </div>
+
+                    <div className="mt-6 text-center">
+                        <Link href="/" className="inline-flex items-center justify-center px-6 py-3 border border-transparent text-base font-medium rounded-md text-white bg-blue-800 hover:bg-blue-900 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition duration-150 ease-in-out">
+                            <Home className="w-5 h-5 mr-2" />
+                            Back to Main Menu
+                        </Link>
                     </div>
 
                     <div className="mt-6 pt-4 border-t border-gray-200 text-center">
