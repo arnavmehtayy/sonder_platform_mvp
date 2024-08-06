@@ -22,6 +22,8 @@ import Validation_obj from "./Validation_obj";
 import Validation_test from "./Validation_test";
 import Validation_select from "./Validation_select";
 import Validation_score from "./Validation_score";
+import { MultiChoiceClass } from "./MultiChoiceClass";
+import { ValidationMultiChoice } from "./ValidationMultiChoice";
 
 type data_type = {
     question : string;
@@ -59,7 +61,14 @@ export const initDataSets: { [key: string]: data_type } = {
         //         control_id: 4
         //     }
         // )
-        [new Validation_test()]
+        [new Validation_test(), 
+            new ValidationMultiChoice(
+                {
+                    answer: [1,3],
+                    control_id: 5
+                }
+            )
+        ]
         ,
 
         influencesData: [
@@ -96,7 +105,21 @@ export const initDataSets: { [key: string]: data_type } = {
                 id: 4,
                 selectable: [1, 2, 89],
                 isActive: false
-            })
+            }),
+            new MultiChoiceClass({
+              id: 5,
+              isMultiSelect: true,
+              isClickable: true,
+              title: "this is a test",
+              description: "this is a test",
+              options: [
+                { id: 1, label: "arnav" },
+                { id: 2, label: "Rachana" },
+                { id: 3, label: "Anaya" },
+                { id: 4, label: "Amar" },
+              ]
+    })
+            
         ],
         canvasData: [
             new TextGeom({

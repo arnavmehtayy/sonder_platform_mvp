@@ -18,7 +18,7 @@ const ValidationComponent = ({ validations, updater }: {validations: Validation[
   return (
     <div className={`bg-white rounded-lg shadow-md p-4 mb-6 ${!isActive ? 'opacity-50' : ''} relative`}>
       <div className="flex items-center justify-between mb-4">
-        <h3 className="text-lg font-semibold text-blue-800">Validation Check</h3>
+        <h3 className="text-lg font-semibold text-blue-800">Autograder</h3>
         <button
           onClick={handleCheck}
           disabled={!isActive}

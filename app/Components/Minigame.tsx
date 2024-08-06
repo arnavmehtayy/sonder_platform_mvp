@@ -23,8 +23,9 @@ import ShowPlacement from "./ShowPlacement";
 import "./style.css";
 import ValidationComponent from "./ShowValid";
 import { useRouter } from "next/router";
-import {FeedbackComponent} from "./MainMenu/FeedbackComponent";
+import { FeedbackComponent } from "./MainMenu/FeedbackComponent";
 import { controlData } from "@/classes/init_data";
+import MultiChoice from "./MultiChoice";
 
 export function Minigame({
   experienceId,
@@ -49,7 +50,6 @@ export function Minigame({
     updateValidation();
   };
 
-
   const test_id: number = 1; // for testing remove soon
   // console.log(initDataSets[state_name].controlData)
 
@@ -58,12 +58,10 @@ export function Minigame({
   // if(state_name) {
   // initDataSets[state_name].controlData
   // }
-  
 
   useEffect(() => {
     reset(page);
   }, []);
-
 
   return (
     <PlacementProvider length={placement?.object_ids.length || 0}>
@@ -91,9 +89,11 @@ export function Minigame({
 
             {/* Scores */}
             <div className="space-y-3 md:space-y-4">
-              {state_name ? initDataSets[state_name].scoreData.map((score) => (
-              <ShowScore key={score.score_id} score_id={score.score_id} />
-              )) : null}
+              {state_name
+                ? initDataSets[state_name].scoreData.map((score) => (
+                    <ShowScore key={score.score_id} score_id={score.score_id} />
+                  ))
+                : null}
             </div>
 
             {/* Show Selects */}
@@ -103,7 +103,6 @@ export function Minigame({
                     <ShowControl control_id={control.id} key={control.id} />
                   ))
                 : null}
-                
             </div>
 
             {placement ? <ShowPlacement /> : null}
@@ -114,7 +113,7 @@ export function Minigame({
                 validations={validationInstance}
                 updater={handleValidationUpdate}
               />
-              {validationInstance.every(v => v.is_valid) && (
+              {validationInstance.every((v) => v.is_valid) && (
                 <Link
                   href={
                     currentSlideIndex < experience.slides.length - 1
@@ -129,9 +128,11 @@ export function Minigame({
                 </Link>
               )}
             </div>
+            
             <br />
             <br />
             <br />
+            
           </div>
         </div>
       </div>

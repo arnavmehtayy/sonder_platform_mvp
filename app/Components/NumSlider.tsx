@@ -17,7 +17,7 @@ export default function NumSlide({control_id }: { control_id: number }) {
   return (
     <div className={`bg-white rounded-lg shadow-md p-4 ${!isActive ? 'opacity-50' : ''} relative`}>
       <h3 className="text-lg font-semibold text-blue-800 mb-2">{control.desc}</h3>
-      <p className="text-sm text-gray-600 mb-2"> {control.text} </p>
+      <p className=" text-gray-600 mb-2"> {control.text} </p>
       <div className="relative pt-1">
         <input
           type="range"

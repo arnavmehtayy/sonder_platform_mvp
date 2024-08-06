@@ -24,6 +24,8 @@ import Validation_test from "@/classes/Validation_test";
 import Validation_obj from "@/classes/Validation_obj";
 import { TransformObj } from "@/classes/transformObj";
 import Validation_select from "@/classes/Validation_select";
+import { MultiChoiceClass } from "@/classes/MultiChoiceClass";
+import { ValidationMultiChoice } from "@/classes/ValidationMultiChoice";
 
 export type State = {
   validations: Validation[];
@@ -47,6 +49,7 @@ export type State = {
   updateAllInfluences: () => void;
   SetIsActiveControl: (control_id: number) => (val: boolean) => void;
   setIsPlacementMode: (val: boolean) => void;
+  setMultiChoiceOptions: (control_id: number, Selectedoptions: number[]) => void;
 };
 
 export const useStore = create<State>((set, get) => ({
@@ -61,7 +64,18 @@ export const useStore = create<State>((set, get) => ({
   scores: {},
   placement: null,
   isSelectActive: false,
-  
+
+  setMultiChoiceOptions: (control_id: number, Selectedoptions: number[]) => {
+    set((state) => {
+      const control = state.controls[control_id] as MultiChoiceClass;
+      if (control instanceof MultiChoiceClass) {
+        const updatedControl = control.setOptions(Selectedoptions);
+        return { controls: { ...state.controls, [control_id]: updatedControl } };
+      }
+      return {};
+    });
+  },
+
 
   setIsPlacementMode: (val: boolean) => {
     set((state) => { 
@@ -82,7 +96,7 @@ export const useStore = create<State>((set, get) => ({
   (control_id: number) => (val: boolean) => {
     set((state) => {
     const control = state.controls[control_id] as SelectControl;
-    if(control) {
+    if(control instanceof SelectControl) {
     
     // Update all controls, placement, and isValidatorClickable
     const updatedControls = Object.entries(state.controls).reduce((acc, [id, ctrl]) => {
@@ -172,7 +186,13 @@ export const useStore = create<State>((set, get) => ({
           const objs: obj[] = state.scores[validation.score_id].obj_id_list.map((id) => state.vizobjs[id]);
           const value = state.scores[validation.score_id].computeValue(objs);
           return validation.computeValidity(value);
-        } else {
+        } 
+        else if(validation instanceof ValidationMultiChoice) {
+          return validation.computeValidity(
+            state.controls[validation.control_id] as MultiChoiceClass
+          );
+        }
+        else {
           return validation.computeValidity(null);
         }
       });
@@ -452,4 +472,8 @@ export const isPlacementModeSelector = (state: State) => state.isPlacementMode;
 
 export const setIsPlacementModeSelector = (state: State) => (val: boolean) => {
   state.setIsPlacementMode(val);
+}
+
+export const setMultiChoiceOptionsSelector = (state: State) => (control_id: number, Selectedoptions: number[]) => {
+  state.setMultiChoiceOptions(control_id, Selectedoptions);
 }

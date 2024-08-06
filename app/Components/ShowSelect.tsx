@@ -68,7 +68,7 @@ export function ShowSelect({ control_id }: { control_id: number }) {
               </button>
             </div>
           </div>
-          <p className="text-sm text-gray-600">{control.text}</p>
+          <p className="text-gray-600">{control.text}</p>
         </div>
         <div className="mt-4 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
           {control.selected.map((id) => (
