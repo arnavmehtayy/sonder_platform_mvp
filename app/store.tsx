@@ -17,6 +17,13 @@ import { Score } from "@/classes/Score";
 import { shallow } from "zustand/shallow";
 import Validation_score from "@/classes/Validation_score";
 import * as THREE from "three";
+import { useMemo } from "react";
+import Placement from "@/classes/Placement";
+import Validation from "@/classes/Validation";
+import Validation_test from "@/classes/Validation_test";
+import Validation_obj from "@/classes/Validation_obj";
+import { TransformObj } from "@/classes/transformObj";
+import Validation_select from "@/classes/Validation_select";
 
 export type State = {
   validations: Validation[];
@@ -34,12 +41,16 @@ export type State = {
   updateInfluences: (id: number) => void;
   isSelectActive: boolean;
   isValidatorClickable: boolean;
+  isPlacementMode: boolean;
   setSelectActive: (val: boolean) => void;
   updateValidations: () => void;
   updateAllInfluences: () => void;
+  SetIsActiveControl: (control_id: number) => (val: boolean) => void;
+  setIsPlacementMode: (val: boolean) => void;
 };
 
 export const useStore = create<State>((set, get) => ({
+  isPlacementMode: false,
   isValidatorClickable: true,
   validations: [],
   state_name: null,
@@ -50,6 +61,73 @@ export const useStore = create<State>((set, get) => ({
   scores: {},
   placement: null,
   isSelectActive: false,
+  
+
+  setIsPlacementMode: (val: boolean) => {
+    set((state) => { 
+      const updatedControls = Object.entries(state.controls).reduce((acc, [id, ctrl]) => {
+        acc[Number(id)] = Control.setControlisClickable(ctrl, !val);
+        return acc;
+      }, {} as { [id: number]: Control });
+
+      
+      return {
+        controls: updatedControls,
+        isValidatorClickable: !val,
+        isPlacementMode: val
+      }});
+  },
+
+  SetIsActiveControl:
+  (control_id: number) => (val: boolean) => {
+    set((state) => {
+    const control = state.controls[control_id] as SelectControl;
+    if(control) {
+    
+    // Update all controls, placement, and isValidatorClickable
+    const updatedControls = Object.entries(state.controls).reduce((acc, [id, ctrl]) => {
+      const isCurrentControl = Number(id) === control_id;
+      acc[Number(id)] = isCurrentControl 
+        ? (ctrl as SelectControl).setIsActive(val) 
+        : Control.setControlisClickable(ctrl, !val);
+      return acc;
+    }, {} as { [id: number]: Control });
+
+    const updatedPlacement = state.placement 
+      ? Placement.setPlacementisClickable(state.placement, !val)
+      : null;
+
+    // Update selectable objects
+    if(control) {
+    control.selectable.forEach((obj_id) => {
+      if (!control.selected.includes(obj_id)) {
+        const updatedState = obj.setObjectisClickable(
+          state.vizobjs[obj_id],
+          val
+        );
+        state.setVizObj(obj_id, updatedState);
+      }
+    })
+  }
+    ;
+
+    state.setSelectActive(val);
+    const updatedState = control.setIsActive(val);
+    state.setControlClick(control_id, updatedState);
+
+    return {
+      controls: updatedControls,
+      placement: updatedPlacement,
+      isValidatorClickable: !val
+    }
+  }
+  else {
+  return {}
+  }
+
+  })
+},
+
   updateAllInfluences: () => {
     set((state) => {
       const updatedVizobjs = { ...state.vizobjs };
@@ -148,7 +226,6 @@ export const useStore = create<State>((set, get) => ({
 
   reset: (dataSetKey: keyof typeof initDataSets) => {
     
-    console.log(initDataSets[dataSetKey].controlData);
     const dataSet = initDataSets[dataSetKey];
     set({
       question: dataSet.question,
@@ -318,33 +395,14 @@ export const DeSelectObjectControl =
 
 export const SetIsActiveControl =
   (control_id: number) => (state: State) => (val: boolean) => {
-    const control = state.controls[control_id] as SelectControl;
-    control.selectable.forEach((obj_id) => {
-      if (!control.selected.includes(obj_id)) {
-        const updatedState = obj.setObjectisClickable(
-          state.vizobjs[obj_id],
-          val
-        );
-        state.setVizObj(obj_id, updatedState);
-        console.log(obj_id)
-      }
-    });
-    const updatedState = control.setIsActive(val);
-    state.setControlClick(control_id, updatedState);
-    state.setSelectActive(val);
+    state.SetIsActiveControl(control_id)(val);
   };
 
 // export const getScore = (score_id: number) => { // note score is not stored in the state
 //     return scores[score_id];
 // }
 
-import { useMemo } from "react";
-import Placement from "@/classes/Placement";
-import Validation from "@/classes/Validation";
-import Validation_test from "@/classes/Validation_test";
-import Validation_obj from "@/classes/Validation_obj";
-import { TransformObj } from "@/classes/transformObj";
-import Validation_select from "@/classes/Validation_select";
+
 
 export const useObjectSelector = (id: number) => {
   const selector = useMemo(() => getObjectSelector(id), [id]);
@@ -389,3 +447,9 @@ export const UpdateValidationSelector = (state: State) => () => {
 export const getValidationsSelector = (state: State) => state.validations;
 
 export const UpdateAllInfluencesSelector = (state: State) => state.updateAllInfluences;
+
+export const isPlacementModeSelector = (state: State) => state.isPlacementMode;
+
+export const setIsPlacementModeSelector = (state: State) => (val: boolean) => {
+  state.setIsPlacementMode(val);
+}

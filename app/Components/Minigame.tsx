@@ -24,6 +24,7 @@ import "./style.css";
 import ValidationComponent from "./ShowValid";
 import { useRouter } from "next/router";
 import {FeedbackComponent} from "./MainMenu/FeedbackComponent";
+import { controlData } from "@/classes/init_data";
 
 export function Minigame({
   experienceId,
@@ -50,13 +51,17 @@ export function Minigame({
 
 
   const test_id: number = 1; // for testing remove soon
+  // console.log(initDataSets[state_name].controlData)
 
   // testing
+
+  // if(state_name) {
+  // initDataSets[state_name].controlData
+  // }
   
 
   useEffect(() => {
     reset(page);
-    console.log("Resetting page", page);
   }, []);
 
 
@@ -98,6 +103,7 @@ export function Minigame({
                     <ShowControl control_id={control.id} key={control.id} />
                   ))
                 : null}
+                
             </div>
 
             {placement ? <ShowPlacement /> : null}

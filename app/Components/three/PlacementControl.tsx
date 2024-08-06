@@ -1,7 +1,7 @@
 import React, { useState, useContext, useMemo, useRef } from "react";
 import { useThree, useFrame } from "@react-three/fiber";
 import * as THREE from "three";
-import { useStore, setVizObjSelector, DeleteVizObjSelector, getPlacementSelector, UpdateAllInfluencesSelector } from "@/app/store";
+import { useStore, setVizObjSelector, DeleteVizObjSelector, getPlacementSelector, UpdateAllInfluencesSelector, isPlacementModeSelector, setIsPlacementModeSelector } from "@/app/store";
 import {
   Selection,
   Select,
@@ -46,7 +46,7 @@ const PlacementMarker = ({
 // Define the context type
 type PlacementContextType = {
   isPlacementMode: boolean;
-  setIsPlacementMode: React.Dispatch<React.SetStateAction<boolean>>;
+  setIsPlacementMode: (val: boolean) => void;
   remainingPlacements: number;
   setRemainingPlacements: React.Dispatch<React.SetStateAction<number>>;
   objectsOnScene: number
@@ -76,13 +76,13 @@ export const PlacementProvider = ({
   children: React.ReactNode;
   length: number;
 }) => {
-  const [isPlacementMode, setIsPlacementMode] = useState(false);
+  const isPlacementMode = useStore(isPlacementModeSelector)
+  const setIsPlacementMode = useStore(setIsPlacementModeSelector)
   const [remainingPlacements, setRemainingPlacements] = useState(length);
   const [objectsOnScene, setObjectOnScene] = useState(0)
   const [showResetButton, setShowResetButton] = useState(false);
   const placement = useStore(getPlacementSelector)
   const deleteObject = useStore(DeleteVizObjSelector)
-  const updateAllInfluences = useStore(UpdateAllInfluencesSelector)
 
 
   const resetPlacements = () => {
@@ -268,20 +268,21 @@ export const PlacementActivationButton = ({
             {isPlacementMode ? "Active" : "Inactive"}
           </button>
         </div>
-        <ResetButton />
+        <ResetButton isActive={isActive} />
       </div>
     );
   };
   
-  export const ResetButton = () => {
+  export const ResetButton = ({isActive}: {isActive: boolean}) => {
     const { showResetButton, resetPlacements } = usePlacementMode();
   
     if (!showResetButton) return null;
   
     return (
       <button
+      disabled = {!isActive}
         onClick={resetPlacements}
-        className="bg-red-500 hover:bg-red-600 text-white py-1 px-3 rounded-md text-sm font-medium transition duration-300 ease-in-out flex items-center"
+        className={` ${!isActive && "opacity-50 cursor-not-allowed"} bg-red-500 hover:bg-red-600 text-white py-1 px-3 rounded-md text-sm font-medium transition duration-300 ease-in-out flex items-center`}
       >
         <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />

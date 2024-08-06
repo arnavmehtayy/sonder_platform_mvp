@@ -16,11 +16,12 @@ const ValidationComponent = ({ validations, updater }: {validations: Validation[
   };
 
   return (
-    <div className="bg-white rounded-lg shadow-md p-4 mb-4">
+    <div className={`bg-white rounded-lg shadow-md p-4 mb-6 ${!isActive ? 'opacity-50' : ''} relative`}>
       <div className="flex items-center justify-between mb-4">
         <h3 className="text-lg font-semibold text-blue-800">Validation Check</h3>
         <button
           onClick={handleCheck}
+          disabled={!isActive}
           className={`px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors duration-300
           ${!isActive && "opacity-50 cursor-not-allowed"}
                   text-white py-1 px-3 rounded-md text-sm font-medium transition duration-300 ease-in-out

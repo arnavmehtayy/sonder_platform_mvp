@@ -25,7 +25,6 @@ export default function ExperiencePage() {
   }
 
   const currentSlideKey = experience.slides[Number(slideIndex)];
-  console.log(currentSlideKey);
 
   return (
     <div className="flex flex-col h-screen">
