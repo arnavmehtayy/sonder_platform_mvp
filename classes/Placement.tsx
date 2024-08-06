@@ -33,4 +33,13 @@ export default class Placement {
     this.isClickable = isClickable
 
   }
+
+  static setPlacementisClickable(obj: Placement, isClickable: boolean): Placement{
+    const newObj = Object.assign(
+      Object.create(Object.getPrototypeOf(obj)),
+      obj
+    );
+    obj.isClickable = isClickable;
+    return obj;
+  }
 }

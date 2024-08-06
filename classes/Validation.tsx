@@ -27,6 +27,7 @@ export default abstract class Validation {
         return this.clone()
     }
 
+
     clone() {
         return Object.assign(Object.create(Object.getPrototypeOf(this)), this);
     }

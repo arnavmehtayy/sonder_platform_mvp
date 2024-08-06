@@ -19,4 +19,13 @@ export class Control {
         this.text = text;
         this.isClickable = isClickable
     }
+
+    static setControlisClickable(obj: Control, isClickable: boolean): Control{
+        const newObj = Object.assign(
+          Object.create(Object.getPrototypeOf(obj)),
+          obj
+        );
+        obj.isClickable = isClickable;
+        return obj;
+      }
 }
