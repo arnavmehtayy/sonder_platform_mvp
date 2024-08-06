@@ -26,6 +26,8 @@ import { MultiChoiceClass } from "./MultiChoiceClass";
 import { ValidationMultiChoice } from "./ValidationMultiChoice";
 import { InputNumber } from "./InputNumber";
 import { Validation_inputNumber } from "./Validation_inputNumber";
+import { init } from "next/dist/compiled/webpack/webpack";
+import FunctionPlot from "./FunctionPlot";
 
 type data_type = {
     question : string;
@@ -369,6 +371,18 @@ initDataSets.set1.canvasData.push(
         color: "gray",
     })
 );
+
+initDataSets.set1.canvasData.push(
+    new FunctionPlot({
+        id: 999999,
+        position: new Vector2(0, 0),
+        color: "purple",
+        func: (x: number) => x ** 2,
+        xRange: [-10, 10],
+        numPoints: 500,
+        lineWidth: 4,
+    })
+)
 
 initDataSets.set1.influencesData.push(
     new Influence<any, LineObj, LineObj>({
