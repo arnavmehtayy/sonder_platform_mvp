@@ -3,6 +3,7 @@ import React from 'react';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { Calendar, FileText, Lightbulb, Home } from 'lucide-react';
+import { FeedbackComponent } from '@/app/Components/MainMenu/FeedbackComponent';
 
 interface NextStepCardProps {
     title: string;
@@ -90,6 +91,8 @@ export default function Thank_you_page({ params }: { params: { id: string } }) {
                             <Home className="w-5 h-5 mr-2" />
                             Back to Main Menu
                         </Link>
+
+                        
                     </div>
 
                     <div className="mt-6 pt-4 border-t border-gray-200 text-center">
@@ -99,6 +102,7 @@ export default function Thank_you_page({ params }: { params: { id: string } }) {
                     </div>
                 </div>
             </motion.div>
+            <FeedbackComponent />
         </div>
     );
 }
