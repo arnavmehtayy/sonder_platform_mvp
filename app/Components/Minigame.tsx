@@ -26,6 +26,7 @@ import { useRouter } from "next/router";
 import { FeedbackComponent } from "./MainMenu/FeedbackComponent";
 import { controlData } from "@/classes/init_data";
 import MultiChoice from "./MultiChoice";
+import ShowInputNumber from './ShowInputNumber'
 
 export function Minigame({
   experienceId,
@@ -128,6 +129,11 @@ export function Minigame({
                 </Link>
               )}
             </div>
+
+
+
+            
+
             
             <br />
             <br />

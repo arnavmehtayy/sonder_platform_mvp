@@ -26,6 +26,8 @@ import { TransformObj } from "@/classes/transformObj";
 import Validation_select from "@/classes/Validation_select";
 import { MultiChoiceClass } from "@/classes/MultiChoiceClass";
 import { ValidationMultiChoice } from "@/classes/ValidationMultiChoice";
+import {InputNumber} from "@/classes/InputNumber";
+import { Validation_inputNumber } from "@/classes/Validation_inputNumber";
 
 export type State = {
   validations: Validation[];
@@ -50,6 +52,7 @@ export type State = {
   SetIsActiveControl: (control_id: number) => (val: boolean) => void;
   setIsPlacementMode: (val: boolean) => void;
   setMultiChoiceOptions: (control_id: number, Selectedoptions: number[]) => void;
+  setInputNumberValue: (control_id: number, value: number | '') => void;
 };
 
 export const useStore = create<State>((set, get) => ({
@@ -64,6 +67,18 @@ export const useStore = create<State>((set, get) => ({
   scores: {},
   placement: null,
   isSelectActive: false,
+
+  setInputNumberValue: (control_id: number, value: number | '') => {
+    set((state) => {
+      const control = state.controls[control_id] as InputNumber;
+      if (control instanceof InputNumber) {
+        const updatedControl = control.setValue(value);
+
+        return {controls: { ...state.controls, [control_id]: updatedControl }  }
+      }
+      return {}
+    });
+  },
 
   setMultiChoiceOptions: (control_id: number, Selectedoptions: number[]) => {
     set((state) => {
@@ -190,6 +205,11 @@ export const useStore = create<State>((set, get) => ({
         else if(validation instanceof ValidationMultiChoice) {
           return validation.computeValidity(
             state.controls[validation.control_id] as MultiChoiceClass
+          );
+        }
+        else if(validation instanceof Validation_inputNumber) {
+          return validation.computeValidity(
+            state.controls[validation.control_id] as InputNumber
           );
         }
         else {
@@ -476,4 +496,8 @@ export const setIsPlacementModeSelector = (state: State) => (val: boolean) => {
 
 export const setMultiChoiceOptionsSelector = (state: State) => (control_id: number, Selectedoptions: number[]) => {
   state.setMultiChoiceOptions(control_id, Selectedoptions);
+}
+
+export const setInputNumberValueSelector = (state: State) => (control_id: number, value: number | '') => {
+  state.setInputNumberValue(control_id, value);
 }

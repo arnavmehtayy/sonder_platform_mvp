@@ -24,6 +24,8 @@ import Validation_select from "./Validation_select";
 import Validation_score from "./Validation_score";
 import { MultiChoiceClass } from "./MultiChoiceClass";
 import { ValidationMultiChoice } from "./ValidationMultiChoice";
+import { InputNumber } from "./InputNumber";
+import { Validation_inputNumber } from "./Validation_inputNumber";
 
 type data_type = {
     question : string;
@@ -66,6 +68,14 @@ export const initDataSets: { [key: string]: data_type } = {
                 {
                     answer: [1,3],
                     control_id: 5
+                }
+            ), 
+            new Validation_inputNumber(
+                {
+                    control_id: 6,
+                    answer: 10,
+                    error: 1
+                    
                 }
             )
         ]
@@ -118,7 +128,20 @@ export const initDataSets: { [key: string]: data_type } = {
                 { id: 3, label: "Anaya" },
                 { id: 4, label: "Amar" },
               ]
-    })
+    }),
+    new InputNumber(
+        {
+            control_id: 6,
+            value: 0,
+            desc: "input a number", 
+            text: "here you need to input a number",
+            placeholder: "number",
+            initial_value: 0,
+            min: 0,
+            max: 100,
+            step: 1
+        }
+    )
             
         ],
         canvasData: [

@@ -35,11 +35,11 @@ export function isEqual<T extends value_typ>(a: T, b: T, error: number) {
 }
 
 export function isnumberGreater(a: number, b: number, error: number) {
-  return a - b > error;
+  return a - b >= error;
 }
 
 export function isnumberLess(a: number, b: number, error: number) {
-  return b - a > error;
+  return b - a >= error;
 }
 
 export function isListContains(list: any[], value: any) {
@@ -67,7 +67,7 @@ export function isAnyNItemsEqual(list1: any[], list2: any[], n: number) {
 // equality checking
 
 function isnumberEqual(a: number, b: number, error: number) {
-  return Math.abs(a - b) < error;
+  return Math.abs(a - b) <= error;
 }
 
 function isPositionEqual(
