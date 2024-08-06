@@ -33,12 +33,14 @@ export type State = {
   deleteVizObj: (id: number) => boolean;
   updateInfluences: (id: number) => void;
   isSelectActive: boolean;
+  isValidatorClickable: boolean;
   setSelectActive: (val: boolean) => void;
   updateValidations: () => void;
   updateAllInfluences: () => void;
 };
 
 export const useStore = create<State>((set, get) => ({
+  isValidatorClickable: true,
   validations: [],
   state_name: null,
   question: "",
@@ -145,10 +147,12 @@ export const useStore = create<State>((set, get) => ({
   },
 
   reset: (dataSetKey: keyof typeof initDataSets) => {
+    
     console.log(initDataSets[dataSetKey].controlData);
     const dataSet = initDataSets[dataSetKey];
     set({
       question: dataSet.question,
+      isValidatorClickable: true,
       state_name: dataSetKey,
       placement: dataSet.placement,
       isSelectActive: false,

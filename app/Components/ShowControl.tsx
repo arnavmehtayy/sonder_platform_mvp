@@ -8,7 +8,7 @@ export default function ShowControl({ control_id }: { control_id: number }) {
   const control = useStore(getControlSelector(control_id));
 
   if (control instanceof SliderControl) {
-    return <NumSlider control_id={control_id} control={control} />;
+    return <NumSlider control_id={control_id}/>;
   } else if (control instanceof SelectControl) {
     return <ShowSelect control_id={control_id}/>;
   } else {

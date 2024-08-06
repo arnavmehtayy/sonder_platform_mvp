@@ -8,6 +8,7 @@ export default class Placement {
   text: string;
   color: string;
   desc: string;
+  isClickable: boolean;
 
 
   constructor({
@@ -18,7 +19,8 @@ export default class Placement {
     gridVectors = [],
     text = "Click to place objects",
     desc = "placement",
-    color = "blue"
+    color = "blue",
+    isClickable = true
   }: Partial<Placement> & { object_ids: number[] }) {
     this.desc = desc
     this.object_ids = object_ids;
@@ -28,5 +30,7 @@ export default class Placement {
     this.gridVectors = gridVectors;
     this.text = text;  
     this.color = color
+    this.isClickable = isClickable
+
   }
 }

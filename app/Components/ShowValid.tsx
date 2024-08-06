@@ -1,10 +1,12 @@
 import React, { useState } from 'react';
 import { CheckCircle, XCircle } from 'react-feather';
 import Validation from '@/classes/Validation';
+import { useStore } from '@/app/store';
 
 const ValidationComponent = ({ validations, updater }: {validations: Validation[], updater: () => void}) => {
   const [isChecked, setIsChecked] = useState(false);
   const [overallValidity, setOverallValidity] = useState(false);
+  const isActive = useStore(state => state.isValidatorClickable);
 
   const handleCheck = () => {
     setIsChecked(true);
@@ -15,27 +17,30 @@ const ValidationComponent = ({ validations, updater }: {validations: Validation[
 
   return (
     <div className="bg-white rounded-lg shadow-md p-4 mb-4">
-      <h3 className="text-lg font-semibold text-blue-800 mb-2">Validation Check</h3>
       <div className="flex items-center justify-between mb-4">
+        <h3 className="text-lg font-semibold text-blue-800">Validation Check</h3>
         <button
           onClick={handleCheck}
-          className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors duration-300"
+          className={`px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors duration-300
+          ${!isActive && "opacity-50 cursor-not-allowed"}
+                  text-white py-1 px-3 rounded-md text-sm font-medium transition duration-300 ease-in-out
+                  flex items-center`}
         >
           Check Validity
         </button>
-        {isChecked && (
-          <div className="flex items-center">
-            {overallValidity ? (
-              <CheckCircle className="text-green-500 w-6 h-6 mr-2" />
-            ) : (
-              <XCircle className="text-red-500 w-6 h-6 mr-2" />
-            )}
-            <span className={overallValidity ? "text-green-600" : "text-red-600"}>
-              {overallValidity ? "Valid" : "Invalid"}
-            </span>
-          </div>
-        )}
       </div>
+      {isChecked && (
+        <div className="flex items-center justify-end mb-4">
+          {overallValidity ? (
+            <CheckCircle className="text-green-500 w-6 h-6 mr-2" />
+          ) : (
+            <XCircle className="text-red-500 w-6 h-6 mr-2" />
+          )}
+          <span className={overallValidity ? "text-green-600" : "text-red-600"}>
+            {overallValidity ? "Valid" : "Invalid"}
+          </span>
+        </div>
+      )}
       {isChecked && (
         <div className="mt-4">
           <h4 className="font-semibold mb-2">Individual Results:</h4>

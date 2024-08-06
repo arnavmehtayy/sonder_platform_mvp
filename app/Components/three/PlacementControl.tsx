@@ -229,8 +229,10 @@ export const PlacementControl = ({
 
 export const PlacementActivationButton = ({
     totalPlacements,
+    isActive
   }: {
     totalPlacements?: number;
+    isActive: boolean
   }) => {
     const {
       isPlacementMode,
@@ -246,15 +248,17 @@ export const PlacementActivationButton = ({
           </span>
           <button
             onClick={() => setIsPlacementMode(!isPlacementMode)}
-            className={`
-              ${
-                isPlacementMode
-                  ? "bg-blue-600 hover:bg-blue-700"
-                  : "bg-gray-400 hover:bg-gray-500"
-              }
-              text-white py-1 px-3 rounded-md text-sm font-medium transition duration-300 ease-in-out
-              flex items-center
-            `}
+            disabled={!isActive}
+                className={`
+                  ${
+                    isPlacementMode
+                      ? "bg-blue-600 hover:bg-blue-700"
+                      : "bg-gray-400 hover:bg-gray-500"
+                  }
+                  ${!isActive && "opacity-50 cursor-not-allowed"}
+                  text-white py-1 px-3 rounded-md text-sm font-medium transition duration-300 ease-in-out
+                  flex items-center
+                `}
           >
             <span
               className={`w-2 h-2 rounded-full ${

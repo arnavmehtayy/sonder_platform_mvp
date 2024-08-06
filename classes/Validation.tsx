@@ -6,7 +6,7 @@ export default abstract class Validation {
 
     abstract computeValidity(obj: any | obj[]): Validation 
 
-    constructor({is_valid, desc = "validation" }: {
+    constructor({is_valid, desc = "validation" }: Partial<Validation> & {
         is_valid: boolean;
         desc: string
     })
