@@ -19,6 +19,7 @@ export default class TextGeom extends geomobj {
     isClickable = true, // if this is false then this object cannot detect a click at all
     OnClick = undefined,
     text = "",
+    isEnabled = true
   }: Partial<TextGeom> & { geom: THREE.BufferGeometry; id: number }) {
     super({
       id: id,
@@ -31,6 +32,7 @@ export default class TextGeom extends geomobj {
       param_t: param_t,
       isClickable: isClickable,
       OnClick: OnClick,
+      isEnabled: isEnabled
     });
     this.text = text;
     this.name = text;

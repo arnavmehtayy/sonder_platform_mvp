@@ -34,6 +34,7 @@ export default class CoordinateAxis extends geomobj {
     lineWidth = 4,
     xLabel = "weight",
     yLabel = "height",
+    isEnabled = true
   }: Partial<CoordinateAxis> & { id: number }) {
     super({
       id: id,
@@ -46,6 +47,7 @@ export default class CoordinateAxis extends geomobj {
       param_t: param_t,
       isClickable: isClickable,
       OnClick: OnClick,
+      isEnabled: isEnabled
 
     });
     this.axisLength = axisLength;

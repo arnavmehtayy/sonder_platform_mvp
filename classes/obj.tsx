@@ -6,15 +6,26 @@ import React from "react";
 import * as THREE from "three";
 import { ThreeEvent } from "@react-three/fiber";
 import { useFrame } from "@react-three/fiber";
+import { is } from "@react-three/fiber/dist/declarations/src/core/utils";
 
 export class obj {
   id: number;
   name: string;
   isClickable: boolean = false;
+  isEnabled: boolean;
 
-  constructor({ id, name }: { id: number; name: string }) {
+  constructor({
+    id,
+    name,
+    isEnabled = true,
+  }: {
+    id: number;
+    name: string;
+    isEnabled: boolean;
+  }) {
     this.id = id;
     this.name = name;
+    this.isEnabled = isEnabled;
   }
 
   static setObjectisClickable(obj: obj, isClickable: boolean): obj {
@@ -38,7 +49,6 @@ export class obj {
     children: React.ReactElement;
     objectRef: React.RefObject<any>;
   }): React.ReactElement {
-
     return (
       <mesh
         position={[0, 0, 0]}

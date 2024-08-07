@@ -32,7 +32,8 @@ export class Score<Score_T, obj_T extends obj> {
   }
 
   computeValue(objs: obj_T[]): Score_T {
-    const vals = objs.map((obj) => this.get_attribute(obj));
+    const filteredObjs = objs.filter((obj) => obj !== undefined && obj.isEnabled);
+    const vals = filteredObjs.map((obj) => this.get_attribute(obj));
     return this.transformation(vals);
   }
 

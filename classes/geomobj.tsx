@@ -23,6 +23,7 @@ export class geomobj extends TransformObj {
     param_t = 0, // the parametric parameter if the object is following a parametric object
     isClickable = false, // if this is false then this object cannot detect a click at all
     OnClick = undefined,
+    isEnabled = true,
   }: Partial<geomobj> & { geom: THREE.BufferGeometry; id: number }) {
     super({
       position: position,
@@ -32,6 +33,7 @@ export class geomobj extends TransformObj {
       param_t: param_t,
       id: id,
       color: color,
+      isEnabled: isEnabled
     });
     this.geom = geom;
     this.isClickable = isClickable;

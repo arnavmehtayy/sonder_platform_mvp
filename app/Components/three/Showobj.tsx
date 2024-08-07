@@ -32,7 +32,7 @@ export const Showobj = memo(function Showobj({ id }: {id: number}) {
   const obj = useStore(getObjectSelector(id));
   const selectionModeActive = useStore((state) => state.isSelectActive);
 
-  if(obj instanceof coloredObj) {
+  if(obj instanceof coloredObj && obj.isEnabled) {
     return <ShowColoredobj obj={obj} />;
   }
 

@@ -10,9 +10,10 @@ export default class coloredObj extends obj {
     constructor({
         id,
         name = "TransformObj",
-        color = "white"
-      }: Partial<coloredObj> & { id: number }) {
-        super({ id: id, name: name});
+        color = "white",
+        isEnabled = true
+      }: Partial<coloredObj> & { id: number, isEnabled: boolean }) {
+        super({ id: id, name: name, isEnabled: isEnabled });
         this.color = color;
       }
 

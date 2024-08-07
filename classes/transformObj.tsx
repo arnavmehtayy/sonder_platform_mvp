@@ -27,8 +27,9 @@ export class TransformObj extends coloredObj {
     param_t = 0,
     color = "white",
     name = "TransformObj",
+    isEnabled = true,
   }: Partial<TransformObj> & { id: number }) {
-    super({ id: id, name: name, color: color});
+    super({ id: id, name: name, color: color, isEnabled:isEnabled});
     this.position = position;
     this.rotation = rotation;
     this.scale = scale;

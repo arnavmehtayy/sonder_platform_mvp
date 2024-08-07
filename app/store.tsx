@@ -282,6 +282,7 @@ export const useStore = create<State>((set, get) => ({
         return acc;
       }, {} as { [id: number]: obj }),
 
+
       influences: dataSet.influencesData.reduce((acc, influence) => {
         if (!acc[influence.master_id]) {
           acc[influence.master_id] = [];

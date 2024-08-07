@@ -29,8 +29,9 @@ export class LineObj extends coloredObj {
     color = "white",
     name = "Line",
     isClickable = false,
+    isEnabled = true,
   }: Partial<LineObj> & { id: number }) {
-    super({ id: id, name: name, color: color });
+    super({ id: id, name: name, color: color, isEnabled: isEnabled });
     this.start = start;
     this.end = end;
     this.line_width = line_width;

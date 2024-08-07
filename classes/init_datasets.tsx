@@ -352,7 +352,9 @@ for (let i = 0; i < num_points; i++) {
       geom: new THREE.CircleGeometry(0.23, 128),
       position: points[i],
       color: "white",
+      
     })
+    
   );
 
   initDataSets.set1.canvasData.push(

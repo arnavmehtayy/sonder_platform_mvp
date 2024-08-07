@@ -9,6 +9,7 @@ export default function ShowScore({
   const [scoreValue, setScoreValue] = useState(null);
   const score = getScore(score_id);
   const get_obj = useStore(getObjectSelector2);
+  
 
   useEffect(() => {
     if(score) {

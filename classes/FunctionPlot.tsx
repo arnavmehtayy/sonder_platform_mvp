@@ -25,6 +25,7 @@ export default class FunctionPlot extends geomobj {
     xRange = [-10, 10],
     numPoints = 100,
     lineWidth = 2,
+    isEnabled = true
   }: Partial<FunctionPlot> & { id: number }) {
     super({
       id: id,
@@ -37,6 +38,7 @@ export default class FunctionPlot extends geomobj {
       param_t: param_t,
       isClickable: isClickable,
       OnClick: OnClick,
+      isEnabled: isEnabled
     });
     this.func = func;
     this.xRange = xRange;
