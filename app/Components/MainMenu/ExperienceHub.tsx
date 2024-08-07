@@ -2,10 +2,10 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
-import { initDataSets } from "@/classes/init_datasets";
+import { initDataSets, experiences as exp} from "@/classes/init_datasets";
 import { ChevronRight, Activity, Eye } from 'lucide-react';
 
-const ExperienceCard = ({ name, slides, index }: { name: string; slides: string[]; index: number }) => {
+const ExperienceCard = ({ name, slides, index, description }: { name: string; slides: string[]; index: number; description: string }) => {
   const [isHovered, setIsHovered] = useState(false);
 
   return (
@@ -28,7 +28,7 @@ const ExperienceCard = ({ name, slides, index }: { name: string; slides: string[
             </div>
           </div>
           <div className="p-6">
-            <p className="text-gray-600 mb-4">Explore interactive 3D models and simulations.</p>
+            <p className="text-gray-600 mb-4">{description}</p>
             <div className="flex justify-between items-center">
               <span className="text-[#257276] font-semibold flex items-center">
                 Start Experience
@@ -44,10 +44,10 @@ const ExperienceCard = ({ name, slides, index }: { name: string; slides: string[
 };
 
 const ExperienceHub = () => {
-  const experiences = Object.entries(initDataSets).map(([key, value], index) => ({
-    name: `Experience ${index + 1}`,
-    slides: value.controlData.map(control => control.id.toString()),
-    key
+  const experiences = exp.map((value) => ({
+    name: value.name,
+    slides: value.slides,
+    description: value.description
   }));
   
 
@@ -78,10 +78,11 @@ const ExperienceHub = () => {
         >
           {experiences.map((experience, index) => (
             <ExperienceCard
-              key={experience.key}
+              key={experience.name}
               name={experience.name}
               slides={experience.slides}
               index={index}
+              description={experience.description}
             />
           ))}
         </motion.div>
