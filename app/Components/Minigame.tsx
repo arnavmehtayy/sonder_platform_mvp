@@ -6,7 +6,6 @@ import ShowControl from "./ShowControl";
 import ShowScore from "./ShowScore";
 import {
   useStore,
-  getQuestionSelector,
   getStateName,
   getPlacementSelector,
   UpdateValidationSelector,
@@ -27,6 +26,7 @@ import { FeedbackComponent } from "./MainMenu/FeedbackComponent";
 import { controlData } from "@/classes/init_data";
 import MultiChoice from "./MultiChoice";
 import ShowInputNumber from './ShowInputNumber'
+import {OrderHandler, OrderItem} from "./OrderHandler";
 
 export function Minigame({
   experienceId,
@@ -38,7 +38,6 @@ export function Minigame({
   // console.log("Page: ", page);
   const page = experiences[experienceId - 1].slides[currentSlideIndex];
   const reset = useStore((state) => state.reset);
-  const question: string = useStore(getQuestionSelector);
   const state_name = useStore(getStateName);
   const placement = useStore(getPlacementSelector);
 
@@ -52,6 +51,15 @@ export function Minigame({
   };
 
   const test_id: number = 1; // for testing remove soon
+  const componentOrder: OrderItem[] = [
+    { type: 'question', id: 0 },
+    { type: 'score', id: 2 },
+    { type: 'control', id: 1 },
+    { type: 'control', id: 2 },
+    { type: 'placement', id: 0 },
+    { type: 'question', id: 1 },
+    { type: 'score', id: 1 },
+  ];
   // console.log(initDataSets[state_name].controlData)
 
   // testing
@@ -77,36 +85,12 @@ export function Minigame({
           className="w-full md:w-1/3 md:min-w-[300px] md:max-w-md bg-blue-50 p-4 overflow-y-auto h-1/2 md:h-full"
           style={{ height: "100lvh" }}
         >
-          <div className="space-y-4 md:space-y-6">
-            {/* Question */}
-            <div className="bg-white rounded-lg shadow-md p-3 md:p-4">
-              <h2 className="text-lg md:text-xl font-semibold text-blue-800 mb-2">
-                Question:
-              </h2>
-              <p id="question-text" className="text-gray-700">
-                <Latex> {question} </Latex>
-              </p>
-            </div>
 
-            {/* Scores */}
-            <div className="space-y-3 md:space-y-4">
-              {state_name
-                ? initDataSets[state_name].scoreData.map((score) => (
-                    <ShowScore key={score.score_id} score_id={score.score_id} />
-                  ))
-                : null}
-            </div>
-
-            {/* Show Selects */}
-            <div className="space-y-3 md:space-y-4">
-              {state_name
-                ? initDataSets[state_name].controlData.map((control) => (
-                    <ShowControl control_id={control.id} key={control.id} />
-                  ))
-                : null}
-            </div>
-
-            {placement ? <ShowPlacement /> : null}
+<div className="space-y-4 md:space-y-6">
+          <OrderHandler
+            order={componentOrder}
+            state_name= {state_name}
+          />
 
             {/* Add the ValidationComponent here */}
             <div className="mt-auto">
@@ -129,6 +113,7 @@ export function Minigame({
                 </Link>
               )}
             </div>
+            </div>
 
 
 
@@ -141,7 +126,6 @@ export function Minigame({
             
           </div>
         </div>
-      </div>
     </PlacementProvider>
   );
 }

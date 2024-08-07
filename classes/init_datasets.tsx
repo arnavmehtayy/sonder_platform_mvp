@@ -28,15 +28,18 @@ import { InputNumber } from "./InputNumber";
 import { Validation_inputNumber } from "./Validation_inputNumber";
 import { init } from "next/dist/compiled/webpack/webpack";
 import FunctionPlot from "./FunctionPlot";
+import { OrderItem } from "@/app/Components/OrderHandler";
 
 type data_type = {
-  question: string;
+  title: string;
+  questions: string[];
   influencesData: Influence<any, any, any>[];
   controlData: Control[];
   canvasData: obj[];
   scoreData: Score<any, any>[];
   placement: Placement | null;
   validations: Validation[];
+  order: OrderItem[];
 };
 
 export const experiences = [
@@ -58,9 +61,18 @@ export const experiences = [
   // Add more experiences as needed
 ];
 
-export const initDataSets: { [key: string]: data_type } = {
+export const initDataSets: { default: data_type, [key: string]: data_type } = {
   default: {
-    question: "This is default",
+    title: "Question Default",
+    order: [ { type: 'question', id: 0 },
+        { type: 'control', id: 1 },
+        { type: 'control', id: 2 },
+        { type: 'control', id: 4 },
+        { type: 'control', id: 5 },
+        { type: 'control', id: 6 },
+        { type: 'placement', id: 0 },
+        ],
+    questions: ["This is default", "This is default"],
     validations:
       // new Validation_obj<THREE.Vector2>(
       //     {
@@ -209,7 +221,16 @@ export const initDataSets: { [key: string]: data_type } = {
     }),
   },
   set1: {
-    question: "This is set1",
+    title: "Question set1",
+    order: [ { type: 'question', id: 0 },
+        { type: 'control', id: 1 },
+        { type: 'control', id: 2 },
+        { type: 'control', id: 4 },
+        { type: 'control', id: 5 },
+        { type: 'placement', id: 0 },
+        { type: 'score', id: 1 },
+        ],
+    questions: ["This is set1", "This"],
     validations: [
       new Validation_score<number, obj>({
         target_score: 30,
@@ -291,7 +312,9 @@ export const initDataSets: { [key: string]: data_type } = {
     }),
   },
   set2: {
-    question: "",
+    title: "Question set2",
+    order: [{ type: "question", id: 0 }],
+    questions: ["This is set2", "This"],
     validations: [new Validation_test()],
     influencesData: [],
     controlData: [],

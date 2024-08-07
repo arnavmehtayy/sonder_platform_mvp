@@ -31,8 +31,7 @@ import { Validation_inputNumber } from "@/classes/Validation_inputNumber";
 
 export type State = {
   validations: Validation[];
-  state_name: keyof typeof initDataSets | null;
-  question: string;
+  state_name: keyof typeof initDataSets;
   placement: Placement | null;
   vizobjs: { [id: number]: obj };
   controls: { [id: number]: Control };
@@ -59,8 +58,7 @@ export const useStore = create<State>((set, get) => ({
   isPlacementMode: false,
   isValidatorClickable: true,
   validations: [],
-  state_name: null,
-  question: "",
+  state_name: "default",
   controls: {},
   vizobjs: {},
   influences: {},
@@ -268,7 +266,6 @@ export const useStore = create<State>((set, get) => ({
     
     const dataSet = initDataSets[dataSetKey];
     set({
-      question: dataSet.question,
       isValidatorClickable: true,
       state_name: dataSetKey,
       placement: dataSet.placement,
@@ -461,8 +458,6 @@ export const useControlValueSelector = (control_id: number) => {
   );
   return useStore(selector);
 };
-
-export const getQuestionSelector = (state: State) => state.question;
 
 export const getNameSelector = (state: State) => (id: number) =>
   state.vizobjs[id].name;
