@@ -28,6 +28,7 @@ import { MultiChoiceClass } from "@/classes/MultiChoiceClass";
 import { ValidationMultiChoice } from "@/classes/ValidationMultiChoice";
 import {InputNumber} from "@/classes/InputNumber";
 import { Validation_inputNumber } from "@/classes/Validation_inputNumber";
+import { EnablerControl } from "@/classes/EnablerControl";
 
 export type State = {
   validations: Validation[];
@@ -52,6 +53,7 @@ export type State = {
   setIsPlacementMode: (val: boolean) => void;
   setMultiChoiceOptions: (control_id: number, Selectedoptions: number[]) => void;
   setInputNumberValue: (control_id: number, value: number | '') => void;
+  setEnablerControl: (control_id: number) => (isEnabled: boolean) => void;
 };
 
 export const useStore = create<State>((set, get) => ({
@@ -66,6 +68,17 @@ export const useStore = create<State>((set, get) => ({
   placement: null,
   isSelectActive: false,
 
+  setEnablerControl: (control_id: number) => (isEnabled: boolean) => {
+    const control = get().controls[control_id] as EnablerControl;
+    // set obj_ids to enabled or disabled
+    control.obj_ids.forEach((obj_id) => {
+      const vobj = get().vizobjs[obj_id];
+      const updatedObj = obj.setEnableObject(vobj, isEnabled);
+      get().setVizObj(obj_id, updatedObj);
+    })
+    const newControl = control.setControlState(isEnabled);
+
+  },
   setInputNumberValue: (control_id: number, value: number | '') => {
     set((state) => {
       const control = state.controls[control_id] as InputNumber;
@@ -497,3 +510,7 @@ export const setMultiChoiceOptionsSelector = (state: State) => (control_id: numb
 export const setInputNumberValueSelector = (state: State) => (control_id: number, value: number | '') => {
   state.setInputNumberValue(control_id, value);
 }
+
+export const setEnablerControl = (control_id: number) => (state: State) => (isEnabled: boolean) => {
+  state.setEnablerControl(control_id)(isEnabled);
+  }

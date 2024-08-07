@@ -28,6 +28,15 @@ export class obj {
     this.isEnabled = isEnabled;
   }
 
+  static setEnableObject(obj: obj, isEnabled: boolean): obj {
+    const newObj = Object.assign(
+      Object.create(Object.getPrototypeOf(obj)),
+      obj
+    );
+    newObj.isEnabled = isEnabled;
+    return newObj
+  }
+
   static setObjectisClickable(obj: obj, isClickable: boolean): obj {
     const newObj = Object.assign(
       Object.create(Object.getPrototypeOf(obj)),
