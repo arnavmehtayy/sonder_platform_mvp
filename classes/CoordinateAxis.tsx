@@ -12,6 +12,8 @@ export default class CoordinateAxis extends geomobj {
   showLabels: boolean;
   fontSize: number;
   lineWidth: number;
+  xLabel: string;
+  yLabel: string;
 
   constructor({
     id,
@@ -30,6 +32,8 @@ export default class CoordinateAxis extends geomobj {
     showLabels = true,
     fontSize = 0.6,
     lineWidth = 4,
+    xLabel = "weight",
+    yLabel = "height",
   }: Partial<CoordinateAxis> & { id: number }) {
     super({
       id: id,
@@ -42,6 +46,7 @@ export default class CoordinateAxis extends geomobj {
       param_t: param_t,
       isClickable: isClickable,
       OnClick: OnClick,
+
     });
     this.axisLength = axisLength;
     this.tickSpacing = tickSpacing;
@@ -50,6 +55,8 @@ export default class CoordinateAxis extends geomobj {
     this.fontSize = fontSize;
     this.lineWidth = lineWidth;
     this.name = "CoordinateAxis";
+    this.xLabel = xLabel;
+    this.yLabel = yLabel;
   }
 
   getMesh({
@@ -74,25 +81,25 @@ export default class CoordinateAxis extends geomobj {
       new THREE.Vector3(0, -this.axisLength / 2, 0),
       new THREE.Vector3(0, this.axisLength / 2, 0),
     ];
-
+  
     const ticksX = [];
     const ticksY = [];
     const labelsX = [];
     const labelsY = [];
-
+  
     for (let i = -this.axisLength / 2; i <= this.axisLength / 2; i += this.tickSpacing) {
       // X-axis ticks
       ticksX.push(
         [new THREE.Vector3(i, -this.tickSize / 2, 0),
         new THREE.Vector3(i, this.tickSize / 2, 0)]
       );
-
+  
       // Y-axis ticks
       ticksY.push(
         [new THREE.Vector3(-this.tickSize / 2, i, 0),
         new THREE.Vector3(this.tickSize / 2, i, 0)]
       );
-
+  
       // Labels
       if (this.showLabels && i !== 0) {
         labelsX.push(
@@ -104,7 +111,7 @@ export default class CoordinateAxis extends geomobj {
             anchorX="center"
             anchorY="top"
           >
-            {i}
+            {(i).toFixed(1)}
           </Text>
         );
         labelsY.push(
@@ -116,14 +123,39 @@ export default class CoordinateAxis extends geomobj {
             anchorX="right"
             anchorY="middle"
           >
-            {i}
+            {(i).toFixed(1)}
           </Text>
         );
       }
     }
-
-    
-
+  
+    // Add axis labels
+    const xAxisLabel = (
+      <Text
+        position={[this.axisLength / 4 + 2 * this.fontSize, -this.tickSize - 2 * this.fontSize, 0]}
+        fontSize={this.fontSize * 2}
+        color={material ? material.color : this.color}
+        anchorX="left"
+        anchorY="top"
+      >
+        {this.xLabel}
+      </Text>
+    );
+  
+    const yAxisLabel = (
+      <Text
+        position={[-this.tickSize - 3 * this.fontSize, this.axisLength / 4 + 2 * this.fontSize, 0]}
+        fontSize={this.fontSize * 2}
+        color={material ? material.color : this.color}
+        anchorX="right"
+        anchorY="bottom"
+        rotation={[0, 0, Math.PI / 2]}
+        
+      >
+        {this.yLabel}
+      </Text>
+    );
+  
     return (
       <group
         ref={objectRef}
@@ -139,10 +171,10 @@ export default class CoordinateAxis extends geomobj {
         ))}
         <Line points={xAxisPoints} color={material ? material.color : this.color} lineWidth={this.lineWidth} />
         <Line points={yAxisPoints} color={material ? material.color : this.color} lineWidth={this.lineWidth} />
-        {/* <Line points={ticksX} color={this.color} lineWidth={this.lineWidth} />
-        <Line points={ticksY} color={this.color} lineWidth={this.lineWidth} /> */}
         {labelsX}
         {labelsY}
+        {xAxisLabel}
+        {yAxisLabel}
         {children}
       </group>
     );
