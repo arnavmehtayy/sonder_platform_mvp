@@ -88,7 +88,6 @@ export function Minigame({
 
 <div className="space-y-4 md:space-y-6">
           <OrderHandler
-            order={componentOrder}
             state_name= {state_name}
           />
 
