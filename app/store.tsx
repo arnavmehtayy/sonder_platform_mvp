@@ -9,7 +9,8 @@ import {
   scoreData,
 } from "@/classes/init_data";
 
-import { initDataSets } from "@/classes/init_datasets";
+// import { initDataSets } from "@/classes/init_datasets";
+import { initDataSets } from "@/classes/Data/CompleteData"
 import { obj } from "@/classes/obj";
 import { Control } from "@/classes/Control";
 import { SelectControl } from "@/classes/SelectControl";
@@ -73,8 +74,10 @@ export const useStore = create<State>((set, get) => ({
     // set obj_ids to enabled or disabled
     control.obj_ids.forEach((obj_id) => {
       const vobj = get().vizobjs[obj_id];
+      if(vobj) {
       const updatedObj = obj.setEnableObject(vobj, isEnabled);
       get().setVizObj(obj_id, updatedObj);
+      }
     })
     const newControl = control.setControlState(isEnabled);
 

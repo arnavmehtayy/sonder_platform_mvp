@@ -31,7 +31,7 @@ import FunctionPlot from "./FunctionPlot";
 import { OrderItem } from "@/app/Components/OrderHandler";
 import { EnablerControl } from "./EnablerControl";
 
-type data_type = {
+export type data_type = {
   title: string;
   questions: string[];
   influencesData: Influence<any, any, any>[];
@@ -43,7 +43,13 @@ type data_type = {
   order: OrderItem[];
 };
 
-export const experiences = [
+export type experience_type = {
+  name: string;
+  slides: string[];
+  description: string;
+};
+
+export const experiences: experience_type[] = [
   {
     name: "Experience 1",
     slides: ["default", "set1"],
@@ -222,17 +228,35 @@ export const initDataSets: { default: data_type, [key: string]: data_type } = {
     }),
   },
   set1: {
-    title: "Question set1",
+    title: "Introduction to Linear Regression",
     order: [ { type: 'question', id: 0 },
+      { type: 'score', id: 1 },
         { type: 'control', id: 1 },
         { type: 'control', id: 2 },
         { type: 'control', id: 4 },
         { type: 'control', id: 5 },
         { type: 'placement', id: 0 },
-        { type: 'score', id: 1 },
+        
         {type: 'control', id: 6}
         ],
-    questions: ["This is set1", "This"],
+    questions: [`
+        We are studying the relationship between a company's average stock price and its revenue over a year using data from 30 companies. 
+
+        <br> <br> 
+        We observe a linear relationship and fit a line to this data. We evaluate how well the line fits by calculating the score:
+
+        \\[
+            \\text{Score} = \\sum_{i=1}^{30} \\text{dist}(\\text{line}, (x_i, y_i))^2
+        \\]
+
+        where \\( \\text{dist}(\\text{line}, (x_i, y_i)) \\) is the shortest distance from the line to each point \\( (x_i, y_i) \\). In the diagram, the grey lines represent these distances.
+        <br> <br>
+
+        In simpler terms, we look at the 30 points on the graph, measure the distance from each point to the line, square these distances, and then add them all up.`, 
+      `What do you think our goal is with the score`, 
+      `Try adjusting the slope and intercept of the line to achieve the optimal score.`,
+      `We received information on 5 new companies yesterday. Click below to reveal it. In hindsight, do you think the line we fit above performs well to predict this new data?`
+      ],
     validations: [
       new Validation_score<number, obj>({
         target_score: 30,
@@ -291,7 +315,7 @@ export const initDataSets: { default: data_type, [key: string]: data_type } = {
     canvasData: [new CoordinateAxis({ id: 99999 })],
     scoreData: [
       new Score<number, LineObj>({
-        text: "Mean Squared Error",
+        text: "Line Score",
         score_id: 1,
         obj_id_list: [
           30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46,

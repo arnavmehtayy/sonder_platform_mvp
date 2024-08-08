@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
-import { initDataSets, experiences as exp} from "@/classes/init_datasets";
+import { initDataSets, experiences as exp} from "@/classes/Data/CompleteData";
 import { ChevronRight, Activity, Eye } from 'lucide-react';
 
 const ExperienceCard = ({ name, slides, index, description }: { name: string; slides: string[]; index: number; description: string }) => {

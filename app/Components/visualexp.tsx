@@ -68,7 +68,7 @@ export default function Experience() {
       <Canvas>
         <OrthographicCamera
           makeDefault
-          zoom={30}
+          zoom={25}
           position={[0, 0, 20]}
           near={0.1}
           far={1000}

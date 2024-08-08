@@ -3,7 +3,7 @@
 import { useRouter } from 'next/router';
 import { useState, useEffect } from 'react';
 import { Minigame } from '@/app/Components/Minigame';
-import { experiences } from "@/classes/init_datasets";
+import { experiences } from "@/classes/Data/CompleteData";
 import CurvedBackButton from '@/app/Components/BackButton';
 import { useParams } from 'next/navigation';
 import { FeedbackComponent } from '@/app/Components/MainMenu/FeedbackComponent';

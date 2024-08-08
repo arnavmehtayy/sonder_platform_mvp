@@ -10,7 +10,7 @@ import {
   getPlacementSelector,
   UpdateValidationSelector,
 } from "../store";
-import { initDataSets, experiences } from "@/classes/init_datasets";
+import { initDataSets, experiences } from "@/classes/Data/CompleteData";
 import "katex/dist/katex.min.css";
 import Latex from "react-latex-next";
 import {
@@ -97,7 +97,7 @@ export function Minigame({
                 validations={validationInstance}
                 updater={handleValidationUpdate}
               />
-              {validationInstance.every((v) => v.is_valid) && (
+              {/*validationInstance.every((v) => v.is_valid) && */(
                 <Link
                   href={
                     currentSlideIndex < experience.slides.length - 1
