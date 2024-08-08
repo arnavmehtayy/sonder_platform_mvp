@@ -1,6 +1,8 @@
 import { Line, Vector2, Vector3 } from "three";
 import { TransformObj } from "./transformObj";
 import { LineObj } from "./Lineobj";
+import { DummyDataStorage, DummyDataSupportedTypes } from "./DummyDataStore";
+import { obj } from "./obj";
 
 /*
     * This file contains the functions to get and set the attributes of a vizobj.
@@ -110,4 +112,12 @@ export function set_scale<T>(obj: T, value: Vector3): T {
   const new_obj = Object.assign(Object.create(Object.getPrototypeOf(obj)), obj);
   new_obj.scale = value;
   return new_obj;
+} 
+
+export function getDummyValue<T extends DummyDataSupportedTypes>(obj: DummyDataStorage<T>): T {
+  return obj.data;
+}
+
+export function setDummyValue<T extends DummyDataSupportedTypes>(obj: DummyDataStorage<T>, value: T): DummyDataStorage<T> {
+  return DummyDataStorage.setData(obj, value);
 }

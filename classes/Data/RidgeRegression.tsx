@@ -31,6 +31,7 @@ import { EnablerControl } from "../EnablerControl";
 import { seededRandom } from "three/src/math/MathUtils.js";
 
 import { data_type, experience_type } from "../init_datasets";
+import { DummyDataStorage } from "../DummyDataStore";
 
 const num_points = 30;
 const num_new_points = 5;
@@ -443,12 +444,22 @@ export const data_regression: { [key: string]: data_type } = {
         { type: "score", id: 1},
         { type: "question", id: 1 },
         { type: "control", id: slope_control.id },
+        { type: "control", id: 5 },
         
         
     ],
     validations: [new Validation_test()],
     influencesData: [...influences, ...tech_influences],
-    controlData: [slope_control, newPointsEnablerControl],
+    controlData: [slope_control, newPointsEnablerControl, new SliderControl<DummyDataStorage<number>>({
+        id: 5,
+        desc: "Lambda",
+        text: "Adjust the value of lambda to achieve the optimal score",
+        obj_id: 9910,
+        range: [0.1, 10],
+        step_size: 0.1,
+        set_attribute: att_funcs.setDummyValue,
+        get_attribute: att_funcs.getDummyValue,
+    })],
     canvasData: [
       ...Object.values(MSE_lines),
       ...Object.values(MSE_tech_companies),
@@ -457,6 +468,10 @@ export const data_regression: { [key: string]: data_type } = {
       CoordinateAxisObj,
       ...point_objs,
       ...new_point_objs,
+
+      new DummyDataStorage<number>(
+        {id: 9910, name: "data storage", data: 1}
+      )
     ],
     scoreData: [
       new Score<number, LineObj>({
