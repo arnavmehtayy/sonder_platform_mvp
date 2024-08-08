@@ -38,7 +38,7 @@ export type State = {
   vizobjs: { [id: number]: obj };
   controls: { [id: number]: Control };
   influences: { [id: number]: Influence<any, obj, obj>[] };
-  scores: { [id: number]: Score<any, any> };
+  scores: { [id: number]: Score<any> };
   setVizObj: (id: number, new_obj: obj) => void;
   setControlClick: (control_id: number, new_obj: Control) => void;
   reset: (dataSetKey: keyof typeof initDataSets) => void;
@@ -212,7 +212,7 @@ export const useStore = create<State>((set, get) => ({
             state.controls[validation.control_id] as SelectControl
           );
         } else if (validation instanceof Validation_score) {
-          const objs: obj[] = state.scores[validation.score_id].obj_id_list.map((id) => state.vizobjs[id]);
+          const objs: obj[] = state.scores[validation.score_id].obj_list.map((obj) => state.vizobjs[obj.id]);
           const value = state.scores[validation.score_id].computeValue(objs);
           return validation.computeValidity(value);
         } 
@@ -310,7 +310,7 @@ export const useStore = create<State>((set, get) => ({
       scores: dataSet.scoreData.reduce((acc, score) => {
         acc[score.score_id] = score;
         return acc;
-      }, {} as { [id: number]: Score<any, any> }),
+      }, {} as { [id: number]: Score<any> }),
     });
 
     set((state) => {

@@ -32,6 +32,7 @@ import { seededRandom } from "three/src/math/MathUtils.js";
 
 import { data_type, experience_type } from "../init_datasets";
 import { DummyDataStorage } from "../DummyDataStore";
+import { objectScorer } from "../objectScorer";
 
 const num_points = 30;
 const num_new_points = 5;
@@ -230,6 +231,27 @@ for (let i = 0; i < num_points; i++) {
   );
 }
 
+
+// SCORE STUFF
+const line_MSE_scorers = Object.keys(MSE_lines).map((key) => {
+    return new objectScorer<LineObj>({
+        id: parseInt(key),
+        get_attribute: (obj: LineObj) => att_funcs.get_length(obj),
+    });
+    })
+const line_MSE__tech_scorers = Object.keys(MSE_tech_companies).map((key) => {
+    return new objectScorer<LineObj>({
+        id: parseInt(key),
+        get_attribute: (obj: LineObj) => att_funcs.get_length(obj),
+    });
+    })
+
+
+
+
+
+// SCORE STUFF
+
 export const experience_regression: experience_type = {
   name: "Bias Variance Tradeoff and Linear Regression",
   slides: ["intro_lin_reg", "lin_reg_flaw", "ridge_regression"],
@@ -330,11 +352,10 @@ export const data_regression: { [key: string]: data_type } = {
       ...new_point_objs,
     ],
     scoreData: [
-      new Score<number, LineObj>({
+      new Score<number>({
         text: "Line Score",
         score_id: 0,
-        obj_id_list: [...Object.keys(MSE_lines).map(Number)],
-        get_attribute: (obj: LineObj) => att_funcs.get_length(obj),
+        obj_list: line_MSE_scorers,
         to_string: (val) => (Math.round(val * 10) / 10).toString(),
         transformation: (vals) => {
           let sum: number = 0;
@@ -407,14 +428,10 @@ export const data_regression: { [key: string]: data_type } = {
       ...new_point_objs,
     ],
     scoreData: [
-      new Score<number, LineObj>({
+      new Score<number>({
         text: "Line Score",
         score_id: 0,
-        obj_id_list: [
-          ...Object.keys(MSE_lines).map(Number),
-          ...Object.keys(MSE_tech_companies).map(Number),
-        ],
-        get_attribute: (obj: LineObj) => att_funcs.get_length(obj),
+        obj_list: [...line_MSE_scorers, ...line_MSE__tech_scorers],
         to_string: (val) => (Math.round(val * 10) / 10).toString(),
         transformation: (vals) => {
           let sum: number = 0;
@@ -437,20 +454,23 @@ export const data_regression: { [key: string]: data_type } = {
         \\]
 
         the only change that we make is the addition of the $\\lambda \\cdot \\text{slope}^2$ term `,
-        `We have fixed the intercept of the line this time. Adust the slope of the line to achieve the optimal score. Adjust to a score of under ___.`,
+      `We have fixed the intercept of the line this time. Adust the slope of the line to achieve the optimal score. Adjust to a score of under ___.`,
     ],
-    order: [{ type: "question", id: 0 },
-        { type: "score", id: 0 },
-        { type: "score", id: 1},
-        { type: "question", id: 1 },
-        { type: "control", id: slope_control.id },
-        { type: "control", id: 5 },
-        
-        
+    order: [
+      { type: "question", id: 0 },
+      { type: "score", id: 0 },
+      { type: "score", id: 1 },
+      { type: "score", id: 2 },
+      { type: "question", id: 1 },
+      { type: "control", id: slope_control.id },
+      { type: "control", id: 5 },
     ],
     validations: [new Validation_test()],
     influencesData: [...influences, ...tech_influences],
-    controlData: [slope_control, newPointsEnablerControl, new SliderControl<DummyDataStorage<number>>({
+    controlData: [
+      slope_control,
+      newPointsEnablerControl,
+      new SliderControl<DummyDataStorage<number>>({
         id: 5,
         desc: "Lambda",
         text: "Adjust the value of lambda to achieve the optimal score",
@@ -459,7 +479,8 @@ export const data_regression: { [key: string]: data_type } = {
         step_size: 0.1,
         set_attribute: att_funcs.setDummyValue,
         get_attribute: att_funcs.getDummyValue,
-    })],
+      }),
+    ],
     canvasData: [
       ...Object.values(MSE_lines),
       ...Object.values(MSE_tech_companies),
@@ -469,19 +490,13 @@ export const data_regression: { [key: string]: data_type } = {
       ...point_objs,
       ...new_point_objs,
 
-      new DummyDataStorage<number>(
-        {id: 9910, name: "data storage", data: 1}
-      )
+      new DummyDataStorage<number>({ id: 9910, name: "data storage", data: 1 }),
     ],
     scoreData: [
-      new Score<number, LineObj>({
+      new Score<number>({
         text: "Old Line Score",
         score_id: 0,
-        obj_id_list: [
-          ...Object.keys(MSE_lines).map(Number),
-          ...Object.keys(MSE_tech_companies).map(Number),
-        ],
-        get_attribute: (obj: LineObj) => att_funcs.get_length(obj),
+        obj_list: [...line_MSE_scorers, ...line_MSE__tech_scorers],
         to_string: (val) => (Math.round(val * 10) / 10).toString(),
         transformation: (vals) => {
           let sum: number = 0;
@@ -491,16 +506,48 @@ export const data_regression: { [key: string]: data_type } = {
           return sum;
         },
       }),
-      new Score<number, LineObj>({
+      new Score<number>({
         text: "New Score term",
         score_id: 1,
-        obj_id_list: [reg_line3.id],
-        get_attribute: (obj: LineObj) => att_funcs.get_slope_intercept(obj).y,
+        obj_list: [
+            new objectScorer<LineObj>(
+                {id: reg_line3.id, get_attribute: (obj: LineObj) => att_funcs.get_slope_intercept(obj).y},
+            ),
+            new objectScorer<DummyDataStorage<number>>(
+                {id: 9910, get_attribute: (obj: DummyDataStorage<number>) => obj.data},
+            )
+            
+        ],
         to_string: (val) => (Math.round(val * 100) / 100).toString(),
         transformation: (vals) => {
-          return vals[0] ** 2;
+        
+          return vals[0] ** 2 * vals[1]; ;
         },
       }),
+
+      new Score<number>({
+        text: "Full Score",
+        score_id: 2,
+        obj_list: [
+            new objectScorer<LineObj>(
+                {id: reg_line3.id, get_attribute: (obj: LineObj) => att_funcs.get_slope_intercept(obj).y},
+            ),
+            new objectScorer<DummyDataStorage<number>>(
+                {id: 9910, get_attribute: (obj: DummyDataStorage<number>) => obj.data},
+            ),
+            ...line_MSE_scorers,
+            ...line_MSE__tech_scorers
+        ],
+        to_string: (val) => (Math.round(val * 100) / 100).toString(),
+        transformation: (vals) => {
+            let sum: number = 0;
+            for (let i = 2; i < vals.length; i++) {
+                sum += vals[i];
+              }
+          return sum + vals[0] ** 2 * vals[1];
+        },
+      }),
+      
     ],
     placement: null,
   },
