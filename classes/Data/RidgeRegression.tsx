@@ -73,16 +73,16 @@ const tech_influences: Influence<any, any, any>[] = [];
 const influences: Influence<any, any, any>[] = [];
 const point_objs: geomobj[] = [];
 const new_point_objs: geomobj[] = [];
-const MSE_lines: LineObj[] = [];
+const MSE_lines: { [key: number]: LineObj } = {};
 const pointobjs_tech_companies = [];
 const MSE_tech_companies: { [key: number]: LineObj } = {};
 
 const newPointsEnablerControl = new EnablerControl({
-    control_id: 3,
-    desc: "New companies",
-    text: "Click to reveal new the data for 5 new companies",
-    obj_ids: [60, 61, 62, 63, 64],
-  })
+  control_id: 3,
+  desc: "New companies",
+  text: "Click to reveal new the data for 5 new companies",
+  obj_ids: [60, 61, 62, 63, 64],
+});
 
 const slope_control = new SliderControl<LineObj>({
   desc: "Slope",
@@ -118,9 +118,11 @@ let reg_line: LineObj = new LineObj({
   line_width: 5,
   color: "red",
 });
-reg_line = LineObj.set_slope_intercept(reg_line, 0, 0.30, [-30, 30]);
+reg_line = LineObj.set_slope_intercept(reg_line, 0, 0.3, [-30, 30]);
 
-const reg_line2 =  LineObj.set_slope_intercept(reg_line, 0, 3.15, [-30, 30]);
+const reg_line2 = LineObj.set_slope_intercept(reg_line, 0, 3.15, [-30, 30]);
+
+const reg_line3 = LineObj.set_slope_intercept(reg_line, -7.4, 0, [-30, 30]);
 
 for (let i = 0; i < num_new_points; i++) {
   new_point_objs.push(
@@ -144,15 +146,13 @@ for (let i = 0; i < num_points; i++) {
     })
   );
 
-  MSE_lines.push(
-    new LineObj({
-      id: i + num_points,
-      start: points[i],
-      end: new Vector2(0, 0),
-      line_width: 3,
-      color: "gray",
-    })
-  );
+  MSE_lines[i + num_points] = new LineObj({
+    id: i + num_points,
+    start: points[i],
+    end: new Vector2(0, 0),
+    line_width: 3,
+    color: "gray",
+  });
 
   for (let i = 0; i < points_tech_companies.length; i++) {
     pointobjs_tech_companies.push(
@@ -231,7 +231,7 @@ for (let i = 0; i < num_points; i++) {
 
 export const experience_regression: experience_type = {
   name: "Bias Variance Tradeoff and Linear Regression",
-  slides: ["intro_lin_reg", "lin_reg_flaw"],
+  slides: ["intro_lin_reg", "lin_reg_flaw", "ridge_regression"],
   description:
     "In this experience, you will learn Ridge Regression, a modification to the standard line of best fit model that is designed to be more robust against outliers.",
 };
@@ -322,7 +322,7 @@ export const data_regression: { [key: string]: data_type } = {
       }),
     ],
     canvasData: [
-      ...MSE_lines,
+      ...Object.values(MSE_lines),
       reg_line,
       CoordinateAxisObj,
       ...point_objs,
@@ -332,10 +332,7 @@ export const data_regression: { [key: string]: data_type } = {
       new Score<number, LineObj>({
         text: "Line Score",
         score_id: 0,
-        obj_id_list: [
-          30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46,
-          47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59,
-        ],
+        obj_id_list: [...Object.keys(MSE_lines).map(Number)],
         get_attribute: (obj: LineObj) => att_funcs.get_length(obj),
         to_string: (val) => (Math.round(val * 10) / 10).toString(),
         transformation: (vals) => {
@@ -354,21 +351,21 @@ export const data_regression: { [key: string]: data_type } = {
     title: "A Flaw in our Score",
     order: [
       { type: "question", id: 0 },
-      {type: "question", id: 1},
+      { type: "question", id: 1 },
       { type: "score", id: 0 },
-      
-      { type: "control", id: 2 },
-      {type: "question", id: 2},
-      {type: "control", id: 3},
-      {type: "control", id: 4},
 
+      { type: "control", id: 2 },
+      { type: "question", id: 2 },
+      { type: "control", id: 3 },
+      { type: "control", id: 4 },
     ],
     questions: [
       "We realized that we initially overlooked data for a few companies. We've now included them in the plot, highlighted in pink. These companies are have inflated stock prices because their buisnesses hold significant future potential.",
       `We have fixed the slope of the line. Adust the intercept of the line to achieve the optimal score. Adjust to a score of under 155.`,
       "We use the 5 new companies to validate our line once again.",
     ],
-    validations: [new Validation_score<number, obj>({
+    validations: [
+      new Validation_score<number, obj>({
         target_score: 155,
         relation: "<=",
         score_id: 0,
@@ -380,9 +377,13 @@ export const data_regression: { [key: string]: data_type } = {
         control_id: 4,
         answer: [2],
         desc: "MCQ 1",
-      }),],
+      }),
+    ],
     influencesData: [...influences, ...tech_influences],
-    controlData: [intercept_control, newPointsEnablerControl, new MultiChoiceClass({
+    controlData: [
+      intercept_control,
+      newPointsEnablerControl,
+      new MultiChoiceClass({
         id: 4,
         title: "New Data",
         description:
@@ -393,9 +394,10 @@ export const data_regression: { [key: string]: data_type } = {
         ],
         isMultiSelect: false,
         isClickable: true,
-      }),],
+      }),
+    ],
     canvasData: [
-      ...MSE_lines,
+      ...Object.values(MSE_lines),
       ...Object.values(MSE_tech_companies),
       ...pointobjs_tech_companies,
       reg_line2,
@@ -408,36 +410,7 @@ export const data_regression: { [key: string]: data_type } = {
         text: "Line Score",
         score_id: 0,
         obj_id_list: [
-          30,
-          31,
-          32,
-          33,
-          34,
-          35,
-          36,
-          37,
-          38,
-          39,
-          40,
-          41,
-          42,
-          43,
-          44,
-          45,
-          46,
-          47,
-          48,
-          49,
-          50,
-          51,
-          52,
-          53,
-          54,
-          55,
-          56,
-          57,
-          58,
-          59,
+          ...Object.keys(MSE_lines).map(Number),
           ...Object.keys(MSE_tech_companies).map(Number),
         ],
         get_attribute: (obj: LineObj) => att_funcs.get_length(obj),
@@ -448,6 +421,69 @@ export const data_regression: { [key: string]: data_type } = {
             sum += vals[i];
           }
           return sum;
+        },
+      }),
+    ],
+    placement: null,
+  },
+
+  ridge_regression: {
+    title: "Fighting the Outliers",
+    questions: [
+      `The pink companies are rare, making them special cases we don't often encounter, known as outliers. A savvy team member recommended a modification to our scoring method that is better suited to handling outliers.
+        \\[
+            \\text{Score} = \\sum_{i=1}^{30} \\text{dist}(\\text{line}, (x_i, y_i))^2  + \\lambda \\cdot \\text{slope}^2
+        \\]
+
+        the only change that we make is the addition of the $\\lambda \\cdot \\text{slope}^2$ term `,
+        `We have fixed the intercept of the line this time. Adust the slope of the line to achieve the optimal score. Adjust to a score of under ___.`,
+    ],
+    order: [{ type: "question", id: 0 },
+        { type: "score", id: 0 },
+        { type: "score", id: 1},
+        { type: "question", id: 1 },
+        { type: "control", id: slope_control.id },
+        
+        
+    ],
+    validations: [new Validation_test()],
+    influencesData: [...influences, ...tech_influences],
+    controlData: [slope_control, newPointsEnablerControl],
+    canvasData: [
+      ...Object.values(MSE_lines),
+      ...Object.values(MSE_tech_companies),
+      ...pointobjs_tech_companies,
+      reg_line3,
+      CoordinateAxisObj,
+      ...point_objs,
+      ...new_point_objs,
+    ],
+    scoreData: [
+      new Score<number, LineObj>({
+        text: "Old Line Score",
+        score_id: 0,
+        obj_id_list: [
+          ...Object.keys(MSE_lines).map(Number),
+          ...Object.keys(MSE_tech_companies).map(Number),
+        ],
+        get_attribute: (obj: LineObj) => att_funcs.get_length(obj),
+        to_string: (val) => (Math.round(val * 10) / 10).toString(),
+        transformation: (vals) => {
+          let sum: number = 0;
+          for (let i = 0; i < vals.length; i++) {
+            sum += vals[i];
+          }
+          return sum;
+        },
+      }),
+      new Score<number, LineObj>({
+        text: "New Score term",
+        score_id: 1,
+        obj_id_list: [reg_line3.id],
+        get_attribute: (obj: LineObj) => att_funcs.get_slope_intercept(obj).y,
+        to_string: (val) => (Math.round(val * 100) / 100).toString(),
+        transformation: (vals) => {
+          return vals[0] ** 2;
         },
       }),
     ],
