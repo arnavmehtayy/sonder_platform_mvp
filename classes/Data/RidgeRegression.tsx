@@ -30,7 +30,7 @@ import { OrderItem } from "@/app/Components/OrderHandler";
 import { EnablerControl } from "../EnablerControl";
 import { seededRandom } from "three/src/math/MathUtils.js";
 
-import { data_type, experience_type } from "../init_datasets";
+import { data_type, experience_type } from "./CompleteData";
 import { DummyDataStorage } from "../DummyDataStore";
 import { objectScorer } from "../objectScorer";
 

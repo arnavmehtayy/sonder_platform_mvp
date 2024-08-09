@@ -2,12 +2,6 @@
 import { create } from "zustand";
 import { SliderControl } from "../classes/SliderControl";
 import { Influence } from "../classes/influence";
-import {
-  influencesData,
-  controlData,
-  canvasData,
-  scoreData,
-} from "@/classes/init_data";
 
 // import { initDataSets } from "@/classes/init_datasets";
 import { initDataSets } from "@/classes/Data/CompleteData"

@@ -23,7 +23,6 @@ import "./style.css";
 import ValidationComponent from "./ShowValid";
 import { useRouter } from "next/router";
 import { FeedbackComponent } from "./MainMenu/FeedbackComponent";
-import { controlData } from "@/classes/init_data";
 import MultiChoice from "./MultiChoice";
 import ShowInputNumber from './ShowInputNumber'
 import {OrderHandler, OrderItem} from "./OrderHandler";
