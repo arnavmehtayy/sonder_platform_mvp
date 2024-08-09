@@ -14,7 +14,6 @@ import {
 } from '@/components/ui/dialog';
 import { MessageCircle } from 'lucide-react';
 import { Minigame } from '@/app/Components/Minigame';
-import { experiences } from "@/classes/init_datasets";
 import CurvedBackButton from '@/app/Components/BackButton';
 
 export const FeedbackComponent = () => {
