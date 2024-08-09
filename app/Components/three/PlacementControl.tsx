@@ -154,8 +154,8 @@ export const PlacementControl = ({
     GridVectors.forEach(element => {
         positions.push(element);
     });
-    for (let x = 0; x <= gridSize[0]; x += cellSize) {
-      for (let y = 0; y <= gridSize[1]; y += cellSize) {
+    for (let x = 0; x < gridSize[0]; x += cellSize) {
+      for (let y = 0; y < gridSize[1]; y += cellSize) {
         positions.push(
           new THREE.Vector2(x - gridSize[0] / 2, y - gridSize[1] / 2)
         );

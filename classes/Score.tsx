@@ -4,6 +4,7 @@ import {objectScorer} from "./objectScorer";
 export class Score<Score_T> {
   score_id: number;
   text: string;
+  desc: string;
   obj_list: objectScorer<any>[];
   transformation: (vals: number[]) => Score_T;
   to_string: (score: Score_T) => string;
@@ -12,6 +13,7 @@ export class Score<Score_T> {
     text,
     score_id,
     obj_list,
+    desc = "",
     transformation,
     to_string = (score) => score as string,
   }: Partial<Score<Score_T>> & {
@@ -25,6 +27,7 @@ export class Score<Score_T> {
     this.score_id = score_id;
     this.transformation = transformation;
     this.obj_list = obj_list;
+    this.desc = desc;
   }
 
   computeValue(objs: obj[]): Score_T {

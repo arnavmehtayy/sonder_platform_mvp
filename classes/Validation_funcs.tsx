@@ -13,6 +13,9 @@ export function compare<T extends value_typ>( // if greater than 0 then a is gre
   if (typeof a === "number" && typeof b === "number") {
     return a-b;
   } else if (a instanceof THREE.Vector2 && b instanceof THREE.Vector2) {
+    if(a.x === b.x && a.y === b.y) {
+      return 0
+    }
     return -1
   } else if (a instanceof THREE.Vector3 && b instanceof THREE.Vector3) {
     return -1

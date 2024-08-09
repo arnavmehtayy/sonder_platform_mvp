@@ -78,7 +78,10 @@ export function set_intercept(obj: LineObj, value: number): LineObj { // change
 }
 
 export function get_position(obj: TransformObj): Vector2 {
+  if(obj) {
   return obj.position;
+  }
+  return new Vector2(0, 0);
 }
 
 export function set_position<T>(obj: TransformObj, value: T): TransformObj {

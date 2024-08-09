@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useStore, getScore, getObjectSelector2 } from "../store";
+import Latex from "react-latex-next";
 
 export default function ShowScore({
   score_id,
@@ -21,7 +22,8 @@ export default function ShowScore({
   return (
     score ?
     <div className="bg-white rounded-lg shadow-md p-4 mb-4">
-      <h3 className="text-lg font-semibold text-blue-800 mb-2">{score.text}</h3>
+      <h3 className="text-lg font-semibold text-blue-800 mb-2"> <Latex> {score.text}</Latex></h3>
+      <p className=" text-gray-600 mb-2"> <Latex> {score.desc}</Latex> </p>
       <div className="flex items-center justify-between">
         <span className="text-gray-600"> </span>
         <span className="text-2xl font-bold text-blue-600">

@@ -33,6 +33,7 @@ import { seededRandom } from "three/src/math/MathUtils.js";
 import { data_type, experience_type } from "./CompleteData";
 import { DummyDataStorage } from "../DummyDataStore";
 import { objectScorer } from "../objectScorer";
+import { getScore } from "@/app/store";
 
 const num_points = 30;
 const num_new_points = 5;
@@ -78,6 +79,22 @@ const new_point_objs: geomobj[] = [];
 const MSE_lines: { [key: number]: LineObj } = {};
 const pointobjs_tech_companies = [];
 const MSE_tech_companies: { [key: number]: LineObj } = {};
+const lambda = new DummyDataStorage<number>({
+  id: 9910,
+  name: "data storage",
+  data: 16,
+});
+
+const lambda_slider = new SliderControl<DummyDataStorage<number>>({
+  id: 5,
+  desc: "Lambda",
+  text: "Move this slider to adjust the value of $\\lambda$",
+  obj_id: 9910,
+  range: [0, 100],
+  step_size: 0.5,
+  set_attribute: att_funcs.setDummyValue,
+  get_attribute: att_funcs.getDummyValue,
+});
 
 const newPointsEnablerControl = new EnablerControl({
   control_id: 3,
@@ -120,11 +137,53 @@ let reg_line: LineObj = new LineObj({
   line_width: 5,
   color: "red",
 });
+
+let reg_ref_line: LineObj = new LineObj({
+  id: 1001,
+  start: new Vector2(0, 0),
+  end: new Vector2(0, 0),
+  line_width: 5,
+  color: "#72FFAC",
+});
 reg_line = LineObj.set_slope_intercept(reg_line, 0, 0.3, [-30, 30]);
 
-const reg_line2 = LineObj.set_slope_intercept(reg_line, 0, 3.15, [-30, 30]);
+const outlier_placement_choices = [
+  new Vector2(2, 14),
+  new Vector2(14, 2),
+  new Vector2(8,10),
+  new Vector2(4, 1),
+];
 
-const reg_line3 = LineObj.set_slope_intercept(reg_line, -7.4, 0, [-30, 30]);
+const reg_line2 = LineObj.set_slope_intercept(reg_line, 0, 3.15, [-30, 30]);
+const reg_line_4_ref = LineObj.set_slope_intercept(
+  reg_ref_line,
+  -7.2,
+  2.5,
+  [-30, 30]
+);
+
+const reg_line_2_ref = LineObj.set_slope_intercept(
+  reg_ref_line,
+  -7.5,
+  3.15,
+  [-30, 30]
+);
+
+const reg_line3 = LineObj.set_slope_intercept(reg_line, -7.4, 4, [-30, 30]);
+
+let reg_line_3_ref = new LineObj({
+  id: 1000,
+  start: new Vector2(0, 0),
+  end: new Vector2(0, 0),
+  line_width: 5,
+  color: "#72FFAC",
+});
+reg_line_3_ref = LineObj.set_slope_intercept(
+  reg_line_3_ref,
+  -7.2,
+  2.5,
+  [-30, 30]
+);
 
 for (let i = 0; i < num_new_points; i++) {
   new_point_objs.push(
@@ -231,30 +290,82 @@ for (let i = 0; i < num_points; i++) {
   );
 }
 
+// OUTLIERS
+
+const outlier_positions = [
+  new Vector2(1, 13),
+  new Vector2(3, 16),
+  new Vector2(16, 1),
+  new Vector2(15, 3),
+];
+const outlier_objs = [];
+for (let i = 0; i < outlier_positions.length; i++) {
+  outlier_objs.push(
+    new geomobj({
+      id: 150 + i,
+      geom: new THREE.CircleGeometry(0.23, 128),
+      position: outlier_positions[i],
+      color: "violet",
+      name: `(${outlier_positions[i].x}, ${outlier_positions[i].y})`,
+
+    })
+  );
+}
+
+// OUTLIERS
 
 // SCORE STUFF
 const line_MSE_scorers = Object.keys(MSE_lines).map((key) => {
-    return new objectScorer<LineObj>({
-        id: parseInt(key),
-        get_attribute: (obj: LineObj) => att_funcs.get_length(obj),
-    });
-    })
+  return new objectScorer<LineObj>({
+    id: parseInt(key),
+    get_attribute: (obj: LineObj) => att_funcs.get_length(obj),
+  });
+});
 const line_MSE__tech_scorers = Object.keys(MSE_tech_companies).map((key) => {
-    return new objectScorer<LineObj>({
-        id: parseInt(key),
-        get_attribute: (obj: LineObj) => att_funcs.get_length(obj),
-    });
-    })
+  return new objectScorer<LineObj>({
+    id: parseInt(key),
+    get_attribute: (obj: LineObj) => att_funcs.get_length(obj),
+  });
+});
 
+const ridge_score = new Score<number>({
+  text: "Old Score + New Score term",
+  desc: `$ \\sum_{i=1}^{40} \\text{dist}(\\text{line}, (x_i, y_i))^2 + \\lambda \\cdot \\text{slope}^2 $`,
+  score_id: 2,
+  obj_list: [
+    new objectScorer<LineObj>({
+      id: reg_line3.id,
+      get_attribute: (obj: LineObj) => att_funcs.get_slope_intercept(obj).y,
+    }),
+    new objectScorer<DummyDataStorage<number>>({
+      id: 9910,
+      get_attribute: (obj: DummyDataStorage<number>) => obj.data,
+    }),
+    ...line_MSE_scorers,
+    ...line_MSE__tech_scorers,
+  ],
+  to_string: (val) => (Math.round(val * 100) / 100).toString(),
+  transformation: (vals) => {
+    let sum: number = 0;
+    for (let i = 1; i < vals.length; i++) {
+      sum += vals[i];
+    }
 
-
-
+    return sum + vals[0] ** 2 * vals[1];
+  },
+});
 
 // SCORE STUFF
 
 export const experience_regression: experience_type = {
-  name: "Bias Variance Tradeoff and Linear Regression",
-  slides: ["intro_lin_reg", "lin_reg_flaw", "ridge_regression"],
+  name: "Introduction to Ridge Regression",
+  slides: [
+    "intro_lin_reg",
+    "lin_reg_flaw",
+    "ridge_regression",
+    "ridge_regression_2",
+    "ridge_regression_fail",
+  ],
   description:
     "In this experience, you will learn Ridge Regression, a modification to the standard line of best fit model that is designed to be more robust against outliers.",
 };
@@ -382,8 +493,17 @@ export const data_regression: { [key: string]: data_type } = {
       { type: "control", id: 4 },
     ],
     questions: [
-      "We realized that we initially overlooked data for a few companies. We've now included them in the plot, highlighted in pink. These companies are have inflated stock prices because their buisnesses hold significant future potential.",
-      `We have fixed the slope of the line. Adust the intercept of the line to achieve the optimal score. Adjust to a score of under 155.`,
+      `Our team discovered that we overlooked data for 10 companies. We’ve now incorporated this information into the plot, highlighting these companies in pink. 
+      <br>
+      Observe how these companies have stock prices that are disproportionately high relative to their revenue
+      <br> $\\textbf{Note}$ : The value of the score is irrelevant; our focus is solely on minimizing it.
+      \\[
+            \\text{Score} = \\sum_{i=1}^{40} \\text{dist}(\\text{line}, (x_i, y_i))^2
+    \\]
+    
+The green line represents the line you identified in the previous section, which is the line of best fit for the data without considering the pink companies. <br> <br> 
+        Note that we have changed the sum from $\\sum_{i=1}^{30}$ to $\\sum_{i=1}^{40}$ to account for the 10 pink companies.`,
+      `Adust the intercept of the line to achieve the optimal score. The optimal score is under 155.`,
       "We use the 5 new companies to validate our line once again.",
     ],
     validations: [
@@ -409,7 +529,7 @@ export const data_regression: { [key: string]: data_type } = {
         id: 4,
         title: "New Data",
         description:
-          "In hindsight, do you think the line we fit predicts this new data?",
+          "In hindsight, do you think our red line predicts this new data?",
         options: [
           { id: 1, label: "Yes" },
           { id: 2, label: "No" },
@@ -426,10 +546,11 @@ export const data_regression: { [key: string]: data_type } = {
       CoordinateAxisObj,
       ...point_objs,
       ...new_point_objs,
+      reg_line_4_ref,
     ],
     scoreData: [
       new Score<number>({
-        text: "Line Score",
+        text: "Line Score Including Pink Data",
         score_id: 0,
         obj_list: [...line_MSE_scorers, ...line_MSE__tech_scorers],
         to_string: (val) => (Math.round(val * 10) / 10).toString(),
@@ -448,13 +569,16 @@ export const data_regression: { [key: string]: data_type } = {
   ridge_regression: {
     title: "Fighting the Outliers",
     questions: [
-      `The pink companies are rare, making them special cases we don't often encounter, known as outliers. A savvy team member recommended a modification to our scoring method that is better suited to handling outliers.
+      `The pink companies are commonly known as outliers and they make our model unstable. A savvy team member recommended a modification to our scoring method that is better suited to handling outliers.
         \\[
             \\text{Score} = \\sum_{i=1}^{30} \\text{dist}(\\text{line}, (x_i, y_i))^2  + \\lambda \\cdot \\text{slope}^2
         \\]
 
-        the only change that we make is the addition of the $\\lambda \\cdot \\text{slope}^2$ term `,
-      `We have fixed the intercept of the line this time. Adust the slope of the line to achieve the optimal score. Adjust to a score of under ___.`,
+        The only modification is the addition of the      $\\lambda \\cdot \\text{slope}^2$ term. For now we set $\\lambda = 16$ <br> <br>
+        The green line represents the line of best fit obtained in the previous part i.e. the line that minimizes the score that includes the pink companies. <br> <br>
+        $\\textbf{Note}$: The value of the score is irrelevant; our focus is solely on minimizing it.`,
+      `We have fixed the y-intercept of the line. Adust the slope of the line to achieve the optimal score. Adjust to a score of under 286.`,
+      "Notice how our red line performs well on the new data. This modification to the score made our model more robust against outliers.",
     ],
     order: [
       { type: "question", id: 0 },
@@ -463,24 +587,21 @@ export const data_regression: { [key: string]: data_type } = {
       { type: "score", id: 2 },
       { type: "question", id: 1 },
       { type: "control", id: slope_control.id },
-      { type: "control", id: 5 },
+      { type: "control", id: newPointsEnablerControl.id },
+      { type: "question", id: 2 },
     ],
-    validations: [new Validation_test()],
-    influencesData: [...influences, ...tech_influences],
-    controlData: [
-      slope_control,
-      newPointsEnablerControl,
-      new SliderControl<DummyDataStorage<number>>({
-        id: 5,
-        desc: "Lambda",
-        text: "Adjust the value of lambda to achieve the optimal score",
-        obj_id: 9910,
-        range: [0.1, 10],
-        step_size: 0.1,
-        set_attribute: att_funcs.setDummyValue,
-        get_attribute: att_funcs.getDummyValue,
+    validations: [
+      new Validation_score<number, obj>({
+        target_score: 286,
+        relation: "<=",
+        score_id: ridge_score.score_id,
+        comparator: (a, b) => a - b,
+        error: 0,
+        desc: "Score less than 286",
       }),
     ],
+    influencesData: [...influences, ...tech_influences],
+    controlData: [slope_control, newPointsEnablerControl],
     canvasData: [
       ...Object.values(MSE_lines),
       ...Object.values(MSE_tech_companies),
@@ -489,12 +610,13 @@ export const data_regression: { [key: string]: data_type } = {
       CoordinateAxisObj,
       ...point_objs,
       ...new_point_objs,
-
-      new DummyDataStorage<number>({ id: 9910, name: "data storage", data: 1 }),
+      lambda,
+      reg_line_2_ref,
     ],
     scoreData: [
       new Score<number>({
-        text: "Old Line Score",
+        text: "Old Score",
+        desc: `$\\sum_{i=1}^{40} \\text{dist}(\\text{line}, (x_i, y_i))^2$`,
         score_id: 0,
         obj_list: [...line_MSE_scorers, ...line_MSE__tech_scorers],
         to_string: (val) => (Math.round(val * 10) / 10).toString(),
@@ -508,47 +630,253 @@ export const data_regression: { [key: string]: data_type } = {
       }),
       new Score<number>({
         text: "New Score term",
+        desc: `$   \\lambda \\cdot \\text{slope}^2 $`,
         score_id: 1,
         obj_list: [
-            new objectScorer<LineObj>(
-                {id: reg_line3.id, get_attribute: (obj: LineObj) => att_funcs.get_slope_intercept(obj).y},
-            ),
-            new objectScorer<DummyDataStorage<number>>(
-                {id: 9910, get_attribute: (obj: DummyDataStorage<number>) => obj.data},
-            )
-            
+          new objectScorer<LineObj>({
+            id: reg_line3.id,
+            get_attribute: (obj: LineObj) =>
+              att_funcs.get_slope_intercept(obj).y,
+          }),
+          new objectScorer<DummyDataStorage<number>>({
+            id: 9910,
+            get_attribute: (obj: DummyDataStorage<number>) => obj.data,
+          }),
         ],
         to_string: (val) => (Math.round(val * 100) / 100).toString(),
         transformation: (vals) => {
-        
-          return vals[0] ** 2 * vals[1]; ;
+          return vals[0] ** 2 * vals[1];
         },
       }),
 
-      new Score<number>({
-        text: "Full Score",
-        score_id: 2,
-        obj_list: [
-            new objectScorer<LineObj>(
-                {id: reg_line3.id, get_attribute: (obj: LineObj) => att_funcs.get_slope_intercept(obj).y},
-            ),
-            new objectScorer<DummyDataStorage<number>>(
-                {id: 9910, get_attribute: (obj: DummyDataStorage<number>) => obj.data},
-            ),
-            ...line_MSE_scorers,
-            ...line_MSE__tech_scorers
-        ],
-        to_string: (val) => (Math.round(val * 100) / 100).toString(),
-        transformation: (vals) => {
-            let sum: number = 0;
-            for (let i = 2; i < vals.length; i++) {
-                sum += vals[i];
-              }
-          return sum + vals[0] ** 2 * vals[1];
-        },
-      }),
-      
+      ridge_score,
     ],
     placement: null,
+  },
+
+  ridge_regression_2: {
+    title: "A game of tug-of-war",
+    order: [
+      { type: "question", id: 0 },
+      { type: "score", id: 0 },
+      { type: "question", id: 1 },
+      { type: "score", id: ridge_score.score_id },
+      { type: "question", id: 2 },
+      { type: "control", id: lambda_slider.id },
+      { type: "control", id: slope_control.id },
+      { type: "control", id: 4 },
+      { type: "question", id: 3 },
+    ],
+    questions: [
+      `This modification to the score is called Ridge Regression and it works well in this case. <br> <br> However, a natural question to ask is: how do we choose a good $\\lambda$?:
+            \\[
+            \\text{Score} = \\sum_{i=1}^{30} \\text{dist}(\\text{line}, (x_i, y_i))^2  + \\lambda \\cdot \\text{slope}^2
+        \\] 
+        <br>
+        $\\textbf{Reminder}$: The value of the score is irrelevant; our focus is solely on minimizing it : `,
+      "Consider how $\\lambda$ affects the minimization of the above equation. Test your hypothesis by adjusting the sliders. After experimenting, proceed to answer the question below",
+      `$\\textbf{Hint} $: First, examine the score equation and attempt to infer the purpose of the two terms. To test your hypothesis, set 
+$\\lambda$ to a very large value, and adjust the line to minimize the score. Afterward, repeat the process with $\\lambda$ set to a very small value.`,
+      `Notice that this is like a game of tug-of-war: the outliers are pulling the slope of the line higher to keep the first term of the score small, while the 
+$\\lambda \\cdot \\text{slope}^2 $ term is pulling the slope lower to minimize the second term. These two forces are working in opposition. The ideal value for  $\\lambda $ depends on the specific problem, and finding the optimal value often involves a process of trial and error`,
+    ],
+    validations: [
+      new ValidationMultiChoice({
+        control_id: 4,
+        answer: [1, 2],
+        desc: "MCQ 1",
+      }),
+    ],
+    influencesData: [...influences, ...tech_influences],
+    controlData: [
+      lambda_slider,
+      new SliderControl<LineObj>({
+        desc: "Slope",
+        text: "move this slider to adjust the slope of the line",
+        id: 1,
+        obj_id: 1000,
+        range: [-1, 10],
+        step_size: 0.1,
+        set_attribute: att_funcs.set_slope,
+        get_attribute: att_funcs.get_slope,
+      }),
+      new MultiChoiceClass({
+        id: 4,
+        title: "The choice of $\\lambda$",
+        description: "Choose the options that are true",
+        options: [
+          {
+            id: 1,
+            label:
+              "A greater value of $\\lambda$ tends to decrease the magnitude of the slope of the line",
+          },
+          {
+            id: 2,
+            label:
+              "A smaller value of $\\lambda$ tends to amplify the influence of outliers on the slope of the line",
+          },
+          {
+            id: 3,
+            label:
+              "If $\\lambda$ is set to 0 then the slope of the line tends to $0$",
+          },
+          {
+            id: 4,
+            label: "A larger value of $\\lambda$ is better in all situations",
+          },
+        ],
+        isMultiSelect: true,
+        isClickable: true,
+      }),
+    ],
+
+    canvasData: [
+      ...Object.values(MSE_lines),
+      ...Object.values(MSE_tech_companies),
+      ...pointobjs_tech_companies,
+      CoordinateAxisObj,
+      ...point_objs,
+      ...new_point_objs,
+      lambda,
+      reg_line3,
+    ],
+    scoreData: [ridge_score],
+    placement: null,
+  },
+
+  ridge_regression_fail: {
+    title: "The Necessary Evil",
+    order: [
+      { type: "question", id: 0 },
+      { type: "score", id: ridge_score.score_id },
+      { type: "question", id: 1 },
+      { type: "control", id: 0 },
+      { type: "control", id: 1 },
+      {type: "question", id: 2},
+        {type: "control", id: 2},
+        {type: "question", id: 3},
+      { type: "placement", id: 0 },
+    ],
+    questions: [
+      `Even if we succeed in selecting an optimal $ \\lambda $, this method is not foolproof. We will construct a scenario where ridge regression fails.
+
+To recap, the goal of ridge regression is to adjust the slope and intercept of a line in order to minimize the following score:
+\\[
+\\text{Score} = \\sum_{i=1}^{30} \\text{dist}(\\text{line}, (x_i, y_i))^2 + \\lambda \\cdot \\text{slope}^2
+\\]
+For reference, the green line represents the true relation between the stock prices and revenue of a company. <br> <br>`,
+      `Notice that we have added 4 pink outlier data points. Answer the below questions by selecting the relevant pink points.`,
+      `As a reminder ridge regression is designed to penalize large slopes, but is penalizing large slopes always beneficial to control any outlier?`,
+      `Select an outlier that would cause ridge regression to move the line in the wrong direction. i.e. help the outliers instead of penalizing them.`,
+    ],
+    validations: [new Validation_select(
+        {
+            control_id: 0,
+            answer: [outlier_objs[0].id, outlier_objs[1].id],
+            desc: "2 outliers increase the slope",
+        }
+    ),
+    new Validation_select(
+        {
+            control_id: 1,
+            answer: [outlier_objs[2].id, outlier_objs[3].id],
+            desc: "2 outliers decrease the slope",
+        }),
+    new Validation_obj<Vector2>(
+        {
+            obj_id: 998,
+            desc: "outlier placed correctly",
+            answer: outlier_placement_choices[1],
+            get_attribute: att_funcs.get_position,
+        },
+    
+        
+    ),
+    new ValidationMultiChoice({
+        control_id: 2,
+        answer: [1],
+        desc: "MCQ 1",
+    }),
+    ],
+    influencesData: [...influences],
+    controlData: [
+      new SelectControl({
+        id: 0,
+        selectable: [
+          outlier_objs[0].id,
+          outlier_objs[1].id,
+          outlier_objs[2].id,
+          outlier_objs[3].id,
+        ],
+        selected: [],
+        text: "Select 2 outliers that tends to increase the slope of our green line of best fit",
+        desc: "Click to Select",
+        capacity: 2,
+      }),
+      new SelectControl({
+        id: 1,
+        selectable: [
+          outlier_objs[0].id,
+          outlier_objs[1].id,
+          outlier_objs[2].id,
+          outlier_objs[3].id,
+        ],
+        selected: [],
+        text: "Select the 2 outlier that tends to decrease the slope of our line of best fit",
+        desc: "Click to Select",
+        capacity: 2,
+      }),
+
+      new MultiChoiceClass({
+        id: 2,
+        title: "Penalizing Large Slopes",
+        description: "Do you think penalizing large slopes is always a good idea to control outliers?",
+        options: [
+            {
+              id: 1,
+              label:
+                "No - penalizing large slopes does not work if the outliers lie below the true line",
+            },
+            {
+                id: 3,
+                label:
+                  "No - penalizing large slopes does not work if the outliers lie above the true line",
+              },
+            {
+              id: 2,
+              label:
+                "Yes - penalizing large slopes is always beneficial",
+            },
+            
+          ],
+          isMultiSelect: false,
+          isClickable: true,
+      })
+    ],
+    canvasData: [
+      ...Object.values(MSE_lines),
+      reg_line_3_ref,
+      CoordinateAxisObj,
+      ...point_objs,
+      lambda,
+      ...outlier_objs,
+
+      //   new geomobj({
+      //     id: 999,
+      //     geom: new THREE.CircleGeometry(0.23, 128),
+      //     position: new Vector2(0, 0),
+      //     color: "#72FFAC",
+      //   }),
+    ],
+    scoreData: [ridge_score],
+    placement: new Placement({
+      grid: [0, 0],
+      cellSize: 0,
+
+      gridVectors: outlier_placement_choices,
+      object_ids: [998],
+      geometry: new THREE.CircleGeometry(0.23, 128),
+      color: "violet",
+    }),
   },
 };

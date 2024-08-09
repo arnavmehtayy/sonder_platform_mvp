@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { getControlSelector, useStore, setMultiChoiceOptionsSelector } from "../store";
 import { MultiChoiceClass } from "@/classes/MultiChoiceClass";
+import Latex from "react-latex-next";
 
 export interface Option {
   id: number;
@@ -42,8 +43,8 @@ export default function MultiChoice({ control_id }: { control_id: number }) {
         !isClickable ? "opacity-70" : ""
       }`}
     >
-      <h3 className="text-lg font-semibold text-blue-800 mb-2"> {title} </h3>
-      <p className="text-gray-600 mb-2"> {description} </p>
+      <h3 className="text-lg font-semibold text-blue-800 mb-2"> <Latex>{title}</Latex> </h3>
+      <p className="text-gray-600 mb-2"> <Latex>{description}</Latex> </p>
       <div className="space-y-3">
         {options.map((option) => (
           <button
@@ -90,7 +91,7 @@ export default function MultiChoice({ control_id }: { control_id: number }) {
                   </svg>
                 )}
               </div>
-              <span className="text">{option.label}</span>
+              <span className="text"> <Latex>{option.label}</Latex></span>
             </div>
           </button>
         ))}

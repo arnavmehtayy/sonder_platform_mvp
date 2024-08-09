@@ -5,6 +5,7 @@ import {
   useControlValueSelector, 
 } from "../store";
 import { SliderControl } from "@/classes/SliderControl";
+import Latex from "react-latex-next";
 
 export default function NumSlide({control_id }: { control_id: number }) {
   const setValue = useStore(setControlValueSelector(control_id));
@@ -16,8 +17,8 @@ export default function NumSlide({control_id }: { control_id: number }) {
 
   return (
     <div className={`bg-white rounded-lg shadow-md p-4 ${!isActive ? 'opacity-50' : ''} relative`}>
-      <h3 className="text-lg font-semibold text-blue-800 mb-2">{control.desc}</h3>
-      <p className=" text-gray-600 mb-2"> {control.text} </p>
+      <h3 className="text-lg font-semibold text-blue-800 mb-2"><Latex> {control.desc} </Latex></h3>
+      <p className=" text-gray-600 mb-2"> <Latex>{control.text}</Latex>  </p>
       <div className="relative pt-1">
         <input
           type="range"
