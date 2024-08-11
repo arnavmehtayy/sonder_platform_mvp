@@ -4,6 +4,9 @@ import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { initDataSets, experiences as exp} from "@/classes/Data/CompleteData";
 import { ChevronRight, Activity, Eye } from 'lucide-react';
+import Image from 'next/image';
+import Logo from '@/images/Sonder logo with text.png'
+
 
 const ExperienceCard = ({ name, slides, index, description }: { name: string; slides: string[]; index: number; description: string }) => {
   const [isHovered, setIsHovered] = useState(false);
@@ -53,39 +56,51 @@ const ExperienceHub = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-neutral-800 to-neutral-800 overflow-auto">
-      <div className="max-w-7xl mx-auto py-16 px-4 sm:px-6 lg:px-8">
-        <motion.h1
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-          className="text-4xl font-extrabold text-center text-white mb-4"
-        >
-          Interactive Experiences
-        </motion.h1>
-        <motion.p
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.2 }}
-          className="text-xl text-center text-white mb-12"
-        >
-          Dive into a world of 3D visualizations and simulations
-        </motion.p>
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.4 }}
-          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
-        >
-          {experiences.map((experience, index) => (
-            <ExperienceCard
-              key={experience.name}
-              name={experience.name}
-              slides={experience.slides}
-              index={index}
-              description={experience.description}
-            />
-          ))}
-        </motion.div>
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="py-4">
+          <Image
+            src={Logo}
+            alt="Company Logo"
+            width={217} // Adjust these values to fit your layout
+            height={60} // These are scaled down significantly from the original size
+            className="mx-auto"
+            priority
+          />
+        </div>
+        <div className="py-12">
+          <motion.h1
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+            className="text-4xl font-extrabold text-center text-white mb-4"
+          >
+            Visual Interactive Experience 
+          </motion.h1>
+          <motion.p
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.2 }}
+            className="text-xl text-center text-white mb-12"
+          >
+            Dive into a world of 3D visualizations and simulations
+          </motion.p>
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.4 }}
+            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
+          >
+            {experiences.map((experience, index) => (
+              <ExperienceCard
+                key={experience.name}
+                name={experience.name}
+                slides={experience.slides}
+                index={index}
+                description={experience.description}
+              />
+            ))}
+          </motion.div>
+        </div>
       </div>
     </div>
   );

@@ -4,6 +4,8 @@ import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { Calendar, FileText, Lightbulb, Home } from 'lucide-react';
 import { FeedbackComponent } from '@/app/Components/MainMenu/FeedbackComponent';
+import Image from 'next/image';
+import Logo from '@/images/LogoSonderWithText.png';
 
 interface NextStepCardProps {
     title: string;
@@ -53,6 +55,7 @@ export default function Thank_you_page({ params }: { params: { id: string } }) {
                     <h1 className="text-4xl font-bold text-white mb-2">Thank You!</h1>
                     <p className="text-xl text-[#E6F3F5]">For Completing Experience {id}</p>
                 </div>
+                
                 <div className="px-6 py-8 flex-grow flex flex-col justify-between">
                     <div>
                         <p className="text-lg text-gray-700 mb-6 text-center max-w-3xl mx-auto">
@@ -102,6 +105,8 @@ export default function Thank_you_page({ params }: { params: { id: string } }) {
                     </div>
                 </div>
             </motion.div>
+
+            
             <FeedbackComponent />
         </div>
     );
