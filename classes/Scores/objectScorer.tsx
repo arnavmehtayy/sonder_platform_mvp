@@ -1,4 +1,4 @@
-import { obj } from "./vizobjects/obj";
+import { obj } from "../vizobjects/obj";
 
 export class objectScorer<obj_T extends obj> {
   id: number;
