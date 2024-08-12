@@ -1,8 +1,12 @@
 import { NextResponse } from 'next/server';
 import { sql } from '@vercel/postgres';
 
+/*
+Handle sending information to Vercel's postgres database
+Current usage: To store Feedback Information in the Database
+*/
+
 export async function POST(request: Request) {
-  console.log('Feedback API route hit');
   try {
     const { feedback, email } = await request.json();
     console.log('Received feedback:', feedback, 'Email:', email);

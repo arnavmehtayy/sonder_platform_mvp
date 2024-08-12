@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { CheckCircle, XCircle } from 'react-feather';
-import Validation from '@/classes/Validation';
+import Validation from '@/classes/Validation/Validation';
 import { useStore } from '@/app/store';
 
 const ValidationComponent = ({ validations, updater }: {validations: Validation[], updater: () => void}) => {

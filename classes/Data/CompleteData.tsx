@@ -1,21 +1,17 @@
-import { experience_regression, data_regression} from "./RidgeRegression";
-import { Control } from "../Control";
-import { obj } from "../obj";
+import { experience_regression, data_regression } from "./RidgeRegression";
+import { Control } from "../Controls/Control";
+import { obj } from "../vizobjects/obj";
 import { Influence } from "../influence";
 import { Vector2, Vector3 } from "three";
 
-import { Score } from "../Score";
+import { Score } from "../Scores/Score";
 import Placement from "../Placement";
 
-import Validation from "../Validation";
+import Validation from "../Validation/Validation";
 
-import Validation_test from "../Validation_test";
+import Validation_test from "../Validation/Validation_test";
 
-import { OrderItem } from "@/app/Components/OrderHandler";
-
-
-
-
+import { OrderItem } from "@/app/Components/Sidebar/OrderHandler";
 
 export type data_type = {
   title: string;
@@ -36,7 +32,8 @@ export type experience_type = {
 };
 
 export const experiences: experience_type[] = [experience_regression];
-export const initDataSets: { default: data_type, [key: string]: data_type } = {default: {
+export const initDataSets: { default: data_type; [key: string]: data_type } = {
+  default: {
     title: "Question default",
     order: [{ type: "question", id: 0 }],
     questions: ["This is default", "This"],
@@ -46,4 +43,6 @@ export const initDataSets: { default: data_type, [key: string]: data_type } = {d
     canvasData: [],
     scoreData: [],
     placement: null,
-  } , ...data_regression }
+  },
+  ...data_regression,
+};

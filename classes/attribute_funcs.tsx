@@ -1,8 +1,8 @@
 import { Line, Vector2, Vector3 } from "three";
-import { TransformObj } from "./transformObj";
-import { LineObj } from "./Lineobj";
-import { DummyDataStorage, DummyDataSupportedTypes } from "./DummyDataStore";
-import { obj } from "./obj";
+import { TransformObj } from "./vizobjects/transformObj";
+import { LineObj } from "./vizobjects/Lineobj";
+import { DummyDataStorage, DummyDataSupportedTypes } from "./vizobjects/DummyDataStore";
+import { obj } from "./vizobjects/obj";
 
 /*
     * This file contains the functions to get and set the attributes of a vizobj.
@@ -41,7 +41,8 @@ export function get_slope(obj: LineObj): number {
   return obj.get_slope_intercept()[1];
 }
 
-export function set_slope(obj: LineObj, value: number): LineObj { // change
+export function set_slope(obj: LineObj, value: number): LineObj {
+  // change
   const slope_intercept = obj.get_slope_intercept();
   slope_intercept[1] = value;
   const new_obj = LineObj.set_slope_intercept(
@@ -55,17 +56,18 @@ export function set_slope(obj: LineObj, value: number): LineObj { // change
 }
 
 export function get_length(obj: LineObj): number {
-if(obj instanceof LineObj) {
-  return obj.get_length();
-}
-return 0;
+  if (obj instanceof LineObj) {
+    return obj.get_length();
+  }
+  return 0;
 }
 
 export function get_intercept(obj: LineObj): number {
   return obj.get_slope_intercept()[0];
 }
 
-export function set_intercept(obj: LineObj, value: number): LineObj { // change
+export function set_intercept(obj: LineObj, value: number): LineObj {
+  // change
   const slope_intercept = obj.get_slope_intercept();
   const new_obj = LineObj.set_slope_intercept(
     obj,
@@ -78,8 +80,8 @@ export function set_intercept(obj: LineObj, value: number): LineObj { // change
 }
 
 export function get_position(obj: TransformObj): Vector2 {
-  if(obj) {
-  return obj.position;
+  if (obj) {
+    return obj.position;
   }
   return new Vector2(0, 0);
 }
@@ -115,12 +117,17 @@ export function set_scale<T>(obj: T, value: Vector3): T {
   const new_obj = Object.assign(Object.create(Object.getPrototypeOf(obj)), obj);
   new_obj.scale = value;
   return new_obj;
-} 
+}
 
-export function getDummyValue<T extends DummyDataSupportedTypes>(obj: DummyDataStorage<T>): T {
+export function getDummyValue<T extends DummyDataSupportedTypes>(
+  obj: DummyDataStorage<T>
+): T {
   return obj.data;
 }
 
-export function setDummyValue<T extends DummyDataSupportedTypes>(obj: DummyDataStorage<T>, value: T): DummyDataStorage<T> {
+export function setDummyValue<T extends DummyDataSupportedTypes>(
+  obj: DummyDataStorage<T>,
+  value: T
+): DummyDataStorage<T> {
   return DummyDataStorage.setData(obj, value);
 }

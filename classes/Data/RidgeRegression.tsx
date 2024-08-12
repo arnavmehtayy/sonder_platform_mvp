@@ -1,38 +1,38 @@
-import { Control } from "../Control";
-import { obj } from "../obj";
+import { Control } from "../Controls/Control";
+import { obj } from "../vizobjects/obj";
 import { Influence } from "../influence";
 import { Vector2, Vector3 } from "three";
 import * as att_funcs from "../attribute_funcs";
-import { SliderControl } from "../SliderControl";
-import { TouchControl } from "../TouchControl";
+import { SliderControl } from "../Controls/SliderControl";
+import { TouchControl } from "../Controls/TouchControl";
 import * as THREE from "three";
-import { LineObj } from "../Lineobj";
-import { geomobj } from "../geomobj";
-import { SelectControl } from "../SelectControl";
-import { SlideContTrans } from "../SliderContTrans";
-import { TransformObj } from "../transformObj";
-import { Score } from "../Score";
+import { LineObj } from "../vizobjects/Lineobj";
+import { geomobj } from "../vizobjects/geomobj";
+import { SelectControl } from "../Controls/SelectControl";
+import { SlideContTrans } from "../Controls/SliderContTrans";
+import { TransformObj } from "../vizobjects/transformObj";
+import { Score } from "../Scores/Score";
 import Placement from "../Placement";
-import TextGeom from "../textgeom";
-import CoordinateAxis from "../CoordinateAxis";
-import Validation from "../Validation";
-import Validation_obj from "../Validation_obj";
-import Validation_test from "../Validation_test";
-import Validation_select from "../Validation_select";
-import Validation_score from "../Validation_score";
-import { MultiChoiceClass } from "../MultiChoiceClass";
-import { ValidationMultiChoice } from "../ValidationMultiChoice";
-import { InputNumber } from "../InputNumber";
-import { Validation_inputNumber } from "../Validation_inputNumber";
+import TextGeom from "../vizobjects/textgeomObj";
+import CoordinateAxis from "../vizobjects/CoordinateAxis";
+import Validation from "../Validation/Validation";
+import Validation_obj from "../Validation/Validation_obj";
+import Validation_test from "../Validation/Validation_test";
+import Validation_select from "../Validation/Validation_select";
+import Validation_score from "../Validation/Validation_score";
+import { MultiChoiceClass } from "../Controls/MultiChoiceClass";
+import { ValidationMultiChoice } from "../Validation/ValidationMultiChoice";
+import { InputNumber } from "../Controls/InputNumber";
+import { Validation_inputNumber } from "../Validation/Validation_inputNumber";
 import { init } from "next/dist/compiled/webpack/webpack";
-import FunctionPlot from "../FunctionPlot";
-import { OrderItem } from "@/app/Components/OrderHandler";
-import { EnablerControl } from "../EnablerControl";
+import FunctionPlot from "../vizobjects/FunctionPlot";
+import { OrderItem } from "@/app/Components/Sidebar/OrderHandler";
+import { EnablerControl } from "../Controls/EnablerControl";
 import { seededRandom } from "three/src/math/MathUtils.js";
 
 import { data_type, experience_type } from "./CompleteData";
-import { DummyDataStorage } from "../DummyDataStore";
-import { objectScorer } from "../objectScorer";
+import { DummyDataStorage } from "../vizobjects/DummyDataStore";
+import { objectScorer } from "../Scores/objectScorer";
 import { getScore } from "@/app/store";
 
 const num_points = 30;
@@ -150,7 +150,7 @@ reg_line = LineObj.set_slope_intercept(reg_line, 0, 0.3, [-30, 30]);
 const outlier_placement_choices = [
   new Vector2(2, 14),
   new Vector2(14, 2),
-  new Vector2(8,10),
+  new Vector2(8, 10),
   new Vector2(4, 1),
 ];
 
@@ -307,7 +307,6 @@ for (let i = 0; i < outlier_positions.length; i++) {
       position: outlier_positions[i],
       color: "violet",
       name: `(${outlier_positions[i].x}, ${outlier_positions[i].y})`,
-
     })
   );
 }
@@ -390,7 +389,7 @@ export const data_regression: { [key: string]: data_type } = {
         We are studying the relationship between a company's average stock price and its revenue over a year using data from 30 companies. 
 
         <br> <br> 
-        We observe a linear relationship and fit a line to this data. We evaluate how well the line fits by calculating the score:
+        We observe a linear relationship and so we will endeavor to fit a line to this data. We use the following metric that scores how well the line fits the data points:
 
         \\[
             \\text{Score} = \\sum_{i=1}^{30} \\text{dist}(\\text{line}, (x_i, y_i))^2
@@ -400,8 +399,8 @@ export const data_regression: { [key: string]: data_type } = {
         <br> <br>
 
         In simpler terms, we look at the 30 points on the graph, measure the distance from each point to the line, square these distances, and then add them all up.`,
-      `Adust the slope and intercept of the line to achieve the optimal score.`,
-      `We received information on 5 new companies yesterday, and we are going to use this to validate our line.`,
+      `Adust the slope and intercept of the line to get as close to the optimal score as you can.`,
+      `We received information on 5 new companies yesterday, and we will use this to validate our line.`,
     ],
     validations: [
       new Validation_score<number, obj>({
@@ -430,7 +429,7 @@ export const data_regression: { [key: string]: data_type } = {
         isMultiSelect: false,
         isClickable: true,
         title: "Score Goal",
-        description: `What value should we aim to achieve as our score in order to 'fit' our line to the data?`,
+        description: `What score value should we aim to achieve in order to 'fit' our line to the data?`,
         options: [
           { id: 1, label: "A really large positive number" },
           { id: 2, label: "A really large negative number" },
@@ -446,7 +445,7 @@ export const data_regression: { [key: string]: data_type } = {
         id: 4,
         title: "New Data",
         description:
-          "In hindsight, do you think the line we fit predicts this new data?",
+          "In hindsight, do you think the line you fit predicts this new data?",
         options: [
           { id: 1, label: "Yes" },
           { id: 2, label: "No" },
@@ -484,8 +483,8 @@ export const data_regression: { [key: string]: data_type } = {
     title: "A Flaw in our Score",
     order: [
       { type: "question", id: 0 },
-      { type: "question", id: 1 },
       { type: "score", id: 0 },
+      { type: "question", id: 1 },
 
       { type: "control", id: 2 },
       { type: "question", id: 2 },
@@ -494,16 +493,21 @@ export const data_regression: { [key: string]: data_type } = {
     ],
     questions: [
       `Our team discovered that we overlooked data for 10 companies. We’ve now incorporated this information into the plot, highlighting these companies in pink. 
-      <br>
-      Observe how these companies have stock prices that are disproportionately high relative to their revenue
-      <br> $\\textbf{Note}$ : The value of the score is irrelevant; our focus is solely on minimizing it.
+      <br> <br>
+      Observe how these companies have stock prices that are disproportionately high relative to their revenue. <br> <br>
+      The green line represents the line you identified in the previous section, which is the line of best fit for the data without considering the pink companies.
+      <br> <br>
+      We adjust our score to account for the addition of the pink data points to our analysis.
+      
       \\[
             \\text{Score} = \\sum_{i=1}^{40} \\text{dist}(\\text{line}, (x_i, y_i))^2
     \\]
+    Note that we have changed the sum from $\\sum_{i=1}^{30}$ to $\\sum_{i=1}^{40}$ to account for the 10 pink companies.
+    <br> <br>
+$\\textbf{Note}$ : The value of the score is irrelevant; our focus is solely on minimizing it.
     
-The green line represents the line you identified in the previous section, which is the line of best fit for the data without considering the pink companies. <br> <br> 
-        Note that we have changed the sum from $\\sum_{i=1}^{30}$ to $\\sum_{i=1}^{40}$ to account for the 10 pink companies.`,
-      `Adust the intercept of the line to achieve the optimal score. The optimal score is under 155.`,
+        `,
+      `For simplicity we have fixed the slope. Adust the intercept of the line to achieve the optimal score. The optimal score is under 155.`,
       "We use the 5 new companies to validate our line once again.",
     ],
     validations: [
@@ -574,7 +578,7 @@ The green line represents the line you identified in the previous section, which
             \\text{Score} = \\sum_{i=1}^{30} \\text{dist}(\\text{line}, (x_i, y_i))^2  + \\lambda \\cdot \\text{slope}^2
         \\]
 
-        The only modification is the addition of the      $\\lambda \\cdot \\text{slope}^2$ term. For now we set $\\lambda = 16$ <br> <br>
+        The only modification is the addition of the      $\\lambda \\cdot \\text{slope}^2$ term. For now we set $\\lambda = 16$. We will address the choice of $\\lambda$ a little later<br> <br>
         The green line represents the line of best fit obtained in the previous part i.e. the line that minimizes the score that includes the pink companies. <br> <br>
         $\\textbf{Note}$: The value of the score is irrelevant; our focus is solely on minimizing it.`,
       `We have fixed the y-intercept of the line. Adust the slope of the line to achieve the optimal score. Adjust to a score of under 286.`,
@@ -615,7 +619,7 @@ The green line represents the line you identified in the previous section, which
     ],
     scoreData: [
       new Score<number>({
-        text: "Old Score",
+        text: "Old Score Including Pink Data",
         desc: `$\\sum_{i=1}^{40} \\text{dist}(\\text{line}, (x_i, y_i))^2$`,
         score_id: 0,
         obj_list: [...line_MSE_scorers, ...line_MSE__tech_scorers],
@@ -668,15 +672,16 @@ The green line represents the line you identified in the previous section, which
       { type: "question", id: 3 },
     ],
     questions: [
-      `This modification to the score is called Ridge Regression and it works well in this case. <br> <br> However, a natural question to ask is: how do we choose a good $\\lambda$?:
+      `This modification to the score is called Ridge Regression and it works well to correct the line in this case. <br> <br> However, a natural question to ask is: how do we choose $\\lambda$?:
             \\[
             \\text{Score} = \\sum_{i=1}^{30} \\text{dist}(\\text{line}, (x_i, y_i))^2  + \\lambda \\cdot \\text{slope}^2
         \\] 
         <br>
-        $\\textbf{Reminder}$: The value of the score is irrelevant; our focus is solely on minimizing it : `,
+         `,
       "Consider how $\\lambda$ affects the minimization of the above equation. Test your hypothesis by adjusting the sliders. After experimenting, proceed to answer the question below",
       `$\\textbf{Hint} $: First, examine the score equation and attempt to infer the purpose of the two terms. To test your hypothesis, set 
-$\\lambda$ to a very large value, and adjust the line to minimize the score. Afterward, repeat the process with $\\lambda$ set to a very small value.`,
+$\\lambda$ to a very large value, and adjust the line to minimize the score. Afterward, repeat the process with $\\lambda$ set to a very small value.
+<br> <br> $\\textbf{Reminder}$: The value of the score is irrelevant; our focus is solely on minimizing it :`,
       `Notice that this is like a game of tug-of-war: the outliers are pulling the slope of the line higher to keep the first term of the score small, while the 
 $\\lambda \\cdot \\text{slope}^2 $ term is pulling the slope lower to minimize the second term. These two forces are working in opposition. The ideal value for  $\\lambda $ depends on the specific problem, and finding the optimal value often involves a process of trial and error`,
     ],
@@ -703,17 +708,17 @@ $\\lambda \\cdot \\text{slope}^2 $ term is pulling the slope lower to minimize t
       new MultiChoiceClass({
         id: 4,
         title: "The choice of $\\lambda$",
-        description: "Choose the options that are true",
+        description: "Choose all the options that are true",
         options: [
           {
             id: 1,
             label:
-              "A greater value of $\\lambda$ tends to decrease the magnitude of the slope of the line",
+              "A greater value of $\\lambda$ tend to decrease the magnitude of the slope of the line",
           },
           {
             id: 2,
             label:
-              "A smaller value of $\\lambda$ tends to amplify the influence of outliers on the slope of the line",
+              "A smaller value of $\\lambda$ tend to amplify the influence of outliers on the slope of the line",
           },
           {
             id: 3,
@@ -748,13 +753,13 @@ $\\lambda \\cdot \\text{slope}^2 $ term is pulling the slope lower to minimize t
     title: "The Necessary Evil",
     order: [
       { type: "question", id: 0 },
-      { type: "score", id: ridge_score.score_id },
+      // { type: "score", id: ridge_score.score_id },
       { type: "question", id: 1 },
       { type: "control", id: 0 },
       { type: "control", id: 1 },
-      {type: "question", id: 2},
-        {type: "control", id: 2},
-        {type: "question", id: 3},
+      { type: "question", id: 2 },
+      { type: "control", id: 2 },
+      { type: "question", id: 3 },
       { type: "placement", id: 0 },
     ],
     questions: [
@@ -767,36 +772,30 @@ To recap, the goal of ridge regression is to adjust the slope and intercept of a
 For reference, the green line represents the true relation between the stock prices and revenue of a company. <br> <br>`,
       `Notice that we have added 4 pink outlier data points. Answer the below questions by selecting the relevant pink points.`,
       `As a reminder ridge regression is designed to penalize large slopes, but is penalizing large slopes always beneficial to control any outlier?`,
-      `Select an outlier that would cause ridge regression to move the line in the wrong direction. i.e. help the outliers instead of penalizing them.`,
+      `Select an outlier that would cause ridge regression to move the slope of the line in the wrong direction. A wrong direction is that which moves the line away from the true line`,
     ],
-    validations: [new Validation_select(
-        {
-            control_id: 0,
-            answer: [outlier_objs[0].id, outlier_objs[1].id],
-            desc: "2 outliers increase the slope",
-        }
-    ),
-    new Validation_select(
-        {
-            control_id: 1,
-            answer: [outlier_objs[2].id, outlier_objs[3].id],
-            desc: "2 outliers decrease the slope",
-        }),
-    new Validation_obj<Vector2>(
-        {
-            obj_id: 998,
-            desc: "outlier placed correctly",
-            answer: outlier_placement_choices[1],
-            get_attribute: att_funcs.get_position,
-        },
-    
-        
-    ),
-    new ValidationMultiChoice({
+    validations: [
+      new Validation_select({
+        control_id: 0,
+        answer: [outlier_objs[0].id, outlier_objs[1].id],
+        desc: "2 outliers increase the slope",
+      }),
+      new Validation_select({
+        control_id: 1,
+        answer: [outlier_objs[2].id, outlier_objs[3].id],
+        desc: "2 outliers decrease the slope",
+      }),
+      new Validation_obj<Vector2>({
+        obj_id: 998,
+        desc: "outlier placed correctly",
+        answer: outlier_placement_choices[1],
+        get_attribute: att_funcs.get_position,
+      }),
+      new ValidationMultiChoice({
         control_id: 2,
         answer: [1],
         desc: "MCQ 1",
-    }),
+      }),
     ],
     influencesData: [...influences],
     controlData: [
@@ -830,28 +829,27 @@ For reference, the green line represents the true relation between the stock pri
       new MultiChoiceClass({
         id: 2,
         title: "Penalizing Large Slopes",
-        description: "Do you think penalizing large slopes is always a good idea to control outliers?",
+        description:
+          "Do you think penalizing large slopes is always a good idea to control outliers?",
         options: [
-            {
-              id: 1,
-              label:
-                "No - penalizing large slopes does not work if the outliers lie below the true line",
-            },
-            {
-                id: 3,
-                label:
-                  "No - penalizing large slopes does not work if the outliers lie above the true line",
-              },
-            {
-              id: 2,
-              label:
-                "Yes - penalizing large slopes is always beneficial",
-            },
-            
-          ],
-          isMultiSelect: false,
-          isClickable: true,
-      })
+          {
+            id: 1,
+            label:
+              "No - penalizing large slopes does not work if the outliers lie below the true line",
+          },
+          {
+            id: 3,
+            label:
+              "No - penalizing large slopes does not work if the outliers lie above the true line",
+          },
+          {
+            id: 2,
+            label: "Yes - penalizing large slopes is always beneficial",
+          },
+        ],
+        isMultiSelect: false,
+        isClickable: true,
+      }),
     ],
     canvasData: [
       ...Object.values(MSE_lines),
@@ -868,7 +866,7 @@ For reference, the green line represents the true relation between the stock pri
       //     color: "#72FFAC",
       //   }),
     ],
-    scoreData: [ridge_score],
+    scoreData: [],
     placement: new Placement({
       grid: [0, 0],
       cellSize: 0,

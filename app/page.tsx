@@ -1,7 +1,6 @@
 "use client";
 import React, { useState, useEffect } from "react";
-import { Minigame } from "./Components/Minigame";
-import ExperienceManager from "./Components/ExperienceManager";
+import { Minigame } from "./Components/Sidebar/Minigame";
 import { preventZoom } from "./preventZoom";
 import ExperienceHub from "@/app/Components/MainMenu/ExperienceHub";
 import { Analytics } from '@vercel/analytics/react';

@@ -1,29 +1,27 @@
-
 import { create } from "zustand";
-import { SliderControl } from "../classes/SliderControl";
+import { SliderControl } from "../classes/Controls/SliderControl";
 import { Influence } from "../classes/influence";
 
 // import { initDataSets } from "@/classes/init_datasets";
-import { initDataSets } from "@/classes/Data/CompleteData"
-import { obj } from "@/classes/obj";
-import { Control } from "@/classes/Control";
-import { SelectControl } from "@/classes/SelectControl";
-import { Score } from "@/classes/Score";
+import { initDataSets } from "@/classes/Data/CompleteData";
+import { obj } from "@/classes/vizobjects/obj";
+import { Control } from "@/classes/Controls/Control";
+import { SelectControl } from "@/classes/Controls/SelectControl";
+import { Score } from "@/classes/Scores/Score";
 import { shallow } from "zustand/shallow";
-import Validation_score from "@/classes/Validation_score";
+import Validation_score from "@/classes/Validation/Validation_score";
 import * as THREE from "three";
 import { useMemo } from "react";
 import Placement from "@/classes/Placement";
-import Validation from "@/classes/Validation";
-import Validation_test from "@/classes/Validation_test";
-import Validation_obj from "@/classes/Validation_obj";
-import { TransformObj } from "@/classes/transformObj";
-import Validation_select from "@/classes/Validation_select";
-import { MultiChoiceClass } from "@/classes/MultiChoiceClass";
-import { ValidationMultiChoice } from "@/classes/ValidationMultiChoice";
-import {InputNumber} from "@/classes/InputNumber";
-import { Validation_inputNumber } from "@/classes/Validation_inputNumber";
-import { EnablerControl } from "@/classes/EnablerControl";
+import Validation from "@/classes/Validation/Validation";
+import Validation_obj from "@/classes/Validation/Validation_obj";
+import { TransformObj } from "@/classes/vizobjects/transformObj";
+import Validation_select from "@/classes/Validation/Validation_select";
+import { MultiChoiceClass } from "@/classes/Controls/MultiChoiceClass";
+import { ValidationMultiChoice } from "@/classes/Validation/ValidationMultiChoice";
+import { InputNumber } from "@/classes/Controls/InputNumber";
+import { Validation_inputNumber } from "@/classes/Validation/Validation_inputNumber";
+import { EnablerControl } from "@/classes/Controls/EnablerControl";
 
 export type State = {
   validations: Validation[];
@@ -46,8 +44,11 @@ export type State = {
   updateAllInfluences: () => void;
   SetIsActiveControl: (control_id: number) => (val: boolean) => void;
   setIsPlacementMode: (val: boolean) => void;
-  setMultiChoiceOptions: (control_id: number, Selectedoptions: number[]) => void;
-  setInputNumberValue: (control_id: number, value: number | '') => void;
+  setMultiChoiceOptions: (
+    control_id: number,
+    Selectedoptions: number[]
+  ) => void;
+  setInputNumberValue: (control_id: number, value: number | "") => void;
   setEnablerControl: (control_id: number) => (isEnabled: boolean) => void;
 };
 
@@ -68,23 +69,24 @@ export const useStore = create<State>((set, get) => ({
     // set obj_ids to enabled or disabled
     control.obj_ids.forEach((obj_id) => {
       const vobj = get().vizobjs[obj_id];
-      if(vobj) {
-      const updatedObj = obj.setEnableObject(vobj, isEnabled);
-      get().setVizObj(obj_id, updatedObj);
+      if (vobj) {
+        const updatedObj = obj.setEnableObject(vobj, isEnabled);
+        get().setVizObj(obj_id, updatedObj);
       }
-    })
+    });
     const newControl = control.setControlState(isEnabled);
-
   },
-  setInputNumberValue: (control_id: number, value: number | '') => {
+  setInputNumberValue: (control_id: number, value: number | "") => {
     set((state) => {
       const control = state.controls[control_id] as InputNumber;
       if (control instanceof InputNumber) {
         const updatedControl = control.setValue(value);
 
-        return {controls: { ...state.controls, [control_id]: updatedControl }  }
+        return {
+          controls: { ...state.controls, [control_id]: updatedControl },
+        };
       }
-      return {}
+      return {};
     });
   },
 
@@ -93,77 +95,78 @@ export const useStore = create<State>((set, get) => ({
       const control = state.controls[control_id] as MultiChoiceClass;
       if (control instanceof MultiChoiceClass) {
         const updatedControl = control.setOptions(Selectedoptions);
-        return { controls: { ...state.controls, [control_id]: updatedControl } };
+        return {
+          controls: { ...state.controls, [control_id]: updatedControl },
+        };
       }
       return {};
     });
   },
 
-
   setIsPlacementMode: (val: boolean) => {
-    set((state) => { 
-      const updatedControls = Object.entries(state.controls).reduce((acc, [id, ctrl]) => {
-        acc[Number(id)] = Control.setControlisClickable(ctrl, !val);
-        return acc;
-      }, {} as { [id: number]: Control });
+    set((state) => {
+      const updatedControls = Object.entries(state.controls).reduce(
+        (acc, [id, ctrl]) => {
+          acc[Number(id)] = Control.setControlisClickable(ctrl, !val);
+          return acc;
+        },
+        {} as { [id: number]: Control }
+      );
 
-      
       return {
         controls: updatedControls,
         isValidatorClickable: !val,
-        isPlacementMode: val
-      }});
+        isPlacementMode: val,
+      };
+    });
   },
 
-  SetIsActiveControl:
-  (control_id: number) => (val: boolean) => {
+  SetIsActiveControl: (control_id: number) => (val: boolean) => {
     set((state) => {
-    const control = state.controls[control_id] as SelectControl;
-    if(control instanceof SelectControl) {
-    
-    // Update all controls, placement, and isValidatorClickable
-    const updatedControls = Object.entries(state.controls).reduce((acc, [id, ctrl]) => {
-      const isCurrentControl = Number(id) === control_id;
-      acc[Number(id)] = isCurrentControl 
-        ? (ctrl as SelectControl).setIsActive(val) 
-        : Control.setControlisClickable(ctrl, !val);
-      return acc;
-    }, {} as { [id: number]: Control });
-
-    const updatedPlacement = state.placement 
-      ? Placement.setPlacementisClickable(state.placement, !val)
-      : null;
-
-    // Update selectable objects
-    if(control) {
-    control.selectable.forEach((obj_id) => {
-      if (!control.selected.includes(obj_id)) {
-        const updatedState = obj.setObjectisClickable(
-          state.vizobjs[obj_id],
-          val
+      const control = state.controls[control_id] as SelectControl;
+      if (control instanceof SelectControl) {
+        // Update all controls, placement, and isValidatorClickable
+        const updatedControls = Object.entries(state.controls).reduce(
+          (acc, [id, ctrl]) => {
+            const isCurrentControl = Number(id) === control_id;
+            acc[Number(id)] = isCurrentControl
+              ? (ctrl as SelectControl).setIsActive(val)
+              : Control.setControlisClickable(ctrl, !val);
+            return acc;
+          },
+          {} as { [id: number]: Control }
         );
-        state.setVizObj(obj_id, updatedState);
+
+        const updatedPlacement = state.placement
+          ? Placement.setPlacementisClickable(state.placement, !val)
+          : null;
+
+        // Update selectable objects
+        if (control) {
+          control.selectable.forEach((obj_id) => {
+            if (!control.selected.includes(obj_id)) {
+              const updatedState = obj.setObjectisClickable(
+                state.vizobjs[obj_id],
+                val
+              );
+              state.setVizObj(obj_id, updatedState);
+            }
+          });
+        }
+        state.setSelectActive(val);
+        const updatedState = control.setIsActive(val);
+        state.setControlClick(control_id, updatedState);
+
+        return {
+          controls: updatedControls,
+          placement: updatedPlacement,
+          isValidatorClickable: !val,
+        };
+      } else {
+        return {};
       }
-    })
-  }
-    ;
-
-    state.setSelectActive(val);
-    const updatedState = control.setIsActive(val);
-    state.setControlClick(control_id, updatedState);
-
-    return {
-      controls: updatedControls,
-      placement: updatedPlacement,
-      isValidatorClickable: !val
-    }
-  }
-  else {
-  return {}
-  }
-
-  })
-},
+    });
+  },
 
   updateAllInfluences: () => {
     set((state) => {
@@ -172,7 +175,7 @@ export const useStore = create<State>((set, get) => ({
       Object.keys(state.influences).forEach((masterId) => {
         const masterObj = updatedVizobjs[Number(masterId)];
         const masterInfluences = state.influences[Number(masterId)];
-        
+
         if (masterInfluences) {
           masterInfluences.forEach((influence) => {
             updatedVizobjs[influence.worker_id] = Influence.UpdateInfluence(
@@ -187,8 +190,6 @@ export const useStore = create<State>((set, get) => ({
       return { vizobjs: updatedVizobjs };
     });
   },
-
-  
 
   setSelectActive: (val: boolean) => {
     set({ isSelectActive: val });
@@ -206,21 +207,20 @@ export const useStore = create<State>((set, get) => ({
             state.controls[validation.control_id] as SelectControl
           );
         } else if (validation instanceof Validation_score) {
-          const objs: obj[] = state.scores[validation.score_id].obj_list.map((obj) => state.vizobjs[obj.id]);
+          const objs: obj[] = state.scores[validation.score_id].obj_list.map(
+            (obj) => state.vizobjs[obj.id]
+          );
           const value = state.scores[validation.score_id].computeValue(objs);
           return validation.computeValidity(value);
-        } 
-        else if(validation instanceof ValidationMultiChoice) {
+        } else if (validation instanceof ValidationMultiChoice) {
           return validation.computeValidity(
             state.controls[validation.control_id] as MultiChoiceClass
           );
-        }
-        else if(validation instanceof Validation_inputNumber) {
+        } else if (validation instanceof Validation_inputNumber) {
           return validation.computeValidity(
             state.controls[validation.control_id] as InputNumber
           );
-        }
-        else {
+        } else {
           return validation.computeValidity(null);
         }
       });
@@ -235,7 +235,6 @@ export const useStore = create<State>((set, get) => ({
         vizobjs: { ...state.vizobjs, [id]: new_obj },
       };
 
-
       const masterInfluences = state.influences[id];
       if (masterInfluences) {
         masterInfluences.forEach((influence: Influence<any, any, any>) => {
@@ -247,10 +246,8 @@ export const useStore = create<State>((set, get) => ({
         });
       }
 
-
       return updatedState;
     });
-    
   },
 
   deleteVizObj: (id: number) => {
@@ -263,7 +260,6 @@ export const useStore = create<State>((set, get) => ({
       return true;
     }
     return false;
-    
   },
 
   setControlClick: (control_id: number, new_obj: Control) => {
@@ -273,7 +269,6 @@ export const useStore = create<State>((set, get) => ({
   },
 
   reset: (dataSetKey: keyof typeof initDataSets) => {
-    
     const dataSet = initDataSets[dataSetKey];
     set({
       isValidatorClickable: true,
@@ -291,7 +286,6 @@ export const useStore = create<State>((set, get) => ({
         acc[obj.id] = obj;
         return acc;
       }, {} as { [id: number]: obj }),
-
 
       influences: dataSet.influencesData.reduce((acc, influence) => {
         if (!acc[influence.master_id]) {
@@ -383,44 +377,41 @@ export const getControlValueSelector =
     return viz && control ? control.get_attribute(viz) : 0;
   };
 
-  export const SelectObjectControl =
-  (obj_id: number) =>
-  (state: State) =>
-  () => {
-    Object.values(state.controls).forEach((control) => {
-      if (control instanceof SelectControl) {
-        const [updatedControl, wasSelected] = control.SelectObj(obj_id);
-        if (wasSelected) {
-          // Update the control state
-          state.setControlClick(control.id, updatedControl);
+export const SelectObjectControl = (obj_id: number) => (state: State) => () => {
+  Object.values(state.controls).forEach((control) => {
+    if (control instanceof SelectControl) {
+      const [updatedControl, wasSelected] = control.SelectObj(obj_id);
+      if (wasSelected) {
+        // Update the control state
+        state.setControlClick(control.id, updatedControl);
 
-          // Update the object's clickable state
-          const new_obj = Object.assign(
-            Object.create(Object.getPrototypeOf(state.vizobjs[obj_id])),
-            state.vizobjs[obj_id]
-          );
-          new_obj.isClickable = false;
-          state.setVizObj(obj_id, new_obj);
+        // Update the object's clickable state
+        const new_obj = Object.assign(
+          Object.create(Object.getPrototypeOf(state.vizobjs[obj_id])),
+          state.vizobjs[obj_id]
+        );
+        new_obj.isClickable = false;
+        state.setVizObj(obj_id, new_obj);
 
-          // If capacity is reached, deactivate the control
-          if (updatedControl.selected.length >= updatedControl.capacity) {
-            const deactivatedControl = updatedControl.setIsActive(false);
-            state.setControlClick(control.id, deactivatedControl);
-            state.setSelectActive(false);
+        // If capacity is reached, deactivate the control
+        if (updatedControl.selected.length >= updatedControl.capacity) {
+          const deactivatedControl = updatedControl.setIsActive(false);
+          state.setControlClick(control.id, deactivatedControl);
+          state.setSelectActive(false);
 
-            // Make all unselected objects clickable again
-            updatedControl.selectable.forEach((selectableId) => {
-              if (!updatedControl.selected.includes(selectableId)) {
-                const obj1 = state.vizobjs[selectableId];
-                const updatedObj = obj.setObjectisClickable(obj1, true);
-                state.setVizObj(selectableId, updatedObj);
-              }
-            });
-          }
+          // Make all unselected objects clickable again
+          updatedControl.selectable.forEach((selectableId) => {
+            if (!updatedControl.selected.includes(selectableId)) {
+              const obj1 = state.vizobjs[selectableId];
+              const updatedObj = obj.setObjectisClickable(obj1, true);
+              state.setVizObj(selectableId, updatedObj);
+            }
+          });
         }
       }
-    });
-  };
+    }
+  });
+};
 
 export const DeSelectObjectControl =
   (state: State) => (obj_id: number, control_id: number) => {
@@ -449,8 +440,6 @@ export const SetIsActiveControl =
 // export const getScore = (score_id: number) => { // note score is not stored in the state
 //     return scores[score_id];
 // }
-
-
 
 export const useObjectSelector = (id: number) => {
   const selector = useMemo(() => getObjectSelector(id), [id]);
@@ -492,22 +481,26 @@ export const UpdateValidationSelector = (state: State) => () => {
 
 export const getValidationsSelector = (state: State) => state.validations;
 
-export const UpdateAllInfluencesSelector = (state: State) => state.updateAllInfluences;
+export const UpdateAllInfluencesSelector = (state: State) =>
+  state.updateAllInfluences;
 
 export const isPlacementModeSelector = (state: State) => state.isPlacementMode;
 
 export const setIsPlacementModeSelector = (state: State) => (val: boolean) => {
   state.setIsPlacementMode(val);
-}
+};
 
-export const setMultiChoiceOptionsSelector = (state: State) => (control_id: number, Selectedoptions: number[]) => {
-  state.setMultiChoiceOptions(control_id, Selectedoptions);
-}
+export const setMultiChoiceOptionsSelector =
+  (state: State) => (control_id: number, Selectedoptions: number[]) => {
+    state.setMultiChoiceOptions(control_id, Selectedoptions);
+  };
 
-export const setInputNumberValueSelector = (state: State) => (control_id: number, value: number | '') => {
-  state.setInputNumberValue(control_id, value);
-}
+export const setInputNumberValueSelector =
+  (state: State) => (control_id: number, value: number | "") => {
+    state.setInputNumberValue(control_id, value);
+  };
 
-export const setEnablerControl = (control_id: number) => (state: State) => (isEnabled: boolean) => {
-  state.setEnablerControl(control_id)(isEnabled);
-  }
+export const setEnablerControl =
+  (control_id: number) => (state: State) => (isEnabled: boolean) => {
+    state.setEnablerControl(control_id)(isEnabled);
+  };

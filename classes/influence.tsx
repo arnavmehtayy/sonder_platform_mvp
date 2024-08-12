@@ -1,5 +1,5 @@
-import { obj } from "./obj";
-import { TransformObj } from "./transformObj";
+import { obj } from "./vizobjects/obj";
+import { TransformObj } from "./vizobjects/transformObj";
 import { Vector2 } from "three";
 
 export class Influence<T, master_T extends obj, worker_T extends obj> {

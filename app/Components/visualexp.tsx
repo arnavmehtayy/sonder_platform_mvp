@@ -8,7 +8,7 @@ import {
   Stats,
   Grid,
 } from "@react-three/drei";
-import { Showobj } from "./three/Showobj";
+import { Showobj } from "./three/ShowObjs/Showobj";
 import { useStore, getObjectsSelector, getPlacementSelector } from "../store";
 import * as THREE from "three";
 import {
@@ -62,7 +62,6 @@ export default function Experience() {
   //   infiniteGrid: true,
   // });
 
-
   return (
     <>
       <Canvas>
@@ -74,7 +73,7 @@ export default function Experience() {
           far={1000}
         />
 
-<OrbitControls
+        <OrbitControls
           enableRotate={false}
           enablePan={true}
           enableZoom={true}
@@ -86,11 +85,11 @@ export default function Experience() {
           mouseButtons={{
             LEFT: THREE.MOUSE.PAN,
             MIDDLE: THREE.MOUSE.DOLLY,
-            RIGHT: THREE.MOUSE.ROTATE
+            RIGHT: THREE.MOUSE.ROTATE,
           }}
           touches={{
             ONE: THREE.TOUCH.PAN,
-            TWO: THREE.TOUCH.DOLLY_PAN
+            TWO: THREE.TOUCH.DOLLY_PAN,
           }}
           makeDefault
         />

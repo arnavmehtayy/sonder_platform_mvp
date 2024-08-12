@@ -2,10 +2,10 @@ import React, { useEffect, useState } from "react";
 import { useDebouncedCallback } from "use-debounce";
 import { TransformControls } from "@react-three/drei";
 import * as THREE from "three";
-import { TouchControl } from "@/classes/TouchControl";
+import { TouchControl } from "@/classes/Controls/TouchControl";
 import { useStore, setVizObjSelector, getObjectSelector } from "@/app/store";
-import { TransformObj } from "@/classes/transformObj";
-import { geomobj } from "@/classes/geomobj";
+import { TransformObj } from "@/classes/vizobjects/transformObj";
+import { geomobj } from "@/classes/vizobjects/geomobj";
 import { useIsMobile } from "@/app/useIsMobile";
 
 /*
@@ -26,20 +26,22 @@ export default function GeneralTransformControl({
   vizObjId,
   touchControl,
   obj_ref,
-}: GeneralTransformControlProps)  {
+}: GeneralTransformControlProps) {
   const setVizObj = useStore(setVizObjSelector);
   const obj = useStore(getObjectSelector(vizObjId)) as TransformObj;
   const [isReady, setIsReady] = useState(false);
   const isMobile = useIsMobile();
 
-  useEffect(() => { // checking if we can attach a tranform to our object that is its ref is non-null
+  useEffect(() => {
+    // checking if we can attach a tranform to our object that is its ref is non-null
     if (obj_ref.current && obj_ref.current.parent) {
       setIsReady(true);
     }
   }, [obj_ref]);
 
   const handleTransformationChange = useDebouncedCallback(() => {
-    if (obj_ref && obj_ref.current && obj) { // REMOVE THIS && chain
+    if (obj_ref && obj_ref.current && obj) {
+      // REMOVE THIS && chain
       let transformValue: THREE.Vector3;
       let updatedObj: TransformObj;
       switch (mode) {
@@ -69,7 +71,7 @@ export default function GeneralTransformControl({
           });
           break;
       }
-      
+
       setVizObj(vizObjId, updatedObj);
     }
   }, 0);
@@ -83,8 +85,6 @@ export default function GeneralTransformControl({
     // console.log("No object found for id GeneralTransformControl: ", vizObjId);
     return null;
   }
-
-
 
   if (!isReady || !touchControl || !obj_ref.current) {
     return null;
@@ -104,5 +104,4 @@ export default function GeneralTransformControl({
       size={isMobile ? 2 : 1}
     />
   );
-};
-
+}

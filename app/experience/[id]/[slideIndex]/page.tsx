@@ -2,9 +2,9 @@
 
 import { useRouter } from 'next/router';
 import { useState, useEffect } from 'react';
-import { Minigame } from '@/app/Components/Minigame';
+import { Minigame } from '@/app/Components/Sidebar/Minigame';
 import { experiences } from "@/classes/Data/CompleteData";
-import CurvedBackButton from '@/app/Components/BackButton';
+import CurvedBackButton from '@/app/Components/three/BackButton';
 import { useParams } from 'next/navigation';
 import { FeedbackComponent } from '@/app/Components/MainMenu/FeedbackComponent';
 
