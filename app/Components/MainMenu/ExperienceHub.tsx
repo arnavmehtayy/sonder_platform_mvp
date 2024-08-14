@@ -92,7 +92,7 @@ const ExperienceHub = () => {
             transition={{ duration: 0.5 }}
             className="text-4xl font-extrabold text-center text-white mb-4"
           >
-            Visual Interactive Experience
+            A Visual Interactive Experience
           </motion.h1>
           <motion.p
             initial={{ opacity: 0, y: -20 }}
@@ -100,7 +100,7 @@ const ExperienceHub = () => {
             transition={{ duration: 0.5, delay: 0.2 }}
             className="text-xl text-center text-white mb-12"
           >
-            Dive into a world of 3D visualizations and simulations
+            Change the way you engage with educational content
           </motion.p>
           <motion.div
             initial={{ opacity: 0, y: 20 }}

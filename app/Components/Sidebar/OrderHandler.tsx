@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import ShowScore from "../ShowScore";
 import ShowControl from "../ShowControls/ShowControl";
 import ShowPlacement from "../ShowPlacement";
@@ -6,11 +6,12 @@ import Latex from "react-latex-next";
 import { initDataSets } from "@/classes/Data/CompleteData";
 
 // Define types for our components
-export type ComponentType = "score" | "control" | "placement" | "question";
+export type ComponentType = "score" | "control" | "placement" | "question" | "hint";
 
 export interface OrderItem {
   type: ComponentType;
   id: number;
+  hint?: string;
 }
 
 interface OrderHandlerProps {
@@ -21,6 +22,12 @@ export const OrderHandler: React.FC<OrderHandlerProps> = ({ state_name }) => {
   const questions = initDataSets[state_name].questions;
   const order = initDataSets[state_name].order;
   const title = initDataSets[state_name].title;
+  const [showHint, setShowHint] = useState<{ [key: number]: boolean }>({});
+
+  const toggleHint = (index: number) => {
+    setShowHint(prev => ({ ...prev, [index]: !prev[index] }));
+  };
+
   const renderComponent = (item: OrderItem, index: number) => {
     console.log(item);
     switch (item.type) {
@@ -54,6 +61,19 @@ export const OrderHandler: React.FC<OrderHandlerProps> = ({ state_name }) => {
                 <Latex>{questions[item.id as number]}</Latex>
               ) : null}
             </p>
+            {item.hint && (
+              <div className="mt-2">
+                <button
+                  onClick={() => toggleHint(index)}
+                  className="text-blue-600 hover:text-blue-800"
+                >
+                  {showHint[index] ? "Hide Hint" : "Show Hint"}
+                </button>
+                {showHint[index] && (
+                  <p className="text-gray-600 mt-1">{item.hint}</p>
+                )}
+              </div>
+            )}
           </div>
         );
       default:

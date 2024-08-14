@@ -1,0 +1,64 @@
+.hand {
+    position: absolute;
+    left: 33.25%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    width: 60px;
+    height: 80px;
+    background: rgba(131, 232, 255, 0.8);
+    border-radius: 20px 20px 30px 30px;
+    border: 2px solid #43b8fc;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+  }
+
+  .hand::before {
+    content: '';
+    position: absolute;
+    left: 50%;
+    top: -20px;
+    transform: translateX(-50%);
+    width: 20px;
+    height: 30px;
+    background: rgba(131, 232, 255, 0.8);
+    border-radius: 10px 10px 0 0;
+    border: 2px solid #43b8fc;
+    border-bottom: none;
+  }
+
+  @keyframes move {
+    0%, 100% { transform: translate(-200%, 0%); }
+    16% { transform: translate(200%, 0%); }
+    32% { transform: translate(0%, 0%); }
+    48% { transform: translate(0%, -200%); }
+    64% { transform: translate(0%, 200%); }
+    80% { transform: translate(0%, 0%); }
+  }
+
+  @keyframes pinch {
+    0%, 100% { transform: translate(-50%, -50%) scale(1); }
+    50% { transform: translate(-50%, -50%) scale(0.8); }
+  }
+
+  @keyframes scroll {
+    0% { transform: translate(calc(-50% + 200px), -100%); }
+    50% { transform: translate(calc(-50% + 200px), 100%); }
+    100% { transform: translate(calc(-50% + 200px), -100%); }
+  }
+
+  .move-hand {
+    animation: move 5s infinite;
+  }
+
+  .pinch-hand {
+    animation: pinch 2s infinite;
+    left: 35.20%;  /* Center the pinching hand */
+  top: 50%;
+  }
+
+  .scroll-hand {
+
+    animation: scroll 2s infinite;
+    left: 72%;  /* Center the pinching hand */
+  top: 50%;
+  }
+

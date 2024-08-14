@@ -26,6 +26,7 @@ import { FeedbackComponent } from "../MainMenu/FeedbackComponent";
 import MultiChoice from "../ShowControls/ShowMultiChoice";
 import ShowInputNumber from "../ShowControls/ShowInputNumber";
 import { OrderHandler, OrderItem } from "./OrderHandler";
+import { Instance } from "@react-three/drei";
 
 export function Minigame({
   experienceId,
@@ -94,7 +95,7 @@ export function Minigame({
                 updater={handleValidationUpdate}
               />
               <div className="flex justify-between mt-6 gap-4">
-                {currentSlideIndex > 0 && (
+                {currentSlideIndex > 0 &&  (
                   <Link
                     href={`/experience/${experienceId}/${
                       currentSlideIndex - 1

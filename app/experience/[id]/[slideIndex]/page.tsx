@@ -7,6 +7,8 @@ import { experiences } from "@/classes/Data/CompleteData";
 import CurvedBackButton from '@/app/Components/three/BackButton';
 import { useParams } from 'next/navigation';
 import { FeedbackComponent } from '@/app/Components/MainMenu/FeedbackComponent';
+import '@/app/TutorialOverlay.css';  // Add this import statement
+import { TutorialOverlay } from '@/app/Components/MainMenu/TutorialOverlay';
 
 export default function ExperiencePage() {
   const params = useParams();
@@ -17,7 +19,7 @@ export default function ExperiencePage() {
   const experienceId = Number(id);
   const experience = experiences[experienceId - 1];
 
-
+ 
 
   if (!experience || experience.slides.length <= Number(slideIndex)) {
     
@@ -36,7 +38,10 @@ export default function ExperiencePage() {
           currentSlideIndex={Number(slideIndex)}
         />
         <FeedbackComponent />
+        
       </div>
+      {Number(slideIndex) == 0 && <TutorialOverlay onComplete={() => 1 + 1} />}
     </div>
+    
   );
 }

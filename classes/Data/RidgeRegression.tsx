@@ -191,7 +191,7 @@ for (let i = 0; i < num_new_points; i++) {
       id: i + 60,
       geom: new THREE.CircleGeometry(0.23, 128),
       position: new_points[i],
-      color: "rgb(0,255,40)",
+      color: "rgb(0,200,25)",
       isEnabled: false,
     })
   );
@@ -328,7 +328,7 @@ const line_MSE__tech_scorers = Object.keys(MSE_tech_companies).map((key) => {
 });
 
 const ridge_score = new Score<number>({
-  text: "Old Score + New Score term",
+  text: "Ridge Score",
   desc: `$ \\sum_{i=1}^{40} \\text{dist}(\\text{line}, (x_i, y_i))^2 + \\lambda \\cdot \\text{slope}^2 $`,
   score_id: 2,
   obj_list: [
@@ -389,7 +389,7 @@ export const data_regression: { [key: string]: data_type } = {
         We are studying the relationship between a company's average stock price and its revenue over a year using data from 30 companies. 
 
         <br> <br> 
-        We observe a linear relationship and so we will endeavor to fit a line to this data. We use the following metric that scores how well the line fits the data points:
+        We observe a linear relationship and so we will endeavor to fit a line to this data. We use the following metric that scores how well a given line fits the 30 data points:
 
         \\[
             \\text{Score} = \\sum_{i=1}^{30} \\text{dist}(\\text{line}, (x_i, y_i))^2
@@ -398,9 +398,12 @@ export const data_regression: { [key: string]: data_type } = {
         where \\( \\text{dist}(\\text{line}, (x_i, y_i)) \\) is the shortest distance from the line to each point \\( (x_i, y_i) \\). In the diagram, the grey lines represent these distances.
         <br> <br>
 
-        In simpler terms, we look at the 30 points on the graph, measure the distance from each point to the line, square these distances, and then add them all up.`,
+        In simpler terms, we look at the 30 points on the graph, measure the distance from each point to the line, square these distances, and then add them all up.
+        <br> <br>
+        $\\textbf{Observe} $ : Changing the line would change the score because changing the line would cause the distances between the points and line to change
+        `,
       `Adust the slope and intercept of the line to get as close to the optimal score as you can.`,
-      `We received information on 5 new companies yesterday, and we will use this to validate our line.`,
+      `We received information on 5 new companies yesterday, and we will use this to check the validity of our line.`,
     ],
     validations: [
       new Validation_score<number, obj>({
@@ -429,12 +432,12 @@ export const data_regression: { [key: string]: data_type } = {
         isMultiSelect: false,
         isClickable: true,
         title: "Score Goal",
-        description: `What score value should we aim to achieve in order to 'fit' our line to the data?`,
+        description: `What score value do you think the true line of best fit would have?`,
         options: [
           { id: 1, label: "A really large positive number" },
           { id: 2, label: "A really large negative number" },
-          { id: 3, label: "0" },
-          { id: 4, label: "A constant value that is not 0" },
+          { id: 3, label: "close to 0" },
+          { id: 4, label: "A constant value that is not close to 0" },
         ],
       }),
       slope_control,
@@ -445,7 +448,7 @@ export const data_regression: { [key: string]: data_type } = {
         id: 4,
         title: "New Data",
         description:
-          "In hindsight, do you think the line you fit predicts this new data?",
+          "Do you think the red line that you fit reasonably predicts this new data?",
         options: [
           { id: 1, label: "Yes" },
           { id: 2, label: "No" },
@@ -492,23 +495,24 @@ export const data_regression: { [key: string]: data_type } = {
       { type: "control", id: 4 },
     ],
     questions: [
-      `Our team discovered that we overlooked data for 10 companies. We’ve now incorporated this information into the plot, highlighting these companies in pink. 
-      <br> <br>
-      Observe how these companies have stock prices that are disproportionately high relative to their revenue. <br> <br>
-      The green line represents the line you identified in the previous section, which is the line of best fit for the data without considering the pink companies.
-      <br> <br>
-      We adjust our score to account for the addition of the pink data points to our analysis.
+      `Our team realized that we missed data for 10 companies, which we've now added to the plot and highlighted in pink.
+<br><br>
+You'll notice that these companies have unusually high stock prices compared to their revenue.
+<br><br>
+The green line represents the line of best fit that you identified earlier, based on the data before including the pink companies.
+<br><br>
+We've updated our score to include these additional companies in our analysis.
       
       \\[
-            \\text{Score} = \\sum_{i=1}^{40} \\text{dist}(\\text{line}, (x_i, y_i))^2
+            \\text{New Score} = \\sum_{i=1}^{40} \\text{dist}(\\text{line}, (x_i, y_i))^2
     \\]
     Note that we have changed the sum from $\\sum_{i=1}^{30}$ to $\\sum_{i=1}^{40}$ to account for the 10 pink companies.
     <br> <br>
-$\\textbf{Note}$ : The value of the score is irrelevant; our focus is solely on minimizing it.
+$\\textbf{Note}$ : The value of the score is irrelevant; our goal is to get it as close to 0 as possible.
     
         `,
-      `For simplicity we have fixed the slope. Adust the intercept of the line to achieve the optimal score. The optimal score is under 155.`,
-      "We use the 5 new companies to validate our line once again.",
+      `For simplicity we have fixed the slope of the red line. Adust the intercept of the red line to achieve the optimal score. The optimal score is under 155.`,
+      "We will use the 5 new companies to validate the red line again..",
     ],
     validations: [
       new Validation_score<number, obj>({
@@ -575,14 +579,14 @@ $\\textbf{Note}$ : The value of the score is irrelevant; our focus is solely on 
     questions: [
       `The pink companies are commonly known as outliers and they make our model unstable. A savvy team member recommended a modification to our scoring method that is better suited to handling outliers.
         \\[
-            \\text{Score} = \\sum_{i=1}^{30} \\text{dist}(\\text{line}, (x_i, y_i))^2  + \\lambda \\cdot \\text{slope}^2
+            \\text{Ridge Score} = \\sum_{i=1}^{40} \\text{dist}(\\text{line}, (x_i, y_i))^2  + \\lambda \\cdot \\text{slope}^2
         \\]
 
-        The only modification is the addition of the      $\\lambda \\cdot \\text{slope}^2$ term. For now we set $\\lambda = 16$. We will address the choice of $\\lambda$ a little later<br> <br>
-        The green line represents the line of best fit obtained in the previous part i.e. the line that minimizes the score that includes the pink companies. <br> <br>
-        $\\textbf{Note}$: The value of the score is irrelevant; our focus is solely on minimizing it.`,
-      `We have fixed the y-intercept of the line. Adust the slope of the line to achieve the optimal score. Adjust to a score of under 286.`,
-      "Notice how our red line performs well on the new data. This modification to the score made our model more robust against outliers.",
+        The only modification is the addition of the $\\lambda \\cdot \\text{slope}^2$ term. For now we set $\\lambda = 16$. We will address the choice of $\\lambda$ a little later<br> <br>
+        The green line represents the line of best fit obtained in the previous part i.e. the line that gets the score as close to 0 as possible. <br> <br>
+        $\\textbf{Note}$: The value of the score is irrelevant; our focus is solely on getting it as close to 0 as possible.`,
+      `We have fixed the y-intercept of the red line. Adust the slope of the red line to achieve the optimal score. Adjust to a score of under 286.`,
+      "Notice how our red line outperforms the green line on this new data. This modification to the score made our red model more robust against outliers.",
     ],
     order: [
       { type: "question", id: 0 },
@@ -662,35 +666,41 @@ $\\textbf{Note}$ : The value of the score is irrelevant; our focus is solely on 
     title: "A game of tug-of-war",
     order: [
       { type: "question", id: 0 },
-      { type: "score", id: 0 },
-      { type: "question", id: 1 },
-      { type: "score", id: ridge_score.score_id },
-      { type: "question", id: 2 },
       { type: "control", id: lambda_slider.id },
       { type: "control", id: slope_control.id },
+      { type: "score", id: ridge_score.score_id },
+      {type: "control", id: 8},
       { type: "control", id: 4 },
-      { type: "question", id: 3 },
+      { type: "question", id: 1 },
     ],
     questions: [
-      `This modification to the score is called Ridge Regression and it works well to correct the line in this case. <br> <br> However, a natural question to ask is: how do we choose $\\lambda$?:
-            \\[
-            \\text{Score} = \\sum_{i=1}^{30} \\text{dist}(\\text{line}, (x_i, y_i))^2  + \\lambda \\cdot \\text{slope}^2
+      `This modification to the score is called Ridge Regression and it works well to correct the line in this case. <br> <br> However, a natural question to ask is: how do we choose $\\lambda$? In the previous part we set $\\lambda = 16$ but is this value always beneficial? <br> <br>
+
+      To explore this, we will consider how varying $\\lambda$ affects the line for which the score is minimized:
+         \\[
+            \\text{Ridge Score} = \\sum_{i=1}^{40} \\text{dist}(\\text{line}, (x_i, y_i))^2  + \\lambda \\cdot \\text{slope}^2
         \\] 
-        <br>
-         `,
-      "Consider how $\\lambda$ affects the minimization of the above equation. Test your hypothesis by adjusting the sliders. After experimenting, proceed to answer the question below",
+      $\\textbf{Note: }$ changing the value of $\\lambda$ effects the equation for the score which in turn affects the line that minimizes the score. We want to explore how $\\lambda$ affects the line. <br> <br>
+      Test your hypothesis by adjusting the sliders. After experimenting, proceed to answer the question below`,
       `$\\textbf{Hint} $: First, examine the score equation and attempt to infer the purpose of the two terms. To test your hypothesis, set 
-$\\lambda$ to a very large value, and adjust the line to minimize the score. Afterward, repeat the process with $\\lambda$ set to a very small value.
-<br> <br> $\\textbf{Reminder}$: The value of the score is irrelevant; our focus is solely on minimizing it :`,
-      `Notice that this is like a game of tug-of-war: the outliers are pulling the slope of the line higher to keep the first term of the score small, while the 
+$\\lambda$ to a very large value, and adjust the line to minimize the score. Afterward, repeat the process with $\\lambda$ set to a very small value. <br> <br>
+      Notice that this is like a game of tug-of-war: the outliers are pulling the slope of the line higher to keep the first term of the score small, while the 
 $\\lambda \\cdot \\text{slope}^2 $ term is pulling the slope lower to minimize the second term. These two forces are working in opposition. The ideal value for  $\\lambda $ depends on the specific problem, and finding the optimal value often involves a process of trial and error`,
     ],
     validations: [
+      
+      new ValidationMultiChoice({
+        control_id: 8,
+        answer: [3],
+        desc: "MCQ 1",
+      }),
       new ValidationMultiChoice({
         control_id: 4,
         answer: [1, 2],
-        desc: "MCQ 1",
-      }),
+        desc: "MCQ 2",
+      })
+      
+      
     ],
     influencesData: [...influences, ...tech_influences],
     controlData: [
@@ -733,6 +743,36 @@ $\\lambda \\cdot \\text{slope}^2 $ term is pulling the slope lower to minimize t
         isMultiSelect: true,
         isClickable: true,
       }),
+
+
+      new MultiChoiceClass({
+        id: 8,
+        title: "Minimising the score",
+        description: "Setting the value of $\\lambda$ to $0.5$. Choose the option that is most accurate",
+        options: [
+          {
+            id: 1,
+            label:
+              "A score of 0 can be achieved by adjusting the slope",
+          },
+          {
+            id: 2,
+            label:
+              "A score of under 121 can be achieved by adjusting the slope",
+          },
+          {
+            id: 3,
+            label:
+              "A score of under 161 can be achieved by adjusting the slope",
+          },
+          {
+            id: 4,
+            label: "A score of under 212 can be achieved by adjusting the slope",
+          },
+        ],
+        isMultiSelect: false,
+        isClickable: true,
+      }),
     ],
 
     canvasData: [
@@ -763,9 +803,9 @@ $\\lambda \\cdot \\text{slope}^2 $ term is pulling the slope lower to minimize t
       { type: "placement", id: 0 },
     ],
     questions: [
-      `Even if we succeed in selecting an optimal $ \\lambda $, this method is not foolproof. We will construct a scenario where ridge regression fails.
+      `Even if we succeed in selecting an optimal $ \\lambda $, this method is not foolproof. We will construct a scenario where ridge regression fails. <br>
 
-To recap, the goal of ridge regression is to adjust the slope and intercept of a line in order to minimize the following score:
+To recap, the goal of ridge regression is to adjust the slope and intercept of a line in order to make the following score as close to 0:
 \\[
 \\text{Score} = \\sum_{i=1}^{30} \\text{dist}(\\text{line}, (x_i, y_i))^2 + \\lambda \\cdot \\text{slope}^2
 \\]
@@ -796,6 +836,7 @@ For reference, the green line represents the true relation between the stock pri
         answer: [1],
         desc: "MCQ 1",
       }),
+      
     ],
     influencesData: [...influences],
     controlData: [
