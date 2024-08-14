@@ -40,7 +40,7 @@ export default function ExperiencePage() {
         <FeedbackComponent />
         
       </div>
-      {Number(slideIndex) == 0 && <TutorialOverlay onComplete={() => 1 + 1} />}
+      {/* {Number(slideIndex) == 0 && <TutorialOverlay onComplete={() => 1 + 1} />} */}
     </div>
     
   );

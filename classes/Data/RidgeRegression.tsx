@@ -389,21 +389,21 @@ export const data_regression: { [key: string]: data_type } = {
         We are studying the relationship between a company's average stock price and its revenue over a year using data from 30 companies. 
 
         <br> <br> 
-        We observe a linear relationship and so we will endeavor to fit a line to this data. We use the following metric that scores how well a given line fits the 30 data points:
+        We notice a linear relationship, so we'll try to fit a line to this data. To measure how well the line fits, we use the following score:
 
         \\[
             \\text{Score} = \\sum_{i=1}^{30} \\text{dist}(\\text{line}, (x_i, y_i))^2
         \\]
 
-        where \\( \\text{dist}(\\text{line}, (x_i, y_i)) \\) is the shortest distance from the line to each point \\( (x_i, y_i) \\). In the diagram, the grey lines represent these distances.
+        where \\( \\text{dist}(\\text{line}, (x_i, y_i)) \\) is the shortest distance from the line to each point \\( (x_i, y_i) \\). The grey lines in the diagram represent these distances.
         <br> <br>
 
-        In simpler terms, we look at the 30 points on the graph, measure the distance from each point to the line, square these distances, and then add them all up.
+        Simply put, we measure the distance from each of the 30 points to the line, square these distances, and add them up.
         <br> <br>
-        $\\textbf{Observe} $ : Changing the line would change the score because changing the line would cause the distances between the points and line to change
+        $\\textbf{Observe} $ : Changing the line will change the score because changing the line alters the distances between the points and the line.
         `,
-      `Adust the slope and intercept of the line to get as close to the optimal score as you can.`,
-      `We received information on 5 new companies yesterday, and we will use this to check the validity of our line.`,
+      `Adjust the slope and intercept of the line to get as close to the optimal score as possible.`,
+      `We recently received information on 5 new data points which we will use to check the validity of our line.`,
     ],
     validations: [
       new Validation_score<number, obj>({
@@ -499,7 +499,7 @@ export const data_regression: { [key: string]: data_type } = {
 <br><br>
 You'll notice that these companies have unusually high stock prices compared to their revenue.
 <br><br>
-The green line represents the line of best fit that you identified earlier, based on the data before including the pink companies.
+The green line represents the line of best fit that you identified in the last part.
 <br><br>
 We've updated our score to include these additional companies in our analysis.
       
@@ -577,15 +577,15 @@ $\\textbf{Note}$ : The value of the score is irrelevant; our goal is to get it a
   ridge_regression: {
     title: "Fighting the Outliers",
     questions: [
-      `The pink companies are commonly known as outliers and they make our model unstable. A savvy team member recommended a modification to our scoring method that is better suited to handling outliers.
+      `The pink companies are known as outliers, and they make our model unstable. A team member suggested a modification to our scoring method to better handle these outliers.
         \\[
             \\text{Ridge Score} = \\sum_{i=1}^{40} \\text{dist}(\\text{line}, (x_i, y_i))^2  + \\lambda \\cdot \\text{slope}^2
         \\]
 
-        The only modification is the addition of the $\\lambda \\cdot \\text{slope}^2$ term. For now we set $\\lambda = 16$. We will address the choice of $\\lambda$ a little later<br> <br>
-        The green line represents the line of best fit obtained in the previous part i.e. the line that gets the score as close to 0 as possible. <br> <br>
-        $\\textbf{Note}$: The value of the score is irrelevant; our focus is solely on getting it as close to 0 as possible.`,
-      `We have fixed the y-intercept of the red line. Adust the slope of the red line to achieve the optimal score. Adjust to a score of under 286.`,
+        The only modification is the addition of the $\\lambda \\cdot \\text{slope}^2$ term.  For now, we'll set $\\lambda = 16$, and we'll discuss the choice of $\\lambda$ later. <br> <br>
+        The green line represents the line of best fit obtained in the previous part <br> <br>
+        $\\textbf{Note}$: The value of the score is irrelevant; our focus is on getting it as close to 0 as possible.`,
+      `We’ve fixed the y-intercept of the red line. Adjust the slope of the red line to achieve the optimal score which is under 286.`,
       "Notice how our red line outperforms the green line on this new data. This modification to the score made our red model more robust against outliers.",
     ],
     order: [
@@ -809,9 +809,9 @@ To recap, the goal of ridge regression is to adjust the slope and intercept of a
 \\[
 \\text{Score} = \\sum_{i=1}^{30} \\text{dist}(\\text{line}, (x_i, y_i))^2 + \\lambda \\cdot \\text{slope}^2
 \\]
-For reference, the green line represents the true relation between the stock prices and revenue of a company. <br> <br>`,
+For reference, the $\\textbf{green line}$ represents the true relation between the stock prices and revenue of a company. <br> <br>`,
       `Notice that we have added 4 pink outlier data points. Answer the below questions by selecting the relevant pink points.`,
-      `As a reminder ridge regression is designed to penalize large slopes, but is penalizing large slopes always beneficial to control any outlier?`,
+      `As a reminder the $\\textbf{ridge score}$ is designed to prefer lines with smaller slopes, but is this always beneficial to control outliers?`,
       `Select an outlier that would cause ridge regression to move the slope of the line in the wrong direction. A wrong direction is that which moves the line away from the true line`,
     ],
     validations: [
