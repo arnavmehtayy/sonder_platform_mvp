@@ -1,6 +1,7 @@
 import { EnablerControl } from "@/classes/Controls/EnablerControl";
 import { useStore, getControlSelector, setEnablerControl } from "../../store";
 import { useState, useRef, useEffect } from "react";
+import Latex from "react-latex-next";
 
 export function ShowEnablerControl({ control_id }: { control_id: number }) {
   const control = useStore(getControlSelector(control_id)) as EnablerControl;
@@ -50,7 +51,7 @@ export function ShowEnablerControl({ control_id }: { control_id: number }) {
         <div className="flex flex-col space-y-3">
           <div className="flex justify-between items-center">
             <h3 className="text-lg font-semibold text-blue-800">
-              {control.desc}
+            <Latex> {control.desc} </Latex>
             </h3>
             <div className="flex items-center space-x-2">
               <button
@@ -73,7 +74,7 @@ export function ShowEnablerControl({ control_id }: { control_id: number }) {
               </button>
             </div>
           </div>
-          <p className="text-gray-600">{control.text}</p>
+          <p className="text-gray-600"> <Latex> {control.text} </Latex></p>
         </div>
       </div>
     );

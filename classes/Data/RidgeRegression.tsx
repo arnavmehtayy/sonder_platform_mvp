@@ -99,7 +99,7 @@ const lambda_slider = new SliderControl<DummyDataStorage<number>>({
 const newPointsEnablerControl = new EnablerControl({
   control_id: 3,
   desc: "New companies",
-  text: "Click to reveal new the data for 5 new companies",
+  text: "$\\textbf{Click to reveal}$ the new data for 5 new companies",
   obj_ids: [60, 61, 62, 63, 64],
 });
 
@@ -401,7 +401,7 @@ export const data_regression: { [key: string]: data_type } = {
 
         Simply put, we measure the distance from each of the 30 points to the line, square these distances, and add them up.
         <br> <br>
-        $\\textbf{Observe} $ : Changing the line will change the score because changing the line alters the distances between the points and the line.
+        $\\textbf{Observe} $ : Adjusting the line will change the score because changing the line alters the distances between the points and the line.
         `,
       `Adjust the slope and intercept of the line to get as close to the optimal score as possible.`,
       `We recently received information on 5 new data points which we will use to check the validity of our line.`,
@@ -498,7 +498,7 @@ export const data_regression: { [key: string]: data_type } = {
     questions: [
       `Our team realized that we missed data for 10 companies, which we've now added to the plot and highlighted in pink.
 <br><br>
-You'll notice that these new companies have unusually high stock prices compared to their revenue.
+You'll notice that these $\\textbf{new companies}$ have unusually high stock prices compared to their revenue.
 <br><br>
 The green line represents the line of best fit that you identified in the last part.
 <br><br>
