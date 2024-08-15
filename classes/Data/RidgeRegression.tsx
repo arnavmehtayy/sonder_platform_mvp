@@ -105,7 +105,7 @@ const newPointsEnablerControl = new EnablerControl({
 
 const slope_control = new SliderControl<LineObj>({
   desc: "Slope",
-  text: "move this slider to adjust the slope of the line",
+  text: "$\\textbf{move}$ this slider to adjust the $\\textbf{slope}$ of the line",
   id: 1,
   obj_id: 1000,
   range: [-1, 10],
@@ -115,7 +115,7 @@ const slope_control = new SliderControl<LineObj>({
 });
 const intercept_control = new SliderControl<LineObj>({
   desc: "Intercept",
-  text: "move this slider to adjust the y-intercept of the line",
+  text: "$\\textbf{move}$ this slider to adjust the $\\textbf{y-intercept}$ of the line",
   id: 2,
   obj_id: 1000,
   range: [-15, 1],
@@ -378,6 +378,7 @@ export const data_regression: { [key: string]: data_type } = {
       { type: "question", id: 1 },
       { type: "score", id: 0 },
       { type: "control", id: 1 },
+
       { type: "control", id: 2 },
       { type: "question", id: 2 },
       { type: "control", id: 3 },
@@ -386,7 +387,7 @@ export const data_regression: { [key: string]: data_type } = {
     title: "Introduction to Linear Regression",
     questions: [
       `
-        We are studying the relationship between a company's average stock price and its revenue over a year using data from 30 companies. 
+        We are studying the relationship between a company's average stock price and its revenue using data from 30 companies. 
 
         <br> <br> 
         We notice a linear relationship, so we'll try to fit a line to this data. To measure how well the line fits, we use the following score:
@@ -448,7 +449,7 @@ export const data_regression: { [key: string]: data_type } = {
         id: 4,
         title: "New Data",
         description:
-          "Do you think the red line that you fit reasonably predicts this new data?",
+          "Do you think the $\\textbf{red line}$ that you fit reasonably predicts this new data?",
         options: [
           { id: 1, label: "Yes" },
           { id: 2, label: "No" },
@@ -497,7 +498,7 @@ export const data_regression: { [key: string]: data_type } = {
     questions: [
       `Our team realized that we missed data for 10 companies, which we've now added to the plot and highlighted in pink.
 <br><br>
-You'll notice that these companies have unusually high stock prices compared to their revenue.
+You'll notice that these new companies have unusually high stock prices compared to their revenue.
 <br><br>
 The green line represents the line of best fit that you identified in the last part.
 <br><br>
@@ -508,7 +509,7 @@ We've updated our score to include these additional companies in our analysis.
     \\]
     Note that we have changed the sum from $\\sum_{i=1}^{30}$ to $\\sum_{i=1}^{40}$ to account for the 10 pink companies.
     <br> <br>
-$\\textbf{Note}$ : The value of the score is irrelevant; our goal is to get it as close to 0 as possible.
+$\\textbf{Note}$ : The value of the $\\textbf{New Score}$ is irrelevant; our goal is to get it as close to 0 as possible.
     
         `,
       `For simplicity we have fixed the slope of the red line. Adust the intercept of the red line to achieve the optimal score. The optimal score is under 155.`,
@@ -537,7 +538,7 @@ $\\textbf{Note}$ : The value of the score is irrelevant; our goal is to get it a
         id: 4,
         title: "New Data",
         description:
-          "In hindsight, do you think our red line predicts this new data?",
+          "In hindsight, do you think our $\\textbf{red line}$ predicts this new data?",
         options: [
           { id: 1, label: "Yes" },
           { id: 2, label: "No" },
@@ -577,16 +578,17 @@ $\\textbf{Note}$ : The value of the score is irrelevant; our goal is to get it a
   ridge_regression: {
     title: "Fighting the Outliers",
     questions: [
-      `The pink companies are known as outliers, and they make our model unstable. A team member suggested a modification to our scoring method to better handle these outliers.
+      `The pink companies are known as outliers, and they make our model unstable. Ridge Regression is a modification to our scoring method to better handle these outliers.
         \\[
             \\text{Ridge Score} = \\sum_{i=1}^{40} \\text{dist}(\\text{line}, (x_i, y_i))^2  + \\lambda \\cdot \\text{slope}^2
         \\]
 
         The only modification is the addition of the $\\lambda \\cdot \\text{slope}^2$ term.  For now, we'll set $\\lambda = 16$, and we'll discuss the choice of $\\lambda$ later. <br> <br>
-        The green line represents the line of best fit obtained in the previous part <br> <br>
-        $\\textbf{Note}$: The value of the score is irrelevant; our focus is on getting it as close to 0 as possible.`,
-      `We’ve fixed the y-intercept of the red line. Adjust the slope of the red line to achieve the optimal score which is under 286.`,
-      "Notice how our red line outperforms the green line on this new data. This modification to the score made our red model more robust against outliers.",
+        The green line represents the line of best fit obtained in the previous part. Notice how it does not represent the white data too well. <br> <br>
+       `,
+      `We’ve fixed the y-intercept of the red line. Adjust the slope of the $\\textbf{red line}$ to achieve the optimal score which is under 286. <br> <br>
+       $\\textbf{Note}$: The value of the $\\textbf{Ridge Score}$ is irrelevant; our focus is on getting it as close to 0 as possible.`,
+      "Notice how our $\\textbf{red line}$ outperforms the green line on this new data. This modification to the score made our red model more $\\textbf{robust against outliers}$.",
     ],
     order: [
       { type: "question", id: 0 },
@@ -807,7 +809,7 @@ $\\lambda \\cdot \\text{slope}^2 $ term is pulling the slope lower to minimize t
 
 To recap, the goal of ridge regression is to adjust the slope and intercept of a line in order to make the following score as close to 0:
 \\[
-\\text{Score} = \\sum_{i=1}^{30} \\text{dist}(\\text{line}, (x_i, y_i))^2 + \\lambda \\cdot \\text{slope}^2
+\\text{Ridge Score} = \\sum_{i=1}^{40} \\text{dist}(\\text{line}, (x_i, y_i))^2 + \\lambda \\cdot \\text{slope}^2
 \\]
 For reference, the $\\textbf{green line}$ represents the true relation between the stock prices and revenue of a company. <br> <br>`,
       `Notice that we have added 4 pink outlier data points. Answer the below questions by selecting the relevant pink points.`,
@@ -849,7 +851,7 @@ For reference, the $\\textbf{green line}$ represents the true relation between t
           outlier_objs[3].id,
         ],
         selected: [],
-        text: "Select 2 outliers that tends to increase the slope of our green line of best fit",
+        text: "Select 2 outliers that if added will increase the slope of our green line of best fit",
         desc: "Click to Select",
         capacity: 2,
       }),
@@ -862,30 +864,30 @@ For reference, the $\\textbf{green line}$ represents the true relation between t
           outlier_objs[3].id,
         ],
         selected: [],
-        text: "Select the 2 outlier that tends to decrease the slope of our line of best fit",
+        text: "Select the 2 outlier that if added will decrease the slope of our line of best fit",
         desc: "Click to Select",
         capacity: 2,
       }),
 
       new MultiChoiceClass({
         id: 2,
-        title: "Penalizing Large Slopes",
+        title: "Prefer Small Slopes",
         description:
-          "Do you think penalizing large slopes is always a good idea to control outliers?",
+          "Do you think choosing small slopes is always a good idea to control outliers?",
         options: [
           {
             id: 1,
             label:
-              "No - penalizing large slopes does not work if the outliers lie below the true line",
+              "No - choosing small slopes does not work if the outliers lie below the true line",
           },
           {
             id: 3,
             label:
-              "No - penalizing large slopes does not work if the outliers lie above the true line",
+              "No - choosing small slopes does not work if the outliers lie above the true line",
           },
           {
             id: 2,
-            label: "Yes - penalizing large slopes is always beneficial",
+            label: "Yes - choosing small slopes is always beneficial",
           },
         ],
         isMultiSelect: false,
