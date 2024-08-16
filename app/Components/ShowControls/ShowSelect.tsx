@@ -7,6 +7,7 @@ import {
   getNameSelector
 } from "@/app/store";
 import { SelectControl } from "@/classes/Controls/SelectControl";
+import Latex from "react-latex-next";
 
 // Define the isEnabled variable at the top
 
@@ -44,7 +45,7 @@ export function ShowSelect({ control_id }: { control_id: number }) {
       <div className={`bg-white rounded-lg shadow-md p-4 mb-6 ${!isActive ? 'opacity-50' : ''} relative`}>
         <div className="flex flex-col space-y-3">
           <div className="flex justify-between items-center">
-            <h3 className="text-lg font-semibold text-blue-800">{control.desc}</h3>
+            <h3 className="text-lg font-semibold text-blue-800"> <Latex>{control.desc}</Latex></h3>
             <div className="flex items-center space-x-2">
               <span className="text-sm text-gray-600">
                 {control.selected.length}/{control.capacity} selected
@@ -68,7 +69,7 @@ export function ShowSelect({ control_id }: { control_id: number }) {
               </button>
             </div>
           </div>
-          <p className="text-gray-600">{control.text}</p>
+          <p className="text-gray-600"><Latex>{control.text}</Latex></p>
         </div>
         <div className="mt-4 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
           {control.selected.map((id) => (

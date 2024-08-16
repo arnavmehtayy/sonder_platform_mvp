@@ -88,7 +88,7 @@ const lambda = new DummyDataStorage<number>({
 const lambda_slider = new SliderControl<DummyDataStorage<number>>({
   id: 5,
   desc: "Lambda",
-  text: "Move this slider to adjust the value of $\\lambda$",
+  text: "Move this slider to adjust the $\\textbf{value of $\\lambda$}$",
   obj_id: 9910,
   range: [0, 100],
   step_size: 0.5,
@@ -403,8 +403,8 @@ export const data_regression: { [key: string]: data_type } = {
         <br> <br>
         $\\textbf{Observe} $ : Adjusting the line will change the score because changing the line alters the distances between the points and the line.
         `,
-      `Adjust the slope and intercept of the line to get as close to the optimal score as possible.`,
-      `We recently received information on 5 new data points which we will use to check the validity of our line.`,
+      `$\\textbf{Adjust the slope and intercept}$ of the line to get as close to the optimal score as possible.`,
+      `We use $\\textbf{5 new data points}$ to check the validity of our line.`,
     ],
     validations: [
       new Validation_score<number, obj>({
@@ -498,9 +498,7 @@ export const data_regression: { [key: string]: data_type } = {
     questions: [
       `Our team realized that we missed data for 10 companies, which we've now added to the plot and highlighted in pink.
 <br><br>
-You'll notice that these $\\textbf{new companies}$ have unusually high stock prices compared to their revenue.
-<br><br>
-The green line represents the line of best fit that you identified in the last part.
+You'll notice that these $\\textbf{pink companies}$ have unusually high stock prices compared to their revenue.
 <br><br>
 We've updated our score to include these additional companies in our analysis.
       
@@ -510,10 +508,13 @@ We've updated our score to include these additional companies in our analysis.
     Note that we have changed the sum from $\\sum_{i=1}^{30}$ to $\\sum_{i=1}^{40}$ to account for the 10 pink companies.
     <br> <br>
 $\\textbf{Note}$ : The value of the $\\textbf{New Score}$ is irrelevant; our goal is to get it as close to 0 as possible.
+<br><br>
+The $\\textbf{green line}$ is the line of best fit that you identified in the last part.
+
     
         `,
-      `For simplicity we have fixed the slope of the red line. Adust the intercept of the red line to achieve the optimal score. The optimal score is under 155.`,
-      "We will use the 5 new companies to validate the red line again..",
+      `For simplicity we have fixed the slope of the red line. $\\textbf{Adust the intercept}$ of the $\\textbf{red line}$ to achieve the optimal score. The optimal score is $\\textbf{under 155}$.`,
+      "We will use the same $\\textbf{5 new companies}$ to validate the red line again.",
     ],
     validations: [
       new Validation_score<number, obj>({
@@ -578,15 +579,15 @@ $\\textbf{Note}$ : The value of the $\\textbf{New Score}$ is irrelevant; our goa
   ridge_regression: {
     title: "Fighting the Outliers",
     questions: [
-      `The pink companies are known as outliers, and they make our model unstable. Ridge Regression is a modification to our scoring method to better handle these outliers.
+      `The pink companies are known as $\\textbf{outliers}$, and they skew our model as seen in the previous part. $\\textbf{Ridge Regression}$ is a modification to our scoring method to better handle these outliers.
         \\[
             \\text{Ridge Score} = \\sum_{i=1}^{40} \\text{dist}(\\text{line}, (x_i, y_i))^2  + \\lambda \\cdot \\text{slope}^2
         \\]
 
         The only modification is the addition of the $\\lambda \\cdot \\text{slope}^2$ term.  For now, we'll set $\\lambda = 16$, and we'll discuss the choice of $\\lambda$ later. <br> <br>
-        The green line represents the line of best fit obtained in the previous part. Notice how it does not represent the white data too well. <br> <br>
+        The $\\textbf{green line}$ represents the line of best fit obtained in the previous part. Notice how it $\\textbf{does not represent}$ the white data well as it has been skewed by the outliers. <br> <br>
        `,
-      `We’ve fixed the y-intercept of the red line. Adjust the slope of the $\\textbf{red line}$ to achieve the optimal score which is under 286. <br> <br>
+      `We’ve fixed the y-intercept of the red line. Adjust the slope of the $\\textbf{red line}$ to achieve the optimal $\\textbf{Ridge Score}$ which is under 286. <br> <br>
        $\\textbf{Note}$: The value of the $\\textbf{Ridge Score}$ is irrelevant; our focus is on getting it as close to 0 as possible.`,
       "Notice how our $\\textbf{red line}$ outperforms the green line on this new data. This modification to the score made our red model more $\\textbf{robust against outliers}$.",
     ],
@@ -676,18 +677,18 @@ $\\textbf{Note}$ : The value of the $\\textbf{New Score}$ is irrelevant; our goa
       { type: "question", id: 1 },
     ],
     questions: [
-      `This modification to the score is called Ridge Regression and it works well to correct the line in this case. <br> <br> However, a natural question to ask is: how do we choose $\\lambda$? In the previous part we set $\\lambda = 16$ but is this value always beneficial? <br> <br>
+      `This modification to the score is called $\\textbf{Ridge Regression}$ and it works well to correct the line in this case. <br> <br> However, a natural question to ask is: how do we choose $\\lambda $ in the $\\textbf{ridge score}$? In the previous part we set $\\lambda = 16$ but is this value always beneficial? <br> <br>
 
-      To explore this, we will consider how varying $\\lambda$ affects the line for which the score is minimized:
+      To explore this, we will consider $\\textbf{how varying $\\lambda$  affects the line}$ for which the ridge score is minimized:
          \\[
             \\text{Ridge Score} = \\sum_{i=1}^{40} \\text{dist}(\\text{line}, (x_i, y_i))^2  + \\lambda \\cdot \\text{slope}^2
         \\] 
-      $\\textbf{Note: }$ changing the value of $\\lambda$ effects the equation for the score which in turn affects the line that minimizes the score. We want to explore how $\\lambda$ affects the line. <br> <br>
-      Test your hypothesis by adjusting the sliders. After experimenting, proceed to answer the question below`,
+      
+     Test your hypothesis by $\\textbf{adjusting the sliders}$. After experimenting, proceed to answer the question below`,
       `$\\textbf{Hint} $: First, examine the score equation and attempt to infer the purpose of the two terms. To test your hypothesis, set 
 $\\lambda$ to a very large value, and adjust the line to minimize the score. Afterward, repeat the process with $\\lambda$ set to a very small value. <br> <br>
-      Notice that this is like a game of tug-of-war: the outliers are pulling the slope of the line higher to keep the first term of the score small, while the 
-$\\lambda \\cdot \\text{slope}^2 $ term is pulling the slope lower to minimize the second term. These two forces are working in opposition. The ideal value for  $\\lambda $ depends on the specific problem, and finding the optimal value often involves a process of trial and error`,
+      Notice that this is like a game of tug-of-war: the $\\textbf{outliers}$ are pulling the $\\textbf{slope}$ of the line $\\textbf{higher}$ to keep the first term of the score small, while the 
+$\\lambda \\cdot \\text{slope}^2 $ term is pulling the $\\textbf{slope lower}$ to reduce the second term. These two forces are working in $\\textbf{opposition}$. The ideal value for  $\\lambda $ depends on the specific problem, and finding the optimal value involves a process of trial and error`,
     ],
     validations: [
       
@@ -709,7 +710,7 @@ $\\lambda \\cdot \\text{slope}^2 $ term is pulling the slope lower to minimize t
       lambda_slider,
       new SliderControl<LineObj>({
         desc: "Slope",
-        text: "move this slider to adjust the slope of the line",
+        text: "move this slider to adjust the $\\textbf{slope}$ of the line",
         id: 1,
         obj_id: 1000,
         range: [-1, 10],
@@ -720,7 +721,7 @@ $\\lambda \\cdot \\text{slope}^2 $ term is pulling the slope lower to minimize t
       new MultiChoiceClass({
         id: 4,
         title: "The choice of $\\lambda$",
-        description: "Choose all the options that are true",
+        description: "Choose $\\textbf{all}$ the options that are true",
         options: [
           {
             id: 1,
@@ -750,7 +751,7 @@ $\\lambda \\cdot \\text{slope}^2 $ term is pulling the slope lower to minimize t
       new MultiChoiceClass({
         id: 8,
         title: "Minimising the score",
-        description: "Setting the value of $\\lambda$ to $0.5$. Choose the option that is most accurate",
+        description: "Set the value of $\\lambda$ to $\\textbf{$0.5$}$. Choose the option that is $\\textbf{most precise}$",
         options: [
           {
             id: 1,
@@ -805,16 +806,16 @@ $\\lambda \\cdot \\text{slope}^2 $ term is pulling the slope lower to minimize t
       { type: "placement", id: 0 },
     ],
     questions: [
-      `Even if we succeed in selecting an optimal $ \\lambda $, this method is not foolproof. We will construct a scenario where ridge regression fails. <br>
+      `Even if we succeed in selecting an optimal $ \\lambda $, this method is not foolproof. We will construct a scenario where $\\textbf{ridge regression}$ fails. <br>
 
-To recap, the goal of ridge regression is to adjust the slope and intercept of a line in order to make the following score as close to 0:
+To recap, the goal of ridge regression is to adjust the slope and intercept of a line in order to make the following $\\textbf{ridge score}$ as close to 0:
 \\[
 \\text{Ridge Score} = \\sum_{i=1}^{40} \\text{dist}(\\text{line}, (x_i, y_i))^2 + \\lambda \\cdot \\text{slope}^2
 \\]
 For reference, the $\\textbf{green line}$ represents the true relation between the stock prices and revenue of a company. <br> <br>`,
-      `Notice that we have added 4 pink outlier data points. Answer the below questions by selecting the relevant pink points.`,
-      `As a reminder the $\\textbf{ridge score}$ is designed to prefer lines with smaller slopes, but is this always beneficial to control outliers?`,
-      `Select an outlier that would cause ridge regression to move the slope of the line in the wrong direction. A wrong direction is that which moves the line away from the true line`,
+      `Notice that we have $\\textbf{added 4 pink outlier}$ data points. Answer the below questions by selecting the relevant pink points.`,
+      `As a reminder the $\\textbf{ridge score}$ is designed to $\\textbf{prefer}$ lines with $\\textbf{smaller slopes}$, but is this always beneficial to control outliers?`,
+      `Choose a position to $\\textbf{place an outlier}$ that would cause ridge regression to shift the slope of the line in the $\\textbf{wrong direction}$. A wrong direction is that which moves the line away from the true line`,
     ],
     validations: [
       new Validation_select({
@@ -851,7 +852,7 @@ For reference, the $\\textbf{green line}$ represents the true relation between t
           outlier_objs[3].id,
         ],
         selected: [],
-        text: "Select 2 outliers that if added will increase the slope of our green line of best fit",
+        text: "$\\textbf{Select}$ the $\\textbf{2 outlier}$ that if added will $\\textbf{increase}$ the slope of our $\\textbf{green line}$ of best fit",
         desc: "Click to Select",
         capacity: 2,
       }),
@@ -864,7 +865,7 @@ For reference, the $\\textbf{green line}$ represents the true relation between t
           outlier_objs[3].id,
         ],
         selected: [],
-        text: "Select the 2 outlier that if added will decrease the slope of our line of best fit",
+        text: "$\\textbf{Select}$ the $\\textbf{2 outlier}$ that if added will $\\textbf{decrease}$ the slope of our $\\textbf{green line}$ of best fit",
         desc: "Click to Select",
         capacity: 2,
       }),
@@ -873,7 +874,7 @@ For reference, the $\\textbf{green line}$ represents the true relation between t
         id: 2,
         title: "Prefer Small Slopes",
         description:
-          "Do you think choosing small slopes is always a good idea to control outliers?",
+          "Do you think prefering small slopes is always a good idea to control outliers?",
         options: [
           {
             id: 1,
