@@ -78,8 +78,12 @@ export const FeedbackComponent = () => {
         <DialogHeader>
           <DialogTitle> We want to improve for you!</DialogTitle>
           <DialogDescription>
-            Share your feedback or suggest a new topic for an interactive
-            visual.
+            Share your feedback by answering the following. <br /> <br />
+
+            1) How effective/ineffective was this in teaching Ridge Regression? <br />
+2) What features did you like/dislike? and are there any that you thought were missing? <br />
+3) What Topics would like to see taught in this format? <br />
+4) Would you prefer this medium over traditional teaching methods such as textbooks or video lectures? Why? <br />
           </DialogDescription>
         </DialogHeader>
         <Textarea
@@ -89,14 +93,14 @@ export const FeedbackComponent = () => {
           className="min-h-[100px]"
         />
         <DialogDescription>
-          Optionally, include your email for updates when we incorporate your
+          Include your email for updates when we incorporate your
           feedback.
         </DialogDescription>
         <Input
           type="email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
-          placeholder="Your email (optional)"
+          placeholder="Your email"
           className={`mb-4 ${!isValidEmail(email) ? "border-red-500" : ""}`}
         />
         {errorMessage && <p className="text-red-500 mt-2">{errorMessage}</p>}
