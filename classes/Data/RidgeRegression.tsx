@@ -303,7 +303,7 @@ for (let i = 0; i < outlier_positions.length; i++) {
   outlier_objs.push(
     new geomobj({
       id: 150 + i,
-      geom: new THREE.CircleGeometry(0.23, 128),
+      geom: new THREE.CircleGeometry(0.3, 128),
       position: outlier_positions[i],
       color: "violet",
       name: `(${outlier_positions[i].x}, ${outlier_positions[i].y})`,
@@ -413,7 +413,7 @@ export const data_regression: { [key: string]: data_type } = {
         score_id: 0,
         comparator: (a, b) => a - b,
         error: 0,
-        desc: "Score less than 25",
+        desc: "Make Score less than 25",
       }),
       new ValidationMultiChoice({
         control_id: 0,
@@ -523,7 +523,7 @@ The $\\textbf{green line}$ is the line of best fit that you identified in the la
         score_id: 0,
         comparator: (a, b) => a - b,
         error: 0,
-        desc: "Score less than 155",
+        desc: "Make Score less than 155",
       }),
       new ValidationMultiChoice({
         control_id: 4,
@@ -608,7 +608,7 @@ The $\\textbf{green line}$ is the line of best fit that you identified in the la
         score_id: ridge_score.score_id,
         comparator: (a, b) => a - b,
         error: 0,
-        desc: "Score less than 286",
+        desc: "Make Score less than 286",
       }),
     ],
     influencesData: [...influences, ...tech_influences],
