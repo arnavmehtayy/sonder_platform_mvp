@@ -33,7 +33,7 @@ const ExperienceCard = ({
       className="h-full"
     >
       {/* A link to the first slide of the index'th experience */}
-      <Link href={`/experience/${index + 1}/0`} className="block h-full">
+      <Link href={`/experience/${index}/0`} className="block h-full">
         <div
           className="bg-white rounded-lg shadow-lg overflow-hidden h-full transition-all duration-300 hover:shadow-xl"
           onMouseEnter={() => setIsHovered(true)}

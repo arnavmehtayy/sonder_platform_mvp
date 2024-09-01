@@ -17,7 +17,7 @@ export default function ExperiencePage() {
 
 
   const experienceId = Number(id);
-  const experience = experiences[experienceId - 1];
+  const experience = experiences[experienceId];
 
  
 

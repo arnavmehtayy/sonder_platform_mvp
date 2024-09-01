@@ -36,13 +36,13 @@ export function Minigame({
   currentSlideIndex: number;
 }) {
   // console.log("Page: ", page);
-  const page = experiences[experienceId - 1].slides[currentSlideIndex];
+  const page = experiences[experienceId]?.slides[currentSlideIndex];
   const reset = useStore((state) => state.reset);
   const state_name = useStore(getStateName);
   const placement = useStore(getPlacementSelector);
 
   // const router = useRouter();
-  const experience = experiences[experienceId - 1];
+  const experience = experiences[experienceId];
   const updateValidation = useStore(UpdateValidationSelector);
   const validationInstance = useStore((state) => state.validations);
 
@@ -69,7 +69,9 @@ export function Minigame({
   // }
 
   useEffect(() => {
+    if(page) {
     reset(page);
+    }
   }, []);
 
   const [allValidationsValid, setAllValidationsValid] = useState(false);
@@ -105,7 +107,7 @@ export function Minigame({
           validations={validationInstance}
           updater={handleValidationUpdate}
         />
-        {allValidationsValid && (
+        {allValidationsValid && experience &&(
           <div className="flex justify-between mt-6 gap-4">
             {currentSlideIndex > 0 && (
               <Link
