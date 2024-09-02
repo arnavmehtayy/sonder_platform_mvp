@@ -12,6 +12,9 @@ import Validation from "../Validation/Validation";
 import Validation_test from "../Validation/Validation_test";
 
 import { OrderItem } from "@/app/Components/Sidebar/OrderHandler";
+import { InputNumber } from "../Controls/InputNumber";
+import { EnablerControl } from "../Controls/EnablerControl";
+import { MultiChoiceClass } from "../Controls/MultiChoiceClass";
 
 export type data_type = {
   title: string;
@@ -39,10 +42,12 @@ export const initDataSets: { default: data_type; [key: string]: data_type } = {
     questions: ["This is default", "This"],
     validations: [new Validation_test()],
     influencesData: [],
-    controlData: [],
+    controlData: [
+    ],
     canvasData: [],
     scoreData: [],
     placement: null,
   },
   ...data_regression,
-};
+}; // this contains all the data that is transferred to the storage system
+// [key: name of slide] => slide data

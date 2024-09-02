@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useState } from "react";
+import React, { use, useEffect, useState } from "react";
 import Experience from "../visualexp";
 import Link from "next/link";
 import ShowControl from "../ShowControls/ShowControl";
@@ -32,6 +32,7 @@ export function MinigameEdit({
 }: {
 }) {
   // console.log("Page: ", page);
+  const reset = useStore((state) => state.reset);
   const state_name = useStore(getStateName);
   const placement = useStore(getPlacementSelector);
 
@@ -42,6 +43,11 @@ export function MinigameEdit({
   const handleValidationUpdate = () => {
     updateValidation();
   };
+
+  useEffect(() => 
+    reset("default")
+  , []);
+
 
   // console.log(initDataSets[state_name].controlData)
 

@@ -3,7 +3,7 @@ import {
   useStore,
   getControlSelector,
   DeSelectObjectControl,
-  SetIsActiveControl,
+  SetIsActiveSelectControl,
   getNameSelector
 } from "@/app/store";
 import { SelectControl } from "@/classes/Controls/SelectControl";
@@ -14,7 +14,7 @@ import Latex from "react-latex-next";
 export function ShowSelect({ control_id }: { control_id: number }) {
   
   const handleRemove = useStore(DeSelectObjectControl);
-  const setIsActive = useStore(SetIsActiveControl(control_id));
+  const setIsActive = useStore(SetIsActiveSelectControl(control_id));
   const getName = useStore(getNameSelector);
   const control = useStore(getControlSelector(control_id)) as SelectControl;
   const isActive = control.isClickable;

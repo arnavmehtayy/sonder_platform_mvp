@@ -1,5 +1,5 @@
 import * as THREE from "three";
-import { useStore, getObjectSelector, setVizObjSelector } from "@/app/store";
+import { useStore, getObjectSelector} from "@/app/store";
 import { extend } from "@react-three/fiber";
 import React, { memo, useMemo } from "react";
 import GeneralTransformControl from "../GeneralTransCont";

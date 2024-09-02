@@ -3,7 +3,7 @@ import { useDebouncedCallback } from "use-debounce";
 import { TransformControls } from "@react-three/drei";
 import * as THREE from "three";
 import { TouchControl } from "@/classes/Controls/TouchControl";
-import { useStore, setVizObjSelector, getObjectSelector } from "@/app/store";
+import { useStore, setVizObjSelector2, getObjectSelector } from "@/app/store";
 import { TransformObj } from "@/classes/vizobjects/transformObj";
 import { geomobj } from "@/classes/vizobjects/geomobj";
 import { useIsMobile } from "@/app/useIsMobile";
@@ -27,7 +27,7 @@ export default function GeneralTransformControl({
   touchControl,
   obj_ref,
 }: GeneralTransformControlProps) {
-  const setVizObj = useStore(setVizObjSelector);
+  const setVizObj = useStore(setVizObjSelector2(vizObjId));
   const obj = useStore(getObjectSelector(vizObjId)) as TransformObj;
   const [isReady, setIsReady] = useState(false);
   const isMobile = useIsMobile();
@@ -72,7 +72,7 @@ export default function GeneralTransformControl({
           break;
       }
 
-      setVizObj(vizObjId, updatedObj);
+      setVizObj(updatedObj);
     }
   }, 0);
 

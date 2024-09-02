@@ -17,7 +17,9 @@ import { InputNumber } from "@/classes/Controls/InputNumber";
 
 
 export default function ShowControl({ control_id }: { control_id: number }) {
+  console.log(control_id)
   const control = useStore(getControlSelector(control_id));
+  console.log
 
   if (control instanceof SliderControl) {
     return <ShowNumSlider control_id={control_id} />;

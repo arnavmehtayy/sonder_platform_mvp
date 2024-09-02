@@ -1,22 +1,32 @@
-import React, { useState } from 'react';
-import { CheckCircle, XCircle } from 'react-feather';
-import Validation from '@/classes/Validation/Validation';
-import { useStore } from '@/app/store';
+import React, { useState } from "react";
+import { CheckCircle, XCircle } from "react-feather";
+import Validation from "@/classes/Validation/Validation";
+import { useStore, isValidatorClickableSelector } from "@/app/store";
 
-const ValidationComponent = ({ validations, updater }: {validations: Validation[], updater: () => void}) => {
+const ValidationComponent = ({
+  validations,
+  updater,
+}: {
+  validations: Validation[];
+  updater: () => void;
+}) => {
   const [isChecked, setIsChecked] = useState(false);
   const [overallValidity, setOverallValidity] = useState(false);
-  const isActive = useStore(state => state.isValidatorClickable);
+  const isActive = useStore(isValidatorClickableSelector);
 
   const handleCheck = () => {
     setIsChecked(true);
     updater();
-    const allValid = validations.every(validation => validation.is_valid);
+    const allValid = validations.every((validation) => validation.is_valid);
     setOverallValidity(allValid);
   };
 
   return (
-    <div className={`bg-white rounded-lg shadow-md p-4 mb-6 ${!isActive ? 'opacity-50' : ''} relative`}>
+    <div
+      className={`bg-white rounded-lg shadow-md p-4 mb-6 ${
+        !isActive ? "opacity-50" : ""
+      } relative`}
+    >
       <div className="flex items-center justify-between mb-4">
         <h3 className="text-lg font-semibold text-blue-800">Autograder</h3>
         <button
@@ -53,7 +63,11 @@ const ValidationComponent = ({ validations, updater }: {validations: Validation[
                 ) : (
                   <XCircle className="text-red-500 w-4 h-4 mr-2" />
                 )}
-                <span className={validation.is_valid ? "text-green-600" : "text-red-600"}>
+                <span
+                  className={
+                    validation.is_valid ? "text-green-600" : "text-red-600"
+                  }
+                >
                   {validation.desc}: {validation.is_valid ? "Valid" : "Invalid"}
                 </span>
               </li>

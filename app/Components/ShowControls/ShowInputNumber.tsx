@@ -11,7 +11,7 @@ export default function ShowInputNumber({
 }: {
   control_id: number;
 }) {
-  const setValue = useStore(setInputNumberValueSelector);
+  const setValue = useStore(setInputNumberValueSelector(control_id));
   const value = useStore(
     (state) => (state.controls[control_id] as InputNumber).value
   );
@@ -30,7 +30,7 @@ export default function ShowInputNumber({
     if (!isClickable) return;
 
     const newValue = e.target.value === "" ? "" : Number(e.target.value);
-    setValue(control_id, newValue);
+    setValue(newValue);
   };
 
   return (

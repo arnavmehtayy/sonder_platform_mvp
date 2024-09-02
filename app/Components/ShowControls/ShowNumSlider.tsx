@@ -1,14 +1,14 @@
 import {
   useStore,
-  setControlValueSelector,
-  useControlValueSelector,
+  setSliderControlValueSelector,
+  getSliderControlValueSelector
 } from "../../store";
 import { SliderControl } from "@/classes/Controls/SliderControl";
 import Latex from "react-latex-next";
 
 export default function NumSlide({ control_id }: { control_id: number }) {
-  const setValue = useStore(setControlValueSelector(control_id));
-  const getValue = useControlValueSelector(control_id);
+  const setValue = useStore(setSliderControlValueSelector(control_id));
+  const getValue = useStore(getSliderControlValueSelector(control_id));
   const control = useStore(
     (state) => state.controls[control_id]
   ) as SliderControl<any>;
