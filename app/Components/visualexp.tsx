@@ -1,30 +1,17 @@
 "use client";
 import React from "react";
-import { useControls } from "leva";
 import { Canvas } from "@react-three/fiber";
 import {
   OrthographicCamera,
   OrbitControls,
-  Stats,
-  Grid,
 } from "@react-three/drei";
 import { Showobj } from "./three/ShowObjs/Showobj";
 import { useStore, getObjectsSelector, getPlacementSelector } from "../store";
 import * as THREE from "three";
+
 import {
-  Bloom,
-  Noise,
-  Glitch,
-  ToneMapping,
-  Vignette,
-  EffectComposer,
-} from "@react-three/postprocessing";
-import {
-  PlacementProvider,
   PlacementControl,
-  PlacementActivationButton,
 } from "./three/PlacementControl";
-import { useThree } from "@react-three/fiber";
 
 /*
  * This component is the main visual experience component.

@@ -24,7 +24,7 @@ const ExperienceCard = ({
   index: number;
   description: string;
 }) => {
-  const [isHovered, setIsHovered] = useState(false);
+  const [isHovered, setIsHovered] = useState(false); 
 
   return (
     <motion.div // enlarge on hover

@@ -10,15 +10,14 @@ import { useIsMobile } from "@/app/useIsMobile";
 
 /*
  * This component handles a TranformControl for a single object in the scene.
-
-
+ * It is used to scale, rotate or translate the object. using the drei TransformControls
 */
 
-type GeneralTransformControlProps = {
-  mode: "scale" | "rotate" | "translate";
-  vizObjId: number;
-  touchControl: { direction: boolean[]; step_size: number } | null;
-  obj_ref: React.RefObject<THREE.Mesh>;
+type GeneralTransformControlProps = { 
+  mode: "scale" | "rotate" | "translate"; 
+  vizObjId: number; // id of the object that should be controlled using this Transform
+  touchControl: { direction: boolean[]; step_size: number } | null; 
+  obj_ref: React.RefObject<THREE.Mesh>; // reference to the object that should be controlled using this Transform
 };
 
 export default function GeneralTransformControl({
@@ -30,18 +29,20 @@ export default function GeneralTransformControl({
   const setVizObj = useStore(setVizObjSelector2(vizObjId));
   const obj = useStore(getObjectSelector(vizObjId)) as TransformObj;
   const [isReady, setIsReady] = useState(false);
-  const isMobile = useIsMobile();
+  const isMobile = useIsMobile(); // larger arrows for mobile so that it can be dragged easily
 
   useEffect(() => {
     // checking if we can attach a tranform to our object that is its ref is non-null
     if (obj_ref.current && obj_ref.current.parent) {
       setIsReady(true);
     }
-  }, [obj_ref]);
+  }, [obj_ref]); 
 
-  const handleTransformationChange = useDebouncedCallback(() => {
+
+  // make sure the object changes using transforms are reflected in the store
+  const handleTransformationChange = useDebouncedCallback(() => {  
+    // this debounces the function so that it is not called too often so that influences arent updated every frame
     if (obj_ref && obj_ref.current && obj) {
-      // REMOVE THIS && chain
       let transformValue: THREE.Vector3;
       let updatedObj: TransformObj;
       switch (mode) {
@@ -77,8 +78,8 @@ export default function GeneralTransformControl({
   }, 0);
 
   useEffect(() => {
-    // This effect ensures that the TransformControls updates when the ref changes
-    handleTransformationChange();
+    // This effect ensures that the store updates when the ref object changes
+    handleTransformationChange(); 
   }, [obj_ref, handleTransformationChange]);
 
   if (!touchControl || !obj_ref.current) {

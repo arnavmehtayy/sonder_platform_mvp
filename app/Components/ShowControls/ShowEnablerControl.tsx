@@ -3,12 +3,17 @@ import { useStore, getControlSelector, setEnablerControl } from "../../store";
 import { useState, useRef, useEffect } from "react";
 import Latex from "react-latex-next";
 
+/*
+  Given a control_id for a EnablerControl generates the UI for the control
+  This control is a button that can be clicked to enable or disable a set of vizobjects
+*/
+
 export function ShowEnablerControl({ control_id }: { control_id: number }) {
   const control = useStore(getControlSelector(control_id)) as EnablerControl;
   const isActive = control.isClickable;
   const [isComponentActive, setIsComponentActive] = useState(
     control.ControlState
-  );
+  ); // stores if the vizobjects controlled by this enabler are visible or not
   const setIsActive = useStore(setEnablerControl(control_id));
   const [hasBeenClicked, setHasBeenClicked] = useState(false);
   const [isHovering, setIsHovering] = useState(false);
@@ -39,8 +44,8 @@ export function ShowEnablerControl({ control_id }: { control_id: number }) {
     };
   }, []);
 
-  if (control) {
-    return (
+  if (control) { 
+    return ( // the UI for the EnablerControl button and its surrounding box and text
       <div
         className={`bg-white rounded-lg shadow-md p-4 mb-6 ${
           !isActive ? "opacity-50" : ""
@@ -51,7 +56,7 @@ export function ShowEnablerControl({ control_id }: { control_id: number }) {
         <div className="flex flex-col space-y-3">
           <div className="flex justify-between items-center">
             <h3 className="text-lg font-semibold text-blue-800">
-            <Latex> {control.desc} </Latex>
+              <Latex> {control.desc} </Latex>
             </h3>
             <div className="flex items-center space-x-2">
               <button
@@ -64,7 +69,11 @@ export function ShowEnablerControl({ control_id }: { control_id: number }) {
                       : "bg-gray-400 hover:bg-gray-500"
                   }
                   ${!isActive && "opacity-50 cursor-not-allowed"}
-                  ${isHovering && !hasBeenClicked && "motion-safe:animate-bounce"}
+                  ${
+                    isHovering &&
+                    !hasBeenClicked &&
+                    "motion-safe:animate-bounce"
+                  }
                   text-white py-1 px-3 rounded-md text-sm font-medium 
                   transition duration-300 ease-in-out
                   flex items-center
@@ -74,7 +83,9 @@ export function ShowEnablerControl({ control_id }: { control_id: number }) {
               </button>
             </div>
           </div>
-          <p className="text-gray-600"> <Latex> {control.text} </Latex></p>
+          <p className="text-gray-600">
+            <Latex> {control.text} </Latex>
+          </p>
         </div>
       </div>
     );

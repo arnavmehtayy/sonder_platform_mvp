@@ -1,5 +1,5 @@
 import React, { useState, useContext, useMemo, useRef } from "react";
-import { useThree, useFrame } from "@react-three/fiber";
+import { useFrame } from "@react-three/fiber";
 import * as THREE from "three";
 import {
   useStore,
@@ -10,16 +10,17 @@ import {
   isPlacementModeSelector,
   setIsPlacementModeSelector,
 } from "@/app/store";
-import {
-  Selection,
-  Select,
-  EffectComposer,
-  DotScreen,
-  HueSaturation,
-  Bloom,
-} from "@react-three/postprocessing";
 import { geomobj } from "@/classes/vizobjects/geomobj";
 
+/*
+ * This component is responsible for the placement of objects in the scene.
+ * It is used to place objects in the scene by clicking on a set of available position.
+ * the clickable positions are denoted with a circle that is scaled up and down.
+ * The user can reset the placements using the reset button.
+ * The user can activate or deactivate the placement mode using the activation button.
+ */
+
+// marks positions where objects can be placed on the three js canvas
 const PlacementMarker = ({
   position,
   onClick,
@@ -30,6 +31,7 @@ const PlacementMarker = ({
   const ref = useRef<THREE.Group>(null);
 
   useFrame((state) => {
+    // animation to denote the clickable positions
     if (ref.current) {
       ref.current.scale.setScalar(
         1.5 + Math.sin(state.clock.elapsedTime * 3) * 0.5
@@ -53,14 +55,23 @@ const PlacementMarker = ({
 
 // Define the context type
 type PlacementContextType = {
+  // get and set if the placement is active
   isPlacementMode: boolean;
   setIsPlacementMode: (val: boolean) => void;
+
+  // get and set the number of remaining placements
   remainingPlacements: number;
   setRemainingPlacements: React.Dispatch<React.SetStateAction<number>>;
+
+  // get and set the number of objects on the scene
   objectsOnScene: number;
   setObjectOnScene: React.Dispatch<React.SetStateAction<number>>;
+
+  // the reset button state and function to do so
   showResetButton: boolean;
   setShowResetButton: React.Dispatch<React.SetStateAction<boolean>>;
+
+  // reset all the objects that were placed
   resetPlacements: () => void;
 };
 
@@ -84,6 +95,7 @@ export const PlacementProvider = ({
   children: React.ReactNode;
   length: number;
 }) => {
+  // create all the state variables and functions
   const isPlacementMode = useStore(isPlacementModeSelector);
   const setIsPlacementMode = useStore(setIsPlacementModeSelector);
   const [remainingPlacements, setRemainingPlacements] = useState(length);
@@ -101,6 +113,7 @@ export const PlacementProvider = ({
     });
   };
 
+  // create the context with the above values
   return (
     <PlacementContext.Provider
       value={{
@@ -120,7 +133,7 @@ export const PlacementProvider = ({
   );
 };
 
-export const usePlacementMode = () => useContext(PlacementContext);
+export const usePlacementMode = () => useContext(PlacementContext); // shorthand for using the context
 
 type PlacementControlProps = {
   GridVectors?: THREE.Vector2[];
@@ -133,11 +146,11 @@ type PlacementControlProps = {
 };
 
 export const PlacementControl = ({
-  GridVectors = [],
-  gridSize = [20, 20],
-  cellSize = 5,
-  obj_ids = [],
-  geom = new THREE.PlaneGeometry(4, 4),
+  GridVectors = [], // user defied positions where objects can be placed
+  gridSize = [20, 20], // size of the grid where objects can be placed
+  cellSize = 5, // size of the cell in the grid
+  obj_ids = [], // the ids of the objects that can be placed
+  geom = new THREE.PlaneGeometry(4, 4), // the geometry of the object that are to be placed
   color = "blue",
 }: Partial<PlacementControlProps>) => {
   const {
@@ -174,9 +187,10 @@ export const PlacementControl = ({
 
   const handlePlacement = (position: THREE.Vector2) => {
     if (remainingPlacements > 0) {
-      setShowResetButton(true);
-      const obj_id = obj_ids[obj_ids.length - remainingPlacements];
+      setShowResetButton(true); // show the reset button when the first object is placed
+      const obj_id = obj_ids[obj_ids.length - remainingPlacements]; // get the id of the object to be placed
       if (!deleteObject(obj_id)) {
+        // delete the object if it already exists and if not increment the number of objects on the scene
         setObjectOnScene((o) => o + 1);
       }
       addObject(
@@ -188,24 +202,23 @@ export const PlacementControl = ({
           color: color,
         })
       );
-      // console.log(obj_id, " placed at ", position.x, position.y, remainingPlacements)
+
       updateAllInfluences();
       const newRemainingPlacements = remainingPlacements - 1;
       setRemainingPlacements(newRemainingPlacements);
 
       if (newRemainingPlacements === 0) {
+        // if all the objects are placed then exit the placement mode
         setIsPlacementMode(false);
       }
     }
   };
 
   React.useEffect(() => {
+    // create the placement positions when the placement mode is activated
     if (isPlacementMode) {
       setRemainingPlacements(obj_ids.length);
       createPlacementPositions();
-    } else {
-      // setRemainingPlacements(0);
-      // setPlacementPositions([]);
     }
   }, [isPlacementMode]);
 
@@ -213,11 +226,6 @@ export const PlacementControl = ({
     <>
       {isPlacementMode && (
         <>
-          {/* <EffectComposer>
-          <Bloom mipmapBlur luminanceThreshold={0.1} intensity={0.2} />
-            
-          </EffectComposer> */}
-
           {placementPositions.map((position, index) => (
             <PlacementMarker
               key={index}
@@ -231,8 +239,7 @@ export const PlacementControl = ({
   );
 };
 
-// New component for the placement activation button
-
+// component for the placement activation button
 export const PlacementActivationButton = ({
   totalPlacements,
   isActive,
@@ -276,6 +283,7 @@ export const PlacementActivationButton = ({
   );
 };
 
+// component for the reset button to reset all the placements
 export const ResetButton = ({ isActive }: { isActive: boolean }) => {
   const { showResetButton, resetPlacements } = usePlacementMode();
 

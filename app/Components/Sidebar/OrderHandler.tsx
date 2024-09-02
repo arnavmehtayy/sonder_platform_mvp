@@ -5,11 +5,17 @@ import ShowPlacement from "../ShowPlacement";
 import Latex from "react-latex-next";
 import { initDataSets } from "@/classes/Data/CompleteData";
 
+/*
+ * This component is responsible for rendering the order of components in the sidebar
+ * It is used in the MiniGame component
+ * It is used to render the order of components in the sidebar
+ */
+
 // Define types for our components
-export type ComponentType = "score" | "control" | "placement" | "question" | "hint";
+export type ComponentType = "score" | "control" | "placement" | "question";
 
 export interface OrderItem {
-  type: ComponentType;
+  type: ComponentType; 
   id: number;
   hint?: string;
 }
@@ -19,8 +25,10 @@ interface OrderHandlerProps {
 }
 
 export const OrderHandler: React.FC<OrderHandlerProps> = ({ state_name }) => {
-  const questions = initDataSets[state_name].questions;
-  const order = initDataSets[state_name].order;
+
+  const questions = initDataSets[state_name].questions; // the set of questions for the current state
+  const order = initDataSets[state_name].order; // the order of things in the sidebar along with hints
+  // note that hints can only be added to questions
   const title = initDataSets[state_name].title;
   const [showHint, setShowHint] = useState<{ [key: number]: boolean }>({});
 
@@ -29,10 +37,10 @@ export const OrderHandler: React.FC<OrderHandlerProps> = ({ state_name }) => {
   };
 
   const renderComponent = (item: OrderItem, index: number) => {
-    console.log(item);
+    // this renders each of the boxes in the sidebar
+    // checks the type of the item and renders the relevant component
     switch (item.type) {
       case "score":
-        console.log(item.id);
         return (
           <ShowScore key={`score-${index}`} score_id={item.id as number} />
         );
@@ -80,7 +88,7 @@ export const OrderHandler: React.FC<OrderHandlerProps> = ({ state_name }) => {
         return null;
     }
   };
-  return (
+  return ( // render the components for each of the items in the order list
     <div className="space-y-4 md:space-y-6">
       {order.map((item, index) => renderComponent(item, index))}
     </div>

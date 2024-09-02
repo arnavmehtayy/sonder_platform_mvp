@@ -2,31 +2,22 @@
 import React, { useEffect, useState } from "react";
 import Experience from "../visualexp";
 import Link from "next/link";
-import ShowControl from "../ShowControls/ShowControl";
-import ShowScore from "../ShowScore";
 import {
   useStore,
   getStateName,
   getPlacementSelector,
   UpdateValidationSelector,
 } from "@/app/store";
-import { initDataSets, experiences } from "@/classes/Data/CompleteData";
+import { experiences } from "@/classes/Data/CompleteData";
 import "katex/dist/katex.min.css";
-import Latex from "react-latex-next";
-import {
-  PlacementProvider,
-  PlacementControl,
-  PlacementActivationButton,
-} from "../three/PlacementControl";
-import ShowPlacement from "../ShowPlacement";
+import { PlacementProvider } from "../three/PlacementControl";
 import "../style.css";
 import ValidationComponent from "../ShowValid";
-import { useRouter } from "next/router";
-import { FeedbackComponent } from "../MainMenu/FeedbackComponent";
-import MultiChoice from "../ShowControls/ShowMultiChoice";
-import ShowInputNumber from "../ShowControls/ShowInputNumber";
 import { OrderHandler, OrderItem } from "./OrderHandler";
-import { Instance } from "@react-three/drei";
+
+/*
+ * This component is the main component for the minigame. It is responsible for rendering the Three.js experience and the sidebar.
+ */
 
 export function Minigame({
   experienceId,
@@ -35,13 +26,11 @@ export function Minigame({
   experienceId: number;
   currentSlideIndex: number;
 }) {
-  // console.log("Page: ", page);
-  const page = experiences[experienceId]?.slides[currentSlideIndex];
+  const page = experiences[experienceId]?.slides[currentSlideIndex]; // gets the relevant name of the slide as stored in the CompleteData
   const reset = useStore((state) => state.reset);
   const state_name = useStore(getStateName);
   const placement = useStore(getPlacementSelector);
 
-  // const router = useRouter();
   const experience = experiences[experienceId];
   const updateValidation = useStore(UpdateValidationSelector);
   const validationInstance = useStore((state) => state.validations);
@@ -50,27 +39,10 @@ export function Minigame({
     updateValidation();
   };
 
-  const test_id: number = 1; // for testing remove soon
-  const componentOrder: OrderItem[] = [
-    { type: "question", id: 0 },
-    { type: "score", id: 2 },
-    { type: "control", id: 1 },
-    { type: "control", id: 2 },
-    { type: "placement", id: 0 },
-    { type: "question", id: 1 },
-    { type: "score", id: 1 },
-  ];
-  // console.log(initDataSets[state_name].controlData)
-
-  // testing
-
-  // if(state_name) {
-  // initDataSets[state_name].controlData
-  // }
-
   useEffect(() => {
-    if(page) {
-    reset(page);
+    // reset the zustand state when the component is mounted to the relevant page
+    if (page) {
+      reset(page);
     }
   }, []);
 
@@ -78,14 +50,17 @@ export function Minigame({
 
   useEffect(() => {
     const checkAllValidations = () => {
-      const allValid = validationInstance.every(validation => validation.get_isValid());
+      const allValid = validationInstance.every((validation) =>
+        validation.get_isValid()
+      );
       setAllValidationsValid(allValid);
     };
 
     checkAllValidations();
-  }, [validationInstance]);
+  }, [validationInstance]); // if validationInstance changes, check if all validations are valid
 
   return (
+    // this is the context provider for the placement system
     <PlacementProvider length={placement?.object_ids.length || 0}>
       <div className="flex flex-col md:flex-row h-screen bg-gray-100">
         {/* Main Three.js Experience */}
@@ -99,75 +74,79 @@ export function Minigame({
           style={{ height: "100lvh" }}
         >
           <div className="space-y-4 md:space-y-6">
+            {/* This returns all the sidebar components */}
             <OrderHandler state_name={state_name} />
 
-            {/* Add the ValidationComponent here */}
+            {/* ValidationComponent */}
             <div className="mt-auto">
-        <ValidationComponent
-          validations={validationInstance}
-          updater={handleValidationUpdate}
-        />
-        {allValidationsValid && experience &&(
-          <div className="flex justify-between mt-6 gap-4">
-            {currentSlideIndex > 0 && (
-              <Link
-                href={`/experience/${experienceId}/${currentSlideIndex - 1}`}
-                className={`flex-1 group relative overflow-hidden rounded-lg bg-blue-600 px-4 py-3 text-white shadow-md transition-all duration-300 hover:bg-blue-700 hover:shadow-lg active:bg-blue-800`}
-              >
-                <span className="relative z-10 flex items-center justify-center text-lg font-semibold">
-                  <svg
-                    className="w-5 h-5 mr-2"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M15 19l-7-7 7-7"
-                    />
-                  </svg>
-                  Previous
-                </span>
-              </Link>
-            )}
-            <Link
-              href={
-                currentSlideIndex < experience.slides.length - 1
-                  ? `/experience/${experienceId}/${currentSlideIndex + 1}`
-                  : `/experience/thank-you/${experienceId}`
-              }
-              className={`flex-1 group relative overflow-hidden rounded-lg bg-blue-600 px-4 py-3 text-white shadow-md transition-all duration-300 hover:bg-blue-700 hover:shadow-lg active:bg-blue-800`}
-            >
-              <span className="relative z-10 flex items-center justify-center text-lg font-semibold">
-                {currentSlideIndex < experience.slides.length - 1 ? (
-                  <>
-                    Next
-                    <svg
-                      className="w-5 h-5 ml-2"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                      xmlns="http://www.w3.org/2000/svg"
+              <ValidationComponent
+                validations={validationInstance}
+                updater={handleValidationUpdate}
+              />
+              {allValidationsValid && experience && (
+                <div className="flex justify-between mt-6 gap-4">
+                  {currentSlideIndex > 0 && (
+                    <Link
+                      href={`/experience/${experienceId}/${
+                        currentSlideIndex - 1
+                      }`}
+                      className={`flex-1 group relative overflow-hidden rounded-lg bg-blue-600 px-4 py-3 text-white shadow-md transition-all duration-300 hover:bg-blue-700 hover:shadow-lg active:bg-blue-800`}
                     >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M9 5l7 7-7 7"
-                      />
-                    </svg>
-                  </>
-                ) : (
-                  "Done"
-                )}
-              </span>
-            </Link>
-          </div>
-        )}
-      </div>
+                      <span className="relative z-10 flex items-center justify-center text-lg font-semibold">
+                        <svg
+                          className="w-5 h-5 mr-2"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                          xmlns="http://www.w3.org/2000/svg"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M15 19l-7-7 7-7"
+                          />
+                        </svg>
+                        Previous
+                      </span>
+                    </Link>
+                  )}
+                  <Link
+                    href={
+                      currentSlideIndex < experience.slides.length - 1
+                        ? `/experience/${experienceId}/${currentSlideIndex + 1}`
+                        : `/experience/thank-you/${experienceId}`
+                    }
+                    className={`flex-1 group relative overflow-hidden rounded-lg bg-blue-600 px-4 py-3 text-white shadow-md transition-all duration-300 hover:bg-blue-700 hover:shadow-lg active:bg-blue-800`}
+                  >
+                    <span className="relative z-10 flex items-center justify-center text-lg font-semibold">
+                      {currentSlideIndex < experience.slides.length - 1 ? (
+                        <>
+                          Next
+                          <svg
+                            className="w-5 h-5 ml-2"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                            xmlns="http://www.w3.org/2000/svg"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={2}
+                              d="M9 5l7 7-7 7"
+                            />
+                          </svg>
+                        </>
+                      ) : (
+                        "Done"
+                      )}
+                    </span>
+                  </Link>
+                </div>
+              )}
+              {/* if all validations are valid, show the next button to go to the next slide or the done button if it is the last slide  */}
+            </div>
           </div>
 
           <br />

@@ -9,7 +9,12 @@ import {
 import { SelectControl } from "@/classes/Controls/SelectControl";
 import Latex from "react-latex-next";
 
-// Define the isEnabled variable at the top
+/*
+  * Given a control_id for a Select generates the UI for the control
+  * this generates a button that can be clicked to select some subset out of a list of selectable objects on screen
+  * the objects on screen that are not selectable will get darkened when the select is active
+  * when you run out of selections the select will become inactive
+*/
 
 export function ShowSelect({ control_id }: { control_id: number }) {
   
@@ -21,18 +26,18 @@ export function ShowSelect({ control_id }: { control_id: number }) {
   const [isComponentActive, setIsComponentActive] = useState(isActive && control.isActive);
 
 
-  useEffect(() => {
+  useEffect(() => { // if the control is not clickable then the select is inactive
     setIsActive(isComponentActive);
   }, [isComponentActive]);
 
-  useEffect(() => {
+  useEffect(() => { // if the number of selected objects is equal to the capacity then the select becomes inactive
     if (control.selected.length >= control.capacity) {
       setIsComponentActive(false);
       setIsActive(false);
     }
   }, [control.selected.length, control.capacity]);
 
-  const handleClick = () => {
+  const handleClick = () => { // toggles the select between active and inactive
     if (isActive) {
       const newState = !isComponentActive;
       setIsComponentActive(newState);

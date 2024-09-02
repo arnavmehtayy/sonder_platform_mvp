@@ -11,7 +11,7 @@ import { EnablerControl } from "@/classes/Controls/EnablerControl";
 import { InputNumber } from "@/classes/Controls/InputNumber";
 
 /*
-  Given a control_id fetch returns the UI for the relevant control
+  Given a control_id returns the UI for the relevant control
   Uses a useStore to fetch the control object corresponding to the control_id
 */
 

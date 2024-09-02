@@ -1,42 +1,35 @@
 "use client";
-import React, { use, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import Experience from "../visualexp";
-import Link from "next/link";
-import ShowControl from "../ShowControls/ShowControl";
-import ShowScore from "../ShowScore";
+
 import {
   useStore,
   getStateName,
   getPlacementSelector,
   UpdateValidationSelector,
 } from "@/app/store";
-import { initDataSets, experiences } from "@/classes/Data/CompleteData";
+
 import "katex/dist/katex.min.css";
-import Latex from "react-latex-next";
-import {
-  PlacementProvider,
-  PlacementControl,
-  PlacementActivationButton,
-} from "../three/PlacementControl";
-import ShowPlacement from "../ShowPlacement";
+import { PlacementProvider } from "../three/PlacementControl";
 import "../style.css";
 import ValidationComponent from "../ShowValid";
-import { useRouter } from "next/router";
-import { FeedbackComponent } from "../MainMenu/FeedbackComponent";
-import MultiChoice from "../ShowControls/ShowMultiChoice";
-import ShowInputNumber from "../ShowControls/ShowInputNumber";
-import { OrderHandler, OrderItem } from "./OrderHandler";
-import { Instance } from "@react-three/drei";
+import { OrderHandler } from "./OrderHandler";
+
+/*
+ * This is the same as the MiniGame component but designed for the editing page
+ * TODO
+*/
+
 
 export function MinigameEdit({
 }: {
 }) {
-  // console.log("Page: ", page);
+
   const reset = useStore((state) => state.reset);
   const state_name = useStore(getStateName);
   const placement = useStore(getPlacementSelector);
 
-  // const router = useRouter();
+
   const updateValidation = useStore(UpdateValidationSelector);
   const validationInstance = useStore((state) => state.validations);
 
@@ -49,13 +42,6 @@ export function MinigameEdit({
   , []);
 
 
-  // console.log(initDataSets[state_name].controlData)
-
-  // testing
-
-  // if(state_name) {
-  // initDataSets[state_name].controlData
-  // }
 
 
 

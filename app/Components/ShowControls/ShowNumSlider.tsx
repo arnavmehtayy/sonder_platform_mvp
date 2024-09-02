@@ -6,13 +6,18 @@ import {
 import { SliderControl } from "@/classes/Controls/SliderControl";
 import Latex from "react-latex-next";
 
+/*
+  Given a control_id for a NumSlider generates the UI for the control
+  this generates a slider that a user can use to select a number within a range
+*/
+
 export default function NumSlide({ control_id }: { control_id: number }) {
   const setValue = useStore(setSliderControlValueSelector(control_id));
   const getValue = useStore(getSliderControlValueSelector(control_id));
   const control = useStore(
     (state) => state.controls[control_id]
   ) as SliderControl<any>;
-  const isActive = control.isClickable;
+  const isActive = control.isClickable; // if the control can be interacted with
   if (!control) return null;
 
   return (
@@ -47,7 +52,7 @@ export default function NumSlide({ control_id }: { control_id: number }) {
           <span className="text-sm text-gray-600">{control.range[1]}</span>
         </div>
       </div>
-
+      
       <style jsx>{`
         input[type="range"] {
           -webkit-appearance: none;

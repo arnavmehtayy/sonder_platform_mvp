@@ -2,17 +2,21 @@ import React, { useEffect, useState } from "react";
 import { useStore, getScore, getObjectSelector2 } from "../store";
 import Latex from "react-latex-next";
 
+
+// render the score box on the sidebar 
+// this component is updated based if the vizobject that this depends on are updated
+
 export default function ShowScore({
   score_id,
 }: {
   score_id: number;
 }) {
-  const [scoreValue, setScoreValue] = useState(null);
+  const [scoreValue, setScoreValue] = useState(null); // stores the value of the score
   const score = getScore(score_id);
   const get_obj = useStore(getObjectSelector2);
   
 
-  useEffect(() => {
+  useEffect(() => { // update the score value using all the objects that this score depends on
     if(score) {
     const objs = score.obj_list.map((obj) => get_obj(obj.id));
     setScoreValue(score.computeValue(objs));
@@ -38,7 +42,7 @@ export default function ShowScore({
         <div className="mt-2 h-2 bg-blue-200 rounded-full overflow-hidden">
           <div
             className="h-full bg-blue-600 rounded-full transition-all duration-500 ease-out"
-            style={{ width: `${Math.min(100, parseFloat(scoreValue)/1)}%` }}
+            style={{ width: `${Math.min(100, parseFloat(scoreValue)/1)}%` }} // set the width of the bar based on the score value
           ></div>
         </div>
       )}

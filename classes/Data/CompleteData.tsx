@@ -38,7 +38,7 @@ export const experiences: experience_type[] = [experience_regression];
 export const initDataSets: { default: data_type; [key: string]: data_type } = {
   default: {
     title: "Question default",
-    order: [{ type: "question", id: 0 }],
+    order: [{ type: "question", id: 0}],
     questions: ["This is default", "This"],
     validations: [new Validation_test()],
     influencesData: [],

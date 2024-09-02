@@ -3,20 +3,23 @@ import { CheckCircle, XCircle } from "react-feather";
 import Validation from "@/classes/Validation/Validation";
 import { useStore, isValidatorClickableSelector } from "@/app/store";
 
+// This component is responsible for rendering the validation box in the sidebar UI
+
+
 const ValidationComponent = ({
   validations,
-  updater,
+  updater, // function to update the state of each of the validations in the store 
 }: {
   validations: Validation[];
-  updater: () => void;
+  updater: () => void; 
 }) => {
-  const [isChecked, setIsChecked] = useState(false);
+  const [isChecked, setIsChecked] = useState(false); // to decide whether the user has clicked the check button and show the results accordingly
   const [overallValidity, setOverallValidity] = useState(false);
   const isActive = useStore(isValidatorClickableSelector);
 
   const handleCheck = () => {
     setIsChecked(true);
-    updater();
+    updater(); 
     const allValid = validations.every((validation) => validation.is_valid);
     setOverallValidity(allValid);
   };

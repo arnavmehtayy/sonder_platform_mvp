@@ -6,6 +6,11 @@ import {
 } from "../../store";
 import { InputNumber } from "@/classes/Controls/InputNumber";
 
+/*
+  This component generates the UI for an InputNumber control 
+  allows the user to input a number into a text box
+*/
+
 export default function ShowInputNumber({
   control_id,
 }: {
@@ -14,14 +19,13 @@ export default function ShowInputNumber({
   const setValue = useStore(setInputNumberValueSelector(control_id));
   const value = useStore(
     (state) => (state.controls[control_id] as InputNumber).value
-  );
+  );  
   const control = useStore(getControlSelector(control_id)) as InputNumber;
 
   const title = control.desc;
   const description = control.text;
   const placeholder = control.placeholder;
-  const isClickable = control.isClickable;
-  const initialValue = control.initial_value;
+  const isClickable = control.isClickable; // if the control can be interacted with
   const min = control.min;
   const max = control.max;
   const step = control.step;

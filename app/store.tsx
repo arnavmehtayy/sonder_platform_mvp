@@ -8,10 +8,8 @@ import { obj } from "@/classes/vizobjects/obj";
 import { Control } from "@/classes/Controls/Control";
 import { SelectControl } from "@/classes/Controls/SelectControl";
 import { Score } from "@/classes/Scores/Score";
-import { shallow } from "zustand/shallow";
 import Validation_score from "@/classes/Validation/Validation_score";
-import * as THREE from "three";
-import { useMemo } from "react";
+
 import Placement from "@/classes/Placement";
 import Validation from "@/classes/Validation/Validation";
 import Validation_obj from "@/classes/Validation/Validation_obj";
@@ -100,6 +98,7 @@ export const useStore = create<State>((set, get) => ({
   placement: null,
   isSelectActive: false,
 
+  // The enabler control enables/disables viz objects on the screen. This function can be used to set the boolean value of any particular Enabler. (Note an enabler is a control)
   setEnablerControl: (control_id: number) => (isEnabled: boolean) => {
     const control = get().controls[control_id] as EnablerControl;
     // set obj_ids to enabled or disabled
@@ -112,6 +111,8 @@ export const useStore = create<State>((set, get) => ({
     });
     const newControl = control.setControlState(isEnabled);
   },
+
+  // The InputNumber control allows users to input numbers. This function is used to update the number when a changes the input.
   setInputNumberValue: (control_id: number) => (value: number | "") => {
     set((state) => {
       const control = state.controls[control_id] as InputNumber;
@@ -126,6 +127,7 @@ export const useStore = create<State>((set, get) => ({
     });
   },
 
+  // The MultiChoiceOptions control manages multiple choice questions. This function is used to update the options that are selected by the user.
   setMultiChoiceOptions: (control_id: number, Selectedoptions: number[]) => {
     set((state) => {
       const control = state.controls[control_id] as MultiChoiceClass;
@@ -139,6 +141,7 @@ export const useStore = create<State>((set, get) => ({
     });
   },
 
+  // set if placement has been activated/deactivated, and updates the clickability of each control accordingly.
   setIsPlacementMode: (val: boolean) => {
     set((state) => {
       const updatedControls = Object.entries(state.controls).reduce(
@@ -156,24 +159,26 @@ export const useStore = create<State>((set, get) => ({
     });
   },
 
+  // set the particular select control to be active and disable every other control, and also disable the placement if it exists. Further this function deals with the logic of selection, it sets the relevant objects to be clickable and it sets the button to inactive when all the selections have been made.
   SetIsActiveSelectControl: (control_id: number) => (val: boolean) => {
     set((state) => {
       const control = state.controls[control_id] as SelectControl; 
       if (control instanceof SelectControl) {
+        // set the current control to be active and disable all other controls
         const updatedControls = Object.entries(state.controls).reduce(
           (acc, [id, ctrl]) => {
             const isCurrentControl = Number(id) === control_id;
             acc[Number(id)] = isCurrentControl
               ? (ctrl as SelectControl).setIsActive(val)
               : Control.setControlisClickable(ctrl, !val);
-            return acc;
+            return acc; 
           },
           {} as { [id: number]: Control }
         );
 
         const updatedPlacement = state.placement
           ? Placement.setPlacementisClickable(state.placement, !val)
-          : null;
+          : null; 
 
         // Update selectable objects and make sure they are clickable
         if (control) {
@@ -201,13 +206,14 @@ export const useStore = create<State>((set, get) => ({
     });
   },
 
+  // when this function is called each of the influences in the influences dictionary is updated. That is the worker, and the master assigned in the influences are synced as per the influence defined.
   updateAllInfluences: () => {
     set((state) => {
       const updatedVizobjs = { ...state.vizobjs };
 
       Object.keys(state.influences).forEach((masterId) => {
-        const masterObj = updatedVizobjs[Number(masterId)];
-        const masterInfluences = state.influences[Number(masterId)];
+        const masterObj = updatedVizobjs[Number(masterId)]; // get the master object
+        const masterInfluences = state.influences[Number(masterId)]; // get the influence object
 
         if (masterInfluences) {
           masterInfluences.forEach((influence) => {
@@ -215,7 +221,7 @@ export const useStore = create<State>((set, get) => ({
               influence,
               masterObj,
               updatedVizobjs[influence.worker_id]
-            );
+            ); // update each of the influences that the masterInfluences controls
           });
         }
       });
@@ -224,10 +230,12 @@ export const useStore = create<State>((set, get) => ({
     });
   },
 
+  // set if select has been activated/deactivated
   setSelectActive: (val: boolean) => {
     set({ isSelectActive: val });
   },
 
+  // This function handles the updation of the states of the Validation objects. These objects store the answers for the interactions that the user has executed, and compare the user's state with the answer.
   updateValidations: () => {
     set((state) => {
       const updatedValidations = state.validations.map((validation) => {
@@ -262,12 +270,14 @@ export const useStore = create<State>((set, get) => ({
     });
   },
 
+  // used to set a particular viz object. Note that after a viz object is set we also update the influences for which the particular viz object was the worker.
   setVizObj: (id: number, new_obj: obj) => {
     set((state) => {
       const updatedState = {
         vizobjs: { ...state.vizobjs, [id]: new_obj },
       };
 
+      // update the influences for which the added object is a master
       const masterInfluences = state.influences[id];
       if (masterInfluences) {
         masterInfluences.forEach((influence: Influence<any, any, any>) => {
@@ -283,6 +293,8 @@ export const useStore = create<State>((set, get) => ({
     });
   },
 
+  // Deletes a viz object from the vizobjs list
+
   deleteVizObj: (id: number) => {
     if (id in get().vizobjs) {
       set((state) => {
@@ -295,12 +307,14 @@ export const useStore = create<State>((set, get) => ({
     return false;
   },
 
+  // given the id and a new control object resets the object in the controls list.
   setControl: (control_id: number, new_obj: Control) => {
     set((state) => {
       return { controls: { ...state.controls, [control_id]: new_obj } };
     });
   },
 
+  // takes in the state_name and populates the placement, scores, vizobjs, controls, validations, influences, and then updates all the viz objects according to the influences. Note that all this data comes from initDataSet in the CompleteData.tsx file. This file is manually populated
   reset: (dataSetKey: keyof typeof initDataSets) => {
     const dataSet = initDataSets[dataSetKey];
     set({

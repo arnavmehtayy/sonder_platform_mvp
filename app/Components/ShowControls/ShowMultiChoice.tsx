@@ -7,6 +7,12 @@ import {
 import { MultiChoiceClass } from "@/classes/Controls/MultiChoiceClass";
 import Latex from "react-latex-next";
 
+/*
+  Given a control_id for a MultiChoiceClass generates the UI for the control
+  this generates a multiple choice question with a list of options that the user can choose from
+
+*/
+
 export interface Option {
   id: number;
   label: string;
@@ -22,8 +28,8 @@ export default function MultiChoice({ control_id }: { control_id: number }) {
   const title = control.desc;
   const description = control.text;
   const options = control.options;
-  const isMultiSelect = control.isMultiSelect;
-  const isClickable = control.isClickable;
+  const isMultiSelect = control.isMultiSelect; // can select multiple options
+  const isClickable = control.isClickable; // if the control can be interacted with
 
   const handleOptionClick = (optionId: number) => {
     if (!isClickable) return;
@@ -31,29 +37,26 @@ export default function MultiChoice({ control_id }: { control_id: number }) {
     if (isMultiSelect) {
       new_options = selectedOptions.includes(optionId)
         ? selectedOptions.filter((id) => id !== optionId)
-        : [...selectedOptions, optionId];
+        : [...selectedOptions, optionId]; // add the option to the list of selected options
     } else {
-      new_options = [optionId];
+      new_options = [optionId]; // if it is not a multi select then only one option can be selected
     }
 
     setSelectedOptions(control_id, new_options);
-
-    console.log(new_options);
   };
 
   return (
+    // the UI for the MultiChoice control and its surrounding box and text
     <div
       className={`bg-white rounded-lg shadow-lg p-6 ${
         !isClickable ? "opacity-70" : ""
       }`}
     >
       <h3 className="text-lg font-semibold text-blue-800 mb-2">
-        {" "}
-        <Latex>{title}</Latex>{" "}
+        <Latex>{title}</Latex>
       </h3>
       <p className="text-gray-600 mb-2">
-        {" "}
-        <Latex>{description}</Latex>{" "}
+        <Latex>{description}</Latex>
       </p>
       <div className="space-y-3">
         {options.map((option) => (

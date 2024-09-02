@@ -1,6 +1,11 @@
 import { PlacementActivationButton } from "./three/PlacementControl";
 import { useStore, getPlacementSelector } from "../store";
 
+
+/* 
+  Given a placement_id returns the UI for the relevant placement
+  this generates a setActive/setInactive; reset button and a description of the placement
+*/ 
 export default function ShowPlacement() {
     const placement = useStore(getPlacementSelector);
 

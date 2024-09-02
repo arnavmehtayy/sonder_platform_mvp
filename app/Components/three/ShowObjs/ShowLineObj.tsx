@@ -1,11 +1,12 @@
 import { LineObj } from "@/classes/vizobjects/Lineobj";
-import { Line } from "@react-three/drei";
-import { ThreeEvent, useThree } from "@react-three/fiber";
-import React, { useRef, useState, useMemo } from "react";
+import { ThreeEvent} from "@react-three/fiber";
+import React, { useRef} from "react";
 import * as THREE from "three";
 import { useStore, SelectObjectControl } from "@/app/store";
 
-import { EffectComposer, Bloom } from "@react-three/postprocessing";
+
+
+// This component is responsible for rendering a LineObj on the scene
 
 export function ShowLineObj({
   obj,
@@ -14,12 +15,12 @@ export function ShowLineObj({
   obj: LineObj;
   material: THREE.MeshBasicMaterial;
 }) {
+
   const object_ref = useRef<THREE.Mesh>(null);
   const add_obj = useStore(SelectObjectControl(obj.id));
-  const selectionModeActive = useStore((state) => state.isSelectActive);
 
   const onClickSelect = (event: ThreeEvent<MouseEvent>) => {
-    add_obj();
+    add_obj(); // when the object is clicked pass on this information to the store so that it can update the select controls
     event.stopPropagation();
   };
 
