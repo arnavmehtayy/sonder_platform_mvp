@@ -47,7 +47,8 @@ export class SliderControl<T extends obj> extends Control {
     this.set_attribute = set_attribute;
   }
 
-  getSliderValue(obj: T): number {
+  // method to get the value of the slider control given the instance of the object that the control is controlling
+  getSliderValue(obj: T): number { 
     if (obj) {
       return this.get_attribute(obj as T);
     } else {
@@ -55,6 +56,7 @@ export class SliderControl<T extends obj> extends Control {
     }
   }
 
+  // method that returns a new object of the controller object with the attribute set to the relevant value
   setSliderValue(obj: T, value: number): T {
     if (obj) {
       return this.set_attribute(obj as T, value);

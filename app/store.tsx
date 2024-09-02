@@ -403,10 +403,11 @@ export const setSliderControlValueSelector =
       const obj_id = control.obj_id;
       const viz = state.vizobjs[obj_id];
       // use the set_attribute to update the viz
-      const updatedViz = control.set_attribute(viz, value);
+      const updatedViz = control.setSliderValue(viz, value);
       state.setVizObj(obj_id, updatedViz);
     }
   };
+
 
 // get the vizobj corresponding to a particular id
 // this is a curried function that takes the id of the vizobj to be set first
@@ -426,7 +427,7 @@ export const getSliderControlValueSelector =
   (control_id: number) => (state: State) => {
     const control = state.controls[control_id] as SliderControl<any>;
     const viz = state.vizobjs[control?.obj_id]; // get the vizobject corresponding to the slider control
-    return viz && control ? control.get_attribute(viz) : 0; 
+    return viz && control.getSliderValue(viz)
 
     // NOTE: 0 is the default value if the vizobject or control is not found
   };

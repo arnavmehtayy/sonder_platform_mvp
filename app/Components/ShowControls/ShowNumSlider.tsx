@@ -4,6 +4,7 @@ import {
   getSliderControlValueSelector
 } from "../../store";
 import { SliderControl } from "@/classes/Controls/SliderControl";
+import { useEffect } from "react";
 import Latex from "react-latex-next";
 
 /*
@@ -19,6 +20,7 @@ export default function NumSlide({ control_id }: { control_id: number }) {
   ) as SliderControl<any>;
   const isActive = control.isClickable; // if the control can be interacted with
   if (!control) return null;
+
 
   return (
     <div
