@@ -1,17 +1,12 @@
 "use client";
 import React from "react";
 import { Canvas } from "@react-three/fiber";
-import {
-  OrthographicCamera,
-  OrbitControls,
-} from "@react-three/drei";
+import { OrthographicCamera, OrbitControls } from "@react-three/drei";
 import { Showobj } from "./three/ShowObjs/Showobj";
 import { useStore, getObjectsSelector, getPlacementSelector } from "../store";
 import * as THREE from "three";
 
-import {
-  PlacementControl,
-} from "./three/PlacementControl";
+import { PlacementControl } from "./three/PlacementControl";
 
 /*
  * This component is the main visual experience component.
@@ -20,39 +15,14 @@ import {
  * The camera position is controlled by the useControls hook.
  */
 
-// function CameraHelper() {
-//   const camera = new THREE.OrthographicCamera(20, -20, 20, -20, 1, 100);
-//   return <cameraHelper args={[camera]} />;
-// }
-
 export default function Experience() {
   const objectlist = useStore(getObjectsSelector);
   const placement = useStore(getPlacementSelector);
-  // const { camera_pos } = useControls("cam", {
-  //   camera_pos: {
-  //     value: [0, 0, 20],
-  //     step: 0.1,
-  //   },
-  // });
-
-  // const { gridSize, ...gridConfig } = useControls({
-  //   gridSize: [10.5, 10.5],
-  //   cellSize: { value: 1, min: 0, max: 10, step: 0.1 },
-  //   cellThickness: { value: 1, min: 0, max: 5, step: 0.1 },
-  //   cellColor: "#6f6f6f",
-  //   sectionSize: { value: 2, min: 0, max: 10, step: 0.1 },
-  //   sectionThickness: { value: 1.5, min: 0, max: 5, step: 0.1 },
-  //   sectionColor: "#9d4b4b",
-  //   fadeDistance: { value: 100, min: 0, max: 200, step: 1 },
-  //   fadeStrength: { value: 1, min: 0, max: 2, step: 0.1 },
-  //   followCamera: false,
-  //   infiniteGrid: true,
-  // });
 
   return (
     <>
       <Canvas>
-        <OrthographicCamera
+        <OrthographicCamera // to allow for 2D camera view
           makeDefault
           zoom={25}
           position={[0, 0, 20]}
@@ -60,7 +30,7 @@ export default function Experience() {
           far={1000}
         />
 
-        <OrbitControls
+        <OrbitControls // to allow drag movement for translation and scroll for zoom
           enableRotate={false}
           enablePan={true}
           enableZoom={true}
@@ -90,7 +60,7 @@ export default function Experience() {
             GridVectors={placement.gridVectors}
             color={placement.color}
           />
-        ) : null}
+        ) : null} 
 
         <>
           {objectlist.map((obj, index) => (
@@ -98,7 +68,6 @@ export default function Experience() {
           ))}
         </>
 
-        {/* <Stats /> */}
       </Canvas>
     </>
   );

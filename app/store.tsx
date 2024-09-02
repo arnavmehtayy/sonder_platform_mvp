@@ -427,6 +427,7 @@ export const getSliderControlValueSelector =
     const control = state.controls[control_id] as SliderControl<any>;
     const viz = state.vizobjs[control?.obj_id]; // get the vizobject corresponding to the slider control
     return viz && control ? control.get_attribute(viz) : 0; 
+
     // NOTE: 0 is the default value if the vizobject or control is not found
   };
 
