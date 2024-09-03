@@ -7,7 +7,6 @@ import { obj } from "./vizobjects/obj";
 /*
     * This file contains the functions to get and set the attributes of a vizobj.
     * These functions are used in the ControlObj class to get and set the attributes of an object.
-
 */
 export function get_slope_intercept(obj: LineObj): Vector2 {
   if (obj instanceof LineObj) {

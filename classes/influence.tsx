@@ -1,13 +1,21 @@
 import { obj } from "./vizobjects/obj";
-import { TransformObj } from "./vizobjects/transformObj";
-import { Vector2 } from "three";
 
+
+/*
+ * This class is responsible for storing information about an influence that is to be computed
+  * the attributes of this class are: influence_id, 
+  * master_id: the id of the object that is the master object (the object that influences the worker object)
+  * worker_id: the id of the object that is the worker object (the object that is influenced by the master object)
+  * get_attribute: function that gets the attribute of the master object
+  * set_attribute: function that sets the attribute of the worker object
+  * transformation: function that takes the attribute of the master object and computes the attribute of the worker object
+*/
 export class Influence<T, master_T extends obj, worker_T extends obj> {
   influence_id: number;
-  master_id: number;
-  worker_id: number;
-  get_attribute: (vizobj: master_T) => T;
-  set_attribute: (vizobj: worker_T, value: T) => worker_T;
+  master_id: number; // the id of the object that is the influencer
+  worker_id: number; // the id of the object that is being influenced
+  get_attribute: (vizobj: master_T) => T; // function that gets the attribute of the master object
+  set_attribute: (vizobj: worker_T, value: T) => worker_T; // function that sets the attribute of the worker object
   transformation: (value: T, worker: worker_T, master: master_T) => T;
 
   constructor({
@@ -33,6 +41,8 @@ export class Influence<T, master_T extends obj, worker_T extends obj> {
     this.transformation = transformation;
   }
 
+ // given the worker and master objects this method updates the attribute of the worker object based on the attribute of the master object
+ // this is used by the storage system
   static UpdateInfluence<T, master_T extends obj, worker_T extends obj>(
     influence: Influence<T, master_T, worker_T>,
     master: master_T,
