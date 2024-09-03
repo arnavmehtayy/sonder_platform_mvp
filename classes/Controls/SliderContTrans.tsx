@@ -5,11 +5,10 @@ import { obj } from "../vizobjects/obj";
 import * as att_funcs from "../attribute_funcs";
 
 /*
- * This class stores the attributes of a transformation slider interaction in the scene.
+ * This class stores information about a slider that will be used to move-x axis, rotate-z axis, scale-x axis or move an object along some parametric path.
  * The set_attribute is how anyone using this control should update the object.
  * The get_attribute is how anyone using this control should get the object's attribute.
  * This control only permits the control of one 'number' attribute of the object and strictly through the set_attribute and get_attribute functions.
-
 */
 
 export type action_typ = "move" | "rotate" | "scale" | "path";
@@ -26,7 +25,7 @@ export class SlideContTrans<T extends TransformObj> extends SliderControl<T> {
     range,
     step_size = 1,
     param_curve = (t: number) =>
-      new THREE.Vector2(5 * Math.sin(t), 5 * Math.cos(t)), // default to a line
+      new THREE.Vector2(5 * Math.sin(t), 5 * Math.cos(t)), // default to a circle path
     desc = "slider control trans",
     text = "this is a slider control trans",
   }: Partial<SlideContTrans<T>> & {
@@ -48,7 +47,7 @@ export class SlideContTrans<T extends TransformObj> extends SliderControl<T> {
 
     // Determine attribute functions based on the action type
     switch (this.action) {
-      case "move":
+      case "move": // move along the x-axis
         this.get_attribute = (obj: T) => att_funcs.get_position(obj).x;
         this.set_attribute = (obj: T, value: number) =>
           att_funcs.set_position(
@@ -56,7 +55,7 @@ export class SlideContTrans<T extends TransformObj> extends SliderControl<T> {
             new THREE.Vector2(value, att_funcs.get_position(obj).y)
           ) as T;
         break;
-      case "rotate":
+      case "rotate": // rotate about the z-axis
         this.get_attribute = (obj: T) => att_funcs.get_rotation(obj).z;
         this.set_attribute = (obj: T, value: number) =>
           att_funcs.set_rotation(
@@ -68,7 +67,7 @@ export class SlideContTrans<T extends TransformObj> extends SliderControl<T> {
             )
           ) as T;
         break;
-      case "scale":
+      case "scale": // scale along the x-axis
         this.get_attribute = (obj: T) => att_funcs.get_scale(obj).x;
         this.set_attribute = (obj: T, value: number) =>
           att_funcs.set_scale(
@@ -80,7 +79,7 @@ export class SlideContTrans<T extends TransformObj> extends SliderControl<T> {
             )
           ) as T;
         break;
-      case "path": // rewrite this to use the parametric curve
+      case "path": // move along the parametric path
         this.get_attribute = (obj: T) => (obj.param_t ? obj.param_t : 0);
         this.set_attribute = (obj: T, t: number) =>
           att_funcs.set_path_pos(obj, this.param_curve(t), t) as T;

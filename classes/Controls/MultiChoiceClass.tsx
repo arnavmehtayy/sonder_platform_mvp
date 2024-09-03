@@ -3,9 +3,9 @@ import { Option } from "@/app/Components/ShowControls/ShowMultiChoice";
 
 
 /*
-* This class is responsible for storing information about a multiple choice question
-* the attributes of this class are: options, isMultiSelect, selectedOptions
-*/
+ * This class is responsible for storing information about a multiple choice question
+ * the attributes of this class are: options, isMultiSelect, selectedOptions
+ */
 
 export class MultiChoiceClass extends Control {
   options: Option[]; // the options of the multiple choice question

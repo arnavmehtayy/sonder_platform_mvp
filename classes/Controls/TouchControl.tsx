@@ -1,8 +1,15 @@
 import * as THREE from "three";
 import { TransformObj } from "../vizobjects/transformObj";
 
+/*
+ * This class stores information about the touch control (drei TransformControls for every object)
+ * this class is used by the GeneralTransformControls component to determine the attributes of the touch controls
+ * the attributes of this class are: scale, rotate, translate
+ * each of the above attributes are of type TouchControlAttributes and they define the direction, range and step size of the control of that type
+ */
+
 type TouchControlAttributes = {
-  direction: [boolean, boolean, boolean];
+  direction: [boolean, boolean, boolean]; // the direction in which we allow the control to move in
   range: [number, number];
   step_size: number;
 } | null;
@@ -26,6 +33,7 @@ export class TouchControl {
     this.translate = translate;
   }
 
+  // change the position, scale and rotation of a vizobject used by the storage system
   static populate_vizobj({
     vizobj,
     position,

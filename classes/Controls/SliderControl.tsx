@@ -9,7 +9,6 @@ import { Control } from "./Control";
   * range, step_size, 
   * get_attribute (function to get the attribute of the object that the control is controlling),
   * set_attribute (function to set the attribute of the object that the control is controlling)
-
 */
 // This class is the base class used to create a slider control for any object in the scene
 
