@@ -17,6 +17,7 @@ export class Score<Score_T> {
   transformation: (vals: number[]) => Score_T; // function that from the list of values of the objects, computes the score
   to_string: (score: Score_T) => string; // function that takes the output of the transform and converts it into a string
 
+
   constructor({
     text,
     score_id,

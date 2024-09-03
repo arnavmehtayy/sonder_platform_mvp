@@ -4,6 +4,9 @@ import { TouchControl } from "../Controls/TouchControl";
 import { ThreeEvent } from "react-three-fiber";
 import { Text } from "@react-three/drei";
 
+/*
+ * This class is used to create a object that has Text on it in the scene.
+*/
 export default class TextGeom extends geomobj {
   text: string;
 
@@ -14,11 +17,11 @@ export default class TextGeom extends geomobj {
     scale = new THREE.Vector3(1, 1, 1),
     color = "blue",
     geom, // geom remains a required parameter
-    touch_controls = new TouchControl(),
+    touch_controls = new TouchControl(), 
     param_t = 0, // the parametric parameter if the object is following a parametric object
     isClickable = true, // if this is false then this object cannot detect a click at all
-    OnClick = undefined,
-    text = "",
+    OnClick = undefined, 
+    text = "", // text on the object
     isEnabled = true,
   }: Partial<TextGeom> & { geom: THREE.BufferGeometry; id: number }) {
     super({
@@ -38,6 +41,8 @@ export default class TextGeom extends geomobj {
     this.name = text;
   }
 
+  // method that returns the physical three.js mesh representation of the object
+  // this is used to render the object in the vizexperience
   getMesh({
     children,
     onClickSelect = (event: ThreeEvent<MouseEvent>) => {},

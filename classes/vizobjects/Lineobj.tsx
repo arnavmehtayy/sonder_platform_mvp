@@ -11,12 +11,10 @@ import coloredObj from "./coloredObj";
     * This class is used to render a Line object in the scene.
     * This stores the start and end points of the line, and the line width.
     * This class provides functionality to convert between slope_intercept form and end points form.
-    
-
 */
 
 export class LineObj extends coloredObj {
-  start: Vector2;
+  start: Vector2; 
   end: Vector2;
   line_width: number = 2;
 
@@ -38,6 +36,7 @@ export class LineObj extends coloredObj {
     this.isClickable = isClickable;
   }
 
+  // methods that instantiates a new LineObj object with the slope and intercept values.
   static set_slope_intercept(
     obj: LineObj,
     b: number,
@@ -49,10 +48,12 @@ export class LineObj extends coloredObj {
     return new LineObj({ ...obj, start: start, end: end });
   }
 
+  // instantiates a new LineObj object with the start and end points.
   static set_endpoints(obj: LineObj, start: Vector2, end: Vector2) {
     return new LineObj({ ...obj, start: start, end: end });
   }
 
+  // returns the slope and intercept of the given line object
   get_slope_intercept(): [number, number, [number, number]] {
     if (this.end.x - this.start.x === 0) {
       return [this.start.y, 0, [this.start.x, this.end.x]];
@@ -66,6 +67,8 @@ export class LineObj extends coloredObj {
     return this.start.distanceTo(this.end);
   }
 
+  // method that returns the physical three.js mesh representation of the object
+  // this is used to render the object in the vizexperience
   getMesh({
     children = null,
     onClickSelect,

@@ -1,10 +1,15 @@
 import {SelectControl} from "../Controls/SelectControl"
 import Validation from "./Validation"
 
+/* 
+* Validation class for the Select control
+* This class checks if the selected objects are equal to the answer objects
+* attributes of this class are: answer, control_id
+*/
 
 export default class Validation_select extends Validation {
-    answer: number[]
-    control_id: number
+    answer: number[] // the list of objects that should be selected
+    control_id: number 
 
     constructor({
         answer,
@@ -20,6 +25,8 @@ export default class Validation_select extends Validation {
         this.control_id = control_id
     }
 
+    // method to check if the selected objects are equal to the answer objects
+    // this is used by the storage system
     computeValidity(obj: SelectControl): Validation_select {
         if (this.answer.length === obj.selected.length) {
             for (let i = 0; i < this.answer.length; i++) {

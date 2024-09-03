@@ -1,14 +1,10 @@
 import * as THREE from "three";
-import { SliderControl } from "../Controls/SliderControl";
 import { TouchControl } from "../Controls/TouchControl";
-import { obj } from "./obj";
 import coloredObj from "./coloredObj";
 
 /*
   * This class stores the position, scale and rotation attributes of an object in the scene.
   * This is the ground truth data that is used to render the object in the scene.
-  * This class also store the touch controls
-
 */
 
 export class TransformObj extends coloredObj {
@@ -16,7 +12,7 @@ export class TransformObj extends coloredObj {
   rotation: THREE.Vector3;
   scale: THREE.Vector3;
   touch_controls: TouchControl;
-  param_t: number; // if we have a parametric curve, this is the parameter value
+  param_t: number; // if we have a parametric curve, this is the parameter value. Do not use it directly
 
   constructor({
     id,

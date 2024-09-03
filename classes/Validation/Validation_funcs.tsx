@@ -1,30 +1,25 @@
 import * as THREE from "three";
 import { value_typ } from "./Validation_obj";
 
-export function compare<T extends value_typ>( // if greater than 0 then a is greater than b, if less than 0 then a is less than b, if 0 then a is equal to b
-  a: T,
-  b: T,
-  error: number,
-) {
-  if(isEqual(a, b, error)) {
+// helper functions for the validation classes
+
+export function compare<T extends value_typ>(a: T, b: T, error: number) { // if greater than 0 then a is greater than b, if less than 0 then a is less than b, if 0 then a is equal to b
+  if (isEqual(a, b, error)) {
     return 0;
   }
 
   if (typeof a === "number" && typeof b === "number") {
-    return a-b;
+    return a - b;
   } else if (a instanceof THREE.Vector2 && b instanceof THREE.Vector2) {
-    if(a.x === b.x && a.y === b.y) {
-      return 0
+    if (a.x === b.x && a.y === b.y) {
+      return 0;
     }
-    return -1
+    return -1;
   } else if (a instanceof THREE.Vector3 && b instanceof THREE.Vector3) {
-    return -1
+    return -1;
   }
-  return -1
-
+  return -1;
 }
-
-
 
 export function isEqual<T extends value_typ>(a: T, b: T, error: number) {
   if (typeof a === "number" && typeof b === "number") {
@@ -36,6 +31,7 @@ export function isEqual<T extends value_typ>(a: T, b: T, error: number) {
   }
   return false;
 }
+
 
 export function isnumberGreater(a: number, b: number, error: number) {
   return a - b >= error;
@@ -67,7 +63,6 @@ export function isAnyNItemsEqual(list1: any[], list2: any[], n: number) {
   return count === n;
 }
 
-// equality checking
 
 function isnumberEqual(a: number, b: number, error: number) {
   return Math.abs(a - b) <= error;

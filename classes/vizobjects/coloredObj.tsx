@@ -3,6 +3,11 @@ import React from "react";
 import * as THREE from "three";
 import { ThreeEvent } from "@react-three/fiber";
 
+
+/*
+ * This class is used to create a colored object in the scene.
+*/
+
 export default class coloredObj extends obj {
   color: string;
 
@@ -16,6 +21,8 @@ export default class coloredObj extends obj {
     this.color = color;
   }
 
+  // method that returns the physical three.js mesh representation of the object
+  // this is used to render the object in the vizexperience
   getMesh({
     children,
     onClickSelect = (event: ThreeEvent<MouseEvent>) => {},

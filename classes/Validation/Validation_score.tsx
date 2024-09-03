@@ -1,8 +1,13 @@
-import { Score } from "../Scores/Score";
 import Validation from "./Validation";
-import * as val_func from "./Validation_funcs";
 import { obj } from "../vizobjects/obj";
-import { relation, value_typ } from "./Validation_obj";
+import { relation } from "./Validation_obj";
+
+/*
+ * this class stores information to validate a score
+ * score_T represents the type of the score that is to be validated
+ * obj_T represents the type of the object that is to be validated
+ * attributes: score_id, target_score, error, relation, comparator
+ */
 
 export default class Validation_score<
   score_T,
@@ -11,8 +16,8 @@ export default class Validation_score<
   score_id: number;
   target_score: score_T;
   error: number;
-  relation: relation;
-  comparator: (a: score_T, b: score_T) => number;
+  relation: relation; // this is the relation that is to be used in the comparison
+  comparator: (a: score_T, b: score_T) => number; // this is the function that is used to compare the scores
 
   constructor({
     score_id,
@@ -35,6 +40,9 @@ export default class Validation_score<
     this.comparator = comparator;
   }
 
+
+  // method that given the score computes the validity of that score
+  // this is used by the storage system
   computeValidity(score: score_T): Validation_score<string, obj_T> {
     // console.log("score", score, this.target_score);
     switch (this.relation) {

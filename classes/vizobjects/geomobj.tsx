@@ -9,8 +9,8 @@ import coloredObj from "./coloredObj";
  */
 
 export class geomobj extends TransformObj {
-  geom: THREE.BufferGeometry;
-  isClickable: boolean = false;
+  geom: THREE.BufferGeometry; // the geometry of the object
+  isClickable: boolean = false; // whether the object on the screen can be clicked or not
   OnClick: ((obj: geomobj) => void) | undefined;
   constructor({
     id,
@@ -42,6 +42,8 @@ export class geomobj extends TransformObj {
     this.OnClick = OnClick;
   }
 
+  // method that returns the physical three.js mesh representation of the object
+  // this is used to render the object in the vizexperience
   getMesh({
     children,
     onClickSelect = (event: ThreeEvent<MouseEvent>) => {},

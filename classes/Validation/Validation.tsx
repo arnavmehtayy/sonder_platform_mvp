@@ -1,10 +1,15 @@
 import { obj } from "../vizobjects/obj";
 
-export default abstract class Validation {
-  desc: string;
-  is_valid: boolean;
+/*
+ * This is the parent class for all the Validation classes
 
-  abstract computeValidity(obj: any | obj[]): Validation;
+*/
+export default abstract class Validation {
+  desc: string; // description of the validation that will show on the validation on the autograder
+  is_valid: boolean; // this is the boolean that tells if the validation is valid or not
+
+  // every validator must have a method to compute the validity of the object
+  abstract computeValidity(obj: any | obj[]): Validation; 
 
   constructor({
     is_valid,
@@ -21,8 +26,8 @@ export default abstract class Validation {
     return this.is_valid;
   }
 
+  // for the store system
   set_valid(val: boolean): Validation {
-    // for the store system
     if (this.is_valid == val) {
       return this;
     }

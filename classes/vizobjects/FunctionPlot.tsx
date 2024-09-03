@@ -4,8 +4,13 @@ import { TouchControl } from "../Controls/TouchControl";
 import { ThreeEvent } from "react-three-fiber";
 import { Line } from "@react-three/drei";
 
+/*
+ * object that represents a function, it is plotted using lots of lines attached together
+ * to make the curve look smoother increase the num of points
+*/
+
 export default class FunctionPlot extends geomobj {
-  func: (x: number) => number;
+  func: (x: number) => number; // function to plot
   xRange: [number, number];
   numPoints: number;
   lineWidth: number;
@@ -46,7 +51,9 @@ export default class FunctionPlot extends geomobj {
     this.lineWidth = lineWidth;
     this.name = "FunctionPlot";
   }
-
+  
+  // method that returns the physical three.js mesh representation of the object
+  // this is used to render the object in the vizexperience
   getMesh({
     children,
     onClickSelect = (event: ThreeEvent<MouseEvent>) => {},

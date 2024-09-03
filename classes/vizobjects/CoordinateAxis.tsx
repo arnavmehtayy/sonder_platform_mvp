@@ -5,13 +5,16 @@ import { ThreeEvent } from "react-three-fiber";
 import { Line } from "@react-three/drei";
 import { Text } from "@react-three/drei";
 
+/*
+ * This class is used to create a Coordinate Axis (2D coordinate graph) in the scene.
+*/
 export default class CoordinateAxis extends geomobj {
-  axisLength: number;
-  tickSpacing: number;
-  tickSize: number;
-  showLabels: boolean;
-  fontSize: number;
-  lineWidth: number;
+  axisLength: number; 
+  tickSpacing: number; // the spacing between the ticks on the axis
+  tickSize: number; // the size of the ticks on the axis
+  showLabels: boolean; // whether to show the labels on the axis
+  fontSize: number; // the size of the font of the labels
+  lineWidth: number; // the width of the line of the axis
   xLabel: string;
   yLabel: string;
 
@@ -60,6 +63,8 @@ export default class CoordinateAxis extends geomobj {
     this.yLabel = yLabel;
   }
 
+  // method that returns the physical three.js mesh representation of the object
+  // this is used to render the object in the vizexperience
   getMesh({
     children,
     onClickSelect = (event: ThreeEvent<MouseEvent>) => {},

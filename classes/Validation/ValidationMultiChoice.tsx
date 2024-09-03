@@ -1,8 +1,14 @@
 import { MultiChoiceClass } from "../Controls/MultiChoiceClass";
 import Validation from "./Validation";
 
+
+/*
+* Validation class for the MultiChoice control
+* This class checks if the selected choices are equal to the answer choices
+*/
+
 export class ValidationMultiChoice extends Validation {
-    answer : number[]
+    answer : number[] // the list of objects that should be selected as the MCQ choices
     control_id : number
 
     constructor({
@@ -19,6 +25,8 @@ export class ValidationMultiChoice extends Validation {
         this.control_id = control_id
     }
 
+    // method to check if the selected choices are equal to the answer choices
+    // this is used by the storage system
     computeValidity(obj: MultiChoiceClass): ValidationMultiChoice {
         if (this.answer.length === obj.selectedOptions.length) {
             for (let i = 0; i < this.answer.length; i++) {
