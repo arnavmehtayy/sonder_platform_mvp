@@ -63,6 +63,8 @@ export interface OrderItem {
 
 export type ComponentType = "score" | "control" | "placement" | "question";
 
+export type EditAddType = string | obj | Control  | Score<any> | Placement | Influence<any, obj, obj> | Validation | OrderItem;
+
 export type State = {
   title: string;
   questions: { [id: number]: string };

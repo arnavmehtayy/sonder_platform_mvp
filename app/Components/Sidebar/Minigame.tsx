@@ -13,7 +13,7 @@ import "katex/dist/katex.min.css";
 import { PlacementProvider } from "../three/PlacementControl";
 import "../style.css";
 import ValidationComponent from "../ShowValid";
-import { OrderHandler, OrderItem } from "./OrderHandler";
+import { OrderHandler } from "./OrderHandler";
 
 /*
  * This component is the main component for the minigame. It is responsible for rendering the Three.js experience and the sidebar.
