@@ -17,7 +17,7 @@ export type ComponentType = "score" | "control" | "placement" | "question";
 export interface OrderItem {
   type: ComponentType; 
   id: number;
-  hint?: string;
+  // hint?: string; removed hints for now will move it somewhere else
 }
 
 interface OrderHandlerProps {
@@ -30,11 +30,11 @@ export const OrderHandler: React.FC<OrderHandlerProps> = ({ state_name }) => {
   const order = initDataSets[state_name].order; // the order of things in the sidebar along with hints
   // note that hints can only be added to questions
   const title = initDataSets[state_name].title;
-  const [showHint, setShowHint] = useState<{ [key: number]: boolean }>({});
+  // const [showHint, setShowHint] = useState<{ [key: number]: boolean }>({});
 
-  const toggleHint = (index: number) => {
-    setShowHint(prev => ({ ...prev, [index]: !prev[index] }));
-  };
+  // const toggleHint = (index: number) => {
+  //   setShowHint(prev => ({ ...prev, [index]: !prev[index] }));
+  // };
 
   const renderComponent = (item: OrderItem, index: number) => {
     // this renders each of the boxes in the sidebar
@@ -69,7 +69,7 @@ export const OrderHandler: React.FC<OrderHandlerProps> = ({ state_name }) => {
                 <Latex>{questions[item.id as number]}</Latex>
               ) : null}
             </p>
-            {item.hint && (
+            {/* {item.hint && (
               <div className="mt-2">
                 <button
                   onClick={() => toggleHint(index)}
@@ -81,7 +81,7 @@ export const OrderHandler: React.FC<OrderHandlerProps> = ({ state_name }) => {
                   <p className="text-gray-600 mt-1">{item.hint}</p>
                 )}
               </div>
-            )}
+            )} */}
           </div>
         );
       default:

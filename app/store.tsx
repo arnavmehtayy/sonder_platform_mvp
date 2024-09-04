@@ -61,6 +61,7 @@ Reset: takes in the state_name and populates the placement, scores, vizobjs, con
 
 
 export type State = {
+  // questions: 
   validations: Validation[];
   state_name: keyof typeof initDataSets;
   placement: Placement | null;
