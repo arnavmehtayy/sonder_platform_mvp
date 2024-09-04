@@ -21,7 +21,6 @@ import { InputNumber } from "@/classes/Controls/InputNumber";
 import { Validation_inputNumber } from "@/classes/Validation/Validation_inputNumber";
 import { EnablerControl } from "@/classes/Controls/EnablerControl";
 
-
 /*
 
 A state in our storage system represents a single visual slide in our viztools. 
@@ -35,7 +34,8 @@ Validations: a dictionary of id => instance that represents the ‘correct’ st
 Influences:  a dictionary of id => instance that defines how a particular viz obj may affect another vizobj. There are two objects the master: the master which is the object that is influencing and the worker which is the object that is being influenced. Allows the worker object to listen to a particular attribute of the master object and change its own attributes based on the master's attributes. 
 Scores: a dictionary of id => instance that represents the numerical scores that are displayed in the sidebar that can change when controls are adjusted by the user.
 isSelectActive: stores if the select control has been activated so that we can disable other interactions 
-isPlacementMode: stores if the placement control has been activated so that we can disable other interactions 
+isActivePlacement: stores if the placement control has been activated so that we can disable other interactions 
+questions: a dictionary of id => string that stores the questions that are displayed in the sidebar
 
 Functions in our Storage System:
 
@@ -54,14 +54,8 @@ Reset: takes in the state_name and populates the placement, scores, vizobjs, con
 
 */
 
-
-
-
-
-
-
 export type State = {
-  // questions: 
+  questions: { [id: number]: string };
   validations: Validation[];
   state_name: keyof typeof initDataSets;
   placement: Placement | null;
@@ -89,6 +83,7 @@ export type State = {
 };
 
 export const useStore = create<State>((set, get) => ({
+  questions: {},
   isActivePlacement: false,
   validations: [],
   state_name: "default",
@@ -155,7 +150,7 @@ export const useStore = create<State>((set, get) => ({
 
       return {
         controls: updatedControls,
-        isPlacementMode: val,
+        isActivePlacement: val,
       };
     });
   },
@@ -163,7 +158,7 @@ export const useStore = create<State>((set, get) => ({
   // set the particular select control to be active and disable every other control, and also disable the placement if it exists. Further this function deals with the logic of selection, it sets the relevant objects to be clickable and it sets the button to inactive when all the selections have been made.
   SetIsActiveSelectControl: (control_id: number) => (val: boolean) => {
     set((state) => {
-      const control = state.controls[control_id] as SelectControl; 
+      const control = state.controls[control_id] as SelectControl;
       if (control instanceof SelectControl) {
         // set the current control to be active and disable all other controls
         const updatedControls = Object.entries(state.controls).reduce(
@@ -172,14 +167,14 @@ export const useStore = create<State>((set, get) => ({
             acc[Number(id)] = isCurrentControl
               ? (ctrl as SelectControl).setIsActive(val)
               : Control.setControlisClickable(ctrl, !val);
-            return acc; 
+            return acc;
           },
           {} as { [id: number]: Control }
         );
 
         const updatedPlacement = state.placement
           ? Placement.setPlacementisClickable(state.placement, !val)
-          : null; 
+          : null;
 
         // Update selectable objects and make sure they are clickable
         if (control) {
@@ -324,6 +319,11 @@ export const useStore = create<State>((set, get) => ({
       isSelectActive: false,
       validations: dataSet.validations,
 
+      questions: dataSet.questions.reduce((acc, question) => {
+        acc[question.id] = question.text;
+        return acc;
+      }, {} as { [id: number]: string }),
+
       controls: dataSet.controlData.reduce((acc, control) => {
         acc[control.id] = control;
         return acc;
@@ -368,34 +368,30 @@ export const useStore = create<State>((set, get) => ({
       return { vizobjs: updatedVizobjs };
     });
   },
-  
-
 }));
 
-
 // get the score corresponding to some score_id
-export const getScore = (score_id: number) => { 
+export const getScore = (score_id: number) => {
   const scores = useStore.getState().scores;
   return scores[score_id];
 };
 
 // get the list of all vizobjects
-export const getObjectsSelector = (state: State) => 
-  Object.values(state.vizobjs); 
-
+export const getObjectsSelector = (state: State) =>
+  Object.values(state.vizobjs);
 
 // get the function to set an arbitrary vizobject
 export const setVizObjSelector = (state: State) => state.setVizObj;
 
-
-// get the function to set a particular vizobject defined by its id 
+// get the function to set a particular vizobject defined by its id
 // this is a curried function that takes the id of the object to be set first
-// to call it do useStore(setVizObjSelector2(id))(new_obj) this helps with effeciency 
-export const setVizObjSelector2 = (id: number) => (state: State) => (new_obj: obj) => {
-  state.setVizObj(id, new_obj);
-}
+// to call it do useStore(setVizObjSelector2(id))(new_obj) this helps with effeciency
+export const setVizObjSelector2 =
+  (id: number) => (state: State) => (new_obj: obj) => {
+    state.setVizObj(id, new_obj);
+  };
 
-// get the function to set the value of a particular slider control 
+// get the function to set the value of a particular slider control
 // this is a curried function that takes the id of the control to be set first
 export const setSliderControlValueSelector =
   (control_id: number) => (state: State) => (value: number) => {
@@ -409,7 +405,6 @@ export const setSliderControlValueSelector =
     }
   };
 
-
 // get the vizobj corresponding to a particular id
 // this is a curried function that takes the id of the vizobj to be set first
 export const getObjectSelector = (id: number) => (state: State) =>
@@ -419,16 +414,15 @@ export const getObjectSelector = (id: number) => (state: State) =>
 export const getObjectSelector2 = (state: State) => (id: number) =>
   state.vizobjs[id];
 
-export const getControlSelector = (control_id: number) => (state: State) => 
+export const getControlSelector = (control_id: number) => (state: State) =>
   state.controls[control_id];
-
 
 // get the value of a particular slider control given its id
 export const getSliderControlValueSelector =
   (control_id: number) => (state: State) => {
     const control = state.controls[control_id] as SliderControl<any>;
     const viz = state.vizobjs[control?.obj_id]; // get the vizobject corresponding to the slider control
-    return viz && control.getSliderValue(viz)
+    return viz && control.getSliderValue(viz);
 
     // NOTE: 0 is the default value if the vizobject or control is not found
   };
@@ -438,8 +432,8 @@ export const SelectObjectControl = (obj_id: number) => (state: State) => () => {
   Object.values(state.controls).forEach((control) => {
     if (control instanceof SelectControl) {
       // wasSelected is true if the objected was actually added to the selected list
-      const [updatedControl, wasSelected] = control.SelectObj(obj_id); 
-      
+      const [updatedControl, wasSelected] = control.SelectObj(obj_id);
+
       if (wasSelected) {
         // Update the control with the new SelectControl obj that has the selected object added
         state.setControl(control.id, updatedControl);
@@ -480,7 +474,8 @@ export const DeSelectObjectControl =
     if (obj_id in state.vizobjs) {
       const select_obj = control.deselectObj(obj_id);
       const updatedState = select_obj[0];
-      if (select_obj[1]) { // if the deselection was successful
+      if (select_obj[1]) {
+        // if the deselection was successful
         const new_obj = Object.assign(
           Object.create(Object.getPrototypeOf(state.vizobjs[obj_id])),
           state.vizobjs[obj_id]
@@ -488,7 +483,7 @@ export const DeSelectObjectControl =
         new_obj.isClickable = true; // make the deselected object clickable again
         state.setVizObj(obj_id, new_obj);
       }
-      state.setControl(control.id, updatedState); 
+      state.setControl(control.id, updatedState);
     }
   };
 
@@ -498,8 +493,7 @@ export const SetIsActiveSelectControl =
     state.SetIsActiveSelectControl(control_id)(val);
   };
 
-
-  export const getStateName = (state: State) => state.state_name;
+export const getStateName = (state: State) => state.state_name;
 
 export const getNameSelector = (state: State) => (id: number) =>
   state.vizobjs[id].name;
@@ -519,7 +513,8 @@ export const getValidationsSelector = (state: State) => state.validations;
 export const UpdateAllInfluencesSelector = (state: State) =>
   state.updateAllInfluences;
 
-export const isPlacementModeSelector = (state: State) => state.isActivePlacement;
+export const isPlacementModeSelector = (state: State) =>
+  state.isActivePlacement;
 
 export const setIsPlacementModeSelector = (state: State) => (val: boolean) => {
   state.setIsPlacementMode(val);
@@ -540,4 +535,8 @@ export const setEnablerControl =
     state.setEnablerControl(control_id)(isEnabled);
   };
 
-export const isValidatorClickableSelector = (state: State) => !state.isActivePlacement && !state.isSelectActive;
+export const getQuestionsSelector = (state: State) => (question_id: number) =>
+  state.questions[question_id];
+
+export const isValidatorClickableSelector = (state: State) =>
+  !state.isActivePlacement && !state.isSelectActive;

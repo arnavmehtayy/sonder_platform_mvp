@@ -1,9 +1,11 @@
+'use client';
 import React, { useState } from "react";
 import ShowScore from "../ShowScore";
 import ShowControl from "../ShowControls/ShowControl";
 import ShowPlacement from "../ShowPlacement";
 import Latex from "react-latex-next";
 import { initDataSets } from "@/classes/Data/CompleteData";
+import { useStore, getQuestionsSelector } from "@/app/store";
 
 /*
  * This component is responsible for rendering the order of components in the sidebar
@@ -26,7 +28,7 @@ interface OrderHandlerProps {
 
 export const OrderHandler: React.FC<OrderHandlerProps> = ({ state_name }) => {
 
-  const questions = initDataSets[state_name].questions; // the set of questions for the current state
+  const get_questions = useStore(getQuestionsSelector); // the set of questions for the current state
   const order = initDataSets[state_name].order; // the order of things in the sidebar along with hints
   // note that hints can only be added to questions
   const title = initDataSets[state_name].title;
@@ -54,6 +56,7 @@ export const OrderHandler: React.FC<OrderHandlerProps> = ({ state_name }) => {
       case "placement":
         return <ShowPlacement key={`placement-${index}`} />;
       case "question":
+        const question = get_questions(item.id as number);
         return (
           <div key={`question-${index}`} className="p-4">
             {item.id == 0 ? (
@@ -65,8 +68,8 @@ export const OrderHandler: React.FC<OrderHandlerProps> = ({ state_name }) => {
             ) : null}
 
             <p id={`question-text-${index}`} className="text-gray-700">
-              {item.id < questions.length ? (
-                <Latex>{questions[item.id as number]}</Latex>
+              {question ? (
+                <Latex>{question}</Latex>
               ) : null}
             </p>
             {/* {item.hint && (

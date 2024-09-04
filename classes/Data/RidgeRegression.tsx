@@ -386,7 +386,7 @@ export const data_regression: { [key: string]: data_type } = {
     ],
     title: "Introduction to Linear Regression",
     questions: [
-      `
+      {id: 0, text:`
         We are studying the relationship between a company's average stock price and its revenue using data from 30 companies. 
 
         <br> <br> 
@@ -402,9 +402,9 @@ export const data_regression: { [key: string]: data_type } = {
         Simply put, we measure the distance from each of the 30 points to the line, square these distances, and add them up.
         <br> <br>
         $\\textbf{Observe} $ : Adjusting the line will change the score because changing the line alters the distances between the points and the line.
-        `,
-      `$\\textbf{Adjust the slope and intercept}$ of the line to get as close to the optimal score as possible.`,
-      `We use $\\textbf{5 new data points}$ to check the validity of our line.`,
+        `},
+      {id: 1, text: `$\\textbf{Adjust the slope and intercept}$ of the line to get as close to the optimal score as possible.`},
+      {id: 2, text: `We use $\\textbf{5 new data points}$ to check the validity of our line.`},
     ],
     validations: [
       new Validation_score<number, obj>({
@@ -496,7 +496,7 @@ export const data_regression: { [key: string]: data_type } = {
       { type: "control", id: 4 },
     ],
     questions: [
-      `Our team realized that we missed data for 10 companies, which we've now added to the plot and highlighted in pink.
+      {id: 0, text: `Our team realized that we missed data for 10 companies, which we've now added to the plot and highlighted in pink.
 <br><br>
 You'll notice that these $\\textbf{pink companies}$ have unusually high stock prices compared to their revenue.
 <br><br>
@@ -512,9 +512,9 @@ $\\textbf{Note}$ : The value of the $\\textbf{New Score}$ is irrelevant; our goa
 The $\\textbf{green line}$ is the line of best fit that you identified in the last part.
 
     
-        `,
-      `For simplicity we have fixed the slope of the red line. $\\textbf{Adust the intercept}$ of the $\\textbf{red line}$ to achieve the optimal score. The optimal score is $\\textbf{under 155}$.`,
-      "We will use the same $\\textbf{5 new companies}$ to validate the red line again.",
+        `},
+      {id: 1, text: `For simplicity we have fixed the slope of the red line. $\\textbf{Adust the intercept}$ of the $\\textbf{red line}$ to achieve the optimal score. The optimal score is $\\textbf{under 155}$.`},
+      {id: 2, text: "We will use the same $\\textbf{5 new companies}$ to validate the red line again."},
     ],
     validations: [
       new Validation_score<number, obj>({
@@ -579,17 +579,17 @@ The $\\textbf{green line}$ is the line of best fit that you identified in the la
   ridge_regression: {
     title: "Fighting the Outliers",
     questions: [
-      `The pink companies are known as $\\textbf{outliers}$, and they skew our model as seen in the previous part. $\\textbf{Ridge Regression}$ is a modification to our scoring method to better handle these outliers.
+      {id: 0, text:`The pink companies are known as $\\textbf{outliers}$, and they skew our model as seen in the previous part. $\\textbf{Ridge Regression}$ is a modification to our scoring method to better handle these outliers.
         \\[
             \\text{Ridge Score} = \\sum_{i=1}^{40} \\text{dist}(\\text{line}, (x_i, y_i))^2  + \\lambda \\cdot \\text{slope}^2
         \\]
 
         The only modification is the addition of the $\\lambda \\cdot \\text{slope}^2$ term.  For now, we'll set $\\lambda = 16$, and we'll discuss the choice of $\\lambda$ later. <br> <br>
         The $\\textbf{green line}$ represents the line of best fit obtained in the previous part. Notice how it $\\textbf{does not represent}$ the white data well as it has been skewed by the outliers. <br> <br>
-       `,
-      `We’ve fixed the y-intercept of the red line. Adjust the slope of the $\\textbf{red line}$ to achieve the optimal $\\textbf{Ridge Score}$ which is under 286. <br> <br>
-       $\\textbf{Note}$: The value of the $\\textbf{Ridge Score}$ is irrelevant; our focus is on getting it as close to 0 as possible.`,
-      "Notice how our $\\textbf{red line}$ outperforms the green line on this new data. This modification to the score made our red model more $\\textbf{robust against outliers}$.",
+       `},
+      {id: 1, text:`We’ve fixed the y-intercept of the red line. Adjust the slope of the $\\textbf{red line}$ to achieve the optimal $\\textbf{Ridge Score}$ which is under 286. <br> <br>
+       $\\textbf{Note}$: The value of the $\\textbf{Ridge Score}$ is irrelevant; our focus is on getting it as close to 0 as possible.`},
+      {id: 2, text:"Notice how our $\\textbf{red line}$ outperforms the green line on this new data. This modification to the score made our red model more $\\textbf{robust against outliers}$."},
     ],
     order: [
       { type: "question", id: 0 },
@@ -677,18 +677,18 @@ The $\\textbf{green line}$ is the line of best fit that you identified in the la
       { type: "question", id: 1 },
     ],
     questions: [
-      `This modification to the score is called $\\textbf{Ridge Regression}$ and it works well to correct the line in this case. <br> <br> However, a natural question to ask is: how do we choose $\\lambda $ in the $\\textbf{ridge score}$? In the previous part we set $\\lambda = 16$ but is this value always beneficial? <br> <br>
+      {id: 0, text:`This modification to the score is called $\\textbf{Ridge Regression}$ and it works well to correct the line in this case. <br> <br> However, a natural question to ask is: how do we choose $\\lambda $ in the $\\textbf{ridge score}$? In the previous part we set $\\lambda = 16$ but is this value always beneficial? <br> <br>
 
       To explore this, we will consider $\\textbf{how varying $\\lambda$  affects the line}$ for which the ridge score is minimized:
          \\[
             \\text{Ridge Score} = \\sum_{i=1}^{40} \\text{dist}(\\text{line}, (x_i, y_i))^2  + \\lambda \\cdot \\text{slope}^2
         \\] 
       
-     Test your hypothesis by $\\textbf{adjusting the sliders}$. After experimenting, proceed to answer the question below`,
-      `$\\textbf{Hint} $: First, examine the score equation and attempt to infer the purpose of the two terms. To test your hypothesis, set 
+     Test your hypothesis by $\\textbf{adjusting the sliders}$. After experimenting, proceed to answer the question below`},
+      {id: 1, text:`$\\textbf{Hint} $: First, examine the score equation and attempt to infer the purpose of the two terms. To test your hypothesis, set 
 $\\lambda$ to a very large value, and adjust the line to minimize the score. Afterward, repeat the process with $\\lambda$ set to a very small value. <br> <br>
       Notice that this is like a game of tug-of-war: the $\\textbf{outliers}$ are pulling the $\\textbf{slope}$ of the line $\\textbf{higher}$ to keep the first term of the score small, while the 
-$\\lambda \\cdot \\text{slope}^2 $ term is pulling the $\\textbf{slope lower}$ to reduce the second term. These two forces are working in $\\textbf{opposition}$. The ideal value for  $\\lambda $ depends on the specific problem, and finding the optimal value involves a process of trial and error`,
+$\\lambda \\cdot \\text{slope}^2 $ term is pulling the $\\textbf{slope lower}$ to reduce the second term. These two forces are working in $\\textbf{opposition}$. The ideal value for  $\\lambda $ depends on the specific problem, and finding the optimal value involves a process of trial and error`},
     ],
     validations: [
       
@@ -806,16 +806,16 @@ $\\lambda \\cdot \\text{slope}^2 $ term is pulling the $\\textbf{slope lower}$ t
       { type: "placement", id: 0 },
     ],
     questions: [
-      `Even if we succeed in selecting an optimal $ \\lambda $, this method is not foolproof. We will construct a scenario where $\\textbf{ridge regression}$ fails. <br>
+      {id: 0, text:`Even if we succeed in selecting an optimal $ \\lambda $, this method is not foolproof. We will construct a scenario where $\\textbf{ridge regression}$ fails. <br>
 
 To recap, the goal of ridge regression is to adjust the slope and intercept of a line in order to make the following $\\textbf{ridge score}$ as close to 0:
 \\[
 \\text{Ridge Score} = \\sum_{i=1}^{40} \\text{dist}(\\text{line}, (x_i, y_i))^2 + \\lambda \\cdot \\text{slope}^2
 \\]
-For reference, the $\\textbf{green line}$ represents the true relation between the stock prices and revenue of a company. <br> <br>`,
-      `Notice that we have $\\textbf{added 4 pink outlier}$ data points. Answer the below questions by selecting the relevant pink points.`,
-      `As a reminder the $\\textbf{ridge score}$ is designed to $\\textbf{prefer}$ lines with $\\textbf{smaller slopes}$, but is this always beneficial to control outliers?`,
-      `Choose a position to $\\textbf{place an outlier}$ that would cause ridge regression to shift the slope of the line in the $\\textbf{wrong direction}$. A wrong direction is that which moves the line away from the true line`,
+For reference, the $\\textbf{green line}$ represents the true relation between the stock prices and revenue of a company. <br> <br>`},
+      {id: 1, text:`Notice that we have $\\textbf{added 4 pink outlier}$ data points. Answer the below questions by selecting the relevant pink points.`},
+      {id: 2, text:`As a reminder the $\\textbf{ridge score}$ is designed to $\\textbf{prefer}$ lines with $\\textbf{smaller slopes}$, but is this always beneficial to control outliers?`},
+      {id: 3, text:`Choose a position to $\\textbf{place an outlier}$ that would cause ridge regression to shift the slope of the line in the $\\textbf{wrong direction}$. A wrong direction is that which moves the line away from the true line`},
     ],
     validations: [
       new Validation_select({

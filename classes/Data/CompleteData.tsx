@@ -18,7 +18,7 @@ import { MultiChoiceClass } from "../Controls/MultiChoiceClass";
 
 export type data_type = {
   title: string;
-  questions: string[];
+  questions: {id: number, text: string}[];
   influencesData: Influence<any, any, any>[];
   controlData: Control[];
   canvasData: obj[];
@@ -39,7 +39,7 @@ export const initDataSets: { default: data_type; [key: string]: data_type } = {
   default: {
     title: "Question default",
     order: [{ type: "question", id: 0}],
-    questions: ["This is default", "This"],
+    questions: [{id: 0, text: "This is default"}, {id: 1, text: "This"}],
     validations: [new Validation_test()],
     influencesData: [],
     controlData: [
