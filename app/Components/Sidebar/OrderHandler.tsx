@@ -5,7 +5,7 @@ import ShowControl from "../ShowControls/ShowControl";
 import ShowPlacement from "../ShowPlacement";
 import Latex from "react-latex-next";
 import { initDataSets } from "@/classes/Data/CompleteData";
-import { useStore, getQuestionsSelector } from "@/app/store";
+import { useStore, getQuestionsSelector, getTitleSelector, getOrderSelector, OrderItem } from "@/app/store";
 
 /*
  * This component is responsible for rendering the order of components in the sidebar
@@ -13,25 +13,12 @@ import { useStore, getQuestionsSelector } from "@/app/store";
  * It is used to render the order of components in the sidebar
  */
 
-// Define types for our components
-export type ComponentType = "score" | "control" | "placement" | "question";
-
-export interface OrderItem {
-  type: ComponentType; 
-  id: number;
-  // hint?: string; removed hints for now will move it somewhere else
-}
-
-interface OrderHandlerProps {
-  state_name: keyof typeof initDataSets;
-}
-
-export const OrderHandler: React.FC<OrderHandlerProps> = ({ state_name }) => {
+export const OrderHandler = ({ state_name }: {state_name: keyof typeof initDataSets}) => {
 
   const get_questions = useStore(getQuestionsSelector); // the set of questions for the current state
-  const order = initDataSets[state_name].order; // the order of things in the sidebar along with hints
+  const order = useStore(getOrderSelector); // the order of things in the sidebar along with hints
   // note that hints can only be added to questions
-  const title = initDataSets[state_name].title;
+  const title = useStore(getTitleSelector);
   // const [showHint, setShowHint] = useState<{ [key: number]: boolean }>({});
 
   // const toggleHint = (index: number) => {
@@ -91,6 +78,7 @@ export const OrderHandler: React.FC<OrderHandlerProps> = ({ state_name }) => {
         return null;
     }
   };
+  
   return ( // render the components for each of the items in the order list
     <div className="space-y-4 md:space-y-6">
       {order.map((item, index) => renderComponent(item, index))}

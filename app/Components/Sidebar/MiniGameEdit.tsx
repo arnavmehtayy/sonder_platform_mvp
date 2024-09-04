@@ -18,17 +18,12 @@ import { OrderHandler } from "./OrderHandler";
 /*
  * This is the same as the MiniGame component but designed for the editing page
  * TODO
-*/
+ */
 
-
-export function MinigameEdit({
-}: {
-}) {
-
+export function MinigameEdit({}: {}) {
   const reset = useStore((state) => state.reset);
   const state_name = useStore(getStateName);
   const placement = useStore(getPlacementSelector);
-
 
   const updateValidation = useStore(UpdateValidationSelector);
   const validationInstance = useStore((state) => state.validations);
@@ -37,19 +32,15 @@ export function MinigameEdit({
     updateValidation();
   };
 
-  useEffect(() => 
-    reset("default")
-  , []);
-
-
-
-
+  useEffect(() => reset("default"), []);
 
   const [allValidationsValid, setAllValidationsValid] = useState(false);
 
   useEffect(() => {
     const checkAllValidations = () => {
-      const allValid = validationInstance.every(validation => validation.get_isValid());
+      const allValid = validationInstance.every((validation) =>
+        validation.get_isValid()
+      );
       setAllValidationsValid(allValid);
     };
 
@@ -74,12 +65,11 @@ export function MinigameEdit({
 
             {/* Add the ValidationComponent here */}
             <div className="mt-auto">
-        <ValidationComponent
-          validations={validationInstance}
-          updater={handleValidationUpdate}
-        />
-        
-      </div>
+              <ValidationComponent
+                validations={validationInstance}
+                updater={handleValidationUpdate}
+              />
+            </div>
           </div>
 
           <br />

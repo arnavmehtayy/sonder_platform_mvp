@@ -11,7 +11,7 @@ import Validation from "../Validation/Validation";
 
 import Validation_test from "../Validation/Validation_test";
 
-import { OrderItem } from "@/app/Components/Sidebar/OrderHandler";
+import { OrderItem } from "@/app/store";
 import { InputNumber } from "../Controls/InputNumber";
 import { EnablerControl } from "../Controls/EnablerControl";
 import { MultiChoiceClass } from "../Controls/MultiChoiceClass";

@@ -26,7 +26,7 @@ import { InputNumber } from "../Controls/InputNumber";
 import { Validation_inputNumber } from "../Validation/Validation_inputNumber";
 import { init } from "next/dist/compiled/webpack/webpack";
 import FunctionPlot from "../vizobjects/FunctionPlot";
-import { OrderItem } from "@/app/Components/Sidebar/OrderHandler";
+
 import { EnablerControl } from "../Controls/EnablerControl";
 import { seededRandom } from "three/src/math/MathUtils.js";
 

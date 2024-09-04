@@ -20,6 +20,7 @@ import { ValidationMultiChoice } from "@/classes/Validation/ValidationMultiChoic
 import { InputNumber } from "@/classes/Controls/InputNumber";
 import { Validation_inputNumber } from "@/classes/Validation/Validation_inputNumber";
 import { EnablerControl } from "@/classes/Controls/EnablerControl";
+import { Option } from "@/app/Components/ShowControls/ShowMultiChoice";
 
 /*
 
@@ -54,8 +55,18 @@ Reset: takes in the state_name and populates the placement, scores, vizobjs, con
 
 */
 
+export interface OrderItem {
+  type: ComponentType;
+  id: number;
+  // hint?: string; removed hints for now will move it somewhere else
+}
+
+export type ComponentType = "score" | "control" | "placement" | "question";
+
 export type State = {
+  title: string;
   questions: { [id: number]: string };
+  order: OrderItem[];
   validations: Validation[];
   state_name: keyof typeof initDataSets;
   placement: Placement | null;
@@ -80,10 +91,15 @@ export type State = {
   ) => void;
   setInputNumberValue: (control_id: number) => (value: number | "") => void;
   setEnablerControl: (control_id: number) => (isEnabled: boolean) => void;
+  addQuestion: (id: number, text: string) => void;
+  addMCQuestion: (id: number, title: string, desc: string, options: Option[]) => void;
+
 };
 
 export const useStore = create<State>((set, get) => ({
+  title: "",
   questions: {},
+  order: [],
   isActivePlacement: false,
   validations: [],
   state_name: "default",
@@ -93,6 +109,43 @@ export const useStore = create<State>((set, get) => ({
   scores: {},
   placement: null,
   isSelectActive: false,
+
+  addMCQuestion: (id: number, title: string, desc: string, options: Option[]) => {
+    set((state) => {
+      const updatedControl= { ...state.controls, [id]:  new MultiChoiceClass(
+        {
+          id: id,
+          title: title,
+          description: desc,
+          options: options,
+        })
+      };
+      const updatedOrder: OrderItem[] = [
+        ...state.order,
+        { type: "control", id: id },
+      ];
+
+      return {
+        controls: updatedControl,
+        order: updatedOrder,
+      };
+    });
+  },
+
+  addQuestion: (id: number, text: string) => {
+    set((state) => {
+      const updatedQuestions = { ...state.questions, [id]: text };
+      const updatedOrder: OrderItem[] = [
+        ...state.order,
+        { type: "question" as const, id },
+      ];
+
+      return {
+        questions: updatedQuestions,
+        order: updatedOrder,
+      };
+    });
+  },
 
   // The enabler control enables/disables viz objects on the screen. This function can be used to set the boolean value of any particular Enabler. (Note an enabler is a control)
   setEnablerControl: (control_id: number) => (isEnabled: boolean) => {
@@ -314,7 +367,9 @@ export const useStore = create<State>((set, get) => ({
   reset: (dataSetKey: keyof typeof initDataSets) => {
     const dataSet = initDataSets[dataSetKey];
     set({
+      title: dataSet.title,
       state_name: dataSetKey,
+      order: dataSet.order,
       placement: dataSet.placement,
       isSelectActive: false,
       validations: dataSet.validations,
@@ -538,5 +593,19 @@ export const setEnablerControl =
 export const getQuestionsSelector = (state: State) => (question_id: number) =>
   state.questions[question_id];
 
+export const getTitleSelector = (state: State) => state.title;
+
+export const getOrderSelector = (state: State) => state.order;
+
 export const isValidatorClickableSelector = (state: State) =>
   !state.isActivePlacement && !state.isSelectActive;
+
+export const addQuestionEditor =
+  (state: State) => (question_id: number) => (question: string) => {
+    state.addQuestion(question_id, question);
+  };
+
+export const addMCQuestionEditor = 
+  (state: State) => (id: number, title: string, desc: string, options: Option[]) => {
+    state.addMCQuestion(id, title, desc, options);
+  };

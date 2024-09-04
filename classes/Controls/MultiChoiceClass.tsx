@@ -40,4 +40,5 @@ export class MultiChoiceClass extends Control {
     new_obj.selectedOptions = options;
     return new_obj;
   }
+
 }
