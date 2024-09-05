@@ -121,7 +121,8 @@ export class LineObj extends coloredObj {
     isOpen: boolean;
     onClose: () => void;
     onSave: (newObject: obj) => void;
-  }): React.ReactElement {
+  }): React.ReactElement 
+  {
     const editedObject :LineObjConstructor= {
       id: 0,
       name: "Line",
