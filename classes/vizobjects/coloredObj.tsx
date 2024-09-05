@@ -32,13 +32,16 @@ export default class coloredObj extends obj {
     children,
     onClickSelect = (event: ThreeEvent<MouseEvent>) => {},
     objectRef,
+    material = null,
   }: Partial<{
     children: React.ReactElement | null;
     onClickSelect: (event: ThreeEvent<MouseEvent>) => void;
     objectRef: React.RefObject<THREE.Mesh>;
+    material: THREE.MeshBasicMaterial | null;
   }> & {
     children: React.ReactElement;
     objectRef: React.RefObject<any>;
+
   }): React.ReactElement {
     return (
       <mesh

@@ -307,6 +307,11 @@ for (let i = 0; i < outlier_positions.length; i++) {
       position: outlier_positions[i],
       color: "violet",
       name: `(${outlier_positions[i].x}, ${outlier_positions[i].y})`,
+      // touch_controls: new TouchControl({
+      //   scale: null,
+      //   rotate: null,
+      //   translate: {direction:[true, true, false], range:[-100,100], step_size:0.1},
+      // })
     })
   );
 }

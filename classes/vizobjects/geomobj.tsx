@@ -3,8 +3,12 @@ import * as THREE from "three";
 import { TouchControl } from "../Controls/TouchControl";
 import { ThreeEvent } from "react-three-fiber";
 import coloredObj from "./coloredObj";
-import { EditableObjectPopup, EditableObjectPopupProps } from "@/app/Components/EditMode/EditPopups/EditableObjectPopup";
+import {
+  EditableObjectPopup,
+  EditableObjectPopupProps,
+} from "@/app/Components/EditMode/EditPopups/EditableObjectPopup";
 import React from "react";
+import GeneralTransformControl from "@/app/Components/three/GeneralTransCont";
 
 /*
  * This class creates a geometric object on the scene (Any object that is rendered using THREE.BufferGeometry).
@@ -23,8 +27,7 @@ interface geomobjconstructor {
   OnClick: ((obj: geomobj) => void) | undefined;
   isEnabled: boolean;
   name: string;
-};
-
+}
 
 export class geomobj extends TransformObj {
   geom: THREE.BufferGeometry; // the geometry of the object
@@ -74,20 +77,47 @@ export class geomobj extends TransformObj {
     objectRef: React.RefObject<THREE.Mesh>;
   }): React.ReactElement {
     return (
-      <mesh
-        position={[this.position.x, this.position.y, 0]}
-        rotation={[this.rotation.x, this.rotation.y, this.rotation.z]}
-        scale={[this.scale.x, this.scale.y, this.scale.z]}
-        ref={objectRef}
-        onPointerDown={this.isClickable ? onClickSelect : undefined}
-      >
-        <primitive object={this.geom} attach="geometry" />
-        {material ? (
-          <primitive object={material} attach="material" />
-        ) : (
-          <meshBasicMaterial color={this.color} side={THREE.DoubleSide} />
+      <>
+        <mesh
+          position={[this.position.x, this.position.y, 0]}
+          rotation={[this.rotation.x, this.rotation.y, this.rotation.z]}
+          scale={[this.scale.x, this.scale.y, this.scale.z]}
+          ref={objectRef}
+          onPointerDown={this.isClickable ? onClickSelect : undefined}
+        >
+          <primitive object={this.geom} attach="geometry" />
+          {material ? (
+            <primitive object={material} attach="material" />
+          ) : (
+            <meshBasicMaterial color={this.color} side={THREE.DoubleSide} />
+          )}
+        </mesh>
+
+        {this.touch_controls.scale && (
+          <GeneralTransformControl
+            mode="scale"
+            vizObjId={this.id}
+            touchControl={this.touch_controls.scale}
+            obj_ref={objectRef}
+          />
         )}
-      </mesh>
+        {this.touch_controls.rotate && (
+          <GeneralTransformControl
+            mode="rotate"
+            vizObjId={this.id}
+            touchControl={this.touch_controls.rotate}
+            obj_ref={objectRef}
+          />
+        )}
+        {this.touch_controls.translate && (
+          <GeneralTransformControl
+            mode="translate"
+            vizObjId={this.id}
+            touchControl={this.touch_controls.translate}
+            obj_ref={objectRef}
+          />
+        )}
+      </>
     );
   }
 
