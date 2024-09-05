@@ -19,6 +19,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import Latex from "react-latex-next";
+import { ObjectCreator } from './ObjectCreator';
 
 export interface Option {
   id: number;
@@ -30,9 +31,16 @@ interface ButtonItem {
   icon: React.ElementType;
 }
 
+interface ObjectType {
+  name: string;
+  type: 'obj' | 'coloredObj' | 'TransformObj' | 'LineObj'; // Extend this union type as you add more object types
+  icon: React.ElementType;
+}
+
 export const EditBar: React.FC = () => {
   const [isQuestionDialogOpen, setIsQuestionDialogOpen] = useState(false);
   const [isMCQDialogOpen, setIsMCQDialogOpen] = useState(false);
+  const [selectedObjectType, setSelectedObjectType] = useState<ObjectType | null>(null);
   const addQuestion = useStore(addQuestionEditor);
   const addMCQuestion = useStore(addMCQuestionEditor);
 
@@ -45,6 +53,15 @@ export const EditBar: React.FC = () => {
   const buttons: ButtonItem[] = [
     { name: 'Add Question Text', icon: HelpCircle },
     { name: 'Add Multiple Choice', icon: List },
+  ];
+
+  const objectTypes: ObjectType[] = [
+    { name: 'Generic Object', type: 'obj', icon: List },
+    {name: 'Colored Object', type: 'coloredObj', icon: List },
+    {name: 'Transform Object', type: 'TransformObj', icon: HelpCircle },
+    {name: 'Line Object', type: 'LineObj', icon: HelpCircle },
+
+    // Add more object types here as needed
   ];
 
   const handleAddQuestion = () => {
@@ -74,7 +91,7 @@ export const EditBar: React.FC = () => {
 
   return (
     <>
-      <div className="fixed top-4 left-1/2 transform -translate-x-1/2 z-10">
+      <div className="fixed top-4 left-1/2 transform -translate-x-1/2 z-10 flex space-x-2">
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button className="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-md flex items-center space-x-2">
@@ -88,6 +105,27 @@ export const EditBar: React.FC = () => {
               <DropdownMenuItem key={item.name} onSelect={() => item.name === 'Add Question Text' ? setIsQuestionDialogOpen(true) : setIsMCQDialogOpen(true)}>
                 <item.icon className="mr-2 h-4 w-4" />
                 <span>{item.name}</span>
+              </DropdownMenuItem>
+            ))}
+          </DropdownMenuContent>
+        </DropdownMenu>
+
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button className="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-md flex items-center space-x-2">
+              <Plus className="h-5 w-5" />
+              <span>Add Object</span>
+              <ChevronDown className="h-4 w-4" />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent>
+            {objectTypes.map((objectType) => (
+              <DropdownMenuItem 
+                key={objectType.type} 
+                onSelect={() => setSelectedObjectType(objectType)}
+              >
+                <objectType.icon className="mr-2 h-4 w-4" />
+                <span>{objectType.name}</span>
               </DropdownMenuItem>
             ))}
           </DropdownMenuContent>
@@ -171,7 +209,13 @@ export const EditBar: React.FC = () => {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {selectedObjectType && (
+        <ObjectCreator 
+          objectType={selectedObjectType.type}
+          onClose={() => setSelectedObjectType(null)}
+        />
+      )}
     </>
   );
 };
-

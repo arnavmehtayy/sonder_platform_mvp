@@ -21,6 +21,7 @@ import { InputNumber } from "@/classes/Controls/InputNumber";
 import { Validation_inputNumber } from "@/classes/Validation/Validation_inputNumber";
 import { EnablerControl } from "@/classes/Controls/EnablerControl";
 import { Option } from "@/app/Components/ShowControls/ShowMultiChoice";
+import { Question } from "@/classes/Question";
 
 /*
 
@@ -55,15 +56,20 @@ Reset: takes in the state_name and populates the placement, scores, vizobjs, con
 
 */
 
-export interface OrderItem {
-  type: ComponentType;
+export class OrderItem {
+  type: SideBarComponentType;
   id: number;
+
+  constructor(type: SideBarComponentType, id: number) {
+    this.type = type;
+    this.id = id;
+  }
   // hint?: string; removed hints for now will move it somewhere else
 }
 
-export type ComponentType = "score" | "control" | "placement" | "question";
+export type SideBarComponentType = "score" | "control" | "placement" | "question"; // possible types of objects that can be in the sidebar
 
-export type EditAddType = string | obj | Control  | Score<any> | Placement | Influence<any, obj, obj> | Validation | OrderItem;
+export type EditAddType = Question | obj | Control  | Score<any> | Placement | Influence<any, obj, obj> | Validation;
 
 export type State = {
   title: string;
@@ -95,6 +101,7 @@ export type State = {
   setEnablerControl: (control_id: number) => (isEnabled: boolean) => void;
   addQuestion: (id: number, text: string) => void;
   addMCQuestion: (id: number, title: string, desc: string, options: Option[]) => void;
+  addElement: (element: EditAddType) => void;
 
 };
 
@@ -111,6 +118,55 @@ export const useStore = create<State>((set, get) => ({
   scores: {},
   placement: null,
   isSelectActive: false,
+
+  // add any element to the state (vizobj, control, score, placement, influence, validation, order)
+  // this is used by the editting system.
+  addElement: (element: EditAddType) => {
+    console.log(element);
+    set((state) => {
+      let updatedState: Partial<State> = {};
+
+      if (element instanceof obj) {
+        updatedState = {
+          vizobjs: { ...state.vizobjs, [element.id]: element },
+        };
+      } else if (element instanceof Question) {
+        updatedState = {
+          questions: { ...state.questions, [element.id]: element.question },
+          order: [...state.order, { type: "question", id: element.id }],
+        };
+      } else if (element instanceof Control) {
+        updatedState = {
+          controls: { ...state.controls, [element.id]: element },
+          order: [...state.order, { type: "control", id: element.id }],
+        };
+      } else if (element instanceof Score) {
+        updatedState = {
+          scores: { ...state.scores, [element.score_id]: element },
+          order: [...state.order, { type: "score", id: element.score_id }],
+        };
+      } else if (element instanceof Placement) {
+        updatedState = {
+          placement: element,
+          order: [...state.order, { type: "placement", id: 0}], // currently only one placement allowed
+        };
+      } else if (element instanceof Influence) {
+        if (!state.influences[element.master_id]) {
+          state.influences[element.master_id] = [];
+        }
+        state.influences[element.master_id].push(element);
+        updatedState = {
+          influences: state.influences,
+        };
+      } else if (element instanceof Validation) {
+        updatedState = {
+          validations: [...state.validations, element],
+        };
+      }
+
+      return updatedState;
+    });
+  },
 
   addMCQuestion: (id: number, title: string, desc: string, options: Option[]) => {
     set((state) => {
@@ -611,3 +667,7 @@ export const addMCQuestionEditor =
   (state: State) => (id: number, title: string, desc: string, options: Option[]) => {
     state.addMCQuestion(id, title, desc, options);
   };
+
+export const addElementSelector = (state: State) => (element: EditAddType) => {
+  state.addElement(element);
+}

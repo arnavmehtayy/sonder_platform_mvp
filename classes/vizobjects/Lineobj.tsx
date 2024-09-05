@@ -5,13 +5,23 @@ import * as THREE from "three";
 import { Line } from "@react-three/drei";
 import { ThreeEvent } from "@react-three/fiber";
 import { useFrame } from "@react-three/fiber";
-import coloredObj from "./coloredObj";
+
+import coloredObj, {coloredObjConstructor}  from "./coloredObj";
+import { EditableObjectPopup, EditableObjectPopupProps } from "@/app/Components/EditMode/EditPopups/EditableObjectPopup";
+
+
 
 /*
     * This class is used to render a Line object in the scene.
     * This stores the start and end points of the line, and the line width.
     * This class provides functionality to convert between slope_intercept form and end points form.
 */
+
+interface LineObjConstructor extends coloredObjConstructor {
+  start: Vector2;
+  end: Vector2;
+  line_width: number;
+}
 
 export class LineObj extends coloredObj {
   start: Vector2; 
@@ -25,15 +35,14 @@ export class LineObj extends coloredObj {
     line_width = 2,
     color = "white",
     name = "Line",
-    isClickable = false,
     isEnabled = true,
-  }: Partial<LineObj> & { id: number }) {
+  }: Partial<LineObjConstructor> & { id: number }) {
     super({ id: id, name: name, color: color, isEnabled: isEnabled });
     this.start = start;
     this.end = end;
     this.line_width = line_width;
     this.color = color;
-    this.isClickable = isClickable;
+    this.isClickable = false;
   }
 
   // methods that instantiates a new LineObj object with the slope and intercept values.
@@ -102,5 +111,45 @@ export class LineObj extends coloredObj {
       onClickSelect: onClickSelect,
       objectRef: objectRef,
     });
+  }
+
+  static getPopup({
+    isOpen,
+    onClose,
+    onSave,
+  }: {
+    isOpen: boolean;
+    onClose: () => void;
+    onSave: (newObject: obj) => void;
+  }): React.ReactElement {
+    const editedObject :LineObjConstructor= {
+      id: 0,
+      name: "Line",
+      isEnabled: true,
+      start: new Vector2(-100, -100),
+      end: new Vector2(100, 100),
+      line_width: 2,
+      color: "white",
+    };
+    
+
+    const popupProps: EditableObjectPopupProps<LineObjConstructor> = {
+      isOpen,
+      onClose,
+      object: editedObject,
+      onSave: (updatedObject: LineObjConstructor) => {
+        const newObj = new LineObj(updatedObject);
+        onSave(newObj);
+      },
+      title: `Create New Object`,
+      fields: [
+        { key: 'id', label: 'ID', type: 'number'},
+        { key: 'name', label: 'Name', type: 'text' },
+        { key: 'isEnabled', label: 'Enabled', type: 'checkbox' },
+        { key: 'line_width', label: 'Line Width', type: 'number' },
+        { key: 'color', label: 'Color', type: 'color' },
+      ],
+    };
+    return <EditableObjectPopup {...popupProps} />;
   }
 }

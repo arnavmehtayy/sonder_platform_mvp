@@ -3,10 +3,28 @@ import * as THREE from "three";
 import { TouchControl } from "../Controls/TouchControl";
 import { ThreeEvent } from "react-three-fiber";
 import coloredObj from "./coloredObj";
+import { EditableObjectPopup, EditableObjectPopupProps } from "@/app/Components/EditMode/EditPopups/EditableObjectPopup";
+import React from "react";
 
 /*
  * This class creates a geometric object on the scene (Any object that is rendered using THREE.BufferGeometry).
  */
+
+interface geomobjconstructor {
+  id: number;
+  position: THREE.Vector2;
+  rotation: THREE.Vector3;
+  scale: THREE.Vector3;
+  color: string;
+  geom: THREE.BufferGeometry;
+  touch_controls: TouchControl;
+  param_t: number;
+  isClickable: boolean;
+  OnClick: ((obj: geomobj) => void) | undefined;
+  isEnabled: boolean;
+  name: string;
+};
+
 
 export class geomobj extends TransformObj {
   geom: THREE.BufferGeometry; // the geometry of the object
@@ -21,7 +39,6 @@ export class geomobj extends TransformObj {
     geom, // geom remains a required parameter
     touch_controls = new TouchControl(),
     param_t = 0, // the parametric parameter if the object is following a parametric object
-    isClickable = false, // if this is false then this object cannot detect a click at all
     OnClick = undefined,
     isEnabled = true,
     name = "geomobj",
@@ -31,14 +48,12 @@ export class geomobj extends TransformObj {
       rotation: rotation,
       scale: scale,
       touch_controls: touch_controls,
-      param_t: param_t,
       id: id,
       color: color,
       isEnabled: isEnabled,
       name: name,
     });
     this.geom = geom;
-    this.isClickable = isClickable;
     this.OnClick = OnClick;
   }
 
@@ -75,4 +90,38 @@ export class geomobj extends TransformObj {
       </mesh>
     );
   }
+
+  // static getPopup({
+  //   isOpen,
+  //   onClose,
+  //   onSave,
+  // }: {
+  //   isOpen: boolean;
+  //   onClose: () => void;
+  //   onSave: (newObject: obj) => void;
+  // }): React.ReactElement {
+  //   const [editedObject, setEditedObject] = React.useState<objconstructor>({
+  //     id: Date.now(), // Generate a temporary ID
+  //     name: '',
+  //     isEnabled: true,
+  //   });
+
+  //   const popupProps: EditableObjectPopupProps<objconstructor> = {
+  //     isOpen,
+  //     onClose,
+  //     object: editedObject,
+  //     onSave: (updatedObject: objconstructor) => {
+  //       const newObj = new obj(updatedObject);
+  //       onSave(newObj);
+  //     },
+  //     title: `Create New Object`,
+  //     fields: [
+  //       { key: 'id', label: 'ID', type: 'number'},
+  //       { key: 'name', label: 'Name', type: 'text' },
+  //       { key: 'isEnabled', label: 'Enabled', type: 'checkbox' },
+  //     ],
+  //   };
+
+  //   return <EditableObjectPopup {...popupProps} />;
+  // }
 }

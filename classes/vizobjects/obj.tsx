@@ -1,8 +1,7 @@
-
-
 import React from "react";
 import * as THREE from "three";
 import { ThreeEvent } from "@react-three/fiber";
+import { EditableObjectPopup, EditableObjectPopupProps } from "@/app/Components/EditMode/EditPopups/EditableObjectPopup";
 
 /*
     This is the base class for every object in the scene.
@@ -10,22 +9,23 @@ import { ThreeEvent } from "@react-three/fiber";
     The attributes of this class are: id, name, isClickable, isEnabled
 */
 
+export interface objconstructor {
+  id: number;
+  name: string;
+  isEnabled: boolean;
+};
 
 export class obj {
   id: number;
   name: string;
   isClickable: boolean = false; // whether the object on the screen can be clicked or not
-  isEnabled: boolean; // whether the object can be visible or not
+  isEnabled: boolean; // whether the object can be visible or not 
 
   constructor({
     id,
     name,
     isEnabled = true,
-  }: {
-    id: number;
-    name: string;
-    isEnabled: boolean;
-  }) {
+  }: objconstructor) {
     this.id = id;
     this.name = name;
     this.isEnabled = isEnabled;
@@ -39,10 +39,10 @@ export class obj {
       obj
     );
     newObj.isEnabled = isEnabled;
-    return newObj
+    return newObj;
   }
 
-  // method to set the ability for the object to be clicked 
+  // method to set the ability for the object to be clicked
   // this is used by the storage system
   static setObjectisClickable(obj: obj, isClickable: boolean): obj {
     const newObj = Object.assign(
@@ -78,5 +78,54 @@ export class obj {
         {children}
       </mesh>
     );
+  }
+
+  // method for teh popup that a editing user will use to populate the object
+  // this is used by the editing system
+
+  // getPopup<T extends objconstructor>({
+  //   setState,
+  //   state,
+  //   handleAdd
+  // }: {
+  //   setState: React.Dispatch<React.SetStateAction<T>>;
+  //   state: T;
+  //   handleAdd: (obj: T) => void;
+  // }): React.ReactElement {
+  //   return <div></div>;
+  // }
+
+  static getPopup({
+    isOpen,
+    onClose,
+    onSave,
+  }: {
+    isOpen: boolean;
+    onClose: () => void;
+    onSave: (newObject: obj) => void;
+  }): React.ReactElement {
+    const editedObject = {
+      id: 0, // Generate a temporary ID
+      name: '',
+      isEnabled: true,
+    };
+
+    const popupProps: EditableObjectPopupProps<objconstructor> = {
+      isOpen,
+      onClose,
+      object: editedObject,
+      onSave: (updatedObject: objconstructor) => {
+        const newObj = new obj(updatedObject);
+        onSave(newObj);
+      },
+      title: `Create New Object`,
+      fields: [
+        { key: 'id', label: 'ID', type: 'number'},
+        { key: 'name', label: 'Name', type: 'text' },
+        { key: 'isEnabled', label: 'Enabled', type: 'checkbox' },
+      ],
+    };
+
+    return <EditableObjectPopup {...popupProps} />;
   }
 }
