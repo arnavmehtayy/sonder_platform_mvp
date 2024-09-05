@@ -19,7 +19,11 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import Latex from "react-latex-next";
-import { ObjectCreator } from './ObjectCreator';
+import { ObjectCreator, PopUpType } from './ObjectCreator';
+import coloredObj from '@/classes/vizobjects/coloredObj';
+import { obj } from '@/classes/vizobjects/obj';
+import { TransformObj } from '@/classes/vizobjects/transformObj';
+import { LineObj } from '@/classes/vizobjects/Lineobj';
 
 export interface Option {
   id: number;
@@ -33,7 +37,7 @@ interface ButtonItem {
 
 interface ObjectType {
   name: string;
-  type: 'obj' | 'coloredObj' | 'TransformObj' | 'LineObj'; // Extend this union type as you add more object types
+  type: PopUpType; // Extend this union type as you add more object types
   icon: React.ElementType;
 }
 
@@ -56,10 +60,10 @@ export const EditBar: React.FC = () => {
   ];
 
   const objectTypes: ObjectType[] = [
-    { name: 'Generic Object', type: 'obj', icon: List },
-    {name: 'Colored Object', type: 'coloredObj', icon: List },
-    {name: 'Transform Object', type: 'TransformObj', icon: HelpCircle },
-    {name: 'Line Object', type: 'LineObj', icon: HelpCircle },
+    {name: 'Generic Object', type: obj, icon: List },
+    {name: 'Colored Object', type: coloredObj, icon: List },
+    {name: 'Transform Object', type: TransformObj, icon: HelpCircle },
+    {name: 'Line Object', type: LineObj, icon: HelpCircle },
 
     // Add more object types here as needed
   ];
@@ -121,7 +125,7 @@ export const EditBar: React.FC = () => {
           <DropdownMenuContent>
             {objectTypes.map((objectType) => (
               <DropdownMenuItem 
-                key={objectType.type} 
+                key={objectType.type.name} 
                 onSelect={() => setSelectedObjectType(objectType)}
               >
                 <objectType.icon className="mr-2 h-4 w-4" />
@@ -154,7 +158,7 @@ export const EditBar: React.FC = () => {
           <DialogHeader>
             <DialogTitle>Add Multiple Choice Question</DialogTitle>
           </DialogHeader>
-          <div className="bg-white rounded-lg shadow-lg p-6">
+          <>
             <Input
               value={mcqTitle}
               onChange={(e) => setMcqTitle(e.target.value)}
@@ -203,7 +207,7 @@ export const EditBar: React.FC = () => {
               />
               <label htmlFor="multiSelect">Allow multiple selections</label>
             </div>
-          </div>
+            </>
           <DialogFooter>
             <Button onClick={handleAddMCQ}>Add MCQ</Button>
           </DialogFooter>
@@ -212,7 +216,7 @@ export const EditBar: React.FC = () => {
 
       {selectedObjectType && (
         <ObjectCreator 
-          objectType={selectedObjectType.type}
+          ObjectType={selectedObjectType.type}
           onClose={() => setSelectedObjectType(null)}
         />
       )}
