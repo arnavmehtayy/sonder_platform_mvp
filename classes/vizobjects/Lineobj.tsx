@@ -6,16 +6,18 @@ import { Line } from "@react-three/drei";
 import { ThreeEvent } from "@react-three/fiber";
 import { useFrame } from "@react-three/fiber";
 
-import coloredObj, {coloredObjConstructor}  from "./coloredObj";
-import { EditableObjectPopup, EditableObjectPopupProps } from "@/app/Components/EditMode/EditPopups/EditableObjectPopup";
-
-
+import coloredObj, { coloredObjConstructor } from "./coloredObj";
+import {
+  EditableObjectPopup,
+  EditableObjectPopupProps,
+} from "@/app/Components/EditMode/EditPopups/EditableObjectPopup";
+import { get_attributes } from "./obj";
 
 /*
-    * This class is used to render a Line object in the scene.
-    * This stores the start and end points of the line, and the line width.
-    * This class provides functionality to convert between slope_intercept form and end points form.
-*/
+ * This class is used to render a Line object in the scene.
+ * This stores the start and end points of the line, and the line width.
+ * This class provides functionality to convert between slope_intercept form and end points form.
+ */
 
 interface LineObjConstructor extends coloredObjConstructor {
   start: Vector2;
@@ -24,7 +26,74 @@ interface LineObjConstructor extends coloredObjConstructor {
 }
 
 export class LineObj extends coloredObj {
-  start: Vector2; 
+  static get_controllable_atts: get_attributes<any, any>[] = [
+    ...coloredObj.get_controllable_atts,
+    {
+      label: "line_width",
+      get_attribute: (obj: LineObj) => obj.line_width,
+      set_attribute: (obj: LineObj, value: number) => {
+        const newObj = Object.assign(
+          Object.create(Object.getPrototypeOf(obj)),
+          obj
+        );
+        newObj.line_width = value;
+        return newObj;
+      },
+    },
+    {
+      label: "start",
+      get_attribute: (obj: LineObj) => obj.start,
+      set_attribute: (obj: LineObj, value: Vector2) => {
+        const newObj = Object.assign(
+          Object.create(Object.getPrototypeOf(obj)),
+          obj
+        );
+        newObj.start = value;
+        return newObj;
+      },
+    },
+    {
+      label: "end",
+      get_attribute: (obj: LineObj) => obj.end,
+      set_attribute: (obj: LineObj, value: Vector2) => {
+        const newObj = Object.assign(
+          Object.create(Object.getPrototypeOf(obj)),
+          obj
+        );
+        newObj.end = value;
+        return newObj;
+      },
+    },
+    {
+      label: "slope",
+      get_attribute: (obj: LineObj) => obj.get_slope_intercept()[1],
+      set_attribute: (obj: LineObj, value: number) => {
+        const newObj = Object.assign(
+          Object.create(Object.getPrototypeOf(obj)),
+          obj
+        );
+        const [b, m, range] = obj.get_slope_intercept();
+        newObj.start = new Vector2(range[0], m * range[0] + b);
+        newObj.end = new Vector2(range[1], m * range[1] + b);
+        return newObj;
+      },
+    },
+    {
+      label: "intercept",
+      get_attribute: (obj: LineObj) => obj.get_slope_intercept()[0],
+      set_attribute: (obj: LineObj, value: number) => {
+        const newObj = Object.assign(
+          Object.create(Object.getPrototypeOf(obj)),
+          obj
+        );
+        const [b, m, range] = obj.get_slope_intercept();
+        newObj.start = new Vector2(range[0], m * range[0] + b);
+        newObj.end = new Vector2(range[1], m * range[1] + b);
+        return newObj;
+      },
+    },
+  ];
+  start: Vector2;
   end: Vector2;
   line_width: number = 2;
 
@@ -121,9 +190,8 @@ export class LineObj extends coloredObj {
     isOpen: boolean;
     onClose: () => void;
     onSave: (newObject: obj) => void;
-  }): React.ReactElement 
-  {
-    const editedObject :LineObjConstructor= {
+  }): React.ReactElement {
+    const editedObject: LineObjConstructor = {
       id: 0,
       name: "Line",
       isEnabled: true,
@@ -132,7 +200,6 @@ export class LineObj extends coloredObj {
       line_width: 2,
       color: "white",
     };
-    
 
     const popupProps: EditableObjectPopupProps<LineObjConstructor> = {
       isOpen,
@@ -144,11 +211,11 @@ export class LineObj extends coloredObj {
       },
       title: `Create New Object`,
       fields: [
-        { key: 'id', label: 'ID', type: 'number'},
-        { key: 'name', label: 'Name', type: 'text' },
-        { key: 'isEnabled', label: 'Enabled', type: 'checkbox' },
-        { key: 'line_width', label: 'Line Width', type: 'number' },
-        { key: 'color', label: 'Color', type: 'color' },
+        { key: "id", label: "ID", type: "number" },
+        { key: "name", label: "Name", type: "text" },
+        { key: "isEnabled", label: "Enabled", type: "checkbox" },
+        { key: "line_width", label: "Line Width", type: "number" },
+        { key: "color", label: "Color", type: "color" },
       ],
     };
     return <EditableObjectPopup {...popupProps} />;

@@ -9,6 +9,7 @@ import {
 } from "@/app/Components/EditMode/EditPopups/EditableObjectPopup";
 import React from "react";
 import GeneralTransformControl from "@/app/Components/three/GeneralTransCont";
+import { get_attributes } from "./obj";
 
 /*
  * This class creates a geometric object on the scene (Any object that is rendered using THREE.BufferGeometry).
@@ -30,6 +31,7 @@ interface geomobjconstructor {
 }
 
 export class geomobj extends TransformObj {
+
   geom: THREE.BufferGeometry; // the geometry of the object
   isClickable: boolean = false; // whether the object on the screen can be clicked or not
   OnClick: ((obj: geomobj) => void) | undefined;
@@ -58,6 +60,7 @@ export class geomobj extends TransformObj {
     });
     this.geom = geom;
     this.OnClick = OnClick;
+
   }
 
   // method that returns the physical three.js mesh representation of the object

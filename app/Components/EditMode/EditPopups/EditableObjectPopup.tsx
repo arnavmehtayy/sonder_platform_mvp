@@ -116,26 +116,30 @@ export function EditableObjectPopup<T>({
     }
   };
 
-  return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[425px]">
-        <DialogHeader>
-          <DialogTitle>{title}</DialogTitle>
-        </DialogHeader>
-        <div className="grid gap-4 py-4">
-          {fields.map((field) => (
-            <div key={field.key as string} className="grid grid-cols-4 items-center gap-4">
-              <label htmlFor={field.key as string} className="text-right font-medium">
-                {field.label}
-              </label>
-              {renderField(field)}
+  const dialogDescriptionId = `dialog-description-${object}`;
+    return (
+        <Dialog open={isOpen} onOpenChange={onClose}>
+          <DialogContent className="sm:max-w-[425px]" aria-describedby={dialogDescriptionId}>
+            <DialogHeader>
+              <DialogTitle>{title}</DialogTitle>
+            </DialogHeader>
+            <div id={dialogDescriptionId} className="sr-only">
+              Edit properties for {title}
             </div>
-          ))}
-        </div>
-        <DialogFooter>
-          <Button onClick={handleSave}>Save changes</Button>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
-  );
+            <div className="grid gap-4 py-4">
+              {fields.map((field) => (
+                <div key={field.key as string} className="grid grid-cols-4 items-center gap-4">
+                  <label htmlFor={field.key as string} className="text-right font-medium">
+                    {field.label}
+                  </label>
+                  {renderField(field)}
+                </div>
+              ))}
+            </div>
+            <DialogFooter>
+              <Button onClick={handleSave}>Save changes</Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+      );
 }

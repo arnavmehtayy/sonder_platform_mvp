@@ -1,4 +1,4 @@
-import { obj } from "./obj";
+import { get_attributes, obj } from "./obj";
 import React from "react";
 import * as THREE from "three";
 import { ThreeEvent } from "@react-three/fiber";
@@ -14,6 +14,20 @@ export interface coloredObjConstructor extends objconstructor {
 }
 
 export default class coloredObj extends obj {
+  static get_controllable_atts: get_attributes<any, any>[] = [
+    ...obj.get_controllable_atts,
+    { label: "color", get_attribute: (obj: coloredObj) => obj.color,
+      set_attribute: (obj: coloredObj, value: string) => {
+        const newObj = Object.assign(
+          Object.create(Object.getPrototypeOf(obj)),
+          obj
+        );
+        newObj.color = value;
+        return newObj;
+      }
+    },
+  ];
+
   color: string;
 
   constructor({

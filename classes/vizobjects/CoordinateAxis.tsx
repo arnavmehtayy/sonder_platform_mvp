@@ -4,12 +4,41 @@ import { TouchControl } from "../Controls/TouchControl";
 import { ThreeEvent } from "react-three-fiber";
 import { Line } from "@react-three/drei";
 import { Text } from "@react-three/drei";
+import { get_attributes } from "./obj";
 
 /*
  * This class is used to create a Coordinate Axis (2D coordinate graph) in the scene.
-*/
+ */
 export default class CoordinateAxis extends geomobj {
-  axisLength: number; 
+  static get_controllable_atts: get_attributes<any, any>[] = [
+    ...geomobj.get_controllable_atts,
+    {
+      label: "x-label",
+      get_attribute: (obj: CoordinateAxis) => obj.xLabel,
+      set_attribute: (obj: CoordinateAxis, value: string) => {
+        const newObj = Object.assign(
+          Object.create(Object.getPrototypeOf(obj)),
+          obj
+        );
+        newObj.xLabel = value;
+        return newObj;
+      },
+    },
+
+    {
+      label: "y-label",
+      get_attribute: (obj: CoordinateAxis) => obj.yLabel,
+      set_attribute: (obj: CoordinateAxis, value: string) => {
+        const newObj = Object.assign(
+          Object.create(Object.getPrototypeOf(obj)),
+          obj
+        );
+        newObj.yLabel = value;
+        return newObj;
+      },
+    },
+  ];
+  axisLength: number;
   tickSpacing: number; // the spacing between the ticks on the axis
   tickSize: number; // the size of the ticks on the axis
   showLabels: boolean; // whether to show the labels on the axis

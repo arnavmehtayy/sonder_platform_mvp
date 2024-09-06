@@ -4,6 +4,7 @@ import coloredObj from "./coloredObj";
 import React from "react";
 import { EditableObjectPopup, EditableObjectPopupProps } from "@/app/Components/EditMode/EditPopups/EditableObjectPopup";
 import { coloredObjConstructor } from "./coloredObj";
+import { get_attributes } from "./obj";
 
 /*
   * This class stores the position, scale and rotation attributes of an object in the scene.
@@ -11,6 +12,7 @@ import { coloredObjConstructor } from "./coloredObj";
 */
 
 export interface TransformObjConstructor extends coloredObjConstructor {
+  
   position: THREE.Vector2;
   rotation: THREE.Vector3;
   scale: THREE.Vector3;
@@ -18,6 +20,40 @@ export interface TransformObjConstructor extends coloredObjConstructor {
 }
 
 export class TransformObj extends coloredObj {
+  static get_controllable_atts: get_attributes<any, any>[] = [
+    ...coloredObj.get_controllable_atts,
+    { label: "position", get_attribute: (obj: TransformObj) => obj.position,
+      set_attribute: (obj: TransformObj, value: THREE.Vector2) => {
+        const newObj = Object.assign(
+          Object.create(Object.getPrototypeOf(obj)),
+          obj
+        );
+        newObj.position = value;
+        return newObj;
+      }
+    },
+    { label: "rotation", get_attribute: (obj: TransformObj) => obj.rotation,
+      set_attribute: (obj: TransformObj, value: THREE.Vector3) => {
+        const newObj = Object.assign(
+          Object.create(Object.getPrototypeOf(obj)),
+          obj
+        );
+        newObj.rotation = value;
+        return newObj;
+      }
+    },
+    { label: "scale", get_attribute: (obj: TransformObj) => obj.scale,
+      set_attribute: (obj: TransformObj, value: THREE.Vector3) => {
+        const newObj = Object.assign(
+          Object.create(Object.getPrototypeOf(obj)),
+          obj
+        );
+        newObj.scale = value;
+        return newObj;
+      }
+    },
+    
+  ];
   position: THREE.Vector2;
   rotation: THREE.Vector3;
   scale: THREE.Vector3;
@@ -74,7 +110,7 @@ export class TransformObj extends coloredObj {
         { key: 'id', label: 'ID', type: 'number'},
         { key: 'name', label: 'Name', type: 'text' },
         { key: 'isEnabled', label: 'Enabled', type: 'checkbox' },
-        
+
       ],
     };
 

@@ -1,31 +1,37 @@
 import React from "react";
 import * as THREE from "three";
 import { ThreeEvent } from "@react-three/fiber";
-import { EditableObjectPopup, EditableObjectPopupProps } from "@/app/Components/EditMode/EditPopups/EditableObjectPopup";
+import {
+  EditableObjectPopup,
+  EditableObjectPopupProps,
+} from "@/app/Components/EditMode/EditPopups/EditableObjectPopup";
 
 /*
     This is the base class for every object in the scene.
     This class is used to store the information about a object in the threejs scene
     The attributes of this class are: id, name, isClickable, isEnabled
 */
+export type get_att_type = number | string | boolean | THREE.Vector2 | THREE.Vector3 ;
+export interface get_attributes<T extends obj, V extends get_att_type = get_att_type> {
+  label: string;
+  get_attribute: (obj: T) => V;
+  set_attribute: (obj: T, value: V) => T;
+}
 
 export interface objconstructor {
   id: number;
   name: string;
   isEnabled: boolean;
-};
+}
 
 export class obj {
+  static get_controllable_atts: get_attributes<any, any>[] = [];
   id: number;
   name: string;
   isClickable: boolean = false; // whether the object on the screen can be clicked or not
-  isEnabled: boolean; // whether the object can be visible or not 
+  isEnabled: boolean; // whether the object can be visible or not
 
-  constructor({
-    id,
-    name,
-    isEnabled = true,
-  }: objconstructor) {
+  constructor({ id, name, isEnabled = true }: objconstructor) {
     this.id = id;
     this.name = name;
     this.isEnabled = isEnabled;
@@ -106,7 +112,7 @@ export class obj {
   }): React.ReactElement {
     const editedObject = {
       id: 0, // Generate a temporary ID
-      name: '',
+      name: "",
       isEnabled: true,
     };
 
@@ -120,9 +126,9 @@ export class obj {
       },
       title: `Create New Object`,
       fields: [
-        { key: 'id', label: 'ID', type: 'number'},
-        { key: 'name', label: 'Name', type: 'text' },
-        { key: 'isEnabled', label: 'Enabled', type: 'checkbox' },
+        { key: "id", label: "ID", type: "number" },
+        { key: "name", label: "Name", type: "text" },
+        { key: "isEnabled", label: "Enabled", type: "checkbox" },
       ],
     };
 

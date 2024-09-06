@@ -19,7 +19,7 @@ export const Showobj = memo(function Showobj({ id }: { id: number }) {
   const add_obj = useStore(SelectObjectControl(obj.id));
 
   const onClickSelect = (event: ThreeEvent<MouseEvent>) => {
-    add_obj();
+    add_obj(); // add the object to any select object lists if they are active (storage system)
     event.stopPropagation();
   };
 

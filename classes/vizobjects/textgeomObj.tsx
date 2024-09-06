@@ -3,11 +3,27 @@ import * as THREE from "three";
 import { TouchControl } from "../Controls/TouchControl";
 import { ThreeEvent } from "react-three-fiber";
 import { Text } from "@react-three/drei";
+import { get_attributes } from "./obj";
 
 /*
  * This class is used to create a object that has Text on it in the scene.
-*/
+ */
 export default class TextGeom extends geomobj {
+  static get_controllable_atts: get_attributes<any, any>[] = [
+    ...geomobj.get_controllable_atts,
+    {
+      label: "text",
+      get_attribute: (obj: TextGeom) => obj.text,
+      set_attribute: (obj: TextGeom, value: string) => {
+        const newObj = Object.assign(
+          Object.create(Object.getPrototypeOf(obj)),
+          obj
+        );
+        newObj.text = value;
+        return newObj;
+      },
+    },
+  ];
   text: string;
 
   constructor({
@@ -17,10 +33,10 @@ export default class TextGeom extends geomobj {
     scale = new THREE.Vector3(1, 1, 1),
     color = "blue",
     geom, // geom remains a required parameter
-    touch_controls = new TouchControl(), 
+    touch_controls = new TouchControl(),
     param_t = 0, // the parametric parameter if the object is following a parametric object
     isClickable = true, // if this is false then this object cannot detect a click at all
-    OnClick = undefined, 
+    OnClick = undefined,
     text = "", // text on the object
     isEnabled = true,
   }: Partial<TextGeom> & { geom: THREE.BufferGeometry; id: number }) {
