@@ -23,18 +23,21 @@ import { Switch } from '@radix-ui/react-switch';
     * It takes a list of fields that will be displayed in the popup and the object
 
 */
+export interface PopupQuestionProps<T, option_T> {
+    key: keyof T; // The key of the object that will be edited
+    label: string;
+    type: 'text' | 'number' | 'checkbox' | 'color' | 'vector2' | 'select';
+    options?: {label: string, value: option_T}[]; // For select type
+  
+} // option_T is the type of the options that will be displayed in the select dropdown
+
 export interface EditableObjectPopupProps<T> {
   isOpen: boolean; // Whether the popup is open
   onClose: () => void; // Function to cleanup and close the popup
   object: T; // The initial object that will be displayed and that will be edited by user
   onSave: (updatedObject: T) => void; // Function to save the edited object when user clicks save
   title: string;
-  fields: Array<{ 
-    key: keyof T; // The key of the object that will be edited
-    label: string;
-    type: 'text' | 'number' | 'checkbox' | 'color' | 'vector2' | 'select';
-    options?: string[]; // For select type
-  }>; // The fields that will be displayed in the popup
+  fields: Array<PopupQuestionProps<T, any>>; // The fields that will be displayed in the popup
 }
 
 export function EditableObjectPopup<T>({
@@ -96,10 +99,12 @@ export function EditableObjectPopup<T>({
             </SelectTrigger>
             <SelectContent>
               {field.options?.map((option) => (
-                <SelectItem key={option} value={option}>
-                  {option}
+                <SelectItem key={option.label} value={option.label}>  
+                  {option.label}
                 </SelectItem>
+                
               ))}
+              {/* THIS NEEDS TO BE CHANGED WHEN WE IMPLEMENT SELECT TODO */}
             </SelectContent>
           </Select>
         );
