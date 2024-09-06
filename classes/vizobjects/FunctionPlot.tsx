@@ -1,19 +1,33 @@
-import { geomobj } from "./geomobj";
+
+
+import { TransformObj, TransformObjConstructor } from "./transformObj";
 import * as THREE from "three";
 import { TouchControl } from "../Controls/TouchControl";
 import { ThreeEvent } from "react-three-fiber";
 import { Line } from "@react-three/drei";
+import React from "react";
 
 /*
  * object that represents a function, it is plotted using lots of lines attached together
  * to make the curve look smoother increase the num of points
 */
 
-export default class FunctionPlot extends geomobj {
-  func: (x: number) => number; // function to plot
+interface FunctionPlotConstructor extends TransformObjConstructor {
+  func?: (x: number) => number;
+  xRange?: [number, number];
+  numPoints?: number;
+  lineWidth?: number;
+  isClickable?: boolean;
+  OnClick?: (event: ThreeEvent<MouseEvent>) => void;
+}
+
+export default class FunctionPlot extends TransformObj {
+  func: (x: number) => number;
   xRange: [number, number];
   numPoints: number;
   lineWidth: number;
+  isClickable: boolean;
+  OnClick?: (event: ThreeEvent<MouseEvent>) => void;
 
   constructor({
     id,
@@ -21,35 +35,31 @@ export default class FunctionPlot extends geomobj {
     rotation = new THREE.Vector3(0, 0, 0),
     scale = new THREE.Vector3(1, 1, 1),
     color = "white",
-    geom = new THREE.PlaneGeometry(0.1, 0.1),
     touch_controls = new TouchControl(),
-    param_t = 0,
-    isClickable = false,
-    OnClick = undefined,
-    func = (x: number) => x, // Default to y = x
+    func = (x: number) => x,
     xRange = [-10, 10],
     numPoints = 100,
     lineWidth = 2,
+    isClickable = false,
+    OnClick,
     isEnabled = true,
-  }: Partial<FunctionPlot> & { id: number }) {
+  }: FunctionPlotConstructor) {
     super({
-      id: id,
-      position: position,
-      rotation: rotation,
-      scale: scale,
-      color: color,
-      geom: geom,
-      touch_controls: touch_controls,
-      param_t: param_t,
-      isClickable: isClickable,
-      OnClick: OnClick,
-      isEnabled: isEnabled,
+      id,
+      position,
+      rotation,
+      scale,
+      color,
+      touch_controls,
+      name: "FunctionPlot",
+      isEnabled,
     });
     this.func = func;
     this.xRange = xRange;
     this.numPoints = numPoints;
     this.lineWidth = lineWidth;
-    this.name = "FunctionPlot";
+    this.isClickable = isClickable;
+    this.OnClick = OnClick;
   }
   
   // method that returns the physical three.js mesh representation of the object
@@ -84,6 +94,7 @@ export default class FunctionPlot extends geomobj {
         position={[this.position.x, this.position.y, 0]}
         rotation={[this.rotation.x, this.rotation.y, this.rotation.z]}
         scale={[this.scale.x, this.scale.y, this.scale.z]}
+        onPointerDown={this.isClickable ? onClickSelect : undefined}
       >
         <Line
           points={points}

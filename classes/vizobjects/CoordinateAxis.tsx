@@ -5,13 +5,28 @@ import { ThreeEvent } from "react-three-fiber";
 import { Line } from "@react-three/drei";
 import { Text } from "@react-three/drei";
 import { get_attributes } from "./obj";
+import { TransformObj, TransformObjConstructor } from "./transformObj";
 
 /*
  * This class is used to create a Coordinate Axis (2D coordinate graph) in the scene.
  */
-export default class CoordinateAxis extends geomobj {
+
+
+interface CoordinateAxisConstructor extends TransformObjConstructor {
+  axisLength?: number;
+  tickSpacing?: number;
+  tickSize?: number;
+  showLabels?: boolean;
+  fontSize?: number;
+  lineWidth?: number;
+  xLabel?: string;
+  yLabel?: string;
+  isClickable?: boolean;
+}
+
+export default class CoordinateAxis extends TransformObj {
   static get_controllable_atts: get_attributes<any, any>[] = [
-    ...geomobj.get_controllable_atts,
+    ...TransformObj.get_controllable_atts,
     {
       label: "x-label",
       get_attribute: (obj: CoordinateAxis) => obj.xLabel,
@@ -24,7 +39,6 @@ export default class CoordinateAxis extends geomobj {
         return newObj;
       },
     },
-
     {
       label: "y-label",
       get_attribute: (obj: CoordinateAxis) => obj.yLabel,
@@ -38,14 +52,17 @@ export default class CoordinateAxis extends geomobj {
       },
     },
   ];
+
   axisLength: number;
-  tickSpacing: number; // the spacing between the ticks on the axis
-  tickSize: number; // the size of the ticks on the axis
-  showLabels: boolean; // whether to show the labels on the axis
-  fontSize: number; // the size of the font of the labels
-  lineWidth: number; // the width of the line of the axis
+  tickSpacing: number;
+  tickSize: number;
+  showLabels: boolean;
+  fontSize: number;
+  lineWidth: number;
   xLabel: string;
   yLabel: string;
+  isClickable: boolean;
+  OnClick?: (event: ThreeEvent<MouseEvent>) => void;
 
   constructor({
     id,
@@ -53,11 +70,7 @@ export default class CoordinateAxis extends geomobj {
     rotation = new THREE.Vector3(0, 0, 0),
     scale = new THREE.Vector3(1, 1, 1),
     color = "white",
-    geom = new THREE.PlaneGeometry(0.1, 0.1),
     touch_controls = new TouchControl(),
-    param_t = 0,
-    isClickable = false,
-    OnClick = undefined,
     axisLength = 60,
     tickSpacing = 2,
     tickSize = 0.2,
@@ -66,20 +79,18 @@ export default class CoordinateAxis extends geomobj {
     lineWidth = 4,
     xLabel = "weight",
     yLabel = "height",
+    isClickable = false,
     isEnabled = true,
-  }: Partial<CoordinateAxis> & { id: number }) {
+  }: CoordinateAxisConstructor) {
     super({
-      id: id,
-      position: position,
-      rotation: rotation,
-      scale: scale,
-      color: color,
-      geom: geom,
-      touch_controls: touch_controls,
-      param_t: param_t,
-      isClickable: isClickable,
-      OnClick: OnClick,
-      isEnabled: isEnabled,
+      id,
+      position,
+      rotation,
+      scale,
+      color,
+      touch_controls,
+      name: "CoordinateAxis",
+      isEnabled,
     });
     this.axisLength = axisLength;
     this.tickSpacing = tickSpacing;
@@ -87,9 +98,9 @@ export default class CoordinateAxis extends geomobj {
     this.showLabels = showLabels;
     this.fontSize = fontSize;
     this.lineWidth = lineWidth;
-    this.name = "CoordinateAxis";
     this.xLabel = xLabel;
     this.yLabel = yLabel;
+    this.isClickable = isClickable;
   }
 
   // method that returns the physical three.js mesh representation of the object
@@ -208,6 +219,7 @@ export default class CoordinateAxis extends geomobj {
         position={[this.position.x, this.position.y, 0]}
         rotation={[this.rotation.x, this.rotation.y, this.rotation.z]}
         scale={[this.scale.x, this.scale.y, this.scale.z]}
+        onPointerDown={this.isClickable ? onClickSelect : undefined}
       >
         {ticksX.map((points, i) => (
           <Line

@@ -20,9 +20,9 @@ import { get_attributes } from "./obj";
  */
 
 interface LineObjConstructor extends coloredObjConstructor {
-  start: Vector2;
-  end: Vector2;
-  line_width: number;
+  start?: Vector2;
+  end?: Vector2;
+  line_width?: number;
 }
 
 export class LineObj extends coloredObj {
@@ -160,12 +160,24 @@ export class LineObj extends coloredObj {
   }> & {
     objectRef: RefObject<THREE.Mesh>;
   }): ReactElement<any, string | JSXElementConstructor<any>> {
-    const line_mat = useRef<any>();
-
-    return super.getMesh({
-      children: (
+    return (
+      <mesh
+        position={[0, 0, 0]}
+        rotation={[0, 0, 0]}
+        scale={[1, 1, 1]}
+        ref={objectRef}
+        onPointerDown={this.isClickable ? onClickSelect : undefined}
+      >
+        <primitive
+          object={
+            new THREE.MeshStandardMaterial({
+              color: this.color,
+              side: THREE.DoubleSide,
+            })
+          }
+          attach="material"
+        />
         <Line
-          ref={line_mat}
           points={[
             [this.start.x, this.start.y, 0],
             [this.end.x, this.end.y, 0],
@@ -176,10 +188,9 @@ export class LineObj extends coloredObj {
           dashed={false}
           {...{ linebutt: "round", linecap: "round" }}
         ></Line>
-      ),
-      onClickSelect: onClickSelect,
-      objectRef: objectRef,
-    });
+        {children}
+      </mesh>
+    );
   }
 
   static getPopup({

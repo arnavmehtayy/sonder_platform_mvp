@@ -74,26 +74,38 @@ export default class TextGeom extends geomobj {
     objectRef: React.RefObject<THREE.Mesh>;
   }): React.ReactElement {
     return (
-      <group
-        ref={objectRef}
-        position={[this.position.x, this.position.y, 0]}
-        onPointerDown={this.isClickable ? onClickSelect : undefined}
-        rotation={[this.rotation.x, this.rotation.y, this.rotation.z]}
-        scale={[this.scale.x, this.scale.y, this.scale.z]}
-      >
-        <mesh>
-          <primitive object={this.geom} attach="geometry" />
-          {material ? (
-            <primitive object={material} attach="material" />
-          ) : (
-            <meshBasicMaterial color={this.color} side={THREE.DoubleSide} />
-          )}
-        </mesh>
+      // <group
+      //   ref={objectRef}
+      //   position={[this.position.x, this.position.y, 0]}
+      //   onPointerDown={this.isClickable ? onClickSelect : undefined}
+      //   rotation={[this.rotation.x, this.rotation.y, this.rotation.z]}
+      //   scale={[this.scale.x, this.scale.y, this.scale.z]}
+      // >
+      //   <mesh>
+      //     <primitive object={this.geom} attach="geometry" />
+      //     {material ? (
+      //       <primitive object={material} attach="material" />
+      //     ) : (
+      //       <meshBasicMaterial color={this.color} side={THREE.DoubleSide} />
+      //     )}
+      //   </mesh>
 
-        <Text color="white" anchorX="center" anchorY="middle">
-          {this.text}
-        </Text>
-      </group>
+      //   <Text color="white" anchorX="center" anchorY="middle">
+      //     {this.text}
+      //   </Text>
+      // </group>
+      super.getMesh({
+        children: (
+          <>
+            <Text color="white" anchorX="center" anchorY="middle">
+              {this.text}
+            </Text>
+          </>
+        ),
+        onClickSelect: onClickSelect,
+        objectRef: objectRef,
+        material: material,
+      })
     );
   }
 }

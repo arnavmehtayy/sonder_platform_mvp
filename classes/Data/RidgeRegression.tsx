@@ -125,6 +125,8 @@ const intercept_control = new SliderControl<LineObj>({
 });
 
 const CoordinateAxisObj = new CoordinateAxis({
+  name: "CoordinateAxis",
+  isEnabled: true,
   id: 99999,
   xLabel: "Revenue in Millions",
   yLabel: "Stock Price",

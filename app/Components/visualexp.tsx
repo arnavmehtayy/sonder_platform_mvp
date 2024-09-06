@@ -2,7 +2,7 @@
 import React from "react";
 import { Canvas } from "@react-three/fiber";
 import { OrthographicCamera, OrbitControls } from "@react-three/drei";
-import { Showobj } from "./three/ShowObjs/Showobj";
+import { Showobj } from "./three/Showobj";
 import { useStore, getObjectsSelector, getPlacementSelector } from "../store";
 import * as THREE from "three";
 

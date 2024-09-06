@@ -9,14 +9,15 @@ import { get_attributes } from "./obj";
 /*
   * This class stores the position, scale and rotation attributes of an object in the scene.
   * This is the ground truth data that is used to render the object in the scene.
+  * there is no get mesh method since this object is no representable in the scene.
 */
 
 export interface TransformObjConstructor extends coloredObjConstructor {
   
-  position: THREE.Vector2;
-  rotation: THREE.Vector3;
-  scale: THREE.Vector3;
-  touch_controls: TouchControl;
+  position?: THREE.Vector2;
+  rotation?: THREE.Vector3;
+  scale?: THREE.Vector3;
+  touch_controls?: TouchControl;
 }
 
 export class TransformObj extends coloredObj {
@@ -97,6 +98,7 @@ export class TransformObj extends coloredObj {
       touch_controls: new TouchControl(),
     });
 
+    
     const popupProps: EditableObjectPopupProps<TransformObjConstructor> = {
       isOpen,
       onClose,
@@ -116,4 +118,6 @@ export class TransformObj extends coloredObj {
 
     return <EditableObjectPopup {...popupProps} />;
   }
+
+  
 }

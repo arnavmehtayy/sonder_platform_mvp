@@ -16,18 +16,18 @@ import { get_attributes } from "./obj";
  */
 
 interface geomobjconstructor {
-  id: number;
-  position: THREE.Vector2;
-  rotation: THREE.Vector3;
-  scale: THREE.Vector3;
-  color: string;
-  geom: THREE.BufferGeometry;
-  touch_controls: TouchControl;
-  param_t: number;
-  isClickable: boolean;
-  OnClick: ((obj: geomobj) => void) | undefined;
-  isEnabled: boolean;
-  name: string;
+  id?: number;
+  position?: THREE.Vector2;
+  rotation?: THREE.Vector3;
+  scale?: THREE.Vector3;
+  color?: string;
+  geom?: THREE.BufferGeometry;
+  touch_controls?: TouchControl;
+  param_t?: number;
+  isClickable?: boolean;
+  OnClick?: ((obj: geomobj) => void) | undefined;
+  isEnabled?: boolean;
+  name?: string;
 }
 
 export class geomobj extends TransformObj {
@@ -47,7 +47,7 @@ export class geomobj extends TransformObj {
     OnClick = undefined,
     isEnabled = true,
     name = "geomobj",
-  }: Partial<geomobj> & { geom: THREE.BufferGeometry; id: number }) {
+  }: Partial<geomobjconstructor> & { geom: THREE.BufferGeometry; id: number }) {
     super({
       position: position,
       rotation: rotation,
@@ -74,7 +74,7 @@ export class geomobj extends TransformObj {
     children: React.ReactElement | null;
     onClickSelect: (event: ThreeEvent<MouseEvent>) => void;
     objectRef: React.RefObject<THREE.Mesh>;
-    material: THREE.MeshBasicMaterial | null;
+    material: THREE.Material | null;
   }> & {
     children: React.ReactElement | null;
     objectRef: React.RefObject<THREE.Mesh>;
@@ -95,6 +95,8 @@ export class geomobj extends TransformObj {
             <meshBasicMaterial color={this.color} side={THREE.DoubleSide} />
           )}
         </mesh>
+
+        {children}
 
         {this.touch_controls.scale && (
           <GeneralTransformControl
