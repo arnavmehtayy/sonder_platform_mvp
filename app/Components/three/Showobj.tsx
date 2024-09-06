@@ -4,6 +4,7 @@ import coloredObj from "@/classes/vizobjects/coloredObj";
 import { ThreeEvent } from "@react-three/fiber";
 import * as THREE from "three";
 import { useMemo } from "react";
+import { TransformObj } from "@/classes/vizobjects/transformObj";
 
 /*
  * This component handles the rendering of a single object in the scene.
@@ -13,7 +14,7 @@ import { useMemo } from "react";
  */
 
 export const Showobj = memo(function Showobj({ id }: { id: number }) {
-  const obj = useStore(getObjectSelector(id)) as coloredObj;
+  const obj = useStore(getObjectSelector(id)) as TransformObj;
   const selectionModeActive = useStore((state) => state.isSelectActive);
   const object_ref = React.useRef<THREE.Mesh>(null);
   const add_obj = useStore(SelectObjectControl(obj.id));

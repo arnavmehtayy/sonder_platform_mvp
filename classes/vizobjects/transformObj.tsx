@@ -5,6 +5,10 @@ import React from "react";
 import { EditableObjectPopup, EditableObjectPopupProps } from "@/app/Components/EditMode/EditPopups/EditableObjectPopup";
 import { coloredObjConstructor } from "./coloredObj";
 import { get_attributes } from "./obj";
+import { ThreeEvent } from "@react-three/fiber";
+import { RefObject } from "react";
+import { ReactElement, JSXElementConstructor } from "react";
+
 
 /*
   * This class stores the position, scale and rotation attributes of an object in the scene.
@@ -76,6 +80,23 @@ export class TransformObj extends coloredObj {
     this.rotation = rotation;
     this.scale = scale;
     this.touch_controls = touch_controls;
+  }
+
+  getMesh({
+    children,
+    onClickSelect = (event: ThreeEvent<MouseEvent>) => {},
+    objectRef,
+    material = null,
+  }: Partial<{
+    children: React.ReactElement | null;
+    onClickSelect: (event: ThreeEvent<MouseEvent>) => void;
+    objectRef: React.RefObject<THREE.Mesh>;
+    material: THREE.Material | null;
+  }> & {
+    children: React.ReactElement | null;
+    objectRef: React.RefObject<THREE.Mesh>;
+  }): React.ReactElement {
+    return <></>;
   }
 
   static getPopup({

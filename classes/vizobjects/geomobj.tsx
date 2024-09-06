@@ -10,24 +10,18 @@ import {
 import React from "react";
 import GeneralTransformControl from "@/app/Components/three/GeneralTransCont";
 import { get_attributes } from "./obj";
+import { TransformObjConstructor } from "./transformObj";
 
 /*
  * This class creates a geometric object on the scene (Any object that is rendered using THREE.BufferGeometry).
  */
 
-interface geomobjconstructor {
-  id?: number;
-  position?: THREE.Vector2;
-  rotation?: THREE.Vector3;
-  scale?: THREE.Vector3;
+interface geomobjconstructor extends TransformObjConstructor{
   color?: string;
   geom?: THREE.BufferGeometry;
-  touch_controls?: TouchControl;
   param_t?: number;
   isClickable?: boolean;
   OnClick?: ((obj: geomobj) => void) | undefined;
-  isEnabled?: boolean;
-  name?: string;
 }
 
 export class geomobj extends TransformObj {
