@@ -1,12 +1,10 @@
 import { useStore, getControlSelector } from "../../store";
 import { SliderControl } from "@/classes/Controls/SliderControl";
-import ShowNumSlider from "./ShowNumSlider";
+
 import { SelectControl } from "@/classes/Controls/SelectControl";
-import { ShowSelect } from "./ShowSelect";
+
 import { MultiChoiceClass } from "@/classes/Controls/MultiChoiceClass";
-import ShowMultiChoice from "./ShowMultiChoice";
-import ShowInputNumber from "./ShowInputNumber";
-import { ShowEnablerControl } from "./ShowEnablerControl";
+
 import { EnablerControl } from "@/classes/Controls/EnablerControl";
 import { InputNumber } from "@/classes/Controls/InputNumber";
 

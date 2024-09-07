@@ -1,5 +1,4 @@
 import { Control } from "./Control";
-import { Option } from "@/app/Components/ShowControls/ShowMultiChoice";
 import { useStore, setMultiChoiceOptionsSelector } from "@/app/store";
 import Latex from "react-latex-next";
 
@@ -9,6 +8,11 @@ import Latex from "react-latex-next";
  * This class is responsible for storing information about a multiple choice question
  * the attributes of this class are: options, isMultiSelect, selectedOptions
  */
+
+export interface Option {
+  id: number;
+  label: string;
+}
 
 function ShowMultiChoice({control}: {control: MultiChoiceClass}) {
   const setSelectedOptions = useStore(setMultiChoiceOptionsSelector);

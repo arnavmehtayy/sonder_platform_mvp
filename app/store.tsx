@@ -20,7 +20,7 @@ import { ValidationMultiChoice } from "@/classes/Validation/ValidationMultiChoic
 import { InputNumber } from "@/classes/Controls/InputNumber";
 import { Validation_inputNumber } from "@/classes/Validation/Validation_inputNumber";
 import { EnablerControl } from "@/classes/Controls/EnablerControl";
-import { Option } from "@/app/Components/ShowControls/ShowMultiChoice";
+import { Option } from "@/classes/Controls/MultiChoiceClass";
 import { Question } from "@/classes/Question";
 
 /*
@@ -614,7 +614,6 @@ export const getNameSelector = (state: State) => (id: number) =>
 export const getPlacementSelector = (state: State) => state.placement;
 
 export const DeleteVizObjSelector = (state: State) => (id: number) => {
-  console.log("deleting viz obj", id);
   return state.deleteVizObj(id);
 };
 
