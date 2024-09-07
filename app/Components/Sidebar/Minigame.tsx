@@ -7,10 +7,10 @@ import {
   getStateName,
   getPlacementSelector,
   UpdateValidationSelector,
+  getPlacementListSelector,
 } from "@/app/store";
 import { experiences } from "@/classes/Data/CompleteData";
 import "katex/dist/katex.min.css";
-import { PlacementProvider } from "../three/PlacementControl";
 import "../style.css";
 import ValidationComponent from "../ShowValid";
 import { OrderHandler } from "./OrderHandler";
@@ -29,7 +29,7 @@ export function Minigame({
   const page = experiences[experienceId]?.slides[currentSlideIndex]; // gets the relevant name of the slide as stored in the CompleteData
   const reset = useStore((state) => state.reset);
   const state_name = useStore(getStateName);
-  const placement = useStore(getPlacementSelector);
+  const placement = useStore(getPlacementListSelector);
 
   const experience = experiences[experienceId];
   const updateValidation = useStore(UpdateValidationSelector);
@@ -61,7 +61,7 @@ export function Minigame({
 
   return (
     // this is the context provider for the placement system
-    <PlacementProvider length={placement?.object_ids.length || 0}>
+    
       <div className="flex flex-col md:flex-row h-screen bg-gray-100">
         {/* Main Three.js Experience */}
         <div className="flex-grow bg-black h-1/2 md:h-full md:flex-1">
@@ -154,6 +154,6 @@ export function Minigame({
           <br />
         </div>
       </div>
-    </PlacementProvider>
+    
   );
 }

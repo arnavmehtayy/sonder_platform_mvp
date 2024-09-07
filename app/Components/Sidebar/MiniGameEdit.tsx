@@ -7,10 +7,10 @@ import {
   getStateName,
   getPlacementSelector,
   UpdateValidationSelector,
+  getPlacementListSelector,
 } from "@/app/store";
 
 import "katex/dist/katex.min.css";
-import { PlacementProvider } from "../three/PlacementControl";
 import "../style.css";
 import ValidationComponent from "../ShowValid";
 import { OrderHandler } from "./OrderHandler";
@@ -23,7 +23,7 @@ import { OrderHandler } from "./OrderHandler";
 export function MinigameEdit({}: {}) {
   const reset = useStore((state) => state.reset);
   const state_name = useStore(getStateName);
-  const placement = useStore(getPlacementSelector);
+  const placement = useStore(getPlacementListSelector);
 
   const updateValidation = useStore(UpdateValidationSelector);
   const validationInstance = useStore((state) => state.validations);
@@ -48,7 +48,6 @@ export function MinigameEdit({}: {}) {
   }, [validationInstance]);
 
   return (
-    <PlacementProvider length={placement?.object_ids.length || 0}>
       <div className="flex flex-col md:flex-row h-screen bg-gray-100">
         {/* Main Three.js Experience */}
         <div className="flex-grow bg-black h-1/2 md:h-full md:flex-1">
@@ -77,6 +76,5 @@ export function MinigameEdit({}: {}) {
           <br />
         </div>
       </div>
-    </PlacementProvider>
   );
 }

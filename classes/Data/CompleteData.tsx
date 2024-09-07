@@ -23,7 +23,7 @@ export type data_type = {
   controlData: Control[];
   canvasData: obj[];
   scoreData: Score<any>[];
-  placement: Placement | null;
+  placement: Placement[];
   validations: Validation[];
   order: OrderItem[];
 };
@@ -46,7 +46,7 @@ export const initDataSets: { default: data_type; [key: string]: data_type } = {
     ],
     canvasData: [],
     scoreData: [],
-    placement: null,
+    placement: [],
   },
   ...data_regression,
 }; // this contains all the data that is transferred to the storage system

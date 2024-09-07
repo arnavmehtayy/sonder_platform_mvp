@@ -6,8 +6,8 @@ import { useStore, getPlacementSelector } from "../store";
   Given a placement_id returns the UI for the relevant placement
   this generates a setActive/setInactive; reset button and a description of the placement
 */ 
-export default function ShowPlacement() {
-    const placement = useStore(getPlacementSelector);
+export default function ShowPlacement({id}: {id: number}) {
+    const placement = useStore(getPlacementSelector(id));
 
     const isActive = placement?.isClickable || false;
     
@@ -19,7 +19,7 @@ export default function ShowPlacement() {
               <h3 className="text-lg font-semibold text-blue-800 mb-2">{placement.desc}</h3>
               <p className="text-gray-600 mb-2">{placement.text}</p>
             </div>
-            <PlacementActivationButton totalPlacements={placement?.object_ids.length} isActive={isActive}/>
+            <PlacementActivationButton isActive={isActive} placement_id={id}/>
           </div>
         </div>
       );

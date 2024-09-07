@@ -66,7 +66,7 @@ function ShowSelectControl({control} : {control: SelectControl}) {
           <p className="text-gray-600"><Latex>{control.text}</Latex></p>
         </div>
         <div className="mt-4 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
-          {control.selected.map((id) => (
+           {control.selected.map((id) => (
             <div key={id} className="relative flex items-center justify-center p-3 bg-blue-100 rounded-md shadow-sm hover:shadow-md transition duration-300">
               <button
                 className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 hover:bg-red-600 transition duration-300 shadow-sm"
@@ -81,7 +81,7 @@ function ShowSelectControl({control} : {control: SelectControl}) {
               <span className="text-blue-800 font-medium truncate">{getName(id)}</span>
             </div>
           ))}
-        </div>
+         </div>
       </div>
     );
 }

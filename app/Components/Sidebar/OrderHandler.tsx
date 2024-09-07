@@ -50,7 +50,7 @@ export const OrderHandler = ({
           />
         );
       case "placement":
-        return <ShowPlacement key={`placement-${index}`} />;
+        return <ShowPlacement key={`placement-${index}`} id={item.id as number} />;
       case "question":
         const question = get_questions(item.id as number);
         return (

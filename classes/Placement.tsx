@@ -16,6 +16,7 @@ import * as THREE from "three";
  */
 
 export default class Placement {
+  id: number
   object_ids: number[]; // the ids of the objects that can be placed
   grid: [number, number]; // the grid that the objects can be placed on
   cellSize: number; // the size of the cell in the grid
@@ -25,8 +26,12 @@ export default class Placement {
   color: string;
   desc: string;
   isClickable: boolean; // whether the placement is activable or not with the isActive button
+  max_placements: number;
+  isPlacementActive: boolean = false;
+  numObjectsPlaced: number = 0;
 
   constructor({
+    id,
     object_ids,
     grid = [0, 0],
     cellSize = 0,
@@ -35,8 +40,9 @@ export default class Placement {
     text = "Click to place objects",
     desc = "placement",
     color = "blue",
+    max_placements = 1,
     isClickable = true,
-  }: Partial<Placement> & { object_ids: number[] }) {
+  }: Partial<Placement> & { object_ids: number[], id: number }) {
     this.desc = desc;
     this.object_ids = object_ids;
     this.grid = grid;
@@ -46,6 +52,8 @@ export default class Placement {
     this.text = text;
     this.color = color;
     this.isClickable = isClickable;
+    this.id = id
+    this.max_placements = max_placements;
   }
 
   // make this object clickable used by the storage system
@@ -57,7 +65,25 @@ export default class Placement {
       Object.create(Object.getPrototypeOf(obj)),
       obj
     );
-    obj.isClickable = isClickable;
-    return obj;
+    newObj.isClickable = isClickable;
+    return newObj;
+  }
+
+  static setPlacementActive( obj: Placement, isActive: boolean): Placement {
+    const newObj = Object.assign(
+      Object.create(Object.getPrototypeOf(obj)),
+      obj
+    );
+    newObj.isPlacementActive = isActive;
+    return newObj;
+  }
+
+  static setNumObjectsPlaced(obj: Placement, num: number): Placement {
+    const newObj = Object.assign(
+      Object.create(Object.getPrototypeOf(obj)),
+      obj
+    );
+    newObj.numObjectsPlaced = num
+    return newObj;
   }
 }

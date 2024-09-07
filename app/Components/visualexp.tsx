@@ -3,7 +3,7 @@ import React from "react";
 import { Canvas } from "@react-three/fiber";
 import { OrthographicCamera, OrbitControls } from "@react-three/drei";
 import { Showobj } from "./three/Showobj";
-import { useStore, getObjectsSelector, getPlacementSelector} from "../store";
+import { useStore, getObjectsSelector, getPlacementSelector, getPlacementListSelector} from "../store";
 import * as THREE from "three";
 
 import { PlacementControl } from "./three/PlacementControl";
@@ -19,7 +19,7 @@ import coloredObj from "@/classes/vizobjects/coloredObj";
 export default function Experience() {
   
   const objectlist = useStore(getObjectsSelector);
-  const placement = useStore(getPlacementSelector);
+  const placement = useStore(getPlacementListSelector);
 
 
   return (
@@ -54,23 +54,18 @@ export default function Experience() {
           makeDefault
         />
 
-        {placement ? (
+        {placement.map((item, index) => (
           <PlacementControl
-            gridSize={placement.grid}
-            cellSize={placement.cellSize}
-            obj_ids={placement.object_ids}
-            geom={placement.geometry}
-            GridVectors={placement.gridVectors}
-            color={placement.color}
+            key={index}
+            placementIndex={item.id}
           />
-        ) : null} 
-
-        
+        ))}
 
         <>
           {objectlist.map((obj, index) => (
-            obj instanceof coloredObj ?
-            <Showobj key={index} obj={obj as coloredObj} /> : null
+            obj instanceof coloredObj ? (
+              <Showobj key={index} obj={obj as coloredObj} />
+            ) : null
           ))}
         </>
 

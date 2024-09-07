@@ -77,7 +77,7 @@ export type State = {
   order: OrderItem[];
   validations: Validation[];
   state_name: keyof typeof initDataSets;
-  placement: Placement | null;
+  placement: { [id: number]: Placement };
   vizobjs: { [id: number]: obj };
   controls: { [id: number]: Control };
   influences: { [id: number]: Influence<any, obj, obj>[] };
@@ -102,6 +102,8 @@ export type State = {
   addQuestion: (id: number, text: string) => void;
   addMCQuestion: (id: number, title: string, desc: string, options: Option[]) => void;
   addElement: (element: EditAddType) => void;
+  setIsPlacementModeIndividual:  (id: number, val: boolean) => void
+  setNumObjectsPlaced: (id: number, num: number) => void
 
 };
 
@@ -116,8 +118,38 @@ export const useStore = create<State>((set, get) => ({
   vizobjs: {},
   influences: {},
   scores: {},
-  placement: null,
+  placement: [],
   isSelectActive: false,
+
+  setNumObjectsPlaced: (id: number, num: number) => {
+    set((state) => {
+      let updatedState: Partial<State> = {}
+      const placement = state.placement[id];
+    const updatedPlacement = Placement.setNumObjectsPlaced(placement, num);
+    updatedState = {
+      placement: { ...state.placement, [id]: updatedPlacement },
+    };
+    return updatedState
+    })
+  },
+
+  setIsPlacementModeIndividual: (id: number, val: boolean) => {
+    set((state) => {
+      let updatedState:  Partial<State> = {};
+    if(val) {
+      state.setIsPlacementMode(true);
+    }
+    else {
+      state.setIsPlacementMode(false);
+    }
+    const placement = state.placement[id];
+    const updatedPlacement = Placement.setPlacementActive(placement, val);
+    updatedState = {
+      placement: { ...state.placement, [id]: updatedPlacement },
+    };
+    return updatedState
+  })
+  },
 
   // add any element to the state (vizobj, control, score, placement, influence, validation, order)
   // this is used by the editting system.
@@ -147,8 +179,8 @@ export const useStore = create<State>((set, get) => ({
         };
       } else if (element instanceof Placement) {
         updatedState = {
-          placement: element,
-          order: [...state.order, { type: "placement", id: 0}], // currently only one placement allowed
+          placement: { ...state.placement, [element.id]: element },
+          order: [...state.order, { type: "placement", id: element.id}], // currently only one placement allowed
         };
       } else if (element instanceof Influence) {
         if (!state.influences[element.master_id]) {
@@ -283,9 +315,11 @@ export const useStore = create<State>((set, get) => ({
           {} as { [id: number]: Control }
         );
 
-        const updatedPlacement = state.placement
-          ? Placement.setPlacementisClickable(state.placement, !val)
-          : null;
+        const updatedPlacement = Object.entries(state.placement).reduce((acc, [id, placement]) => {
+              acc[placement.id] = Placement.setPlacementisClickable(placement, !val);
+              return acc;
+            }, {} as { [id: number]: Placement })
+          
 
         // Update selectable objects and make sure they are clickable
         if (control) {
@@ -428,9 +462,14 @@ export const useStore = create<State>((set, get) => ({
       title: dataSet.title,
       state_name: dataSetKey,
       order: dataSet.order,
-      placement: dataSet.placement,
       isSelectActive: false,
       validations: dataSet.validations,
+
+      placement: dataSet.placement.reduce((acc, placement) => {
+        acc[placement.id] = placement;
+        return acc;
+      }
+      , {} as { [id: number]: Placement }),
 
       questions: dataSet.questions.reduce((acc, question) => {
         acc[question.id] = question.text;
@@ -611,7 +650,11 @@ export const getStateName = (state: State) => state.state_name;
 export const getNameSelector = (state: State) => (id: number) =>
   state.vizobjs[id].name;
 
-export const getPlacementSelector = (state: State) => state.placement;
+export const getPlacementSelector = (id: number) => (state: State) => state.placement[id];
+
+export const getPlacementSelector2 = (state: State) => (id: number) => state.placement[id];
+
+export const getPlacementListSelector = (state: State) => Object.values(state.placement);
 
 export const DeleteVizObjSelector = (state: State) => (id: number) => {
   return state.deleteVizObj(id);
@@ -626,12 +669,25 @@ export const getValidationsSelector = (state: State) => state.validations;
 export const UpdateAllInfluencesSelector = (state: State) =>
   state.updateAllInfluences;
 
-export const isPlacementModeSelector = (state: State) =>
-  state.isActivePlacement;
 
-export const setIsPlacementModeSelector = (state: State) => (val: boolean) => {
-  state.setIsPlacementMode(val);
+/* new */
+
+export const isPlacementModeActive2 = (state: State) => (id: number) => {
+  return state.placement[id].isPlacementActive
 };
+
+export const setIsPlacementModeActive2 = (state: State) => (id: number, val: boolean) => {
+  state.setIsPlacementModeIndividual(id, val);
+}
+
+export const getNumObjectsPlaced = (state: State) => (id: number) => {
+  return state.placement[id].numObjectsPlaced
+}
+
+export const setNumObjectsPlaced = (state: State) => (id: number, num: number) => {
+  state.setNumObjectsPlaced(id, num)
+}
+/* new */
 
 export const setMultiChoiceOptionsSelector =
   (state: State) => (control_id: number, Selectedoptions: number[]) => {

@@ -1,26 +1,22 @@
-import React, { useState, useContext, useMemo, useRef } from "react";
+import React, { useState, useContext, useRef } from "react";
 import { useFrame } from "@react-three/fiber";
 import * as THREE from "three";
 import {
   useStore,
   setVizObjSelector,
   DeleteVizObjSelector,
-  getPlacementSelector,
+
   UpdateAllInfluencesSelector,
-  isPlacementModeSelector,
-  setIsPlacementModeSelector,
+  getPlacementSelector,
+  isPlacementModeActive2,
+  setIsPlacementModeActive2,
+  getNumObjectsPlaced,
+  setNumObjectsPlaced,
+  getPlacementSelector2,
 } from "@/app/store";
 import { geomobj } from "@/classes/vizobjects/geomobj";
+import Placement from "@/classes/Placement"; // Assuming the Placement class is in a separate file
 
-/*
- * This component is responsible for the placement of objects in the scene.
- * It is used to place objects in the scene by clicking on a set of available position.
- * the clickable positions are denoted with a circle that is scaled up and down.
- * The user can reset the placements using the reset button.
- * The user can activate or deactivate the placement mode using the activation button.
- */
-
-// marks positions where objects can be placed on the three js canvas
 const PlacementMarker = ({
   position,
   onClick,
@@ -31,7 +27,6 @@ const PlacementMarker = ({
   const ref = useRef<THREE.Group>(null);
 
   useFrame((state) => {
-    // animation to denote the clickable positions
     if (ref.current) {
       ref.current.scale.setScalar(
         1.5 + Math.sin(state.clock.elapsedTime * 3) * 0.5
@@ -53,178 +48,162 @@ const PlacementMarker = ({
   );
 };
 
-// Define the context type
-type PlacementContextType = {
-  // get and set if the placement is active
-  isPlacementMode: boolean;
-  setIsPlacementMode: (val: boolean) => void;
+// type PlacementContextType = {
+//   remainingPlacements: { [key: number]: number };
+//   setRemainingPlacements: React.Dispatch<React.SetStateAction<{ [key: number]: number }>>;
+//   objectsOnScene: { [key: number]: number };
+//   setObjectsOnScene: React.Dispatch<React.SetStateAction<{ [key: number]: number }>>;
+//   showResetButton: { [key: number]: boolean };
+//   setShowResetButton: React.Dispatch<React.SetStateAction<{ [key: number]: boolean }>>;
+//   resetPlacements: () => void;
+//   placements: Placement[];
+// };
 
-  // get and set the number of remaining placements
-  remainingPlacements: number;
-  setRemainingPlacements: React.Dispatch<React.SetStateAction<number>>;
+// const PlacementContext = React.createContext<PlacementContextType>({
+//   remainingPlacements: {},
+//   setRemainingPlacements: () => {},
+//   objectsOnScene: {},
+//   setObjectsOnScene: () => {},
+//   showResetButton: {},
+//   setShowResetButton: () => {},
+//   resetPlacements: () => {},
+//   placements: [],
+// });
 
-  // get and set the number of objects on the scene
-  objectsOnScene: number;
-  setObjectOnScene: React.Dispatch<React.SetStateAction<number>>;
+// export const PlacementProvider = ({
+//   children,
+//   placements,
+// }: {
+//   children: React.ReactNode;
+//   placements: Placement[];
+// }) => {
+//   const [remainingPlacements, setRemainingPlacements] = useState(
+//     placements.reduce((acc, p, index) => ({ ...acc, [p.id]: p.max_placements }), {})
+//   );
+//   const [objectsOnScene, setObjectsOnScene] = useState(
+//     placements.reduce((acc, p, index) => ({ ...acc, [p.id]: 0 }), {})
+//   );
+//   const [showResetButton, setShowResetButton] = useState(
+//     placements.reduce((acc, p, index) => ({ ...acc, [p.id]: false }), {})
+//   );
+//   const deleteObject = useStore(DeleteVizObjSelector);
 
-  // the reset button state and function to do so
-  showResetButton: boolean;
-  setShowResetButton: React.Dispatch<React.SetStateAction<boolean>>;
+//   const resetPlacements = () => {
+//     setRemainingPlacements(
+//       placements.reduce((acc, p, index) => ({ ...acc, [p.id]: p.max_placements }), {})
+//     );
+//     setObjectsOnScene(
+//       placements.reduce((acc, p, index) => ({ ...acc, [p.id]: 0 }), {})
+//     );
+    
+//     setShowResetButton(
+//       placements.reduce((acc, p, index) => ({ ...acc, [p.id]: false }), {})
+//     );
 
-  // reset all the objects that were placed
-  resetPlacements: () => void;
-};
+//     placements.forEach(placement => {
+//       placement.object_ids.forEach((id: number) => {
+//         deleteObject(id);
+//       });
+//     });
+//   };
 
-// Create the context with an initial value
-const PlacementContext = React.createContext<PlacementContextType>({
-  isPlacementMode: false,
-  setIsPlacementMode: () => {},
-  remainingPlacements: 0,
-  setRemainingPlacements: () => {},
-  objectsOnScene: 0,
-  setObjectOnScene: () => {},
-  showResetButton: false,
-  setShowResetButton: () => {},
-  resetPlacements: () => {},
-});
+//   return (
+//     <PlacementContext.Provider
+//       value={{
+//         remainingPlacements,
+//         setRemainingPlacements,
+//         objectsOnScene,
+//         setObjectsOnScene,
+//         showResetButton,
+//         setShowResetButton,
+//         resetPlacements,
+//         placements,
+//       }}
+//     >
+//       {children}
+//     </PlacementContext.Provider>
+//   );
+// };
 
-export const PlacementProvider = ({
-  length,
-  children,
-}: {
-  children: React.ReactNode;
-  length: number;
-}) => {
-  // create all the state variables and functions
-  const isPlacementMode = useStore(isPlacementModeSelector);
-  const setIsPlacementMode = useStore(setIsPlacementModeSelector);
-  const [remainingPlacements, setRemainingPlacements] = useState(length);
-  const [objectsOnScene, setObjectOnScene] = useState(0);
-  const [showResetButton, setShowResetButton] = useState(false);
-  const placement = useStore(getPlacementSelector);
-  const deleteObject = useStore(DeleteVizObjSelector);
-
-  const resetPlacements = () => {
-    setRemainingPlacements(length);
-    setObjectOnScene(0);
-    setShowResetButton(false);
-    placement?.object_ids.forEach((id) => {
-      deleteObject(id);
-    });
-  };
-
-  // create the context with the above values
-  return (
-    <PlacementContext.Provider
-      value={{
-        isPlacementMode,
-        setIsPlacementMode,
-        remainingPlacements,
-        setRemainingPlacements,
-        objectsOnScene,
-        setObjectOnScene,
-        showResetButton,
-        setShowResetButton,
-        resetPlacements,
-      }}
-    >
-      {children}
-    </PlacementContext.Provider>
-  );
-};
-
-export const usePlacementMode = () => useContext(PlacementContext); // shorthand for using the context
-
-type PlacementControlProps = {
-  GridVectors?: THREE.Vector2[];
-  gridSize?: [number, number];
-  cellSize?: number;
-  obj_ids: number[];
-  geom: THREE.BufferGeometry;
-  onPlacement: (remainingPlacements: number) => void;
-  color: string;
-};
+// export const usePlacementMode = () => useContext(PlacementContext);
 
 export const PlacementControl = ({
-  GridVectors = [], // user defied positions where objects can be placed
-  gridSize = [20, 20], // size of the grid where objects can be placed
-  cellSize = 5, // size of the cell in the grid
-  obj_ids = [], // the ids of the objects that can be placed
-  geom = new THREE.PlaneGeometry(4, 4), // the geometry of the object that are to be placed
-  color = "blue",
-}: Partial<PlacementControlProps>) => {
-  const {
-    isPlacementMode,
-    setIsPlacementMode,
-    remainingPlacements,
-    setRemainingPlacements,
-    objectsOnScene,
-    setObjectOnScene,
-    setShowResetButton,
-  } = usePlacementMode();
-  const [placementPositions, setPlacementPositions] = useState<THREE.Vector2[]>(
-    []
-  );
+  placementIndex,
+}: {
+  placementIndex: number;
+}) => {
+  // const {
+  //   remainingPlacements,
+  //   setRemainingPlacements,
+  //   objectsOnScene,
+  //   setObjectsOnScene,
+  //   setShowResetButton,
+  //   placements,
+  // } = usePlacementMode();
+  
+  const isActivePlacement = useStore(isPlacementModeActive2)(placementIndex);
+  const setIsPlacementMode = useStore(setIsPlacementModeActive2);
+  const placement = useStore(getPlacementSelector(placementIndex));
+  const [placementPositions, setPlacementPositions] = useState<THREE.Vector2[]>([]);
   const addObject = useStore(setVizObjSelector);
   const deleteObject = useStore(DeleteVizObjSelector);
   const updateAllInfluences = useStore(UpdateAllInfluencesSelector);
+  const getNumObjs = useStore(getNumObjectsPlaced)(placementIndex)
+  const setNumObjs = useStore(setNumObjectsPlaced)
+
 
   const createPlacementPositions = () => {
-    const positions: THREE.Vector2[] = [];
-    GridVectors.forEach((element) => {
-      positions.push(element);
-    });
-    for (let x = 0; x < gridSize[0]; x += cellSize) {
-      for (let y = 0; y < gridSize[1]; y += cellSize) {
-        positions.push(
-          new THREE.Vector2(x - gridSize[0] / 2, y - gridSize[1] / 2)
-        );
-        // console.log("Position: ", positions[positions.length - 1])
+    const positions: THREE.Vector2[] = [...placement.gridVectors];
+    if (placement.grid[0] !== 0 && placement.grid[1] !== 0) {
+      for (let x = 0; x < placement.grid[0]; x += placement.cellSize) {
+        for (let y = 0; y < placement.grid[1]; y += placement.cellSize) {
+          positions.push(new THREE.Vector2(x - placement.grid[0] / 2, y - placement.grid[1] / 2));
+        }
       }
     }
     setPlacementPositions(positions);
   };
 
   const handlePlacement = (position: THREE.Vector2) => {
-    if (remainingPlacements > 0) {
-      setShowResetButton(true); // show the reset button when the first object is placed
-      const obj_id = obj_ids[obj_ids.length - remainingPlacements]; // get the id of the object to be placed
+    if (placement.max_placements - placement.numObjectsPlaced > 0) {
+
+      // setShowResetButton(
+      //   {...placement, [placementIndex]: true}
+      // );
+      const obj_id = placement.object_ids[
+        placement.object_ids.length - (placement.max_placements - placement.numObjectsPlaced)
+      ];
       if (!deleteObject(obj_id)) {
-        // delete the object if it already exists and if not increment the number of objects on the scene
-        setObjectOnScene((o) => o + 1);
+        setNumObjs(placementIndex, placement.numObjectsPlaced - 1);
       }
       addObject(
         obj_id,
         new geomobj({
           id: obj_id,
           position: position,
-          geom: geom,
-          color: color,
+          geom: placement.geometry,
+          color: placement.color,
         })
       );
 
       updateAllInfluences();
-      const newRemainingPlacements = remainingPlacements - 1;
-      setRemainingPlacements(newRemainingPlacements);
+      setNumObjs(placementIndex, placement.numObjectsPlaced + 1);
 
-      if (newRemainingPlacements === 0) {
-        // if all the objects are placed then exit the placement mode
-        setIsPlacementMode(false);
+      if (placement.numObjectsPlaced === 0 ) {
+        setIsPlacementMode(placementIndex, false);
       }
     }
   };
 
   React.useEffect(() => {
-    // create the placement positions when the placement mode is activated
-    if (isPlacementMode) {
-      setRemainingPlacements(obj_ids.length);
+    if (isActivePlacement) {
       createPlacementPositions();
     }
-  }, [isPlacementMode]);
+  }, [isActivePlacement]);
 
   return (
     <>
-      {isPlacementMode && (
+      {isActivePlacement && (
         <>
           {placementPositions.map((position, index) => (
             <PlacementMarker
@@ -239,63 +218,78 @@ export const PlacementControl = ({
   );
 };
 
-// component for the placement activation button
 export const PlacementActivationButton = ({
-  totalPlacements,
-  isActive,
+  isActive, 
+  placement_id
 }: {
-  totalPlacements?: number;
   isActive: boolean;
+  placement_id: number;
 }) => {
-  const { isPlacementMode, setIsPlacementMode, objectsOnScene } =
-    usePlacementMode();
+  // const {objectsOnScene, placements } = usePlacementMode();
+  const isPlacementModeActive = useStore(isPlacementModeActive2)(placement_id);
+  const setIsPlacementModeActive = useStore(setIsPlacementModeActive2);
+  const getNumObjs = useStore(getNumObjectsPlaced)(placement_id)
+  const setNumObjs = useStore(setNumObjectsPlaced)
+
+
+  const totalPlacements = useStore(state => state.placement[placement_id]).max_placements;
+
 
   return (
     <div className="flex flex-col items-end space-y-2">
       <div className="flex items-center space-x-2">
         <span className="text-sm text-gray-600">
-          {objectsOnScene}/{totalPlacements} placed
+          {getNumObjs}/{totalPlacements} placed
         </span>
         <button
-          onClick={() => setIsPlacementMode(!isPlacementMode)}
+          onClick={() => setIsPlacementModeActive(placement_id, !isPlacementModeActive)}
           disabled={!isActive}
           className={`
-                  ${
-                    isPlacementMode
-                      ? "bg-blue-600 hover:bg-blue-700"
-                      : "bg-gray-400 hover:bg-gray-500"
-                  }
-                  ${!isActive && "opacity-50 cursor-not-allowed"}
-                  text-white py-1 px-3 rounded-md text-sm font-medium transition duration-300 ease-in-out
-                  flex items-center
-                `}
+            ${isPlacementModeActive ? "bg-blue-600 hover:bg-blue-700" : "bg-gray-400 hover:bg-gray-500"}
+            ${!isActive && "opacity-50 cursor-not-allowed"}
+            text-white py-1 px-3 rounded-md text-sm font-medium transition duration-300 ease-in-out
+            flex items-center
+          `}
         >
           <span
             className={`w-2 h-2 rounded-full ${
-              isPlacementMode ? "bg-green-400" : "bg-red-400"
+              isPlacementModeActive ? "bg-green-400" : "bg-red-400"
             } mr-2`}
           ></span>
-          {isPlacementMode ? "Active" : "Inactive"}
+          {isPlacementModeActive ? "Active" : "Inactive"}
         </button>
       </div>
-      <ResetButton isActive={isActive} />
+      <ResetButton isActive={isActive} placement_id={placement_id}/>
     </div>
   );
 };
 
-// component for the reset button to reset all the placements
-export const ResetButton = ({ isActive }: { isActive: boolean }) => {
-  const { showResetButton, resetPlacements } = usePlacementMode();
+export const ResetButton = ({ isActive, placement_id}: { isActive: boolean, placement_id: number }) => {
+  // const { showResetButton, resetPlacements } = usePlacementMode();
+  const placement = useStore(getPlacementSelector2)(placement_id)
+  const setplacementState = useStore(setIsPlacementModeActive2)
+  const setNumPlacedObjs = useStore(setNumObjectsPlaced)
+  const deleteObject = useStore(DeleteVizObjSelector)
+  const reset =() => {
+    // resetPlacements();
+    placement.object_ids.forEach((id: number) => {
+              deleteObject(id);
+            });
+    setplacementState(placement_id, false);
+    setNumPlacedObjs(placement_id, 0)
+  }
 
-  if (!showResetButton) return null;
+  if (placement.numObjectsPlaced === 0) return null; // check this
 
   return (
     <button
       disabled={!isActive}
-      onClick={resetPlacements}
-      className={` ${
-        !isActive && "opacity-50 cursor-not-allowed"
-      } bg-red-500 hover:bg-red-600 text-white py-1 px-3 rounded-md text-sm font-medium transition duration-300 ease-in-out flex items-center`}
+      onClick={reset}
+      className={`
+        ${!isActive && "opacity-50 cursor-not-allowed"}
+        bg-red-500 hover:bg-red-600 text-white py-1 px-3 rounded-md text-sm font-medium
+        transition duration-300 ease-in-out flex items-center
+      `}
     >
       <svg
         xmlns="http://www.w3.org/2000/svg"

@@ -487,7 +487,7 @@ export const data_regression: { [key: string]: data_type } = {
         },
       }),
     ],
-    placement: null,
+    placement: [],
   },
 
   lin_reg_flaw: {
@@ -580,7 +580,7 @@ The $\\textbf{green line}$ is the line of best fit that you identified in the la
         },
       }),
     ],
-    placement: null,
+    placement: [],
   },
 
   ridge_regression: {
@@ -669,7 +669,7 @@ The $\\textbf{green line}$ is the line of best fit that you identified in the la
 
       ridge_score,
     ],
-    placement: null,
+    placement: [],
   },
 
   ridge_regression_2: {
@@ -796,7 +796,7 @@ $\\lambda \\cdot \\text{slope}^2 $ term is pulling the $\\textbf{slope lower}$ t
       reg_line3,
     ],
     scoreData: [ridge_score],
-    placement: null,
+    placement: [],
   },
 
   ridge_regression_fail: {
@@ -811,6 +811,7 @@ $\\lambda \\cdot \\text{slope}^2 $ term is pulling the $\\textbf{slope lower}$ t
       { type: "control", id: 2 },
       { type: "question", id: 3 },
       { type: "placement", id: 0 },
+      { type: "placement", id: 1 },
     ],
     questions: [
       {id: 0, text:`Even if we succeed in selecting an optimal $ \\lambda $, this method is not foolproof. We will construct a scenario where $\\textbf{ridge regression}$ fails. <br>
@@ -918,7 +919,8 @@ For reference, the $\\textbf{green line}$ represents the true relation between t
       //   }),
     ],
     scoreData: [],
-    placement: new Placement({
+    placement: [new Placement({
+      id: 0,
       grid: [0, 0],
       cellSize: 0,
 
@@ -927,5 +929,17 @@ For reference, the $\\textbf{green line}$ represents the true relation between t
       geometry: new THREE.CircleGeometry(0.23, 128),
       color: "violet",
     }),
+
+    new Placement({
+      id: 1,
+      grid: [4, 4],
+      cellSize: 1,
+      gridVectors: [],
+      object_ids: [998],
+      geometry: new THREE.CircleGeometry(0.23, 128),
+      color: "violet",
+    }),
+  
+    ],
   },
 };
