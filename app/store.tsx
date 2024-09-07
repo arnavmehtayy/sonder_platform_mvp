@@ -614,6 +614,7 @@ export const getNameSelector = (state: State) => (id: number) =>
 export const getPlacementSelector = (state: State) => state.placement;
 
 export const DeleteVizObjSelector = (state: State) => (id: number) => {
+  console.log("deleting viz obj", id);
   return state.deleteVizObj(id);
 };
 

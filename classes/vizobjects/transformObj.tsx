@@ -24,7 +24,7 @@ export interface TransformObjConstructor extends coloredObjConstructor {
   touch_controls?: TouchControl;
 }
 
-export class TransformObj extends coloredObj {
+export abstract class TransformObj extends coloredObj {
   static get_controllable_atts: get_attributes<any, any>[] = [
     ...coloredObj.get_controllable_atts,
     { label: "position", get_attribute: (obj: TransformObj) => obj.position,
@@ -82,11 +82,11 @@ export class TransformObj extends coloredObj {
     this.touch_controls = touch_controls;
   }
 
-  getMesh({
+  abstract getMesh({
     children,
-    onClickSelect = (event: ThreeEvent<MouseEvent>) => {},
+    onClickSelect,
     objectRef,
-    material = null,
+    material,
   }: Partial<{
     children: React.ReactElement | null;
     onClickSelect: (event: ThreeEvent<MouseEvent>) => void;
@@ -95,50 +95,6 @@ export class TransformObj extends coloredObj {
   }> & {
     children: React.ReactElement | null;
     objectRef: React.RefObject<THREE.Mesh>;
-  }): React.ReactElement {
-    return <></>;
-  }
+  }): React.ReactElement;
 
-  static getPopup({
-    isOpen,
-    onClose,
-    onSave,
-  }: {
-    isOpen: boolean;
-    onClose: () => void;
-    onSave: (newObject: TransformObj) => void;
-  }): React.ReactElement {
-    const [editedObject, setEditedObject] = React.useState<TransformObjConstructor>({
-      id: 0,
-      name: "TransformObj",
-      color: "white",
-      isEnabled: true,
-      position: new THREE.Vector2(0, 0),
-      rotation: new THREE.Vector3(0, 0, 0),
-      scale: new THREE.Vector3(1, 1, 1),
-      touch_controls: new TouchControl(),
-    });
-
-    
-    const popupProps: EditableObjectPopupProps<TransformObjConstructor> = {
-      isOpen,
-      onClose,
-      object: editedObject,
-      onSave: (updatedObject: TransformObjConstructor) => {
-        const newObj = new TransformObj(updatedObject);
-        onSave(newObj);
-      },
-      title: `Create New Object`,
-      fields: [
-        { key: 'id', label: 'ID', type: 'number'},
-        { key: 'name', label: 'Name', type: 'text' },
-        { key: 'isEnabled', label: 'Enabled', type: 'checkbox' },
-
-      ],
-    };
-
-    return <EditableObjectPopup {...popupProps} />;
-  }
-
-  
 }

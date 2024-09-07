@@ -13,7 +13,7 @@ export interface coloredObjConstructor extends objconstructor {
   color?: string;
 }
 
-export default class coloredObj extends obj {
+export default abstract class coloredObj extends obj {
   static get_controllable_atts: get_attributes<any, any>[] = [
     ...obj.get_controllable_atts,
     { label: "color", get_attribute: (obj: coloredObj) => obj.color,
@@ -79,39 +79,21 @@ export default class coloredObj extends obj {
   //   );
   // }
 
-  static getPopup({
-    isOpen,
-    onClose,
-    onSave,
-  }: {
-    isOpen: boolean;
-    onClose: () => void;
-    onSave: (newObject: coloredObj) => void;
-  }): React.ReactElement {
-    const editedObject: coloredObjConstructor = {
-      id: Date.now(), // Generate a temporary ID
-      name: '',
-      isEnabled: true,
-      color: 'white',
-    }
+  abstract getMesh({
+    children,
+    onClickSelect,
+    objectRef,
+    material,
+  }: Partial<{
+    children: React.ReactElement | null;
+    onClickSelect: (event: ThreeEvent<MouseEvent>) => void;
+    objectRef: React.RefObject<THREE.Mesh>;
+    material: THREE.Material | null;
+  }> & {
+    children: React.ReactElement | null;
+    objectRef: React.RefObject<THREE.Mesh>;
+  }): React.ReactElement;
 
-    const popupProps: EditableObjectPopupProps<coloredObjConstructor> = {
-      isOpen,
-      onClose,
-      object: editedObject,
-      onSave: (updatedObject: coloredObjConstructor) => {
-        const newObj = new coloredObj(updatedObject);
-        onSave(newObj);
-      },
-      title: `Create New Object`,
-      fields: [
-        { key: 'id', label: 'ID', type: 'number'},
-        { key: 'name', label: 'Name', type: 'text' },
-        { key: 'isEnabled', label: 'Enabled', type: 'checkbox' },
-        { key: 'color', label: 'Color', type: 'text' },
-      ],
-    };
 
-    return <EditableObjectPopup {...popupProps} />;
-  }
+  
 }

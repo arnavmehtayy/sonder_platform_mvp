@@ -101,37 +101,37 @@ export class obj {
   //   return <div></div>;
   // }
 
-  static getPopup({
-    isOpen,
-    onClose,
-    onSave,
-  }: {
-    isOpen: boolean;
-    onClose: () => void;
-    onSave: (newObject: obj) => void;
-  }): React.ReactElement {
-    const editedObject = {
-      id: 0, // Generate a temporary ID
-      name: "",
-      isEnabled: true,
-    };
+  // static getPopup({
+  //   isOpen,
+  //   onClose,
+  //   onSave,
+  // }: {
+  //   isOpen: boolean;
+  //   onClose: () => void;
+  //   onSave: (newObject: obj) => void;
+  // }): React.ReactElement {
+  //   const editedObject = {
+  //     id: 0, // Generate a temporary ID
+  //     name: "",
+  //     isEnabled: true,
+  //   };
 
-    const popupProps: EditableObjectPopupProps<objconstructor> = {
-      isOpen,
-      onClose,
-      object: editedObject,
-      onSave: (updatedObject: objconstructor) => {
-        const newObj = new obj(updatedObject);
-        onSave(newObj);
-      },
-      title: `Create New Object`,
-      fields: [
-        { key: "id", label: "ID", type: "number" },
-        { key: "name", label: "Name", type: "text" },
-        { key: "isEnabled", label: "Enabled", type: "checkbox" },
-      ],
-    };
+  //   const popupProps: EditableObjectPopupProps<objconstructor> = {
+  //     isOpen,
+  //     onClose,
+  //     object: editedObject,
+  //     onSave: (updatedObject: objconstructor) => {
+  //       const newObj = new obj(updatedObject);
+  //       onSave(newObj);
+  //     },
+  //     title: `Create New Object`,
+  //     fields: [
+  //       { key: "id", label: "ID", type: "number" },
+  //       { key: "name", label: "Name", type: "text" },
+  //       { key: "isEnabled", label: "Enabled", type: "checkbox" },
+  //     ],
+  //   };
 
-    return <EditableObjectPopup {...popupProps} />;
-  }
+  //   return <EditableObjectPopup {...popupProps} />;
+  // }
 }

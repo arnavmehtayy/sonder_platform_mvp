@@ -148,18 +148,19 @@ export class LineObj extends coloredObj {
   // method that returns the physical three.js mesh representation of the object
   // this is used to render the object in the vizexperience
   getMesh({
-    children = null,
+    children,
     onClickSelect,
     objectRef,
-    material = null,
+    material,
   }: Partial<{
     children: React.ReactElement | null;
     onClickSelect: (event: ThreeEvent<MouseEvent>) => void;
-    objectRef: RefObject<THREE.Mesh>;
-    material: THREE.MeshBasicMaterial | null;
+    objectRef: React.RefObject<THREE.Mesh>;
+    material: THREE.MeshStandardMaterial | null;
   }> & {
-    objectRef: RefObject<THREE.Mesh>;
-  }): ReactElement<any, string | JSXElementConstructor<any>> {
+    children: React.ReactElement | null;
+    objectRef: React.RefObject<THREE.Mesh>;
+  }): React.ReactElement {
     return (
       <mesh
         position={[0, 0, 0]}

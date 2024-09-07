@@ -4,7 +4,7 @@
 */
 
 
-export class Control {
+export abstract class Control {
   id: number; // This is the id of the control
   desc: string; // This is the description of the control
     text: string; // This is the text
@@ -43,4 +43,7 @@ export class Control {
         );
         return clone;
       }
+    
+      abstract render(): React.ReactNode;
+
 }

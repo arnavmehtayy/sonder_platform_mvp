@@ -3,6 +3,10 @@ import * as THREE from "three";
 import { TransformObj } from "../vizobjects/transformObj";
 import { obj } from "../vizobjects/obj";
 import * as att_funcs from "../attribute_funcs";
+import React from "react";
+import Latex from "react-latex-next";
+import { useStore, setSliderControlValueSelector, getSliderControlValueSelector } from "@/app/store";
+import {ShowSliderControl } from "./SliderControl";
 
 /*
  * This class stores information about a slider that will be used to move-x axis, rotate-z axis, scale-x axis or move an object along some parametric path.
@@ -13,6 +17,8 @@ import * as att_funcs from "../attribute_funcs";
 
 export type action_typ = "move" | "rotate" | "scale" | "path";
 export type Parametric_curve = (t: number) => THREE.Vector2;
+
+
 
 export class SlideContTrans<T extends TransformObj> extends SliderControl<T> {
   action: action_typ; // This is the type of the action that we want for our object
@@ -85,5 +91,42 @@ export class SlideContTrans<T extends TransformObj> extends SliderControl<T> {
           att_funcs.set_path_pos(obj, this.param_curve(t), t) as T;
         break;
     }
+  }
+
+  // method to render the slider control onto the sidebar
+  render(): React.ReactNode {
+    return <ShowSliderControl control={this} />;
+    // const setValue = useStore(setSliderControlValueSelector(this.id));
+    // const getValue = useStore(getSliderControlValueSelector(this.id));
+
+    // return (
+    //   <div className={`bg-white rounded-lg shadow-md p-4 ${!this.isClickable ? "opacity-50" : ""} relative`}>
+    //     <h3 className="text-lg font-semibold text-blue-800 mb-2">
+    //       <Latex>{this.desc}</Latex>
+    //     </h3>
+    //     <p className="text-gray-600 mb-2">
+    //       <Latex>{this.text}</Latex>
+    //     </p>
+    //     <div className="relative pt-1">
+    //       <input
+    //         type="range"
+    //         min={this.range[0]}
+    //         max={this.range[1]}
+    //         step={this.step_size}
+    //         value={getValue}
+    //         onChange={(e) => setValue(Number(e.target.value))}
+    //         className="w-full h-2 bg-blue-200 rounded-lg appearance-none cursor-pointer"
+    //         disabled={!this.isClickable}
+    //       />
+    //       <div className="flex justify-between items-center mt-2">
+    //         <span className="text-sm text-gray-600">{this.range[0]}</span>
+    //         <span className="text-sm font-medium text-blue-600">
+    //           {getValue.toFixed(2)}
+    //         </span>
+    //         <span className="text-sm text-gray-600">{this.range[1]}</span>
+    //       </div>
+    //     </div>
+    //   </div>
+    // );
   }
 }

@@ -3,10 +3,11 @@ import React from "react";
 import { Canvas } from "@react-three/fiber";
 import { OrthographicCamera, OrbitControls } from "@react-three/drei";
 import { Showobj } from "./three/Showobj";
-import { useStore, getObjectsSelector, getPlacementSelector } from "../store";
+import { useStore, getObjectsSelector, getPlacementSelector} from "../store";
 import * as THREE from "three";
 
 import { PlacementControl } from "./three/PlacementControl";
+import coloredObj from "@/classes/vizobjects/coloredObj";
 
 /*
  * This component is the main visual experience component.
@@ -16,8 +17,10 @@ import { PlacementControl } from "./three/PlacementControl";
  */
 
 export default function Experience() {
+  
   const objectlist = useStore(getObjectsSelector);
   const placement = useStore(getPlacementSelector);
+
 
   return (
     <>
@@ -62,9 +65,12 @@ export default function Experience() {
           />
         ) : null} 
 
+        
+
         <>
           {objectlist.map((obj, index) => (
-            <Showobj key={index} id={obj.id} />
+            obj instanceof coloredObj ?
+            <Showobj key={index} obj={obj as coloredObj} /> : null
           ))}
         </>
 

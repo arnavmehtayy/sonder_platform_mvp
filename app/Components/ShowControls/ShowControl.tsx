@@ -17,21 +17,22 @@ import { InputNumber } from "@/classes/Controls/InputNumber";
 
 
 export default function ShowControl({ control_id }: { control_id: number }) {
-  console.log(control_id)
   const control = useStore(getControlSelector(control_id));
-  console.log
-
-  if (control instanceof SliderControl) {
-    return <ShowNumSlider control_id={control_id} />;
-  } else if (control instanceof SelectControl) {
-    return <ShowSelect control_id={control_id} />;
-  } else if (control instanceof MultiChoiceClass) {
-    return <ShowMultiChoice control_id={control_id} />;
-  } else if (control instanceof InputNumber) {
-    return <ShowInputNumber control_id={control_id} />;
-  } else if (control instanceof EnablerControl) {
-    return <ShowEnablerControl control_id={control_id} />;
-  } else {
-    return null;
+  if(control) {
+  return control.render();
   }
+
+  // if (control instanceof SliderControl) {
+  //   return <ShowNumSlider control_id={control_id} />;
+  // } else if (control instanceof SelectControl) {
+  //   return <ShowSelect control_id={control_id} />;
+  // } else if (control instanceof MultiChoiceClass) {
+  //   return <ShowMultiChoice control_id={control_id} />;
+  // } else if (control instanceof InputNumber) {
+  //   return <ShowInputNumber control_id={control_id} />;
+  // } else if (control instanceof EnablerControl) {
+  //   return <ShowEnablerControl control_id={control_id} />;
+  // } else {
+  //   return null;
+  // }
 }

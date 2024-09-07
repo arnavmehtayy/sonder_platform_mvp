@@ -60,11 +60,7 @@ export const EditBar: React.FC = () => {
   ];
 
   const objectTypes: ObjectType[] = [
-    {name: 'Generic Object', type: obj, icon: List },
-    {name: 'Colored Object', type: coloredObj, icon: List },
-    {name: 'Transform Object', type: TransformObj, icon: HelpCircle },
     {name: 'Line Object', type: LineObj, icon: HelpCircle },
-
     // Add more object types here as needed
   ];
 
