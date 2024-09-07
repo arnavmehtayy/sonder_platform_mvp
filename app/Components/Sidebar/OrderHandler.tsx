@@ -1,11 +1,17 @@
-'use client';
+"use client";
 import React, { useState } from "react";
 import ShowScore from "../ShowScore";
-import ShowControl from "../ShowControls/ShowControl";
+import ShowControl from "../ShowControl";
 import ShowPlacement from "../ShowPlacement";
 import Latex from "react-latex-next";
 import { initDataSets } from "@/classes/Data/CompleteData";
-import { useStore, getQuestionsSelector, getTitleSelector, getOrderSelector, OrderItem } from "@/app/store";
+import {
+  useStore,
+  getQuestionsSelector,
+  getTitleSelector,
+  getOrderSelector,
+  OrderItem,
+} from "@/app/store";
 
 /*
  * This component is responsible for rendering the order of components in the sidebar
@@ -13,8 +19,11 @@ import { useStore, getQuestionsSelector, getTitleSelector, getOrderSelector, Ord
  * It is used to render the order of components in the sidebar
  */
 
-export const OrderHandler = ({ state_name }: {state_name: keyof typeof initDataSets}) => {
-
+export const OrderHandler = ({
+  state_name,
+}: {
+  state_name: keyof typeof initDataSets;
+}) => {
   const get_questions = useStore(getQuestionsSelector); // the set of questions for the current state
   const order = useStore(getOrderSelector); // the order of things in the sidebar along with hints
   // note that hints can only be added to questions
@@ -55,9 +64,7 @@ export const OrderHandler = ({ state_name }: {state_name: keyof typeof initDataS
             ) : null}
 
             <p id={`question-text-${index}`} className="text-gray-700">
-              {question ? (
-                <Latex>{question}</Latex>
-              ) : null}
+              {question ? <Latex>{question}</Latex> : null}
             </p>
             {/* {item.hint && (
               <div className="mt-2">
@@ -78,8 +85,9 @@ export const OrderHandler = ({ state_name }: {state_name: keyof typeof initDataS
         return null;
     }
   };
-  
-  return ( // render the components for each of the items in the order list
+
+  return (
+    // render the components for each of the items in the order list
     <div className="space-y-4 md:space-y-6">
       {order.map((item, index) => renderComponent(item, index))}
     </div>

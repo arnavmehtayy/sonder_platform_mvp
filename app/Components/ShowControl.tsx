@@ -1,4 +1,4 @@
-import { useStore, getControlSelector } from "../../store";
+import { useStore, getControlSelector } from "../store";
 import { SliderControl } from "@/classes/Controls/SliderControl";
 
 import { SelectControl } from "@/classes/Controls/SelectControl";
@@ -13,11 +13,10 @@ import { InputNumber } from "@/classes/Controls/InputNumber";
   Uses a useStore to fetch the control object corresponding to the control_id
 */
 
-
 export default function ShowControl({ control_id }: { control_id: number }) {
   const control = useStore(getControlSelector(control_id));
-  if(control) {
-  return control.render();
+  if (control) {
+    return control.render();
   }
 
   // if (control instanceof SliderControl) {

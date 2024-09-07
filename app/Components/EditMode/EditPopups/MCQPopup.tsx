@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Option } from '@/app/Components/ShowControls/ShowMultiChoice';
+import { Option } from '@/classes/Controls/MultiChoiceClass';
 
 
 
