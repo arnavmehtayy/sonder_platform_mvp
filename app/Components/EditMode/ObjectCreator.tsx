@@ -6,7 +6,7 @@ import { TransformObj } from '@/classes/vizobjects/transformObj';
 import { LineObj } from '@/classes/vizobjects/Lineobj';
 
 export type EditAddType = obj | coloredObj | TransformObj | LineObj;
-export type PopUpType = typeof obj | typeof coloredObj | typeof TransformObj | typeof LineObj;
+export type PopUpType = typeof LineObj; // add more to this
 
 interface ObjectCreatorProps {
   ObjectType: PopUpType;
