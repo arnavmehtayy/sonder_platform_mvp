@@ -569,6 +569,9 @@ export const getObjectSelector2 = (state: State) => (id: number) =>
 export const getControlSelector = (control_id: number) => (state: State) =>
   state.controls[control_id];
 
+export const getControlSelector2 = (state: State) => (control_id: number) => 
+  state.controls[control_id];
+
 // get the value of a particular slider control given its id
 export const getSliderControlValueSelector =
   (control_id: number) => (state: State) => {

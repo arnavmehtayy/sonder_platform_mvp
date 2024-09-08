@@ -1,4 +1,6 @@
 import * as THREE from "three";
+import { useStore, getPlacementSelector } from "@/app/store";
+import { PlacementActivationButton } from "@/app/Components/three/PlacementControl";
 
 /*
  * This class stores information about a control that allows users to place of objects on the three.js experience
@@ -14,6 +16,27 @@ import * as THREE from "three";
  * isClickable: whether the placement is activable or not with the isActive button
  * NOTE: if we set the grid to [0,0] then the options to place in come solely from the gridVectors
  */
+
+function ShowPlacement({id}: {id: number}) {
+  const placement = useStore(getPlacementSelector(id));
+
+  const isActive = placement?.isClickable || false;
+  
+  if (placement) {
+    return (
+      <div className={`bg-white rounded-lg shadow-md p-4 ${!isActive&& 'opacity-50'}`}>
+        <div className="flex justify-between items-start mb-3">
+          <div>
+            <h3 className="text-lg font-semibold text-blue-800 mb-2">{placement.desc}</h3>
+            <p className="text-gray-600 mb-2">{placement.text}</p>
+          </div>
+          <PlacementActivationButton isActive={isActive} placement_id={id}/>
+        </div>
+      </div>
+    );
+  }
+  return null;
+}
 
 export default class Placement {
   id: number
@@ -85,5 +108,9 @@ export default class Placement {
     );
     newObj.numObjectsPlaced = num
     return newObj;
+  }
+
+  render() {
+    return <ShowPlacement id={this.id} />;
   }
 }

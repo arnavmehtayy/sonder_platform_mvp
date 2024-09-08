@@ -11,7 +11,11 @@ import {
   getTitleSelector,
   getOrderSelector,
   OrderItem,
+  getPlacementSelector2,
+  getScore,
+  getControlSelector2
 } from "@/app/store";
+import { get } from "http";
 
 /*
  * This component is responsible for rendering the order of components in the sidebar
@@ -28,6 +32,8 @@ export const OrderHandler = ({
   const order = useStore(getOrderSelector); // the order of things in the sidebar along with hints
   // note that hints can only be added to questions
   const title = useStore(getTitleSelector);
+  const get_placement = useStore(getPlacementSelector2)
+  const get_control = useStore(getControlSelector2)
   // const [showHint, setShowHint] = useState<{ [key: number]: boolean }>({});
 
   // const toggleHint = (index: number) => {
@@ -39,18 +45,11 @@ export const OrderHandler = ({
     // checks the type of the item and renders the relevant component
     switch (item.type) {
       case "score":
-        return (
-          <ShowScore key={`score-${index}`} score_id={item.id as number} />
-        );
+        return getScore(item.id)?.render();
       case "control":
-        return (
-          <ShowControl
-            key={`control-${index}`}
-            control_id={item.id as number}
-          />
-        );
+        return get_control(item.id)?.render()
       case "placement":
-        return <ShowPlacement key={`placement-${index}`} id={item.id as number} />;
+        return get_placement(item.id)?.render();
       case "question":
         const question = get_questions(item.id as number);
         return (

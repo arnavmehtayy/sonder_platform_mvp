@@ -4,13 +4,7 @@ import { useStore, setEnablerControl } from '@/app/store'
 import Latex from 'react-latex-next';
 import { useState } from "react";
 
-/*
 
- * This is the class that holds information about the enabler control
- * The enabler control is used to enable or disable vizobject on the screen
- * the attributes of this class are: obj_ids, ControlState
-
-*/
 function ShowEnablerControl({control}: {control: EnablerControl}) {
     const isActive = control.isClickable;
     const [isComponentActive, setIsComponentActive] = useState<boolean>(control.ControlState);
@@ -52,6 +46,14 @@ function ShowEnablerControl({control}: {control: EnablerControl}) {
     );
   
 }
+
+/*
+
+ * This is the class that holds information about the enabler control
+ * The enabler control is used to enable or disable vizobject on the screen
+ * the attributes of this class are: obj_ids, ControlState
+
+*/
 
 export class EnablerControl extends Control {
   obj_ids: number[]; // vizobjects that this enabler can enable or disable
