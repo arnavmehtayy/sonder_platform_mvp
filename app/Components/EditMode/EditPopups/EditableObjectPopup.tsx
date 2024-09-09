@@ -16,7 +16,9 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 
-import { Switch } from '@radix-ui/react-switch';
+import Vector2Input from './PositionInput';
+import RotationInput from './RotationInput';
+import { Vector2, Vector3 } from 'three';
 
 /*
  * This component is a generic popup that allows the user to edit an object.
@@ -26,7 +28,7 @@ import { Switch } from '@radix-ui/react-switch';
 export interface PopupQuestionProps<T, option_T> {
     key: keyof T; // The key of the object that will be edited
     label: string;
-    type: 'text' | 'number' | 'checkbox' | 'color' | 'vector2' | 'select';
+    type: 'text' | 'number' | 'checkbox' | 'color' | 'position' | 'select' | "rotation";
     options?: {label: string, value: option_T}[]; // For select type
   
 } // option_T is the type of the options that will be displayed in the select dropdown
@@ -71,23 +73,43 @@ export function EditableObjectPopup<T>({
             className="col-span-3 h-5 w-5"
           />
         );
-      case 'vector2':
+      case 'rotation':
         return (
-          <div className="col-span-3 grid grid-cols-2 gap-2">
-            <Input
-              type="number"
-              value={(editedObject[field.key] as {x: number, y: number}).x}
-              onChange={(e) => handleChange(field.key, {...editedObject[field.key] as object, x: parseFloat(e.target.value)})}
-              placeholder="X"
-            />
-            <Input
-              type="number"
-              value={(editedObject[field.key] as {x: number, y: number}).y}
-              onChange={(e) => handleChange(field.key, {...editedObject[field.key] as object, y: parseFloat(e.target.value)})}
-              placeholder="Y"
+          <div key={field.key as string} className="col-span-3">
+            <RotationInput
+            key={field.key as string}
+              value={editedObject[field.key] as Vector3}
+              onChange={(newValue: Vector3) => handleChange(field.key, newValue)}
+              size={200}
             />
           </div>
         );
+      case 'position':
+        // return (
+        //   <div className="col-span-3 grid grid-cols-2 gap-2">
+        //     <Input
+        //       type="number"
+        //       value={(editedObject[field.key] as {x: number, y: number}).x}
+        //       onChange={(e) => handleChange(field.key, {...editedObject[field.key] as object, x: parseFloat(e.target.value)})}
+        //       placeholder="X"
+        //     />
+        //     <Input
+        //       type="number"
+        //       value={(editedObject[field.key] as {x: number, y: number}).y}
+        //       onChange={(e) => handleChange(field.key, {...editedObject[field.key] as object, y: parseFloat(e.target.value)})}
+        //       placeholder="Y"
+        //     />
+        //   </div>
+        // );
+        return (
+          <div className="col-span-3">
+            <Vector2Input
+              value={editedObject[field.key] as Vector2}
+              onChange={(newValue: Vector2) => handleChange(field.key, newValue)}
+              size={200}
+              range={10}
+            />
+          </div>)
       case 'select':
         return (
           <Select
@@ -98,15 +120,34 @@ export function EditableObjectPopup<T>({
               <SelectValue placeholder="Select an option" />
             </SelectTrigger>
             <SelectContent>
-              {field.options?.map((option) => (
-                <SelectItem key={option.label} value={option.label}>  
+              {field.options?.map((option, index) => (
+                <SelectItem key={`${option.value}-${index}`} value={option.value}>
                   {option.label}
                 </SelectItem>
-                
               ))}
-              {/* THIS NEEDS TO BE CHANGED WHEN WE IMPLEMENT SELECT TODO */}
             </SelectContent>
           </Select>
+        );
+      case 'text':
+        return (
+          <Input
+            key={field.key as string}
+            id={field.key as string}
+            type={field.type}
+            value={editedObject[field.key] as string}
+            onChange={(e) => handleChange(field.key, e.target.value)}
+            className="col-span-3"
+          />
+        );
+      case 'color':
+        return (
+          <Input
+            id={field.key as string}
+            type={field.type}
+            value={editedObject[field.key] as string | number}
+            onChange={(e) => handleChange(field.key, e.target.value)}
+            className="col-span-3"
+          />
         );
       default:
         return (
@@ -118,12 +159,13 @@ export function EditableObjectPopup<T>({
             className="col-span-3"
           />
         );
+
     }
   };
 
-  const dialogDescriptionId = `dialog-description-${object}`;
+  const dialogDescriptionId = `dialog-description-${React.useId()}`;;
     return (
-        <Dialog open={isOpen} onOpenChange={onClose}>
+      <Dialog key={`dialog-${React.useId()}`} open={isOpen} onOpenChange={onClose}>
           <DialogContent className="sm:max-w-[425px]" aria-describedby={dialogDescriptionId}>
             <DialogHeader>
               <DialogTitle>{title}</DialogTitle>
@@ -132,11 +174,9 @@ export function EditableObjectPopup<T>({
               Edit properties for {title}
             </div>
             <div className="grid gap-4 py-4">
-              {fields.map((field) => (
-                <div key={field.key as string} className="grid grid-cols-4 items-center gap-4">
-                  <label htmlFor={field.key as string} className="text-right font-medium">
+              {fields.map((field, index) => (
+                <div key={`${field.key as string}-${index}`} className="grid grid-cols-4 items-center gap-4">
                     {field.label}
-                  </label>
                   {renderField(field)}
                 </div>
               ))}

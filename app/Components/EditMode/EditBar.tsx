@@ -24,6 +24,7 @@ import coloredObj from '@/classes/vizobjects/coloredObj';
 import { obj } from '@/classes/vizobjects/obj';
 import { TransformObj } from '@/classes/vizobjects/transformObj';
 import { LineObj } from '@/classes/vizobjects/Lineobj';
+import { geomobj } from '@/classes/vizobjects/geomobj';
 
 export interface Option {
   id: number;
@@ -37,7 +38,7 @@ interface ButtonItem {
 
 interface ObjectType {
   name: string;
-  type: PopUpType; // Extend this union type as you add more object types
+  type: PopUpType;
   icon: React.ElementType;
 }
 
@@ -61,7 +62,7 @@ export const EditBar: React.FC = () => {
 
   const objectTypes: ObjectType[] = [
     {name: 'Line Object', type: LineObj, icon: HelpCircle },
-    // Add more object types here as needed
+    {name: 'Geom Object', type: geomobj, icon: HelpCircle },
   ];
 
   const handleAddQuestion = () => {

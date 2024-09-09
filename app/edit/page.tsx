@@ -1,6 +1,5 @@
 'use client'
 
-import { Minigame } from '@/app/Components/Sidebar/Minigame';
 import CurvedBackButton from '@/app/Components/three/BackButton';
 import { FeedbackComponent } from '@/app/Components/MainMenu/FeedbackComponent';
 import { EditBar } from '../Components/EditMode/EditBar';

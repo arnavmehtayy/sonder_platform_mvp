@@ -16,16 +16,15 @@ import { TransformObjConstructor } from "./transformObj";
  * This class creates a geometric object on the scene (Any object that is rendered using THREE.BufferGeometry).
  */
 
-interface geomobjconstructor extends TransformObjConstructor{
+interface geomobjconstructor extends TransformObjConstructor {
   color?: string;
-  geom?: THREE.BufferGeometry;
+  geom: THREE.BufferGeometry;
   param_t?: number;
   isClickable?: boolean;
   OnClick?: ((obj: geomobj) => void) | undefined;
 }
 
 export class geomobj extends TransformObj {
-
   geom: THREE.BufferGeometry; // the geometry of the object
   isClickable: boolean = false; // whether the object on the screen can be clicked or not
   OnClick: ((obj: geomobj) => void) | undefined;
@@ -54,7 +53,6 @@ export class geomobj extends TransformObj {
     });
     this.geom = geom;
     this.OnClick = OnClick;
-
   }
 
   // method that returns the physical three.js mesh representation of the object
@@ -120,37 +118,68 @@ export class geomobj extends TransformObj {
     );
   }
 
-  // static getPopup({
-  //   isOpen,
-  //   onClose,
-  //   onSave,
-  // }: {
-  //   isOpen: boolean;
-  //   onClose: () => void;
-  //   onSave: (newObject: obj) => void;
-  // }): React.ReactElement {
-  //   const [editedObject, setEditedObject] = React.useState<objconstructor>({
-  //     id: Date.now(), // Generate a temporary ID
-  //     name: '',
-  //     isEnabled: true,
-  //   });
+  static getPopup({
+    isOpen,
+    onClose,
+    onSave,
+  }: {
+    isOpen: boolean;
+    onClose: () => void;
+    onSave: (newObject: geomobj) => void;
+  }): React.ReactElement {
+    const [editedObject, setEditedObject] = React.useState<geomobjconstructor>({
+      id: Date.now(), // Generate a temporary ID
+      name: "",
+      isEnabled: true,
+      position: new THREE.Vector2(0, 0),
+      rotation: new THREE.Vector3(0, 0, 0),
+      scale: new THREE.Vector3(2, 2, 2),
+      color: "#000000",
+      geom: new THREE.BufferGeometry(),
+      touch_controls: new TouchControl(),
+      param_t: 0,
+      isClickable: false,
+    });
 
-  //   const popupProps: EditableObjectPopupProps<objconstructor> = {
-  //     isOpen,
-  //     onClose,
-  //     object: editedObject,
-  //     onSave: (updatedObject: objconstructor) => {
-  //       const newObj = new obj(updatedObject);
-  //       onSave(newObj);
-  //     },
-  //     title: `Create New Object`,
-  //     fields: [
-  //       { key: 'id', label: 'ID', type: 'number'},
-  //       { key: 'name', label: 'Name', type: 'text' },
-  //       { key: 'isEnabled', label: 'Enabled', type: 'checkbox' },
-  //     ],
-  //   };
+    const handleChange = (key: keyof geomobjconstructor, value: any) => {
+      setEditedObject((prev) => ({ ...prev, [key]: value }));
+    };
 
-  //   return <EditableObjectPopup {...popupProps} />;
-  // }
+    const popupProps: EditableObjectPopupProps<geomobjconstructor> = {
+      isOpen,
+      onClose,
+      object: editedObject,
+      onSave: (updatedObject: geomobjconstructor) => {
+        const newObj = new geomobj(updatedObject);
+        onSave(newObj);
+      },
+      title: `Create New Object`,
+      fields: [
+        { key: "name", label: "Name", type: "text" },
+        {
+          key: "geom",
+          label: "Geometry",
+          type: "select",
+          options: [
+            
+            { label: "Circle", value: new THREE.CircleGeometry() },
+            { label: "Box", value: new THREE.BoxGeometry() },
+            {
+              label: "Triangle",
+              value: new THREE.Triangle(
+                new THREE.Vector3(0, 0, 0),
+                new THREE.Vector3(1, 0, 0),
+                new THREE.Vector3(0, 1, 0)
+              ),
+            },
+          ],
+        },
+        { key: "color", label: "Color", type: "color" },
+        { key: "position", label: "Position", type: "position" },
+        { key: "rotation", label: "Rotation", type: "rotation" },
+      ],
+    };
+
+    return <EditableObjectPopup {...popupProps} />;
+  }
 }

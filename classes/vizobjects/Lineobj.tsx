@@ -207,8 +207,8 @@ export class LineObj extends coloredObj {
       id: 0,
       name: "Line",
       isEnabled: true,
-      start: new Vector2(-100, -100),
-      end: new Vector2(100, 100),
+      start: new Vector2(0, 0),
+      end: new Vector2(0, 0),
       line_width: 2,
       color: "white",
     };
@@ -223,11 +223,11 @@ export class LineObj extends coloredObj {
       },
       title: `Create New Object`,
       fields: [
-        { key: "id", label: "ID", type: "number" },
         { key: "name", label: "Name", type: "text" },
-        { key: "isEnabled", label: "Enabled", type: "checkbox" },
         { key: "line_width", label: "Line Width", type: "number" },
-        { key: "color", label: "Color", type: "color" },
+        { key: "start", label: "Start Point", type: "position" },
+        { key: "end", label: "End Point", type: "position" },
+        //{ key: "color", label: "Color", type: "color" },
       ],
     };
     return <EditableObjectPopup {...popupProps} />;
