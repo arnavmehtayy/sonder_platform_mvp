@@ -1,6 +1,11 @@
-import { Control } from "./Control";
+import { Control, ControlConstructor } from "./Control";
 import { useStore, setMultiChoiceOptionsSelector } from "@/app/store";
 import Latex from "react-latex-next";
+import React from "react";
+import {
+  EditableObjectPopup,
+  EditableObjectPopupProps,
+} from "@/app/Components/EditMode/EditPopups/EditableObjectPopup";
 
 
 
@@ -12,6 +17,13 @@ import Latex from "react-latex-next";
 export interface Option {
   id: number;
   label: string;
+}
+
+export interface MultiChoiceConstructor extends ControlConstructor {
+  options: Option[];
+  title: string;
+  description: string;
+  isMultiSelect?: boolean;
 }
 
 function ShowMultiChoice({control}: {control: MultiChoiceClass}) {
@@ -101,7 +113,7 @@ export class MultiChoiceClass extends Control {
     isClickable = true,
     options,
     isMultiSelect = false,
-  }: Partial<MultiChoiceClass> & {
+  }: Partial<MultiChoiceConstructor> & {
     id: number;
     title: string;
     description: string;
@@ -121,6 +133,50 @@ export class MultiChoiceClass extends Control {
     );
     new_obj.selectedOptions = options;
     return new_obj;
+  }
+
+  static getPopup({
+    isOpen,
+    onClose,
+    onSave,
+  }: {
+    isOpen: boolean;
+    onClose: () => void;
+    onSave: (obj: MultiChoiceClass) => void;
+  }) {
+    const [editedObject, setEditedObject] = React.useState<MultiChoiceConstructor>({
+      id: Date.now(),
+      title: "",
+      options: [],
+      isMultiSelect: false,
+      description: "",
+    });
+
+    const handleChange = (field: string, value: any) => {
+      setEditedObject((prev) => ({ ...prev, [field]: value }));
+    };
+
+    
+    const popupProps: EditableObjectPopupProps<MultiChoiceConstructor> = {
+      isOpen,
+      onClose,
+      object: editedObject,
+      onSave: (updatedObject: MultiChoiceConstructor) => {
+        const newObj = new MultiChoiceClass(updatedObject);
+        onSave(newObj);
+      },
+      title: `Create New Multiple Choice Question`,
+      fields: [
+        { key: "title", label: "Title", type: "title" },
+        { key: "description", label: "Description", type: "textarea" },
+        { key: "options", label: "Options", type: "addoptions" },
+        { key: "isMultiSelect", label: "Allow Multiple Selections", type: "checkbox" },
+        
+      ],
+      
+    };
+
+    return <EditableObjectPopup {...popupProps} />;
   }
 
   render(): React.ReactNode {

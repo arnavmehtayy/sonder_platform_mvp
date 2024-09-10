@@ -21,6 +21,8 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import Vector2Input from './PositionInput';
 import RotationInput from './RotationInput';
 import { Vector2, Vector3 } from 'three';
+import { Textarea } from "@/components/ui/textarea";
+import { MCQOptionsInput } from './MCQPopup';
 
 /*
  * This component is a generic popup that allows the user to edit an object.
@@ -30,7 +32,7 @@ import { Vector2, Vector3 } from 'three';
 export interface PopupQuestionProps<T, option_T> {
     key: keyof T; // The key of the object that will be edited
     label: string;
-    type: 'text' | 'number' | 'checkbox' | 'color' | 'position' | 'select' | "rotation";
+    type: 'text' | 'number' | 'checkbox' | 'color' | 'position' | 'select' | "rotation" | "textarea" | "title" | "addoptions"; // The type of the input field
     options?: {label: string, value: option_T}[]; // For select type
     showIf?: (obj: T) => boolean; // New property for conditional rendering
 } // option_T is the type of the options that will be displayed in the select dropdown
@@ -54,11 +56,6 @@ export function EditableObjectPopup<T>({
 }: EditableObjectPopupProps<T>) {
   const [editedObject, setEditedObject] = React.useState<T>({...object});
 
-  const getOptimalColumnCount = (fieldCount: number) => {
-    return 2;
-  };
-
-  const columnCount = getOptimalColumnCount(fields.length);
 
   const handleChange = (key: keyof T, value: any) => {
     setEditedObject(prev => ({ ...prev, [key]: value }));
@@ -88,6 +85,36 @@ export function EditableObjectPopup<T>({
           <label htmlFor={field.key as string}>{field.label}</label>
         </div>
         );
+      
+      case 'title':
+        return (<div className="mb-4">
+        <Input
+              
+              onChange={(e) => handleChange(field.key, e.target.value)}
+              placeholder={field.label}
+              className="text-lg font-semibold text-blue-800 mb-2"
+            />
+            </div>);
+      case 'textarea':
+        return (<div className="mb-4">
+        <Textarea
+              onChange={(e) => handleChange(field.key, e.target.value)}
+              placeholder="Question Description"
+              className="text-gray-600 mb-2"
+            />
+            </div>)
+      case 'addoptions':
+        return (
+        <div className="mb-4">
+            <label className="block mb-2">{field.label}</label>
+            <MCQOptionsInput
+              options={editedObject[field.key] as { id: string; label: string }[]}
+              onChange={(newOptions) => handleChange(field.key, newOptions)}
+            />
+          </div>)
+
+
+
       case 'rotation':
         return (
           <div className="mb-4">
@@ -138,6 +165,7 @@ export function EditableObjectPopup<T>({
           <Input
             key={field.key as string}
             id={field.key as string}
+            placeholder={field.label}
             type={field.type}
             value={editedObject[field.key] as string}
             onChange={(e) => handleChange(field.key, e.target.value)}
@@ -163,6 +191,7 @@ export function EditableObjectPopup<T>({
           <div className="mb-4">
             <label htmlFor={field.key as string} className="block mb-2">{field.label}</label>
             <Input
+              placeholder={field.label}
               id={field.key as string}
               type={field.type}
               value={editedObject[field.key] as string | number}
@@ -177,15 +206,15 @@ export function EditableObjectPopup<T>({
   const dialogDescriptionId = `dialog-description-${React.useId()}`;;
     return (
       <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[600px] w-full" aria-describedby={dialogDescriptionId}>
+      <DialogContent className="sm:max-w-[400px] md:max-w-[500px] lg:max-w-[600px]">
         <DialogHeader>
           <DialogTitle>{title}</DialogTitle>
         </DialogHeader>
         <div id={dialogDescriptionId} className="sr-only">
           Edit properties for {title}
         </div>
-        <ScrollArea className="h-[60vh] pr-4">
-          <div className="space-y-4 py-4">
+        <ScrollArea className="max-h-[60vh] overflow-y-auto pr-4">
+        <div className="space-y-4 py-4 px-2 flex flex-col ">
             {fields.map((field, index) => (
               <React.Fragment key={`${field.key as string}-${index}`}>
                 {renderField(field)}

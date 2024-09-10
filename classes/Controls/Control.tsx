@@ -3,6 +3,12 @@
  * it has the following properties: id, desc, text, isClickable (if the control can be interacted with)
 */
 
+export interface ControlConstructor {
+    id: number;
+    desc?: string;
+    text?: string;
+    isClickable?: boolean;
+}
 
 export abstract class Control {
   id: number; // This is the id of the control

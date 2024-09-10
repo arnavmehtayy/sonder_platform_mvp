@@ -6,9 +6,12 @@ import { TransformObj } from '@/classes/vizobjects/transformObj';
 import { LineObj } from '@/classes/vizobjects/Lineobj';
 import { geomobj } from '@/classes/vizobjects/geomobj';
 import CoordinateAxis from '@/classes/vizobjects/CoordinateAxis';
+import { Question } from '@/classes/Question';
+import { Control } from '@/classes/Controls/Control';
+import { MultiChoiceClass } from '@/classes/Controls/MultiChoiceClass';
 
-export type EditAddType = obj | coloredObj | TransformObj | LineObj;
-export type PopUpType = typeof LineObj | typeof geomobj | typeof CoordinateAxis; // add more to this
+export type EditAddType = obj | coloredObj | TransformObj | LineObj | Question | MultiChoiceClass;
+export type PopUpType = typeof LineObj | typeof geomobj | typeof CoordinateAxis | typeof Question | typeof MultiChoiceClass; // add more to this
 
 interface ObjectCreatorProps {
   ObjectType: PopUpType;

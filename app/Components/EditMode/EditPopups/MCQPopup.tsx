@@ -1,83 +1,57 @@
 import React, { useState } from 'react';
-import { Option } from '@/classes/Controls/MultiChoiceClass';
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 
+import { X } from 'lucide-react';
 
-
-interface MCQPopupProps {
-  onSubmit: (id: number, title: string, desc: string, options: Option[]) => void;
-  onClose: () => void;
+interface MCQOption {
+  id: string;
+  label: string;
 }
 
-export const MCQPopup: React.FC<MCQPopupProps> = ({ onSubmit, onClose }) => {
-  const [title, setTitle] = useState('');
-  const [desc, setDesc] = useState('');
-  const [options, setOptions] = useState<Option[]>([{ id: 1, label: '' }]);
+interface MCQOptionsInputProps {
+  options: MCQOption[];
+  onChange: (newOptions: MCQOption[]) => void;
+}
 
+export function MCQOptionsInput({ options, onChange }: MCQOptionsInputProps) {
   const handleAddOption = () => {
-    setOptions([...options, { id: options.length + 1, label: '' }]);
+    const newOption: MCQOption = { id: Date.now().toString(), label: '' };
+    onChange([...options, newOption]);
   };
 
-  const handleOptionChange = (id: number, text: string) => {
-    setOptions(options.map(opt => opt.id === id ? { ...opt, text } : opt));
+  const handleRemoveOption = (id: string) => {
+    onChange(options.filter(option => option.id !== id));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    onSubmit(Date.now(), title, desc, options);
-    onClose();
+  const handleOptionChange = (id: string, newLabel: string) => {
+    onChange(options.map(option => 
+      option.id === id ? { ...option, label: newLabel } : option
+    ));
   };
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-      <div className="bg-white p-6 rounded-lg w-96">
-        <h2 className="text-xl font-bold mb-4">Add Multiple Choice Question</h2>
-        <form onSubmit={handleSubmit}>
-          <input
-            className="w-full p-2 border rounded mb-2"
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-            placeholder="Question Title"
+    <div className="space-y-3 mt-4">
+      {options.map((option) => (
+        <div key={option.id} className="flex items-center">
+          <Input
+            value={option.label}
+            onChange={(e) => handleOptionChange(option.id, e.target.value)}
+            placeholder={`Option ${option.id}`}
+            className="flex-grow mr-2 px-4 py-3 rounded-lg bg-gray-100 text-gray-700"
           />
-          <textarea
-            className="w-full p-2 border rounded mb-2"
-            value={desc}
-            onChange={(e) => setDesc(e.target.value)}
-            placeholder="Question Description"
-            rows={3}
-          />
-          {options.map((option) => (
-            <input
-              key={option.id}
-              className="w-full p-2 border rounded mb-2"
-              value={option.label}
-              onChange={(e) => handleOptionChange(option.id, e.target.value)}
-              placeholder={`Option ${option.id}`}
-            />
-          ))}
-          <button
-            type="button"
-            onClick={handleAddOption}
-            className="mb-4 px-4 py-2 bg-gray-200 rounded"
+          <Button
+            onClick={() => handleRemoveOption(option.id)}
+            variant="ghost"
+            size="icon"
           >
-            Add Option
-          </button>
-          <div className="flex justify-end">
-            <button
-              type="button"
-              onClick={onClose}
-              className="mr-2 px-4 py-2 bg-gray-200 rounded"
-            >
-              Cancel
-            </button>
-            <button
-              type="submit"
-              className="px-4 py-2 bg-blue-500 text-white rounded"
-            >
-              Add MCQ
-            </button>
-          </div>
-        </form>
-      </div>
+            <X className="h-4 w-4" />
+          </Button>
+        </div>
+      ))}
+      <Button onClick={handleAddOption} variant="outline" className="mt-3">
+        Add Option
+      </Button>
     </div>
   );
-};
+}

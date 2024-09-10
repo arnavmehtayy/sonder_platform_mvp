@@ -158,6 +158,7 @@ export const useStore = create<State>((set, get) => ({
     set((state) => {
       let updatedState: Partial<State> = {};
 
+
       if (element instanceof obj) {
         updatedState = {
           vizobjs: { ...state.vizobjs, [element.id]: element },

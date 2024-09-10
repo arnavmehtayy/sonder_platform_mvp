@@ -27,6 +27,8 @@ import { LineObj } from '@/classes/vizobjects/Lineobj';
 import { geomobj } from '@/classes/vizobjects/geomobj';
 import FunctionPlotString from '@/classes/vizobjects/FunctionPlotString';
 import CoordinateAxis from '@/classes/vizobjects/CoordinateAxis';
+import { Question } from '@/classes/Question';
+import { MultiChoiceClass } from '@/classes/Controls/MultiChoiceClass';
 
 export interface Option {
   id: number;
@@ -68,7 +70,14 @@ export const EditBar: React.FC = () => {
     {name: 'Geom Object', type: geomobj, icon: HelpCircle },
     {name: 'Function Object', type: FunctionPlotString, icon: HelpCircle },
     {name: 'Axis Object', type: CoordinateAxis, icon: HelpCircle },
+    {name: 'Question', type: Question, icon: HelpCircle },
+    {name: 'MCQ', type: MultiChoiceClass , icon: HelpCircle },
   ];
+
+  const questionTypes: ObjectType[] = [
+    {name: 'Question', type: Question, icon: HelpCircle },
+    {name: 'MCQ', type: MultiChoiceClass , icon: HelpCircle },
+  ]
 
 
   const handleAddQuestion = () => {
