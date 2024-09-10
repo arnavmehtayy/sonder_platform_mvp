@@ -6,6 +6,12 @@ import { Line } from "@react-three/drei";
 import { Text } from "@react-three/drei";
 import { get_attributes } from "./obj";
 import { TransformObj, TransformObjConstructor } from "./transformObj";
+import {
+  EditableObjectPopup,
+  EditableObjectPopupProps,
+} from "@/app/Components/EditMode/EditPopups/EditableObjectPopup";
+import React from "react";
+
 
 /*
  * This class is used to create a Coordinate Axis (2D coordinate graph) in the scene.
@@ -255,4 +261,54 @@ export default class CoordinateAxis extends TransformObj {
       </group>
     );
   }
+
+  static getPopup({
+    isOpen,
+    onClose,
+    onSave,
+  }: {
+    isOpen: boolean;
+    onClose: () => void;
+    onSave: (obj: CoordinateAxis) => void;
+  }) {
+
+    const [editedObject, setEditedObject] = React.useState<CoordinateAxisConstructor>({
+      id: Date.now(),
+      name: "CoordinateAxis",
+      isEnabled: true,
+      color: "#000000",
+      touch_controls: new TouchControl(),
+      axisLength: 60,
+      isClickable: false,
+      tickSpacing: 2,
+      tickSize: 0.2,
+      showLabels: true,
+      fontSize: 0.6,
+      lineWidth: 4,
+      xLabel: "",
+      yLabel: "",  
+    });
+
+    const popupProps: EditableObjectPopupProps<CoordinateAxisConstructor> = {
+      isOpen,
+      onClose,
+      object: editedObject,
+      onSave: (updatedObject: CoordinateAxisConstructor) => {
+        const newObj = new CoordinateAxis(updatedObject);
+        onSave(newObj);
+      },
+      title: `Create New Object`,
+      fields: [
+        { key: "name", label: "Name", type: "text" },
+        { key: "color", label: "Color", type: "color" },
+        { key: "axisLength", label: "Axis Length", type: "number" },
+        { key: "showLabels", label: "Show Labels", type: "checkbox" },
+        { key: "xLabel", label: "X Label", type: "text" },
+        { key: "yLabel", label: "Y Label", type: "text" },
+
+      ],
+    };
+    return <EditableObjectPopup {...popupProps} />;
+    
+}
 }

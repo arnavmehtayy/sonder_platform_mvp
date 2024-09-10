@@ -25,6 +25,8 @@ import { obj } from '@/classes/vizobjects/obj';
 import { TransformObj } from '@/classes/vizobjects/transformObj';
 import { LineObj } from '@/classes/vizobjects/Lineobj';
 import { geomobj } from '@/classes/vizobjects/geomobj';
+import FunctionPlotString from '@/classes/vizobjects/FunctionPlotString';
+import CoordinateAxis from '@/classes/vizobjects/CoordinateAxis';
 
 export interface Option {
   id: number;
@@ -58,12 +60,16 @@ export const EditBar: React.FC = () => {
   const buttons: ButtonItem[] = [
     { name: 'Add Question Text', icon: HelpCircle },
     { name: 'Add Multiple Choice', icon: List },
+
   ];
 
   const objectTypes: ObjectType[] = [
     {name: 'Line Object', type: LineObj, icon: HelpCircle },
     {name: 'Geom Object', type: geomobj, icon: HelpCircle },
+    {name: 'Function Object', type: FunctionPlotString, icon: HelpCircle },
+    {name: 'Axis Object', type: CoordinateAxis, icon: HelpCircle },
   ];
+
 
   const handleAddQuestion = () => {
     const id = Math.floor(Date.now());

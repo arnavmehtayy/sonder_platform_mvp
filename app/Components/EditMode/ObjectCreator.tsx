@@ -5,9 +5,10 @@ import coloredObj from '@/classes/vizobjects/coloredObj';
 import { TransformObj } from '@/classes/vizobjects/transformObj';
 import { LineObj } from '@/classes/vizobjects/Lineobj';
 import { geomobj } from '@/classes/vizobjects/geomobj';
+import CoordinateAxis from '@/classes/vizobjects/CoordinateAxis';
 
 export type EditAddType = obj | coloredObj | TransformObj | LineObj;
-export type PopUpType = typeof LineObj | typeof geomobj; // add more to this
+export type PopUpType = typeof LineObj | typeof geomobj | typeof CoordinateAxis; // add more to this
 
 interface ObjectCreatorProps {
   ObjectType: PopUpType;
