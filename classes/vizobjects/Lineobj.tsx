@@ -20,9 +20,13 @@ import { get_attributes } from "./obj";
  */
 
 interface LineObjConstructor extends coloredObjConstructor {
+  constructionType: 'endpoints' | 'slopeIntercept';
   start?: Vector2;
   end?: Vector2;
+  slope?: number;
+  intercept?: number;
   line_width?: number;
+  length?: number;
 }
 
 export class LineObj extends coloredObj {
@@ -96,22 +100,53 @@ export class LineObj extends coloredObj {
   start: Vector2;
   end: Vector2;
   line_width: number = 2;
+  constructionType: 'endpoints' | 'slopeIntercept';
+  slope?: number;
+  intercept?: number;
+  length?: number;
 
   constructor({
     id,
-    start = new Vector2(1, 1),
-    end = new Vector2(0, 0),
+    constructionType = 'endpoints',
+    start = new Vector2(0, 0),
+    end = new Vector2(1, 1),
+    slope = 0,
+    intercept = 0,
+    length = 10,
     line_width = 2,
     color = "white",
     name = "Line",
     isEnabled = true,
   }: Partial<LineObjConstructor> & { id: number }) {
-    super({ id: id, name: name, color: color, isEnabled: isEnabled });
+    super({ id, name, color, isEnabled });
+    this.constructionType = constructionType;
+    this.line_width = line_width;
     this.start = start;
     this.end = end;
-    this.line_width = line_width;
-    this.color = color;
-    this.isClickable = false;
+    this.length = length;
+
+    if (constructionType === 'slopeIntercept') {
+      this.slope = slope;
+      this.intercept = intercept;
+      this.length = length;
+      this.updateEndpoints();
+    }
+  }
+  private updateEndpoints() {
+    if (this.constructionType === 'slopeIntercept' && this.slope !== undefined && this.intercept !== undefined && this.length !== undefined) {
+      const angle = Math.atan(this.slope);
+      const halfLength = this.length / 2;
+    
+      this.start = new Vector2(
+        -halfLength * Math.cos(angle),
+        -halfLength * Math.sin(angle) + this.intercept
+      );
+    
+      this.end = new Vector2(
+        halfLength * Math.cos(angle),
+        halfLength * Math.sin(angle) + this.intercept
+      );
+    }
   }
 
   // methods that instantiates a new LineObj object with the slope and intercept values.
@@ -204,13 +239,17 @@ export class LineObj extends coloredObj {
     onSave: (newObject: obj) => void;
   }): React.ReactElement {
     const editedObject: LineObjConstructor = {
-      id: 0,
+      id: Date.now(),
       name: "Line",
       isEnabled: true,
+      constructionType: 'endpoints',
       start: new Vector2(0, 0),
-      end: new Vector2(0, 0),
+      end: new Vector2(1, 1),
+      slope: 1,
+      intercept: 0,
       line_width: 2,
       color: "white",
+      length: 10
     };
 
     const popupProps: EditableObjectPopupProps<LineObjConstructor> = {
@@ -221,13 +260,20 @@ export class LineObj extends coloredObj {
         const newObj = new LineObj(updatedObject);
         onSave(newObj);
       },
-      title: `Create New Object`,
+      title: `Create New Line`,
       fields: [
         { key: "name", label: "Name", type: "text" },
         { key: "line_width", label: "Line Width", type: "number" },
-        { key: "start", label: "Start Point", type: "position" },
-        { key: "end", label: "End Point", type: "position" },
-        //{ key: "color", label: "Color", type: "color" },
+        { key: "constructionType", label: "Construction Type", type: "select", options: [
+          { label: "Endpoints", value: "endpoints" },
+          { label: "Slope-Intercept", value: "slopeIntercept" },
+        ]},
+        { key: "start", label: "Start Point", type: "position", showIf: (obj) => obj.constructionType === 'endpoints' },
+        { key: "end", label: "End Point", type: "position", showIf: (obj) => obj.constructionType === 'endpoints' },
+        { key: "slope", label: "Slope", type: "number", showIf: (obj) => obj.constructionType === 'slopeIntercept' },
+        { key: "intercept", label: "Intercept", type: "number", showIf: (obj) => obj.constructionType === 'slopeIntercept' },
+        { key: "length", label: "Length", type: "number", showIf: (obj) => obj.constructionType === 'slopeIntercept' },
+        { key: "color", label: "Color", type: "color" },
       ],
     };
     return <EditableObjectPopup {...popupProps} />;

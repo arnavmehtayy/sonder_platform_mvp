@@ -16,6 +16,8 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 
+import { ScrollArea } from '@/components/ui/scroll-area';
+
 import Vector2Input from './PositionInput';
 import RotationInput from './RotationInput';
 import { Vector2, Vector3 } from 'three';
@@ -30,7 +32,7 @@ export interface PopupQuestionProps<T, option_T> {
     label: string;
     type: 'text' | 'number' | 'checkbox' | 'color' | 'position' | 'select' | "rotation";
     options?: {label: string, value: option_T}[]; // For select type
-  
+    showIf?: (obj: T) => boolean; // New property for conditional rendering
 } // option_T is the type of the options that will be displayed in the select dropdown
 
 export interface EditableObjectPopupProps<T> {
@@ -52,6 +54,12 @@ export function EditableObjectPopup<T>({
 }: EditableObjectPopupProps<T>) {
   const [editedObject, setEditedObject] = React.useState<T>({...object});
 
+  const getOptimalColumnCount = (fieldCount: number) => {
+    return 2;
+  };
+
+  const columnCount = getOptimalColumnCount(fields.length);
+
   const handleChange = (key: keyof T, value: any) => {
     setEditedObject(prev => ({ ...prev, [key]: value }));
   };
@@ -62,22 +70,29 @@ export function EditableObjectPopup<T>({
   };
 
   const renderField = (field: EditableObjectPopupProps<T>['fields'][0]) => {
+    if (field.showIf && !field.showIf(editedObject)) {
+      return null;
+    }
+
     switch (field.type) {
       case 'checkbox':
         return (
+          <div className="flex items-center">
           <input
             type="checkbox"
             id={field.key as string}
             checked={editedObject[field.key] as boolean}
             onChange={(e) => handleChange(field.key, e.target.checked)}
-            className="col-span-3 h-5 w-5"
+            className="h-5 w-5 mr-2"
           />
+          <label htmlFor={field.key as string}>{field.label}</label>
+        </div>
         );
       case 'rotation':
         return (
-          <div key={field.key as string} className="col-span-3">
+          <div className="mb-4">
+            <label className="block mb-2">{field.label}</label>
             <RotationInput
-            key={field.key as string}
               value={editedObject[field.key] as Vector3}
               onChange={(newValue: Vector3) => handleChange(field.key, newValue)}
               size={200}
@@ -85,24 +100,9 @@ export function EditableObjectPopup<T>({
           </div>
         );
       case 'position':
-        // return (
-        //   <div className="col-span-3 grid grid-cols-2 gap-2">
-        //     <Input
-        //       type="number"
-        //       value={(editedObject[field.key] as {x: number, y: number}).x}
-        //       onChange={(e) => handleChange(field.key, {...editedObject[field.key] as object, x: parseFloat(e.target.value)})}
-        //       placeholder="X"
-        //     />
-        //     <Input
-        //       type="number"
-        //       value={(editedObject[field.key] as {x: number, y: number}).y}
-        //       onChange={(e) => handleChange(field.key, {...editedObject[field.key] as object, y: parseFloat(e.target.value)})}
-        //       placeholder="Y"
-        //     />
-        //   </div>
-        // );
         return (
-          <div className="col-span-3">
+          <div className="mb-4">
+            <label className="block mb-2">{field.label}</label>
             <Vector2Input
               value={editedObject[field.key] as Vector2}
               onChange={(newValue: Vector2) => handleChange(field.key, newValue)}
@@ -112,24 +112,29 @@ export function EditableObjectPopup<T>({
           </div>)
       case 'select':
         return (
-          <Select
-            value={editedObject[field.key] as string}
-            onValueChange={(value) => handleChange(field.key, value)}
-          >
-            <SelectTrigger className="col-span-3">
-              <SelectValue placeholder="Select an option" />
-            </SelectTrigger>
-            <SelectContent>
-              {field.options?.map((option, index) => (
-                <SelectItem key={`${option.value}-${index}`} value={option.value}>
-                  {option.label}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+          <div className="mb-4">
+            <label className="block mb-2">{field.label}</label>
+            <Select
+              value={editedObject[field.key] as string}
+              onValueChange={(value) => handleChange(field.key, value)}
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="Select an option" />
+              </SelectTrigger>
+              <SelectContent>
+                {field.options?.map((option, index) => (
+                  <SelectItem key={`${option.value}-${index}`} value={option.value}>
+                    {option.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
         );
       case 'text':
         return (
+          <div className="mb-4">
+            <label className="block mb-2">{field.label}</label>
           <Input
             key={field.key as string}
             id={field.key as string}
@@ -138,9 +143,12 @@ export function EditableObjectPopup<T>({
             onChange={(e) => handleChange(field.key, e.target.value)}
             className="col-span-3"
           />
+          </div>
         );
       case 'color':
         return (
+          <div className="mb-4">
+            <label className="block mb-2">{field.label}</label>
           <Input
             id={field.key as string}
             type={field.type}
@@ -148,16 +156,19 @@ export function EditableObjectPopup<T>({
             onChange={(e) => handleChange(field.key, e.target.value)}
             className="col-span-3"
           />
+          </div>
         );
       default:
         return (
-          <Input
-            id={field.key as string}
-            type={field.type}
-            value={editedObject[field.key] as string | number}
-            onChange={(e) => handleChange(field.key, e.target.value)}
-            className="col-span-3"
-          />
+          <div className="mb-4">
+            <label htmlFor={field.key as string} className="block mb-2">{field.label}</label>
+            <Input
+              id={field.key as string}
+              type={field.type}
+              value={editedObject[field.key] as string | number}
+              onChange={(e) => handleChange(field.key, e.target.value)}
+            />
+          </div>
         );
 
     }
@@ -165,26 +176,27 @@ export function EditableObjectPopup<T>({
 
   const dialogDescriptionId = `dialog-description-${React.useId()}`;;
     return (
-      <Dialog key={`dialog-${React.useId()}`} open={isOpen} onOpenChange={onClose}>
-          <DialogContent className="sm:max-w-[425px]" aria-describedby={dialogDescriptionId}>
-            <DialogHeader>
-              <DialogTitle>{title}</DialogTitle>
-            </DialogHeader>
-            <div id={dialogDescriptionId} className="sr-only">
-              Edit properties for {title}
-            </div>
-            <div className="grid gap-4 py-4">
-              {fields.map((field, index) => (
-                <div key={`${field.key as string}-${index}`} className="grid grid-cols-4 items-center gap-4">
-                    {field.label}
-                  {renderField(field)}
-                </div>
-              ))}
-            </div>
-            <DialogFooter>
-              <Button onClick={handleSave}>Save changes</Button>
-            </DialogFooter>
-          </DialogContent>
-        </Dialog>
+      <Dialog open={isOpen} onOpenChange={onClose}>
+      <DialogContent className="sm:max-w-[600px] w-full" aria-describedby={dialogDescriptionId}>
+        <DialogHeader>
+          <DialogTitle>{title}</DialogTitle>
+        </DialogHeader>
+        <div id={dialogDescriptionId} className="sr-only">
+          Edit properties for {title}
+        </div>
+        <ScrollArea className="h-[60vh] pr-4">
+          <div className="space-y-4 py-4">
+            {fields.map((field, index) => (
+              <React.Fragment key={`${field.key as string}-${index}`}>
+                {renderField(field)}
+              </React.Fragment>
+            ))}
+          </div>
+        </ScrollArea>
+        <DialogFooter>
+          <Button onClick={handleSave}>Save changes</Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
       );
 }
