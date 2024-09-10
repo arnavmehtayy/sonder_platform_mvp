@@ -134,18 +134,12 @@ export class LineObj extends coloredObj {
   }
   private updateEndpoints() {
     if (this.constructionType === 'slopeIntercept' && this.slope !== undefined && this.intercept !== undefined && this.length !== undefined) {
-      const angle = Math.atan(this.slope);
-      const halfLength = this.length / 2;
+      const half_length = this.length / 2;
+      const start = new THREE.Vector2(-half_length, this.slope * (-half_length) + this.intercept);
+    const end = new THREE.Vector2(half_length, this.slope * half_length + this.intercept);
+    this.start = start;
+    this.end = end;
     
-      this.start = new Vector2(
-        -halfLength * Math.cos(angle),
-        -halfLength * Math.sin(angle) + this.intercept
-      );
-    
-      this.end = new Vector2(
-        halfLength * Math.cos(angle),
-        halfLength * Math.sin(angle) + this.intercept
-      );
     }
   }
 
