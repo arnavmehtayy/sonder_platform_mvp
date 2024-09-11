@@ -23,6 +23,7 @@ import RotationInput from "./RotationInput";
 import { Vector2, Vector3 } from "three";
 import { Textarea } from "@/components/ui/textarea";
 import { MCQOptionsInput } from "./MCQPopup";
+import { X } from "lucide-react";
 
 /*
  * This component is a generic popup that allows the user to edit an object.
@@ -249,23 +250,24 @@ export function EditableObjectPopup<T>({
               onWheel={(e) => e.currentTarget.blur()}
             />
           
-          <button
+          <Button
             onClick={() => {
               const newArray = (editedObject[field.key] as any[]).filter((_, i) => i !== index);
               handleChange(field.key, newArray);
             }}
-            className="ml-2 px-2 py-1 bg-blue-500 text-white rounded"
+            variant="ghost"
+            size="icon"
           >
-            Remove
-          </button>
+            <X className="h-4 w-4" />
+          </Button>
         </div>
       ))}
-      <button
+      <Button
         onClick={() => handleChange(field.key, [...(editedObject[field.key] as any[]), ''])}
-        className="px-2 py-1 bg-blue-500 text-white rounded"
+        variant="outline" className="mt-3"
       >
         Add Item
-      </button>
+      </Button>
     </div>
   );
 
