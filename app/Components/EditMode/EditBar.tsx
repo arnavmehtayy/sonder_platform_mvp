@@ -30,6 +30,7 @@ import CoordinateAxis from '@/classes/vizobjects/CoordinateAxis';
 import { Question } from '@/classes/Question';
 import { MultiChoiceClass } from '@/classes/Controls/MultiChoiceClass';
 import { DropDownMenu } from '../DropDownMenu';
+import { SliderControlAdvanced } from '@/classes/Controls/SliderControlAdv';
 
 export interface Option {
   id: number;
@@ -63,6 +64,7 @@ export const EditBar: React.FC = () => {
   const questionTypes: ObjectType[] = [
     {name: 'Question', type: Question, icon: HelpCircle },
     {name: 'MCQ', type: MultiChoiceClass , icon: HelpCircle },
+    {name: 'SliderControl', type: SliderControlAdvanced, icon: HelpCircle },
   ]
 
 

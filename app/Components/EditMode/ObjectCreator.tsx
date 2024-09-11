@@ -1,17 +1,31 @@
-import React, { useState } from 'react';
-import { useStore } from '@/app/store';
-import { obj } from '@/classes/vizobjects/obj';
-import coloredObj from '@/classes/vizobjects/coloredObj';
-import { TransformObj } from '@/classes/vizobjects/transformObj';
-import { LineObj } from '@/classes/vizobjects/Lineobj';
-import { geomobj } from '@/classes/vizobjects/geomobj';
-import CoordinateAxis from '@/classes/vizobjects/CoordinateAxis';
-import { Question } from '@/classes/Question';
-import { Control } from '@/classes/Controls/Control';
-import { MultiChoiceClass } from '@/classes/Controls/MultiChoiceClass';
+import React, { useState } from "react";
+import { useStore } from "@/app/store";
+import { obj } from "@/classes/vizobjects/obj";
+import coloredObj from "@/classes/vizobjects/coloredObj";
+import { TransformObj } from "@/classes/vizobjects/transformObj";
+import { LineObj } from "@/classes/vizobjects/Lineobj";
+import { geomobj } from "@/classes/vizobjects/geomobj";
+import CoordinateAxis from "@/classes/vizobjects/CoordinateAxis";
+import { Question } from "@/classes/Question";
+import { Control } from "@/classes/Controls/Control";
+import { MultiChoiceClass } from "@/classes/Controls/MultiChoiceClass";
+import { SliderControlAdvanced } from "@/classes/Controls/SliderControlAdv";
 
-export type EditAddType = obj | coloredObj | TransformObj | LineObj | Question | MultiChoiceClass;
-export type PopUpType = typeof LineObj | typeof geomobj | typeof CoordinateAxis | typeof Question | typeof MultiChoiceClass; // add more to this
+export type EditAddType =
+  | obj
+  | coloredObj
+  | TransformObj
+  | LineObj
+  | Question
+  | MultiChoiceClass
+  | SliderControlAdvanced<any>;
+export type PopUpType =
+  | typeof LineObj
+  | typeof geomobj
+  | typeof CoordinateAxis
+  | typeof Question
+  | typeof MultiChoiceClass // add more to this
+  | typeof SliderControlAdvanced<any>;
 
 interface ObjectCreatorProps {
   ObjectType: PopUpType;

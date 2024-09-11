@@ -44,10 +44,12 @@ export interface PopupQuestionProps<T, option_T> {
     | "textarea"
     | "title"
     | "addoptions" // The type of the input field
-    | "arraynum";
+    | "arraynum"
+    | "custom"; 
   options?: { label: string; value: option_T }[]; // For select type
   length_of_array?: number; // For arraynum type
   showIf?: (obj: T) => boolean; // New property for conditional rendering
+  render?: (value: any, onChange: (newValue: any) => void) => React.ReactNode; // New property for custom rendering
 } // option_T is the type of the options that will be displayed in the select dropdown
 
 export interface EditableObjectPopupProps<T> {
@@ -95,6 +97,18 @@ export function EditableObjectPopup<T>({
     }
 
     switch (field.type) {
+      case "custom":
+        if (field.render) {
+          return (
+            <div className="mb-4">
+              <label className="block mb-2">{field.label}</label>
+              {field.render(editedObject[field.key], (newValue) => handleChange(field.key, newValue))}
+            </div>
+          );
+        }
+        return null;
+
+
       case "checkbox":
         return (
           <div className="flex items-center">
