@@ -1,5 +1,7 @@
 import React from 'react';
 import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { X } from "lucide-react";
 
 interface ObjectEditorProps {
   object: any;
@@ -26,30 +28,47 @@ export function ObjectEditor({ object, onChange }: ObjectEditorProps) {
           {value.map((item, index) => (
             <div key={index} className="flex items-center mb-2">
               <Input
-                value={item}
+                value={item ?? ''}
+                type={typeof item === 'number' ? 'number' : 'text'}
                 onChange={(e) => {
+                  const newValue = e.target.value;
+                  if (newValue === "" || (typeof item === 'number' && /^-?\d*\.?\d*$/.test(newValue))) {
+                    const newArray = [...value];
+                    newArray[index] = newValue === "" ? null : 
+                      (typeof item === 'number' ? parseFloat(newValue) : newValue);
+                    handleChange(key, newArray);
+                  }
+                }}
+                onBlur={(e) => {
+                  const newValue = e.target.value;
                   const newArray = [...value];
-                  newArray[index] = e.target.value;
+                  newArray[index] = newValue === "" ? null : 
+                    (typeof item === 'number' ? parseFloat(newValue) : newValue);
                   handleChange(key, newArray);
                 }}
+                onWheel={(e) => e.currentTarget.blur()}
               />
-              <button
+              <Button
                 onClick={() => {
                   const newArray = value.filter((_, i) => i !== index);
                   handleChange(key, newArray);
                 }}
-                className="ml-2 px-2 py-1 bg-red-500 text-white rounded"
+                variant="ghost"
+                size="icon"
+                className="ml-2"
               >
-                Remove
-              </button>
+                <X className="h-4 w-4" />
+              </Button>
             </div>
           ))}
-          <button
+          <Button
             onClick={() => handleChange(key, [...value, ''])}
-            className="px-2 py-1 bg-green-500 text-white rounded"
+            variant="outline"
+            size="sm"
+            className="mt-2"
           >
             Add Item
-          </button>
+          </Button>
         </div>
       );
     } else if (typeof value === 'object' && value !== null) {
