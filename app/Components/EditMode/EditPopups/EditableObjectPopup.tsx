@@ -42,7 +42,8 @@ export interface PopupQuestionProps<T, option_T> {
     | "rotation"
     | "textarea"
     | "title"
-    | "addoptions"; // The type of the input field
+    | "addoptions" // The type of the input field
+    | "array"
   options?: { label: string; value: option_T }[]; // For select type
   showIf?: (obj: T) => boolean; // New property for conditional rendering
 } // option_T is the type of the options that will be displayed in the select dropdown
@@ -212,12 +213,62 @@ export function EditableObjectPopup<T>({
             <Input
               id={field.key as string}
               type={field.type}
-              value={editedObject[field.key] as string | number}
+              value={editedObject[field.key] as number}
               onChange={(e) => handleChange(field.key, e.target.value)}
               className="col-span-3"
             />
           </div>
         );
+    
+        case "array":
+  return (
+    <div className="mb-4">
+      <label className="block mb-2">{field.label}</label>
+      {(editedObject[field.key] as any[]).map((item, index) => (
+        <div key={index} className="flex items-center mb-2">
+          <Input
+              placeholder={field.label}
+              id={field.key as string}
+              type={field.type}
+              onChange={(e) => {
+                const value = e.target.value;
+                if (value === "" || /^-?\d*\.?\d*$/.test(value)) {
+                  const newArray = [...editedObject[field.key] as any[]];
+              newArray[index] = parseInt(e.target.value);
+              handleChange(field.key, newArray);
+                }
+              }}
+              onBlur={(e) => {
+                const value = e.target.value;
+                if (value !== "") {
+                  const newArray = [...editedObject[field.key] as any[]];
+              newArray[index] = parseInt(e.target.value);
+              handleChange(field.key, newArray);
+                }
+              }}
+              onWheel={(e) => e.currentTarget.blur()}
+            />
+          
+          <button
+            onClick={() => {
+              const newArray = (editedObject[field.key] as any[]).filter((_, i) => i !== index);
+              handleChange(field.key, newArray);
+            }}
+            className="ml-2 px-2 py-1 bg-blue-500 text-white rounded"
+          >
+            Remove
+          </button>
+        </div>
+      ))}
+      <button
+        onClick={() => handleChange(field.key, [...(editedObject[field.key] as any[]), ''])}
+        className="px-2 py-1 bg-blue-500 text-white rounded"
+      >
+        Add Item
+      </button>
+    </div>
+  );
+
 
       case "number":
         return (

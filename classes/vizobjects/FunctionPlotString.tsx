@@ -152,6 +152,7 @@ const FunctionPlotPopup: React.FC<{
       numPoints: 200,
       lineWidth: 2,
       isEnabled: true,
+      color: '#000000',
 
     },
     onSave: (updatedObject: FunctionPlotConstructor) => {
@@ -177,6 +178,7 @@ const FunctionPlotPopup: React.FC<{
       { key: 'functionString', label: 'Function (e.g., sin(x))', type: 'text' },
       { key: 'lineWidth', label: 'Line Width', type: 'number' },
       { key: 'color', label: 'Color', type: 'color' },
+    { key: 'xRange', label: 'X Range', type: 'array' },
 
     ],
   };
