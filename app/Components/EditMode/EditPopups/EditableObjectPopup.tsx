@@ -44,8 +44,9 @@ export interface PopupQuestionProps<T, option_T> {
     | "textarea"
     | "title"
     | "addoptions" // The type of the input field
-    | "arraynum"
+    | "arraynum";
   options?: { label: string; value: option_T }[]; // For select type
+  length_of_array?: number; // For arraynum type
   showIf?: (obj: T) => boolean; // New property for conditional rendering
 } // option_T is the type of the options that will be displayed in the select dropdown
 
@@ -220,50 +221,69 @@ export function EditableObjectPopup<T>({
             />
           </div>
         );
-    
-        case "arraynum":
-  return (
-    <div className="mb-4">
-  <label className="block mb-2">{field.label}</label>
-  {(editedObject[field.key] as any[]).map((item, index) => (
-    <div key={index} className="flex items-center mb-2">
-      <Input
-        placeholder={field.label}
-        id={`${field.key as string}-${index}`}
-        type="number"
-        value={item ?? ''} // Use empty string if item is null or undefined
-        onChange={(e) => {
-          const value = e.target.value;
-          if (value === "" || /^-?\d*\.?\d*$/.test(value)) {
-            const newArray = [...editedObject[field.key] as any[]];
-            newArray[index] = value === "" ? null : parseFloat(value);
-            handleChange(field.key, newArray);
-          }
-        }}
-        onBlur={(e) => {
-          const value = e.target.value;
-          const newArray = [...editedObject[field.key] as any[]];
-          newArray[index] = value === "" ? null : parseFloat(value);
-          handleChange(field.key, newArray);
-        }}
-        onWheel={(e) => e.currentTarget.blur()}
-      />
-      
-      <Button
-        onClick={() => {
-          const newArray = (editedObject[field.key] as any[]).filter((_, i) => i !== index);
-          handleChange(field.key, newArray);
-        }}
-        variant="ghost"
-        size="icon"
-      >
-        <X className="h-4 w-4" />
-      </Button>
-    </div>
-  ))}
-</div>
-  );
+      case "arraynum":
+        return (
+          <div className="mb-4">
+            <label className="block mb-2">{field.label}</label>
+            {(editedObject[field.key] as any[]).map((item, index) => (
+              <div key={index} className="flex items-center mb-2">
+                <Input
+                  placeholder={field.label}
+                  id={`${field.key as string}-${index}`}
+                  type="number"
+                  // value={item ?? ""} // Use empty string if item is null or undefined
+                  onChange={(e) => {
+                    const value = e.target.value;
+                    if (value === "" || /^-?\d*\.?\d*$/.test(value)) {
+                      const newArray = [...(editedObject[field.key] as any[])];
+                      newArray[index] = value === "" ? null : parseFloat(value);
+                      handleChange(field.key, newArray);
+                    }
+                  }}
+                  onBlur={(e) => {
+                    const value = e.target.value;
+                    const newArray = [...(editedObject[field.key] as any[])];
+                    newArray[index] = value === "" ? null : parseFloat(value);
+                    handleChange(field.key, newArray);
+                  }}
+                  onWheel={(e) => e.currentTarget.blur()}
+                />
 
+                {field.length_of_array === -1 && (
+                  <Button
+                    onClick={() => {
+                      const newArray = (
+                        editedObject[field.key] as any[]
+                      ).filter((_, i) => i !== index);
+                      handleChange(field.key, newArray);
+                    }}
+                    variant="ghost"
+                    size="icon"
+                  >
+                    <X className="h-4 w-4" />
+                  </Button>
+                )}
+              </div>
+            ))}
+
+            {field.length_of_array === -1 && (
+              <Button
+                onClick={() => {
+                  const newArray = [
+                    ...(editedObject[field.key] as any[]),
+                    null,
+                  ];
+                  handleChange(field.key, newArray);
+                }}
+                variant="outline"
+                size="sm"
+                className="mt-2"
+              >
+                Add Item
+              </Button>
+            )}
+          </div>
+        );
 
       case "number":
         return (

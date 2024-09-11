@@ -178,7 +178,7 @@ const FunctionPlotPopup: React.FC<{
       { key: 'functionString', label: 'Function (e.g., sin(x))', type: 'text' },
       { key: 'lineWidth', label: 'Line Width', type: 'number' },
       { key: 'color', label: 'Color', type: 'color' },
-    { key: 'xRange', label: 'X Range', type: 'arraynum' },
+    { key: 'xRange', label: 'X Range', type: 'arraynum', length_of_array: 2 },
 
     ],
   };
