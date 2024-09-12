@@ -40,6 +40,7 @@ export class Question {
         isOpen,
         onClose,
         object: editedObject,
+        set_object: setEditedObject,
         onSave: (updatedObject: QuestionConstructor) => {
           const newObj = new Question(updatedObject);
           onSave(newObj);
