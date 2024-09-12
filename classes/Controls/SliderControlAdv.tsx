@@ -155,16 +155,15 @@ export default function AttributePairsEditor({ pairs, onChange, objectId }: Attr
   return (
     <div className="space-y-4">
       {pairs.map((pair, index) => (
-        <div key={index} className="space-y-2">
-          <Input
-            type="text"
-            value={pair.transform_function}
-            onChange={(e) => updatePair(index, "transform_function", e.target.value)}
-            placeholder="Transform function (e.g., 2*x + 1)"
-            className="w-full"
-          />
-          <div className="flex items-center space-x-2">
-            
+        <div key={index} className="flex items-center space-x-2">
+          <div className="flex-grow space-y-2">
+            <Input
+              type="text"
+              value={pair.transform_function}
+              onChange={(e) => updatePair(index, "transform_function", e.target.value)}
+              placeholder="Transform function (e.g., 2*x + 1)"
+              className="w-full"
+            />
             <Select
               value={setAttributeOptions.findIndex(attr => attr.set_attribute === pair.set_attribute).toString()}
               onValueChange={(value) => {
@@ -183,14 +182,15 @@ export default function AttributePairsEditor({ pairs, onChange, objectId }: Attr
                 ))}
               </SelectContent>
             </Select>
-            <Button
-              onClick={() => removePair(index)}
-              variant="ghost"
-              size="icon"
-            >
-              <X className="h-4 w-4" />
-            </Button>
           </div>
+          <Button
+            onClick={() => removePair(index)}
+            variant="ghost"
+            size="icon"
+            className="self-center"
+          >
+            <X className="h-4 w-4" />
+          </Button>
         </div>
       ))}
       <Button onClick={addPair} variant="outline" className="w-full mt-3">

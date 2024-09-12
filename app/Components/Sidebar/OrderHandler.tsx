@@ -13,7 +13,7 @@ import {
   OrderItem,
   getPlacementSelector2,
   getScore,
-  getControlSelector2
+  getControlSelector2,
 } from "@/app/store";
 import { get } from "http";
 
@@ -32,8 +32,8 @@ export const OrderHandler = ({
   const order = useStore(getOrderSelector); // the order of things in the sidebar along with hints
   // note that hints can only be added to questions
   const title = useStore(getTitleSelector);
-  const get_placement = useStore(getPlacementSelector2)
-  const get_control = useStore(getControlSelector2)
+  const get_placement = useStore(getPlacementSelector2);
+  const get_control = useStore(getControlSelector2);
   // const [showHint, setShowHint] = useState<{ [key: number]: boolean }>({});
 
   // const toggleHint = (index: number) => {
@@ -47,7 +47,7 @@ export const OrderHandler = ({
       case "score":
         return getScore(item.id)?.render();
       case "control":
-        return get_control(item.id)?.render()
+        return get_control(item.id)?.render();
       case "placement":
         return get_placement(item.id)?.render();
       case "question":
@@ -88,7 +88,11 @@ export const OrderHandler = ({
   return (
     // render the components for each of the items in the order list
     <div className="space-y-4 md:space-y-6">
-      {order.map((item, index) => renderComponent(item, index))}
+      {order.map((item, index) => (
+        <React.Fragment key={`${item.type}-${item.id}-${index}`}>
+          {renderComponent(item, index)}
+        </React.Fragment>
+      ))}
     </div>
   );
 };

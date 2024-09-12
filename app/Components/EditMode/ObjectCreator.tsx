@@ -10,6 +10,7 @@ import { Question } from "@/classes/Question";
 import { Control } from "@/classes/Controls/Control";
 import { MultiChoiceClass } from "@/classes/Controls/MultiChoiceClass";
 import { SliderControlAdvanced } from "@/classes/Controls/SliderControlAdv";
+import { InputNumber } from "@/classes/Controls/InputNumber";
 
 export type EditAddType =
   | obj
@@ -18,7 +19,8 @@ export type EditAddType =
   | LineObj
   | Question
   | MultiChoiceClass
-  | SliderControlAdvanced<any>;
+  | SliderControlAdvanced<any>
+  | InputNumber;
   
 export type PopUpType = 
   | typeof LineObj
@@ -26,7 +28,8 @@ export type PopUpType =
   | typeof CoordinateAxis
   | typeof Question
   | typeof MultiChoiceClass // add more to this
-  | typeof SliderControlAdvanced<any>;
+  | typeof SliderControlAdvanced<any>
+  | typeof InputNumber;
 
 interface ObjectCreatorProps {
   ObjectType: PopUpType;

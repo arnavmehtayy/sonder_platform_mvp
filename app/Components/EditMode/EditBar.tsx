@@ -1,7 +1,15 @@
-'use client';
-import React, { useState } from 'react';
-import { HelpCircle, List, ChevronDown, Plus, X } from 'lucide-react';
-import { useStore, addQuestionEditor, addMCQuestionEditor } from '@/app/store';
+"use client";
+import React, { useState } from "react";
+import { HelpCircle, List, ChevronDown, Plus, X } from "lucide-react";
+import { 
+  LineChart, 
+  Circle, 
+  Axis3D, 
+  ListChecks, 
+  Sliders,
+  PencilLine,
+} from 'lucide-react';
+import { useStore, addQuestionEditor, addMCQuestionEditor } from "@/app/store";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
@@ -19,18 +27,19 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import Latex from "react-latex-next";
-import { ObjectCreator, PopUpType } from './ObjectCreator';
-import coloredObj from '@/classes/vizobjects/coloredObj';
-import { obj } from '@/classes/vizobjects/obj';
-import { TransformObj } from '@/classes/vizobjects/transformObj';
-import { LineObj } from '@/classes/vizobjects/Lineobj';
-import { geomobj } from '@/classes/vizobjects/geomobj';
-import FunctionPlotString from '@/classes/vizobjects/FunctionPlotString';
-import CoordinateAxis from '@/classes/vizobjects/CoordinateAxis';
-import { Question } from '@/classes/Question';
-import { MultiChoiceClass } from '@/classes/Controls/MultiChoiceClass';
-import { DropDownMenu } from '../DropDownMenu';
-import { SliderControlAdvanced } from '@/classes/Controls/SliderControlAdv';
+import { ObjectCreator, PopUpType } from "./ObjectCreator";
+import coloredObj from "@/classes/vizobjects/coloredObj";
+import { obj } from "@/classes/vizobjects/obj";
+import { TransformObj } from "@/classes/vizobjects/transformObj";
+import { LineObj } from "@/classes/vizobjects/Lineobj";
+import { geomobj } from "@/classes/vizobjects/geomobj";
+import FunctionPlotString from "@/classes/vizobjects/FunctionPlotString";
+import CoordinateAxis from "@/classes/vizobjects/CoordinateAxis";
+import { Question } from "@/classes/Question";
+import { MultiChoiceClass } from "@/classes/Controls/MultiChoiceClass";
+import { DropDownMenu } from "./DropDownMenu";
+import { SliderControlAdvanced } from "@/classes/Controls/SliderControlAdv";
+import { InputNumber } from "@/classes/Controls/InputNumber";
 
 export interface Option {
   id: number;
@@ -49,31 +58,47 @@ export interface ObjectType {
 }
 
 export const EditBar: React.FC = () => {
-  const [selectedObjectType, setSelectedObjectType] = useState<ObjectType | null>(null);
+  const [selectedObjectType, setSelectedObjectType] =
+    useState<ObjectType | null>(null);
 
 
 
-
-  const objectTypes: ObjectType[] = [
-    {name: 'Line Object', type: LineObj, icon: HelpCircle },
-    {name: 'Geom Object', type: geomobj, icon: HelpCircle },
-    {name: 'Function Object', type: FunctionPlotString, icon: HelpCircle },
-    {name: 'Axis Object', type: CoordinateAxis, icon: HelpCircle },
-  ];
-
-  const questionTypes: ObjectType[] = [
-    {name: 'Question', type: Question, icon: HelpCircle },
-    {name: 'MCQ', type: MultiChoiceClass , icon: HelpCircle },
-    {name: 'SliderControl', type: SliderControlAdvanced, icon: HelpCircle },
-  ]
-
-
+const controlTypes: ObjectType[] = [
+  { name: "SliderControl", type: SliderControlAdvanced, icon: Sliders },
+  {name: "Number Input", type: InputNumber, icon: List},
+]
   
+const objectTypes: ObjectType[] = [
+  { name: "Line Object", type: LineObj, icon: PencilLine},
+  { name: "Geom Object", type: geomobj, icon: Circle },
+  { name: "Function Object", type: FunctionPlotString, icon: LineChart },
+  { name: "Axis Object", type: CoordinateAxis, icon: Axis3D },
+];
+
+const questionTypes: ObjectType[] = [
+  { name: "Question", type: Question, icon: HelpCircle },
+  { name: "MCQ", type: MultiChoiceClass, icon: ListChecks },
+];
+
   return (
     <>
       <div className="fixed top-4 left-1/2 transform -translate-x-1/2 z-10 flex space-x-2">
-      <DropDownMenu ObjectList={questionTypes} setSelectedObjectType={setSelectedObjectType} />
-      <DropDownMenu ObjectList={objectTypes} setSelectedObjectType={setSelectedObjectType} />
+      <DropDownMenu
+          ObjectList={controlTypes}
+          setSelectedObjectType={setSelectedObjectType}
+          label="Add Control"
+          />
+        <DropDownMenu
+          ObjectList={questionTypes}
+          setSelectedObjectType={setSelectedObjectType}
+          label="Add Question"
+        />
+        <DropDownMenu
+          ObjectList={objectTypes}
+          setSelectedObjectType={setSelectedObjectType}
+          label="Add Object"
+        />
+        
         {/* <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button className="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-md flex items-center space-x-2">
@@ -114,9 +139,8 @@ export const EditBar: React.FC = () => {
         </DropdownMenu> */}
       </div>
 
-
       {selectedObjectType && (
-        <ObjectCreator 
+        <ObjectCreator
           ObjectType={selectedObjectType.type}
           onClose={() => setSelectedObjectType(null)}
         />
