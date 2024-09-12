@@ -9,6 +9,8 @@ import React from 'react';
 import Latex from 'react-latex-next';
 import { ShowSliderControl } from "./SliderControl";
 import * as math from 'mathjs';
+import { Button } from "@/components/ui/button";
+import { X } from "react-feather";
 
 interface AttributePair<T extends obj> {
   transform_function: string;
@@ -88,6 +90,7 @@ export class SliderControlAdvanced<T extends obj> extends SliderControl<T> {
       isOpen,
       onClose,
       object: editedObject,
+      set_object: setEditedObject,
       onSave: (updatedObject: SliderControlAdvancedConstructor<any>) => {
         const newObj = new SliderControlAdvanced(updatedObject);
         onSave(newObj);
@@ -170,14 +173,19 @@ export default function AttributePairsEditor({ pairs, onChange, objectId }: Attr
               </option>
             ))}
           </select>
-          <button onClick={() => removePair(index)} className="px-2 py-1 bg-red-500 text-white rounded">
-            Remove
-          </button>
+          <Button
+            onClick={() => removePair(index)}
+            variant="ghost"
+            size="icon"
+          >
+            <X className="h-4 w-4" />
+          </Button>
+          
         </div>
       ))}
-      <button onClick={addPair} className="px-2 py-1 bg-blue-500 text-white rounded">
+      <Button onClick={addPair} variant="outline" className="mt-3">
         Add Attribute Pair
-      </button>
+      </Button>
     </div>
   );
 }

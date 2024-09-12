@@ -150,6 +150,7 @@ export class geomobj extends TransformObj {
       isOpen,
       onClose,
       object: editedObject,
+      set_object: setEditedObject,
       onSave: (updatedObject: geomobjconstructor) => {
         const newObj = new geomobj(updatedObject);
         onSave(newObj);
@@ -178,6 +179,7 @@ export class geomobj extends TransformObj {
         { key: "color", label: "Color", type: "color" },
         { key: "position", label: "Position", type: "position" },
         { key: "rotation", label: "Rotation", type: "rotation" },
+        
       ],
     };
 

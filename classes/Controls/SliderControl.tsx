@@ -244,6 +244,7 @@ export class SliderControl<T extends obj> extends Control {
         isOpen,
         onClose,
         object: editedObject,
+        set_object: setEditedObject,
         onSave: (updatedObject: SliderControlConstructor<any>) => {
           const newObj = new SliderControl(updatedObject);
           onSave(newObj);

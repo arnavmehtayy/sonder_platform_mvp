@@ -58,6 +58,7 @@ export interface EditableObjectPopupProps<T> {
   isOpen: boolean; // Whether the popup is open
   onClose: () => void; // Function to cleanup and close the popup
   object: T; // The initial object that will be displayed and that will be edited by user
+  set_object: React.Dispatch<React.SetStateAction<T>>; // Function to update the object when user changes the value
   onSave: (updatedObject: T) => void; // Function to save the edited object when user clicks save
   title: string;
   fields: Array<PopupQuestionProps<T, any>>; // The fields that will be displayed in the popup
@@ -67,11 +68,12 @@ export function EditableObjectPopup<T>({
   isOpen,
   onClose,
   object,
+  set_object,
   onSave,
   title,
   fields,
 }: EditableObjectPopupProps<T>) {
-  const [editedObject, setEditedObject] = React.useState<T>({ ...object });
+  const [editedObject, setEditedObject] = [object, set_object];
 
   const handleChange = (key: keyof T, value: any) => {
     setEditedObject((prev) => ({ ...prev, [key]: value }));

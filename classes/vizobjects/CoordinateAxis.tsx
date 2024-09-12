@@ -271,6 +271,7 @@ export default class CoordinateAxis extends TransformObj {
       isOpen,
       onClose,
       object: editedObject,
+      set_object: setEditedObject,
       onSave: (updatedObject: CoordinateAxisConstructor) => {
         const newObj = new CoordinateAxis(updatedObject);
         onSave(newObj);

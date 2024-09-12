@@ -161,6 +161,7 @@ export class MultiChoiceClass extends Control {
       isOpen,
       onClose,
       object: editedObject,
+      set_object: setEditedObject,
       onSave: (updatedObject: MultiChoiceConstructor) => {
         const newObj = new MultiChoiceClass(updatedObject);
         onSave(newObj);

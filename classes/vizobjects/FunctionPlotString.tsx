@@ -142,10 +142,8 @@ const FunctionPlotPopup: React.FC<{
 }> = ({ isOpen, onClose, onSave }) => {
   const [error, setError] = useState<string | null>(null);
 
-  const popupProps: EditableObjectPopupProps<FunctionPlotConstructor> = {
-    isOpen,
-    onClose,
-    object: {
+  const [editedObject, setEditedObject] = useState<FunctionPlotConstructor>(
+    {
       id: Date.now(),
       functionString: 'x',
       xRange: [-10, 10],
@@ -154,7 +152,14 @@ const FunctionPlotPopup: React.FC<{
       isEnabled: true,
       color: '#000000',
 
-    },
+    }
+  )
+
+  const popupProps: EditableObjectPopupProps<FunctionPlotConstructor> = {
+    isOpen,
+    onClose,
+    object: editedObject,
+    set_object: setEditedObject,
     onSave: (updatedObject: FunctionPlotConstructor) => {
       try {
         // Attempt to parse the function string

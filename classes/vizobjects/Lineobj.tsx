@@ -12,6 +12,7 @@ import {
   EditableObjectPopupProps,
 } from "@/app/Components/EditMode/EditPopups/EditableObjectPopup";
 import { line_atts,  get_attributes, dict_keys} from "./get_set_obj_attributes";
+import React from "react";
 
 /*
  * This class is used to render a Line object in the scene.
@@ -171,7 +172,7 @@ export class LineObj extends coloredObj {
     onClose: () => void;
     onSave: (newObject: obj) => void;
   }): React.ReactElement {
-    const editedObject: LineObjConstructor = {
+    const [editedObject, setEditedObject] = React.useState<LineObjConstructor>({
       id: Date.now(),
       name: "Line",
       isEnabled: true,
@@ -183,12 +184,13 @@ export class LineObj extends coloredObj {
       line_width: 2,
       color: "white",
       length: 10
-    };
+    });
 
     const popupProps: EditableObjectPopupProps<LineObjConstructor> = {
       isOpen,
       onClose,
       object: editedObject,
+      set_object: setEditedObject,
       onSave: (updatedObject: LineObjConstructor) => {
         const newObj = new LineObj(updatedObject);
         onSave(newObj);
