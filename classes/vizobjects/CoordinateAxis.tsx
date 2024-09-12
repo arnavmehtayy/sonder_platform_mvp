@@ -4,13 +4,13 @@ import { TouchControl } from "../Controls/TouchControl";
 import { ThreeEvent } from "react-three-fiber";
 import { Line } from "@react-three/drei";
 import { Text } from "@react-three/drei";
-import { get_attributes } from "./obj";
 import { TransformObj, TransformObjConstructor } from "./transformObj";
 import {
   EditableObjectPopup,
   EditableObjectPopupProps,
 } from "@/app/Components/EditMode/EditPopups/EditableObjectPopup";
 import React from "react";
+import { Axis_atts,  get_attributes, dict_keys} from "./get_set_obj_attributes";
 
 
 /*
@@ -31,33 +31,7 @@ interface CoordinateAxisConstructor extends TransformObjConstructor {
 }
 
 export default class CoordinateAxis extends TransformObj {
-  static get_controllable_atts: get_attributes<any, any>[] = [
-    ...TransformObj.get_controllable_atts,
-    {
-      label: "x-label",
-      get_attribute: (obj: CoordinateAxis) => obj.xLabel,
-      set_attribute: (obj: CoordinateAxis, value: string) => {
-        const newObj = Object.assign(
-          Object.create(Object.getPrototypeOf(obj)),
-          obj
-        );
-        newObj.xLabel = value;
-        return newObj;
-      },
-    },
-    {
-      label: "y-label",
-      get_attribute: (obj: CoordinateAxis) => obj.yLabel,
-      set_attribute: (obj: CoordinateAxis, value: string) => {
-        const newObj = Object.assign(
-          Object.create(Object.getPrototypeOf(obj)),
-          obj
-        );
-        newObj.yLabel = value;
-        return newObj;
-      },
-    },
-  ];
+  
 
   axisLength: number;
   tickSpacing: number;
@@ -107,6 +81,10 @@ export default class CoordinateAxis extends TransformObj {
     this.xLabel = xLabel;
     this.yLabel = yLabel;
     this.isClickable = isClickable;
+  }
+
+  get_set_att_selector(type: dict_keys): get_attributes<any, any>[] {
+    return [...super.get_set_att_selector(type), ...Axis_atts[type]]
   }
 
   // method that returns the physical three.js mesh representation of the object

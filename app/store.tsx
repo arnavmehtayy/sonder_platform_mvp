@@ -560,7 +560,7 @@ export const setSliderControlValueSelector =
 
 // get the vizobj corresponding to a particular id
 // this is a curried function that takes the id of the vizobj to be set first
-export const getObjectSelector = (id: number) => (state: State) =>
+export const getObjectSelector = (id: number) => (state: State) => 
   state.vizobjs[id];
 
 // get the vizobj corresponding to an arbitrary id

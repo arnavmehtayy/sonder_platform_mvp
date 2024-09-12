@@ -11,7 +11,7 @@ import {
   EditableObjectPopup,
   EditableObjectPopupProps,
 } from "@/app/Components/EditMode/EditPopups/EditableObjectPopup";
-import { get_attributes } from "./obj";
+import { line_atts,  get_attributes, dict_keys} from "./get_set_obj_attributes";
 
 /*
  * This class is used to render a Line object in the scene.
@@ -30,73 +30,7 @@ interface LineObjConstructor extends coloredObjConstructor {
 }
 
 export class LineObj extends coloredObj {
-  static get_controllable_atts: get_attributes<any, any>[] = [
-    ...coloredObj.get_controllable_atts,
-    {
-      label: "line_width",
-      get_attribute: (obj: LineObj) => obj.line_width,
-      set_attribute: (obj: LineObj, value: number) => {
-        const newObj = Object.assign(
-          Object.create(Object.getPrototypeOf(obj)),
-          obj
-        );
-        newObj.line_width = value;
-        return newObj;
-      },
-    },
-    {
-      label: "start",
-      get_attribute: (obj: LineObj) => obj.start,
-      set_attribute: (obj: LineObj, value: Vector2) => {
-        const newObj = Object.assign(
-          Object.create(Object.getPrototypeOf(obj)),
-          obj
-        );
-        newObj.start = value;
-        return newObj;
-      },
-    },
-    {
-      label: "end",
-      get_attribute: (obj: LineObj) => obj.end,
-      set_attribute: (obj: LineObj, value: Vector2) => {
-        const newObj = Object.assign(
-          Object.create(Object.getPrototypeOf(obj)),
-          obj
-        );
-        newObj.end = value;
-        return newObj;
-      },
-    },
-    {
-      label: "slope",
-      get_attribute: (obj: LineObj) => obj.get_slope_intercept()[1],
-      set_attribute: (obj: LineObj, value: number) => {
-        const newObj = Object.assign(
-          Object.create(Object.getPrototypeOf(obj)),
-          obj
-        );
-        const [b, m, range] = obj.get_slope_intercept();
-        newObj.start = new Vector2(range[0], m * range[0] + b);
-        newObj.end = new Vector2(range[1], m * range[1] + b);
-        return newObj;
-      },
-    },
-    {
-      label: "intercept",
-      get_attribute: (obj: LineObj) => obj.get_slope_intercept()[0],
-      set_attribute: (obj: LineObj, value: number) => {
-        const newObj = Object.assign(
-          Object.create(Object.getPrototypeOf(obj)),
-          obj
-        );
-        const [b, m, range] = obj.get_slope_intercept();
-        newObj.start = new Vector2(range[0], m * range[0] + b);
-        newObj.end = new Vector2(range[1], m * range[1] + b);
-        return newObj;
-      },
-    },
-  ];
+  
   start: Vector2;
   end: Vector2;
   line_width: number = 2;
@@ -139,7 +73,7 @@ export class LineObj extends coloredObj {
     const end = new THREE.Vector2(half_length, this.slope * half_length + this.intercept);
     this.start = start;
     this.end = end;
-    
+
     }
   }
 
@@ -174,6 +108,11 @@ export class LineObj extends coloredObj {
     return this.start.distanceTo(this.end);
   }
 
+
+  // write a function that given a type of output you want from your get_set_att_selector, it returns a list of attributes that can be controlled
+  get_set_att_selector(type: dict_keys): get_attributes<any, any>[] {
+    return [...super.get_set_att_selector(type), ...line_atts[type]]
+  }
   // method that returns the physical three.js mesh representation of the object
   // this is used to render the object in the vizexperience
   getMesh({

@@ -1,6 +1,6 @@
 import { obj } from "../vizobjects/obj";
 import { SliderControl, SliderControlConstructor } from "./SliderControl";
-import { useStore, setSliderControlValueSelector, getSliderControlValueSelector } from "@/app/store";
+import { useStore, setSliderControlValueSelector, getSliderControlValueSelector, getObjectSelector } from "@/app/store";
 import {
     EditableObjectPopup,
     EditableObjectPopupProps,
@@ -18,41 +18,6 @@ interface AttributePair<T extends obj> {
 export interface SliderControlAdvancedConstructor<T extends obj> extends SliderControlConstructor<T> {
   attribute_pairs: AttributePair<T>[];
 }
-
-// export function ShowSliderControl({control} : {control: SliderControlAdvanced<any>}) {
-//   const setValue = useStore(setSliderControlValueSelector(control.id));
-//   const getValue = useStore(getSliderControlValueSelector(control.id));
-
-//   return (
-//     <div className={`bg-white rounded-lg shadow-md p-4 ${!control.isClickable ? "opacity-50" : ""} relative`}>
-//       <h3 className="text-lg font-semibold text-blue-800 mb-2">
-//         <Latex>{control.desc}</Latex>
-//       </h3>
-//       <p className="text-gray-600 mb-2">
-//         <Latex>{control.text}</Latex>
-//       </p>
-//       <div className="relative pt-1">
-//         <input
-//           type="range"
-//           min={control.range[0]}
-//           max={control.range[1]}
-//           step={control.step_size}
-//           value={getValue}
-//           onChange={(e) => setValue(Number(e.target.value))}
-//           className="w-full h-2 bg-blue-200 rounded-lg appearance-none cursor-pointer"
-//           disabled={!control.isClickable}
-//         />
-//         <div className="flex justify-between items-center mt-2">
-//           <span className="text-sm text-gray-600">{control.range[0]}</span>
-//           <span className="text-sm font-medium text-blue-600">
-//             {getValue.toFixed(2)}
-//           </span>
-//           <span className="text-sm text-gray-600">{control.range[1]}</span>
-//         </div>
-//       </div>
-//     </div>
-//   );
-// }
 
 export class SliderControlAdvanced<T extends obj> extends SliderControl<T> {
   attribute_pairs: AttributePair<T>[];
@@ -129,7 +94,7 @@ export class SliderControlAdvanced<T extends obj> extends SliderControl<T> {
       },
       title: `Create New Advanced Slider Control`,
       fields: [
-        { key: "obj_id", label: "Object ID", type: "number" },
+        { key: "obj_id", label: "Object ID", type: "vizObjSelect" },
         { key: "step_size", label: "Step Size", type: "number" },
         {key: "range", label: "Range", type: "arraynum", length_of_array: 2},
         {
@@ -140,6 +105,7 @@ export class SliderControlAdvanced<T extends obj> extends SliderControl<T> {
             <AttributePairsEditor
               pairs={value}
               onChange={onChange}
+              objectId={editedObject.obj_id}
             />
           ),
         },
@@ -149,15 +115,24 @@ export class SliderControlAdvanced<T extends obj> extends SliderControl<T> {
     return <EditableObjectPopup {...popupProps} />;
   }
 }
-
 interface AttributePairsEditorProps {
   pairs: AttributePair<any>[];
   onChange: (pairs: AttributePair<any>[]) => void;
+  objectId: number;
 }
 
-function AttributePairsEditor({ pairs, onChange }: AttributePairsEditorProps) {
+export default function AttributePairsEditor({ pairs, onChange, objectId }: AttributePairsEditorProps) {
+  const object = useStore(getObjectSelector(objectId));
+  const setAttributeOptions = object ? object.get_set_att_selector("number") : [];
+  console.log(object, setAttributeOptions)
+
   const addPair = () => {
-    onChange([...pairs, { transform_function: "x", set_attribute: (obj, value) => obj }]);
+    if (setAttributeOptions.length > 0) {
+      onChange([...pairs, { 
+        transform_function: "", 
+        set_attribute: setAttributeOptions[0].set_attribute 
+      }]);
+    }
   };
 
   const updatePair = (index: number, field: keyof AttributePair<any>, value: any) => {
@@ -179,9 +154,23 @@ function AttributePairsEditor({ pairs, onChange }: AttributePairsEditorProps) {
             value={pair.transform_function}
             onChange={(e) => updatePair(index, "transform_function", e.target.value)}
             placeholder="Transform function (e.g., 2*x + 1)"
-            className="w-full p-2 border rounded"
+            className="w-full p-2 border rounded mb-2"
           />
-          <button onClick={() => removePair(index)} className="mt-1 px-2 py-1 bg-red-500 text-white rounded">
+          <select
+            value={setAttributeOptions.findIndex(attr => attr.set_attribute === pair.set_attribute)}
+            onChange={(e) => {
+              const selectedIndex = parseInt(e.target.value);
+              updatePair(index, "set_attribute", setAttributeOptions[selectedIndex].set_attribute);
+            }}
+            className="w-full p-2 border rounded mb-2"
+          >
+            {setAttributeOptions.map((attr, attrIndex) => (
+              <option key={attrIndex} value={attrIndex}>
+                {attr.label}
+              </option>
+            ))}
+          </select>
+          <button onClick={() => removePair(index)} className="px-2 py-1 bg-red-500 text-white rounded">
             Remove
           </button>
         </div>

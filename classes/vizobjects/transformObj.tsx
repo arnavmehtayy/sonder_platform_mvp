@@ -4,10 +4,12 @@ import coloredObj from "./coloredObj";
 import React from "react";
 import { EditableObjectPopup, EditableObjectPopupProps } from "@/app/Components/EditMode/EditPopups/EditableObjectPopup";
 import { coloredObjConstructor } from "./coloredObj";
-import { get_attributes } from "./obj";
 import { ThreeEvent } from "@react-three/fiber";
 import { RefObject } from "react";
 import { ReactElement, JSXElementConstructor } from "react";
+import { color } from "framer-motion";
+import { transform_atts,  get_attributes, dict_keys} from "./get_set_obj_attributes";
+
 
 
 /*
@@ -25,40 +27,6 @@ export interface TransformObjConstructor extends coloredObjConstructor {
 }
 
 export abstract class TransformObj extends coloredObj {
-  static get_controllable_atts: get_attributes<any, any>[] = [
-    ...coloredObj.get_controllable_atts,
-    { label: "position", get_attribute: (obj: TransformObj) => obj.position,
-      set_attribute: (obj: TransformObj, value: THREE.Vector2) => {
-        const newObj = Object.assign(
-          Object.create(Object.getPrototypeOf(obj)),
-          obj
-        );
-        newObj.position = value;
-        return newObj;
-      }
-    },
-    { label: "rotation", get_attribute: (obj: TransformObj) => obj.rotation,
-      set_attribute: (obj: TransformObj, value: THREE.Vector3) => {
-        const newObj = Object.assign(
-          Object.create(Object.getPrototypeOf(obj)),
-          obj
-        );
-        newObj.rotation = value;
-        return newObj;
-      }
-    },
-    { label: "scale", get_attribute: (obj: TransformObj) => obj.scale,
-      set_attribute: (obj: TransformObj, value: THREE.Vector3) => {
-        const newObj = Object.assign(
-          Object.create(Object.getPrototypeOf(obj)),
-          obj
-        );
-        newObj.scale = value;
-        return newObj;
-      }
-    },
-    
-  ];
   position: THREE.Vector2;
   rotation: THREE.Vector3;
   scale: THREE.Vector3;
@@ -80,6 +48,10 @@ export abstract class TransformObj extends coloredObj {
     this.rotation = rotation;
     this.scale = scale;
     this.touch_controls = touch_controls;
+  }
+
+  get_set_att_selector(type: dict_keys): get_attributes<any, any>[] {
+    return [...super.get_set_att_selector(type), ...transform_atts[type]]
   }
 
   abstract getMesh({

@@ -19,7 +19,8 @@ export type EditAddType =
   | Question
   | MultiChoiceClass
   | SliderControlAdvanced<any>;
-export type PopUpType =
+  
+export type PopUpType = 
   | typeof LineObj
   | typeof geomobj
   | typeof CoordinateAxis

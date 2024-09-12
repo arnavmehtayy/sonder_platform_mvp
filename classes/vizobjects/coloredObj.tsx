@@ -1,10 +1,9 @@
-import { get_attributes, obj } from "./obj";
+import {obj } from "./obj";
 import React from "react";
 import * as THREE from "three";
 import { ThreeEvent } from "@react-three/fiber";
 import { objconstructor } from "./obj";
-import { EditableObjectPopup, EditableObjectPopupProps } from "@/app/Components/EditMode/EditPopups/EditableObjectPopup";
-
+import { color_atts,  get_attributes, dict_keys} from "./get_set_obj_attributes";
 /*
  * This class is used to create a colored object in the scene.
 */
@@ -14,31 +13,24 @@ export interface coloredObjConstructor extends objconstructor {
 }
 
 export default abstract class coloredObj extends obj {
-  static get_controllable_atts: get_attributes<any, any>[] = [
-    ...obj.get_controllable_atts,
-    { label: "color", get_attribute: (obj: coloredObj) => obj.color,
-      set_attribute: (obj: coloredObj, value: string) => {
-        const newObj = Object.assign(
-          Object.create(Object.getPrototypeOf(obj)),
-          obj
-        );
-        newObj.color = value;
-        return newObj;
-      }
-    },
-  ];
 
   color: string;
 
   constructor({
     id,
     name = "TransformObj",
-    color = "white",
+    color = "#FFFFFF",
     isEnabled = true,
   }: Partial<coloredObjConstructor> & { id: number; isEnabled: boolean }) {
     super({ id: id, name: name, isEnabled: isEnabled });
     this.color = color;
   }
+
+  get_set_att_selector(type: dict_keys): get_attributes<any, any>[] {
+    return [...super.get_set_att_selector(type), ...color_atts[type]]
+  }
+
+
 
   // method that returns the physical three.js mesh representation of the object
   // this is used to render the object in the vizexperience

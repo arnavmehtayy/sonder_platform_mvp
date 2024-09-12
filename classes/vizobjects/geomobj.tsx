@@ -9,7 +9,6 @@ import {
 } from "@/app/Components/EditMode/EditPopups/EditableObjectPopup";
 import React from "react";
 import GeneralTransformControl from "@/app/Components/three/GeneralTransCont";
-import { get_attributes } from "./obj";
 import { TransformObjConstructor } from "./transformObj";
 
 /*
@@ -54,6 +53,8 @@ export class geomobj extends TransformObj {
     this.geom = geom;
     this.OnClick = OnClick;
   }
+
+
 
   // method that returns the physical three.js mesh representation of the object
   // this is used to render the object in the vizexperience

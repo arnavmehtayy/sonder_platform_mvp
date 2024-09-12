@@ -3,7 +3,6 @@ import { Control, ControlConstructor } from "./Control";
 import { useStore, setSliderControlValueSelector, getSliderControlValueSelector } from "@/app/store";
 import React from 'react';
 import Latex from 'react-latex-next';
-import { get_attributes } from "../vizobjects/obj";
 import {
   EditableObjectPopup,
   EditableObjectPopupProps,
@@ -26,7 +25,6 @@ export interface SliderControlConstructor<T extends obj> extends ControlConstruc
   step_size?: number;
   get_attribute?: (obj: T) => number;
   set_attribute?: (obj: T, value: number) => T;
-  get_set_inbuilt?: get_attributes<T, number> | null;
 }
 
 export function ShowSliderControl({control} : {control: SliderControl<any>}) {
@@ -148,7 +146,6 @@ export class SliderControl<T extends obj> extends Control {
   step_size: number;
   get_attribute: (obj: T) => number; // Function to get the attribute of the object
   set_attribute: (obj: T, value: number) => T; // Function to set the attribute of the object
-  get_set_inbuilt: get_attributes<T, number> | null = null; // this is to allow for users to use the inbuilt get_set functions of the object
   constructor({
     id,
     obj_id,
@@ -164,7 +161,6 @@ export class SliderControl<T extends obj> extends Control {
     },
     desc = "slider control",
     text = "this is a slider control",
-    get_set_inbuilt = null,
   }: SliderControlConstructor<T>) {
     super({ id: id, desc, text: text });
     this.obj_id = obj_id;
@@ -172,10 +168,6 @@ export class SliderControl<T extends obj> extends Control {
     this.step_size = step_size;
     this.get_attribute = get_attribute;
     this.set_attribute = set_attribute;
-    if(this.get_set_inbuilt) { // this is too allow for users to use the inbuilt get_set functions of the object
-      this.get_attribute = this.get_set_inbuilt.get_attribute;
-      this.set_attribute = this.get_set_inbuilt.set_attribute;
-    }
   }
 
   // method to get the value of the slider control given the instance of the object that the control is controlling

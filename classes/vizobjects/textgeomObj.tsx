@@ -3,27 +3,13 @@ import * as THREE from "three";
 import { TouchControl } from "../Controls/TouchControl";
 import { ThreeEvent } from "react-three-fiber";
 import { Text } from "@react-three/drei";
-import { get_attributes } from "./obj";
+import { text_atts,  get_attributes, dict_keys} from "./get_set_obj_attributes";
+
 
 /*
  * This class is used to create a object that has Text on it in the scene.
  */
 export default class TextGeom extends geomobj {
-  static get_controllable_atts: get_attributes<any, any>[] = [
-    ...geomobj.get_controllable_atts,
-    {
-      label: "text",
-      get_attribute: (obj: TextGeom) => obj.text,
-      set_attribute: (obj: TextGeom, value: string) => {
-        const newObj = Object.assign(
-          Object.create(Object.getPrototypeOf(obj)),
-          obj
-        );
-        newObj.text = value;
-        return newObj;
-      },
-    },
-  ];
   text: string;
 
   constructor({
@@ -57,6 +43,9 @@ export default class TextGeom extends geomobj {
     this.name = text;
   }
 
+  get_set_att_selector(type: dict_keys): get_attributes<any, any>[] {
+    return [...super.get_set_att_selector(type), ...text_atts[type]]
+  }
   // method that returns the physical three.js mesh representation of the object
   // this is used to render the object in the vizexperience
   getMesh({

@@ -6,6 +6,8 @@ import { TouchControl } from "../Controls/TouchControl";
 import { ThreeEvent } from "react-three-fiber";
 import { Line } from "@react-three/drei";
 import React from "react";
+import { functionplot_atts,  get_attributes, dict_keys} from "./get_set_obj_attributes";
+
 
 /*
  * object that represents a function, it is plotted using lots of lines attached together
@@ -60,6 +62,10 @@ export default class FunctionPlot extends TransformObj {
     this.lineWidth = lineWidth;
     this.isClickable = isClickable;
     this.OnClick = OnClick;
+  }
+
+  get_set_att_selector(type: dict_keys): get_attributes<any, any>[] {
+    return [...super.get_set_att_selector(type), ...functionplot_atts[type]]
   }
   
   // method that returns the physical three.js mesh representation of the object

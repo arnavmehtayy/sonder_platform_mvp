@@ -5,27 +5,20 @@ import {
   EditableObjectPopup,
   EditableObjectPopupProps,
 } from "@/app/Components/EditMode/EditPopups/EditableObjectPopup";
-
+import { obj_atts,  get_attributes, dict_keys} from "./get_set_obj_attributes";
 /*
     This is the base class for every object in the scene.
     This class is used to store the information about a object in the threejs scene
     The attributes of this class are: id, name, isClickable, isEnabled
 */
-export type get_att_type = number | string | boolean | THREE.Vector2 | THREE.Vector3 ;
-export interface get_attributes<T extends obj, V extends get_att_type = get_att_type> {
-  label: string;
-  get_attribute: (obj: T) => V;
-  set_attribute: (obj: T, value: V) => T;
-}
-
 export interface objconstructor {
   id: number;
   name: string;
   isEnabled: boolean;
 }
 
+
 export class obj {
-  static get_controllable_atts: get_attributes<any, any>[] = [];
   id: number;
   name: string;
   isClickable: boolean = false; // whether the object on the screen can be clicked or not
@@ -57,6 +50,10 @@ export class obj {
     );
     obj.isClickable = isClickable;
     return obj;
+  }
+
+  get_set_att_selector(type: dict_keys): get_attributes<any, any>[] {
+    return obj_atts[type]
   }
 
   // method that returns the physical three.js mesh representation of the object
