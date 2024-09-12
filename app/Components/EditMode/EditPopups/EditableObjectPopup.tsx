@@ -24,7 +24,8 @@ import { Vector2, Vector3 } from "three";
 import { Textarea } from "@/components/ui/textarea";
 import { MCQOptionsInput } from "./MCQPopup";
 import { X } from "lucide-react";
-import SelectVizObjectComponent from "./SelectVizObjsPopup";
+import {SelectVizObject, SelectVizObjectList} from "./SelectVizObjsPopup";
+
 
 /*
  * This component is a generic popup that allows the user to edit an object.
@@ -47,7 +48,8 @@ export interface PopupQuestionProps<T, option_T> {
     | "addoptions" // The type of the input field
     | "arraynum"
     | "vizObjSelect"
-    | "custom"; 
+    | "vizObjSelectList"
+    | "custom";
   options?: { label: string; value: option_T }[]; // For select type
   length_of_array?: number; // For arraynum type
   showIf?: (obj: T) => boolean; // New property for conditional rendering
@@ -190,7 +192,12 @@ export function EditableObjectPopup<T>({
       
       case "vizObjSelect":
         return (
-        <SelectVizObjectComponent handleChange={(id) => handleChange(field.key, id)} />
+        <SelectVizObject handleChange={(id) => handleChange(field.key, id)} />
+      );
+
+      case "vizObjSelectList":
+        return (
+        <SelectVizObjectList handleChange={(selectedObjects) => handleChange(field.key, selectedObjects)} />
       );
       case "select":
         return (

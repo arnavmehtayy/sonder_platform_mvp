@@ -40,6 +40,7 @@ import { MultiChoiceClass } from "@/classes/Controls/MultiChoiceClass";
 import { DropDownMenu } from "./DropDownMenu";
 import { SliderControlAdvanced } from "@/classes/Controls/SliderControlAdv";
 import { InputNumber } from "@/classes/Controls/InputNumber";
+import { SelectControl } from "@/classes/Controls/SelectControl";
 
 export interface Option {
   id: number;
@@ -66,6 +67,7 @@ export const EditBar: React.FC = () => {
 const controlTypes: ObjectType[] = [
   { name: "SliderControl", type: SliderControlAdvanced, icon: Sliders },
   {name: "Number Input", type: InputNumber, icon: List},
+  {name: "Select Input", type: SelectControl, icon: List},
 ]
   
 const objectTypes: ObjectType[] = [

@@ -1,8 +1,12 @@
-import { Control } from "./Control";
+import { Control, ControlConstructor } from "./Control";
 import { obj } from "../vizobjects/obj";
 import { useStore, DeSelectObjectControl,SetIsActiveSelectControl, getNameSelector  } from "@/app/store";
 import React from 'react';
 import Latex from 'react-latex-next';
+import {
+  EditableObjectPopup,
+  EditableObjectPopupProps,
+} from "@/app/Components/EditMode/EditPopups/EditableObjectPopup";
 
 
 /*
@@ -110,6 +114,13 @@ function ShowSelectControl({control} : {control: SelectControl}) {
 </div>
     );
 }
+
+interface SelectControlConstructor extends ControlConstructor {
+  selectable: number[];
+  selected?: number[];
+  isActive?: boolean;
+  capacity?: number;
+}
 export class SelectControl extends Control {
   selectable: number[]; // This is the list of id's that a user can select using this select control
   selected: number[]; // This is the list of id's of the objects that have been selected by the user
@@ -124,7 +135,7 @@ export class SelectControl extends Control {
     capacity = 1,
     desc = "select control",
     text = "this is a select control",
-  }: Partial<SelectControl> & {
+  }: Partial<SelectControlConstructor> & {
     id: number;
     selectable: number[];
   }) {
@@ -181,74 +192,50 @@ export class SelectControl extends Control {
 
   render(): React.ReactNode {
     return <ShowSelectControl control={this} />;
-    // const handleRemove = useStore(DeSelectObjectControl);
-    // const setIsActive = useStore(SetIsActiveSelectControl(this.id));
-    // const getName = useStore(getNameSelector);
-    // const [isComponentActive, setIsComponentActive] = React.useState(this.isClickable && this.isActive);
+  }
 
-    // React.useEffect(() => {
-    //   setIsActive(isComponentActive);
-    // }, [isComponentActive]);
+  static getPopup({
+    isOpen,
+    onClose,
+    onSave,
+  }: {
+    isOpen: boolean;
+    onClose: () => void;
+    onSave: (obj: SelectControl) => void;
+  }) {
+    const [editedObject, setEditedObject] = React.useState<SelectControlConstructor>({
+      id: Date.now(),
+      selectable: [],
+      capacity: 1,
+      desc: "select control",
+      text: "this is a select control",
+    });
 
-    // React.useEffect(() => {
-    //   if (this.selected.length >= this.capacity) {
-    //     setIsComponentActive(false);
-    //     setIsActive(false);
-    //   }
-    // }, [this.selected.length, this.capacity]);
+    const handleChange = (field: string, value: any) => {
+      setEditedObject((prev) => ({ ...prev, [field]: value }));
+    };
 
-    // const handleClick = () => {
-    //   if (this.isClickable) {
-    //     const newState = !isComponentActive;
-    //     setIsComponentActive(newState);
-    //     setIsActive(newState);
-    //   }
-    // };
+    
+    const popupProps: EditableObjectPopupProps<SelectControlConstructor> = {
+      isOpen,
+      onClose,
+      object: editedObject,
+      set_object: setEditedObject,
+      onSave: (updatedObject: SelectControlConstructor) => {
+        const newObj = new SelectControl(updatedObject);
+        onSave(newObj);
+      },
+      title: `Create New Select Control`,
+      fields: [
+        { key: "desc", label: "Title", type: "title" },
+        { key: "text", label: "Text", type: "textarea" },
+        { key: "selectable", label: "Selectable Objects", type: "vizObjSelectList" },
+        { key: "capacity", label: "Capacity", type: "number" },
+      ],
+      
+    };
 
-    // return (
-    //   <div className={`bg-white rounded-lg shadow-md p-4 mb-6 ${!this.isClickable ? 'opacity-50' : ''} relative`}>
-    //     <div className="flex flex-col space-y-3">
-    //       <div className="flex justify-between items-center">
-    //         <h3 className="text-lg font-semibold text-blue-800"><Latex>{this.desc}</Latex></h3>
-    //         <div className="flex items-center space-x-2">
-    //           <span className="text-sm text-gray-600">
-    //             {this.selected.length}/{this.capacity} selected
-    //           </span>
-    //           <button
-    //             onClick={handleClick}
-    //             disabled={!this.isClickable}
-    //             className={`
-    //               ${isComponentActive ? "bg-blue-600 hover:bg-blue-700" : "bg-gray-400 hover:bg-gray-500"}
-    //               ${!this.isClickable && "opacity-50 cursor-not-allowed"}
-    //               text-white py-1 px-3 rounded-md text-sm font-medium transition duration-300 ease-in-out
-    //               flex items-center
-    //             `}
-    //           >
-    //             {isComponentActive ? "Active" : "Inactive"}
-    //           </button>
-    //         </div>
-    //       </div>
-    //       <p className="text-gray-600"><Latex>{this.text}</Latex></p>
-    //     </div>
-    //     <div className="mt-4 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
-    //       {this.selected.map((id) => (
-    //         <div key={id} className="relative flex items-center justify-center p-3 bg-blue-100 rounded-md shadow-sm hover:shadow-md transition duration-300">
-    //           <button
-    //             className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 hover:bg-red-600 transition duration-300 shadow-sm"
-    //             onClick={() => handleRemove(id, this.id)}
-    //             aria-label="Remove item"
-    //             disabled={!this.isClickable}
-    //           >
-    //             <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
-    //               <path fillRule="evenodd" d="M3 10a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z" clipRule="evenodd" />
-    //             </svg>
-    //           </button>
-    //           <span className="text-blue-800 font-medium truncate">{getName(id)}</span>
-    //         </div>
-    //       ))}
-    //     </div>
-    //   </div>
-    // );
+    return <EditableObjectPopup {...popupProps} />;
   }
 
 
