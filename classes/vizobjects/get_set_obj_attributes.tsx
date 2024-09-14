@@ -235,6 +235,57 @@ export const line_atts: dict_get_attributes<LineObj> = {
         return newObj;
       },
     },
+    {
+      label: "point1-x",
+      get_attribute: (obj: LineObj) => obj.point1?.x || 0,
+      set_attribute: (obj: LineObj, value: number) => {
+        const newObj = Object.assign(
+          Object.create(Object.getPrototypeOf(obj)),
+          obj
+        );
+        newObj.set_points(value, 'point1-x');
+        return newObj;
+      },
+    },
+    {
+      label: "point1-y",
+      get_attribute: (obj: LineObj) => obj.point1?.y || 0,
+      set_attribute: (obj: LineObj, value: number) => {
+        const newObj = Object.assign(
+          Object.create(Object.getPrototypeOf(obj)),
+          obj
+        );
+        newObj.set_points(value, 'point1-y');
+        return newObj;
+      },
+    }
+    ,
+    {
+      label: "point2-x",
+      get_attribute: (obj: LineObj) => obj.point2?.x || 0,
+      set_attribute: (obj: LineObj, value: number) => {
+        const newObj = Object.assign(
+          Object.create(Object.getPrototypeOf(obj)),
+          obj
+        );
+        newObj.set_points(value, 'point2-x');
+        return newObj;
+      },
+
+    },
+    {
+      label: "point2-y",
+      get_attribute: (obj: LineObj) => obj.point2?.y || 0,
+      set_attribute: (obj: LineObj, value: number) => {
+        const newObj = Object.assign(
+          Object.create(Object.getPrototypeOf(obj)),
+          obj
+        );
+        newObj.set_points(value, 'point2-y');
+        return newObj;
+      },
+    }
+
   ],
   string: [],
   boolean: [],

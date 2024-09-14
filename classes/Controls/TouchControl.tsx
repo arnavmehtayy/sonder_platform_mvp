@@ -10,7 +10,6 @@ import { TransformObj } from "../vizobjects/transformObj";
 
 export type TouchControlAttributes = {
   direction: [boolean, boolean, boolean]; // the direction in which we allow the control to move in
-  range: [number, number];
   step_size: number;
 } | null;
 

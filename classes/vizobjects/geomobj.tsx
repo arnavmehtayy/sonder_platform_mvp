@@ -256,20 +256,12 @@ export function TouchControlAttributeEditor({
     if (attributes === null) {
       onChange({
         direction: [false, false, false],
-        range: [0, 1],
         step_size: 0.1,
         [key]: value
       });
     } else {
       onChange({ ...attributes, [key]: value });
     }
-  };
-
-  const handleRangeChange = (index: number, value: string) => {
-    if (attributes === null) return;
-    const newRange = [...attributes.range];
-    newRange[index] = value === '' ? 0 : parseFloat(value);
-    updateAttributes('range', newRange);
   };
 
   return (
@@ -282,7 +274,6 @@ export function TouchControlAttributeEditor({
             onCheckedChange={(checked) =>
               onChange(checked ? {
                 direction: [false, false, false],
-                range: [0, 1],
                 step_size: 0.1
               } : null)
             }
@@ -315,23 +306,7 @@ export function TouchControlAttributeEditor({
 
             <Separator className="my-4" />
 
-            <div className="space-y-2">
-              <Label className="font-medium">Range</Label>
-              <div className="flex space-x-4">
-                <Input
-                  type="number"
-                  value={attributes.range[0]}
-                  onChange={(e) => handleRangeChange(0, e.target.value)}
-                  className="w-24"
-                />
-                <Input
-                  type="number"
-                  value={attributes.range[1]}
-                  onChange={(e) => handleRangeChange(1, e.target.value)}
-                  className="w-24"
-                />
-              </div>
-            </div>
+           
 
             <Separator className="my-4" />
 

@@ -21,13 +21,15 @@ import React from "react";
  */
 
 interface LineObjConstructor extends coloredObjConstructor {
-  constructionType: 'endpoints' | 'slopeIntercept';
+  constructionType: 'endpoints' | 'slopeIntercept' | 'twoPointsAndLength';
   start?: Vector2;
   end?: Vector2;
   slope?: number;
   intercept?: number;
   line_width?: number;
   length?: number;
+  point1?: Vector2;
+  point2?: Vector2;
 }
 
 export class LineObj extends coloredObj {
@@ -35,10 +37,12 @@ export class LineObj extends coloredObj {
   start: Vector2;
   end: Vector2;
   line_width: number = 2;
-  constructionType: 'endpoints' | 'slopeIntercept';
-  slope?: number;
-  intercept?: number;
+  constructionType: 'endpoints' | 'slopeIntercept' | 'twoPointsAndLength';
+  slope: number;
+  intercept: number;
   length?: number;
+  point1: Vector2;
+  point2: Vector2;
 
   constructor({
     id,
@@ -52,21 +56,59 @@ export class LineObj extends coloredObj {
     color = "white",
     name = "Line",
     isEnabled = true,
+    point1 = new Vector2(0, 0),
+    point2 = new Vector2(1, 1),
   }: Partial<LineObjConstructor> & { id: number }) {
     super({ id, name, color, isEnabled });
     this.constructionType = constructionType;
     this.line_width = line_width;
+    this.length = length;
     this.start = start;
     this.end = end;
-    this.length = length;
+    this.point1 = point1;
+    this.point2 = point2;
+    this.slope = slope;
+    this.intercept = intercept;
 
     if (constructionType === 'slopeIntercept') {
-      this.slope = slope;
-      this.intercept = intercept;
-      this.length = length;
       this.updateEndpoints();
+    } else if (constructionType === 'twoPointsAndLength') {
+      this.updateEndpointsFromTwoPoints();
+    }
+
+    
+  }
+
+  public set_points(value: number, type: 'point1-x'| 'point1-y' | 'point2-x' | 'point2-y') {
+    switch (type) {
+      case 'point1-x':
+        this.point1 = new Vector2(value, this.point1.y);
+        break;
+      case 'point1-y':
+        this.point1 = new Vector2(this.point1.x, value);
+        break;
+      case 'point2-x':
+        this.point2 = new Vector2(value, this.point2.y);
+        break;
+      case 'point2-y':
+        this.point2 = new Vector2(this.point2.x, value);
+        break;
+    }
+    this.updateEndpointsFromTwoPoints();
+  }
+
+
+  private updateEndpointsFromTwoPoints() {
+    if (this.point1 && this.point2 && this.length) {
+      const direction = new THREE.Vector2().subVectors(this.point2, this.point1).normalize();
+      const halfLength = this.length / 2;
+      const midpoint = new THREE.Vector2().addVectors(this.point1, this.point2).multiplyScalar(0.5);
+      
+      this.start = new THREE.Vector2().addVectors(midpoint, direction.clone().multiplyScalar(-halfLength));
+      this.end = new THREE.Vector2().addVectors(midpoint, direction.clone().multiplyScalar(halfLength));
     }
   }
+
   private updateEndpoints() {
     if (this.constructionType === 'slopeIntercept' && this.slope !== undefined && this.intercept !== undefined && this.length !== undefined) {
       const half_length = this.length / 2;
@@ -183,7 +225,9 @@ export class LineObj extends coloredObj {
       intercept: 0,
       line_width: 2,
       color: "white",
-      length: 10
+      length: 10,
+      point1: new Vector2(0, 0),
+      point2: new Vector2(1, 1),
     });
 
     const popupProps: EditableObjectPopupProps<LineObjConstructor> = {
@@ -202,12 +246,15 @@ export class LineObj extends coloredObj {
         { key: "constructionType", label: "Construction Type", type: "select", options: [
           { label: "Endpoints", value: "endpoints" },
           { label: "Slope-Intercept", value: "slopeIntercept" },
+          { label: "Two Points and Length", value: "twoPointsAndLength" },
         ]},
         { key: "start", label: "Start Point", type: "position", showIf: (obj) => obj.constructionType === 'endpoints' },
         { key: "end", label: "End Point", type: "position", showIf: (obj) => obj.constructionType === 'endpoints' },
         { key: "slope", label: "Slope", type: "number", showIf: (obj) => obj.constructionType === 'slopeIntercept' },
         { key: "intercept", label: "Intercept", type: "number", showIf: (obj) => obj.constructionType === 'slopeIntercept' },
-        { key: "length", label: "Length", type: "number", showIf: (obj) => obj.constructionType === 'slopeIntercept' },
+        { key: "point1", label: "Point 1", type: "position", showIf: (obj) => obj.constructionType === 'twoPointsAndLength' },
+        { key: "point2", label: "Point 2", type: "position", showIf: (obj) => obj.constructionType === 'twoPointsAndLength' },
+        { key: "length", label: "Length", type: "number", showIf: (obj) => obj.constructionType === 'slopeIntercept' || obj.constructionType === 'twoPointsAndLength' },
         { key: "color", label: "Color", type: "color" },
       ],
     };
