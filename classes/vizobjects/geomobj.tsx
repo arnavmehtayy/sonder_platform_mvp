@@ -10,6 +10,15 @@ import {
 import React from "react";
 import GeneralTransformControl from "@/app/Components/three/GeneralTransCont";
 import { TransformObjConstructor } from "./transformObj";
+import { TouchControlAttributes } from "../Controls/TouchControl";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
+import { Slider } from "@/components/ui/slider";
+import { Switch } from "@/components/ui/switch";
+import { Separator } from "@/components/ui/separator";
+
 
 /*
  * This class creates a geometric object on the scene (Any object that is rendered using THREE.BufferGeometry).
@@ -179,10 +188,166 @@ export class geomobj extends TransformObj {
         { key: "color", label: "Color", type: "color" },
         { key: "position", label: "Position", type: "position" },
         { key: "rotation", label: "Rotation", type: "rotation" },
+        {
+          key: "touch_controls",
+          label: "Touch Controls",
+          type: "custom",
+          render: (value, onChange) => (
+            <TouchControlEditor
+              touchControl={value}
+              onChange={onChange}
+            />
+          ),
+        },
+        { key: "isEnabled", label: "IsVisible", type: "checkbox" },
+
         
       ],
     };
 
     return <EditableObjectPopup {...popupProps} />;
   }
+}
+
+interface TouchControlEditorProps {
+  touchControl: TouchControl;
+  onChange: (touchControl: TouchControl) => void;
+}
+
+function TouchControlEditor({ touchControl, onChange }: TouchControlEditorProps) {
+  const updateTouchControl = (key: keyof TouchControl, value: any) => {
+    onChange(new TouchControl({ ...touchControl, [key]: value }));
+  };
+
+  return (
+    <div>
+      <TouchControlAttributeEditor
+        label="Scale"
+        attributes={touchControl.scale}
+        onChange={(value) => updateTouchControl("scale", value)}
+      />
+      <TouchControlAttributeEditor
+        label="Rotate"
+        attributes={touchControl.rotate}
+        onChange={(value) => updateTouchControl("rotate", value)}
+      />
+      <TouchControlAttributeEditor
+        label="Translate"
+        attributes={touchControl.translate}
+        onChange={(value) => updateTouchControl("translate", value)}
+      />
+    </div>
+  );
+}
+
+
+
+interface TouchControlAttributeEditorProps {
+  label: string;
+  attributes: TouchControlAttributes | null;
+  onChange: (attributes: TouchControlAttributes | null) => void;
+}
+export function TouchControlAttributeEditor({
+  label,
+  attributes,
+  onChange,
+}: TouchControlAttributeEditorProps) {
+  const updateAttributes = (key: keyof NonNullable<TouchControlAttributes>, value: any) => {
+    if (attributes === null) {
+      onChange({
+        direction: [false, false, false],
+        range: [0, 1],
+        step_size: 0.1,
+        [key]: value
+      });
+    } else {
+      onChange({ ...attributes, [key]: value });
+    }
+  };
+
+  const handleRangeChange = (index: number, value: string) => {
+    if (attributes === null) return;
+    const newRange = [...attributes.range];
+    newRange[index] = value === '' ? 0 : parseFloat(value);
+    updateAttributes('range', newRange);
+  };
+
+  return (
+    <div className="mb-8 p-4 border rounded-lg shadow-sm">
+      <label className="block mb-2 font-semibold">{label}</label>
+      <div className="space-y-4">
+        <div className="flex items-center space-x-2">
+          <Switch
+            checked={attributes !== null}
+            onCheckedChange={(checked) =>
+              onChange(checked ? {
+                direction: [false, false, false],
+                range: [0, 1],
+                step_size: 0.1
+              } : null)
+            }
+          />
+          <Label>Enabled</Label>
+        </div>
+
+        {attributes !== null && (
+          <>
+            <Separator className="my-4" />
+            
+            <div className="space-y-2">
+              <Label className="font-medium">Direction</Label>
+              <div className="flex space-x-4">
+                {['X', 'Y', 'Z'].map((axis, index) => (
+                  <div key={axis} className="flex items-center space-x-2">
+                    <Checkbox
+                      checked={attributes.direction[index]}
+                      onCheckedChange={(checked) => {
+                        const newDirection = [...attributes.direction];
+                        newDirection[index] = checked as boolean;
+                        updateAttributes("direction", newDirection);
+                      }}
+                    />
+                    <Label>{axis}</Label>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <Separator className="my-4" />
+
+            <div className="space-y-2">
+              <Label className="font-medium">Range</Label>
+              <div className="flex space-x-4">
+                <Input
+                  type="number"
+                  value={attributes.range[0]}
+                  onChange={(e) => handleRangeChange(0, e.target.value)}
+                  className="w-24"
+                />
+                <Input
+                  type="number"
+                  value={attributes.range[1]}
+                  onChange={(e) => handleRangeChange(1, e.target.value)}
+                  className="w-24"
+                />
+              </div>
+            </div>
+
+            <Separator className="my-4" />
+
+            <div className="space-y-2">
+              <Label className="font-medium">Step Size: {attributes.step_size.toFixed(2)}</Label>
+              <Slider
+                value={[attributes.step_size]}
+                min={0}
+                max={1}
+                step={0.01}
+                onValueChange={([value]) => updateAttributes("step_size", value)}
+              />
+            </div>
+          </>
+        )}
+      </div>
+    </div>
+  );
 }

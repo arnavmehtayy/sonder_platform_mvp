@@ -3,7 +3,14 @@ import React from 'react';
 import { useStore, setEnablerControl } from '@/app/store'
 import Latex from 'react-latex-next';
 import { useState } from "react";
+import { EditableObjectPopup, EditableObjectPopupProps } from "@/app/Components/EditMode/EditPopups/EditableObjectPopup";
+import { ControlConstructor } from "./Control";
 
+
+export interface EnablerControlConstructor extends ControlConstructor {
+  obj_ids: number[];
+  ControlState?: boolean;
+}
 
 function ShowEnablerControl({control}: {control: EnablerControl}) {
     const isActive = control.isClickable;
@@ -59,15 +66,15 @@ export class EnablerControl extends Control {
   obj_ids: number[]; // vizobjects that this enabler can enable or disable
   ControlState: boolean; // the current enabled/disabled state of the enabler
   constructor({
-    control_id,
+    id,
     desc = "control_Enabler",
     text = "this is a description of an enabler control",
     obj_ids,
-  }: Partial<EnablerControl> & {
-    control_id: number;
+  }: Partial<EnablerControlConstructor> & {
+    id: number;
     obj_ids: number[];
   }) {
-    super({ id: control_id, desc: desc, text: text }); 
+    super({ id: id, desc: desc, text: text }); 
     this.obj_ids = obj_ids;
     this.ControlState = false; // objects start of invisible
   }
@@ -80,6 +87,48 @@ export class EnablerControl extends Control {
     );
     newControl.ControlState = state;
     return newControl;
+  }
+
+  static getPopup({
+    isOpen,
+    onClose,
+    onSave,
+  }: {
+    isOpen: boolean;
+    onClose: () => void;
+    onSave: (obj: EnablerControl) => void;
+  }) {
+    const [editedObject, setEditedObject] = React.useState<EnablerControlConstructor>({
+      id: Date.now(),
+      obj_ids: [],
+      desc: "control_Enabler",
+      text: "this is a description of an enabler control",
+    });
+
+    const handleChange = (field: string, value: any) => {
+      setEditedObject((prev) => ({ ...prev, [field]: value }));
+    };
+
+    
+    const popupProps: EditableObjectPopupProps<EnablerControlConstructor> = {
+      isOpen,
+      onClose,
+      object: editedObject,
+      set_object: setEditedObject,
+      onSave: (updatedObject: EnablerControlConstructor) => {
+        const newObj = new EnablerControl(updatedObject);
+        onSave(newObj);
+      },
+      title: `Create New Enabler Control`,
+      fields: [
+        { key: "desc", label: "Title", type: "title" },
+        { key: "text", label: "Description", type: "textarea" },
+        { key: "obj_ids", label: "Options", type: "vizObjSelectList" },
+      ],
+      
+    };
+
+    return <EditableObjectPopup {...popupProps} />;
   }
 
   // this is the rendering for the EnablerControl on the sidebar it also controls the state of the control in the state management system

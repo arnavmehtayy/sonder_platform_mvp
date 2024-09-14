@@ -14,7 +14,7 @@ import { obj_atts,  get_attributes, dict_keys} from "./get_set_obj_attributes";
 export interface objconstructor {
   id: number;
   name: string;
-  isEnabled: boolean;
+  isEnabled?: boolean;
 }
 
 

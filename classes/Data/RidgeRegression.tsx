@@ -97,7 +97,7 @@ const lambda_slider = new SliderControl<DummyDataStorage<number>>({
 });
 
 const newPointsEnablerControl = new EnablerControl({
-  control_id: 3,
+  id: 3,
   desc: "New companies",
   text: "$\\textbf{Click to reveal}$ the new data for 5 new companies",
   obj_ids: [60, 61, 62, 63, 64],

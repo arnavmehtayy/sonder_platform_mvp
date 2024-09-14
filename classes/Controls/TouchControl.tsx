@@ -8,7 +8,7 @@ import { TransformObj } from "../vizobjects/transformObj";
  * each of the above attributes are of type TouchControlAttributes and they define the direction, range and step size of the control of that type
  */
 
-type TouchControlAttributes = {
+export type TouchControlAttributes = {
   direction: [boolean, boolean, boolean]; // the direction in which we allow the control to move in
   range: [number, number];
   step_size: number;
