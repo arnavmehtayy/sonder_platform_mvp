@@ -24,7 +24,8 @@ import { Separator } from "@/components/ui/separator";
  * This class creates a geometric object on the scene (Any object that is rendered using THREE.BufferGeometry).
  */
 
-interface geomobjconstructor extends TransformObjConstructor {
+
+export interface geomobjconstructor extends TransformObjConstructor {
   color?: string;
   geom: THREE.BufferGeometry;
   param_t?: number;

@@ -7,6 +7,7 @@ import { Vector2 } from "three";
 import FunctionPlot from "./FunctionPlot";
 import CoordinateAxis from "./CoordinateAxis";
 import { DummyDataStorage } from "./DummyDataStore";
+import FunctionPlotString from "./FunctionPlotString";
 
 export type get_att_type = number | string | boolean;
 export interface get_attributes<
@@ -344,6 +345,25 @@ export const functionplot_atts: dict_get_attributes<FunctionPlot> = {
   string: [],
   boolean: [],
 };
+
+export const FunctionPlotString_atts: dict_get_attributes<FunctionPlotString> = {
+  number: [
+    {
+      label: "Parametric-t",
+      get_attribute: (obj: FunctionPlotString) => obj.tValue,
+      set_attribute: (obj: FunctionPlotString, value: number) => {
+        const newObj = Object.assign(
+          Object.create(Object.getPrototypeOf(obj)),
+          obj
+        );
+        newObj.tValue = value;
+        return newObj;
+      },
+    }
+  ],
+  string: [],
+  boolean: [],
+}
 
 export const Axis_atts: dict_get_attributes<CoordinateAxis> = {
   number: [],
