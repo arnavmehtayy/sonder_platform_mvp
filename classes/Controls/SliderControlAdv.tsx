@@ -16,17 +16,17 @@ import { Input } from "@/components/ui/input";
 
 
 
-interface AttributePair<T extends obj> {
+interface AttributePairSet<T extends obj> {
   transform_function: string;
   set_attribute: (obj: T, value: number) => T;
 }
 
 export interface SliderControlAdvancedConstructor<T extends obj> extends SliderControlConstructor<T> {
-  attribute_pairs: AttributePair<T>[];
+  attribute_pairs: AttributePairSet<T>[];
 }
 
 export class SliderControlAdvanced<T extends obj> extends SliderControl<T> {
-  attribute_pairs: AttributePair<T>[];
+  attribute_pairs: AttributePairSet<T>[];
   localValue: number;
 
   constructor({
@@ -102,6 +102,8 @@ export class SliderControlAdvanced<T extends obj> extends SliderControl<T> {
       title: `Create New Advanced Slider Control`,
       fields: [
         { key: "obj_id", label: "Object ID", type: "vizObjSelect" },
+        { key: "desc", label: "Title", type: "title" },
+        { key: "text", label: "Desc", type: "textarea" },
         { key: "step_size", label: "Step Size", type: "number" },
         {key: "range", label: "Range", type: "arraynum", length_of_array: 2},
         {
@@ -123,10 +125,11 @@ export class SliderControlAdvanced<T extends obj> extends SliderControl<T> {
   }
 }
 interface AttributePairsEditorProps {
-  pairs: AttributePair<any>[];
-  onChange: (pairs: AttributePair<any>[]) => void;
+  pairs: AttributePairSet<any>[];
+  onChange: (pairs: AttributePairSet<any>[]) => void;
   objectId: number;
 }
+
 
 export default function AttributePairsEditor({ pairs, onChange, objectId }: AttributePairsEditorProps) {
   const object = useStore(getObjectSelector(objectId));
@@ -137,12 +140,12 @@ export default function AttributePairsEditor({ pairs, onChange, objectId }: Attr
     if (setAttributeOptions.length > 0) {
       onChange([...pairs, { 
         transform_function: "", 
-        set_attribute: setAttributeOptions[0].set_attribute 
+        set_attribute: setAttributeOptions[0].set_attribute  // this needs to change will not work if set_attribute is empty
       }]);
     }
   };
 
-  const updatePair = (index: number, field: keyof AttributePair<any>, value: any) => {
+  const updatePair = (index: number, field: keyof AttributePairSet<any>, value: any) => {
     const newPairs = [...pairs];
     newPairs[index] = { ...newPairs[index], [field]: value };
     onChange(newPairs);

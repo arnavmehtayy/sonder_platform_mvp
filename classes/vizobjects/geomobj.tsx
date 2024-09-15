@@ -18,6 +18,7 @@ import { Input } from "@/components/ui/input";
 import { Slider } from "@/components/ui/slider";
 import { Switch } from "@/components/ui/switch";
 import { Separator } from "@/components/ui/separator";
+import { dict_keys, get_attributes  } from "./get_set_obj_attributes";
 
 
 /*
@@ -127,6 +128,10 @@ export class geomobj extends TransformObj {
         )}
       </>
     );
+  }
+
+  get_set_att_selector(type: dict_keys): get_attributes<any, any>[] {
+    return [...super.get_set_att_selector(type)]
   }
 
   static getPopup({
