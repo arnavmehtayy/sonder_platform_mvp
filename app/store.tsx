@@ -698,6 +698,10 @@ export const setMultiChoiceOptionsSelector =
     state.setMultiChoiceOptions(control_id, Selectedoptions);
   };
 
+export const setControlSelector = (state: State) => (control_id: number, new_obj: Control) => {
+  state.setControl(control_id, new_obj);
+}
+
 export const setInputNumberValueSelector =
   (control_id: number) => (state: State) => (value: number | "") => {
     state.setInputNumberValue(control_id)(value);

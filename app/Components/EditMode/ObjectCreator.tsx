@@ -13,6 +13,7 @@ import { SliderControlAdvanced } from "@/classes/Controls/SliderControlAdv";
 import { InputNumber } from "@/classes/Controls/InputNumber";
 import { SelectControl } from "@/classes/Controls/SelectControl";
 import { EnablerControl } from "@/classes/Controls/EnablerControl";
+import { TableControl } from "@/classes/Controls/TableControl";
 
 export type EditAddType =
   | obj
@@ -24,7 +25,8 @@ export type EditAddType =
   | SliderControlAdvanced<any>
   | InputNumber
   | SelectControl
-  | EnablerControl;
+  | EnablerControl
+  | TableControl<obj>;
   
 export type PopUpType = 
   | typeof LineObj
@@ -35,7 +37,8 @@ export type PopUpType =
   | typeof SliderControlAdvanced<any>
   | typeof InputNumber 
   | typeof SelectControl
-  | typeof EnablerControl;
+  | typeof EnablerControl
+  | typeof TableControl;
   
 
 interface ObjectCreatorProps {

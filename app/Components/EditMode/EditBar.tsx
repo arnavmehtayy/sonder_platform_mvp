@@ -42,6 +42,7 @@ import { SliderControlAdvanced } from "@/classes/Controls/SliderControlAdv";
 import { InputNumber } from "@/classes/Controls/InputNumber";
 import { SelectControl } from "@/classes/Controls/SelectControl";
 import { EnablerControl } from "@/classes/Controls/EnablerControl";
+import { TableControl } from "@/classes/Controls/TableControl";
 
 export interface Option {
   id: number;
@@ -82,6 +83,7 @@ const objectTypes: ObjectType[] = [
 const questionTypes: ObjectType[] = [
   { name: "Question", type: Question, icon: HelpCircle },
   { name: "MCQ", type: MultiChoiceClass, icon: ListChecks },
+  {name: "Table Question", type: TableControl, icon: HelpCircle},
 ];
 
   return (
