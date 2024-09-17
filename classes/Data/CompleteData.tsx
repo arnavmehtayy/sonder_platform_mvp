@@ -1,4 +1,5 @@
 import { experience_regression, data_regression } from "./RidgeRegression";
+import { experience_transforms1, data_transformation } from "./MehraTransformations";
 import { Control } from "../Controls/Control";
 import { obj } from "../vizobjects/obj";
 import { Influence } from "../influence";
@@ -34,7 +35,7 @@ export type experience_type = {
   description: string;
 };
 
-export const experiences: experience_type[] = [experience_regression];
+export const experiences: experience_type[] = [experience_regression, experience_transforms1];
 export const initDataSets: { default: data_type; [key: string]: data_type } = {
   default: {
     title: "Question default",
@@ -49,5 +50,6 @@ export const initDataSets: { default: data_type; [key: string]: data_type } = {
     placement: [],
   },
   ...data_regression,
+  ...data_transformation
 }; // this contains all the data that is transferred to the storage system
 // [key: name of slide] => slide data
