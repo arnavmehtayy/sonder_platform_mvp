@@ -432,6 +432,13 @@ export const data_transformation: { [key: string]: data_type } = {
         error: 0.1,
         desc: "Validate vertical shift of the transformed function",
       }),
+      new Validation_obj({
+        obj_id: 2,
+        answer: 0,
+        get_attribute: (obj: TransformObj) => obj.position.x,
+        error: 0.1,
+        desc: "Validate horizontal shift of the transformed function",
+      }),
     ],
     camera_zoom: 10,
   },
@@ -644,6 +651,16 @@ export const data_transformation: { [key: string]: data_type } = {
         error: 0.1,
         desc: "Validate horizontal shift of the transformed function",
       }),
+
+      new Validation_obj({
+        obj_id: 2,
+        answer: 0,
+        get_attribute: (obj: TransformObj) => obj.position.y,
+        error: 0.1,
+        desc: "Validate verticle shift of the transformed function",
+      }),
+
+      
     ],
     camera_zoom: 10,
   },
