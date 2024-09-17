@@ -3,7 +3,7 @@ import React from "react";
 import { Canvas } from "@react-three/fiber";
 import { OrthographicCamera, OrbitControls } from "@react-three/drei";
 import { Showobj } from "./three/Showobj";
-import { useStore, getObjectsSelector, getPlacementSelector, getPlacementListSelector} from "../store";
+import { useStore, getObjectsSelector, getPlacementSelector, getPlacementListSelector, getZoomSelector} from "../store";
 import * as THREE from "three";
 
 import { PlacementControl } from "./three/PlacementControl";
@@ -20,6 +20,9 @@ export default function Experience() {
   
   const objectlist = useStore(getObjectsSelector);
   const placement = useStore(getPlacementListSelector);
+  const zoom = useStore(getZoomSelector);
+  const minZoom = zoom / 2;
+  const maxZoom = zoom + 98;
 
 
   return (
@@ -27,7 +30,7 @@ export default function Experience() {
       <Canvas>
         <OrthographicCamera // to allow for 2D camera view
           makeDefault
-          zoom={25}
+          zoom={zoom}
           position={[0, 0, 20]}
           near={0.1}
           far={1000}
@@ -37,8 +40,8 @@ export default function Experience() {
           enableRotate={false}
           enablePan={true}
           enableZoom={true}
-          maxZoom={100}
-          minZoom={17}
+          maxZoom={maxZoom}
+          minZoom={minZoom}
           dampingFactor={0.3} // Disable damping
           zoomSpeed={0.8}
           panSpeed={0.7}

@@ -18,6 +18,7 @@ import { EnablerControl } from "../Controls/EnablerControl";
 import { MultiChoiceClass } from "../Controls/MultiChoiceClass";
 
 export type data_type = {
+  camera_zoom?: number;
   title: string;
   questions: {id: number, text: string}[];
   influencesData: Influence<any, any, any>[];

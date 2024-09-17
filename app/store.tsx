@@ -72,6 +72,7 @@ export type SideBarComponentType = "score" | "control" | "placement" | "question
 export type EditAddType = Question | obj | Control  | Score<any> | Placement | Influence<any, obj, obj> | Validation;
 
 export type State = {
+  camera_zoom: number;
   title: string;
   questions: { [id: number]: string };
   order: OrderItem[];
@@ -108,6 +109,7 @@ export type State = {
 };
 
 export const useStore = create<State>((set, get) => ({
+  camera_zoom: 25,
   title: "",
   questions: {},
   order: [],
@@ -460,6 +462,7 @@ export const useStore = create<State>((set, get) => ({
   reset: (dataSetKey: keyof typeof initDataSets) => {
     const dataSet = initDataSets[dataSetKey];
     set({
+      camera_zoom: dataSet.camera_zoom || 25, 
       title: dataSet.title,
       state_name: dataSetKey,
       order: dataSet.order,
@@ -735,3 +738,5 @@ export const addMCQuestionEditor =
 export const addElementSelector = (state: State) => (element: EditAddType) => {
   state.addElement(element);
 }
+
+export const getZoomSelector = (state: State) => state.camera_zoom;

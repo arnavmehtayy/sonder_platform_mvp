@@ -18,6 +18,7 @@ interface TableCell<T extends obj> {
   transform_function: string;
   set_attribute: (obj: T, value: number) => T;
   obj_id: number;
+  isStatic: boolean;
 }
 
 interface TableRow<T extends obj> {
@@ -44,7 +45,12 @@ export class TableControl<T extends obj> extends Control {
     rowHeaders,
   }: TableControlConstructor<T>) {
     super({ id, desc, text });
-    this.rows = rows;
+    this.rows = rows.map(row => ({
+      cells: row.cells.map(cell => ({
+        ...cell,
+        isStatic: cell.isStatic || false
+      }))
+    }));
     this.columnHeaders = columnHeaders;
     this.rowHeaders = rowHeaders;
   }
@@ -191,14 +197,16 @@ function ShowTableControl<T extends obj>({ control }: { control: TableControl<T>
               <td className="border p-2 font-medium">{control.rowHeaders[rowIndex]}</td>
               {row.cells.map((cell, cellIndex) => (
                 <td key={cellIndex} className="border p-2">
-                  <input
-                    type="number"
-                    // inputMode="numeric"
-                    // pattern="[0-9]*"
-                    value={localValues[rowIndex][cellIndex].toString()}
-                    onChange={(e) => handleCellChange(rowIndex, cellIndex, e.target.value)}
-                    className="w-full px-3 py-2 text-base rounded-md border border-blue-300 focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50 focus:outline-none transition-all duration-200 ease-in-out"
-                  />
+                  {cell.isStatic ? (
+                    <span className="px-3 py-2">{cell.value}</span>
+                  ) : (
+                    <input
+                      type="number"
+                      value={localValues[rowIndex][cellIndex].toString()}
+                      onChange={(e) => handleCellChange(rowIndex, cellIndex, e.target.value)}
+                      className="w-full px-3 py-2 text-base rounded-md border border-blue-300 focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50 focus:outline-none transition-all duration-200 ease-in-out"
+                    />
+                  )}
                 </td>
               ))}
             </tr>
@@ -248,116 +256,129 @@ function HeadersEditor({ headers, onChange, label }: { headers: string[], onChan
 }
 
 function TableEditor<T extends obj>({ rows, onChange, columnHeaders, rowHeaders }: { rows: TableRow<T>[], onChange: (rows: TableRow<T>[]) => void, columnHeaders: string[], rowHeaders: string[] }) {
-  const updateCell = (rowIndex: number, cellIndex: number, field: keyof TableCell<T>, value: any) => {
-    const newRows = [...rows];
-    newRows[rowIndex].cells[cellIndex] = { ...newRows[rowIndex].cells[cellIndex], [field]: value };
-    onChange(newRows);
-  };
-
-  const addRow = () => {
-    const newRow: TableRow<T> = {
-      cells: columnHeaders.map(() => ({ value: 0, transform_function: "", set_attribute: () => ({} as T), obj_id: -1 })),
+    const updateCell = (rowIndex: number, cellIndex: number, field: keyof TableCell<T>, value: any) => {
+      const newRows = [...rows];
+      newRows[rowIndex].cells[cellIndex] = { ...newRows[rowIndex].cells[cellIndex], [field]: value };
+      onChange(newRows);
     };
-    onChange([...rows, newRow]);
-  };
-
-  const removeRow = (index: number) => {
-    onChange(rows.filter((_, i) => i !== index));
-  };
-
-  const vizobjs = useStore.getState().vizobjs;
-
-  return (
-    <div className="space-y-4">
-      <table className="w-full border-collapse">
-        <thead>
-          <tr>
-            <th className="border p-2"></th>
-            {columnHeaders.map((header, index) => (
-              <th key={index} className="border p-2">{header}</th>
-            ))}
-            <th className="border p-2"></th>
-          </tr>
-        </thead>
-        <tbody>
-          {rows.map((row, rowIndex) => (
-            <tr key={rowIndex}>
-              <td className="border p-2 font-medium">{rowHeaders[rowIndex]}</td>
-              {row.cells.map((cell, cellIndex) => (
-                <td key={cellIndex} className="border p-2">
-                  <Input
-                    type="number"
-                    value={cell.value}
-                    onChange={(e) => updateCell(rowIndex, cellIndex, "value", parseFloat(e.target.value))}
-                    placeholder="Cell value"
-                    className="w-full mb-2"
-                  />
-                  <Input
-                    value={cell.transform_function}
-                    onChange={(e) => updateCell(rowIndex, cellIndex, "transform_function", e.target.value)}
-                    placeholder="Transform function"
-                    className="w-full mb-2"
-                  />
-                  <Select
-                    value={cell.obj_id.toString()}
-                    onValueChange={(value) => {
-                      const objId = parseInt(value);
-                      updateCell(rowIndex, cellIndex, "obj_id", objId);
-                      const obj = vizobjs[objId] as T;
-                      if (obj) {
-                        const setAttributeOptions = obj.get_set_att_selector("number");
-                        if (setAttributeOptions.length > 0) {
-                          updateCell(rowIndex, cellIndex, "set_attribute", setAttributeOptions[0].set_attribute);
-                        }
-                      }
-                    }}
-                  >
-                    <SelectTrigger className="w-full">
-                      <SelectValue placeholder="Select object" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="-1">Select object</SelectItem>
-                      {Object.entries(vizobjs).map(([id, obj]) => (
-                        <SelectItem key={id} value={id}>{obj.name}</SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  {cell.obj_id !== -1 && (
-                    <Select
-                      value={cell.set_attribute.toString()}
-                      onValueChange={(value) => {
-                        const obj = vizobjs[cell.obj_id] as T;
-                        const setAttributeOptions = obj.get_set_att_selector("number");
-                        const selectedSetAttribute = setAttributeOptions.find(attr => attr.set_attribute.toString() === value);
-                        if (selectedSetAttribute) {
-                          updateCell(rowIndex, cellIndex, "set_attribute", selectedSetAttribute.set_attribute);
-                        }
-                      }}
-                    >
-                      <SelectTrigger className="w-full mt-2">
-                        <SelectValue placeholder="Select set attribute" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {(vizobjs[cell.obj_id] as T).get_set_att_selector("number").map((attr, index) => (
-                          <SelectItem key={index} value={attr.set_attribute.toString()}>{attr.label}</SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  )}
-                </td>
+  
+    const addRow = () => {
+      const newRow: TableRow<T> = {
+        cells: columnHeaders.map(() => ({ value: 0, transform_function: "", set_attribute: () => ({} as T), obj_id: -1, isStatic: false })),
+      };
+      onChange([...rows, newRow]);
+    };
+  
+    const removeRow = (index: number) => {
+      onChange(rows.filter((_, i) => i !== index));
+    };
+  
+    const vizobjs = useStore.getState().vizobjs;
+  
+    return (
+      <div className="space-y-4">
+        <table className="w-full border-collapse">
+          <thead>
+            <tr>
+              <th className="border p-2"></th>
+              {columnHeaders.map((header, index) => (
+                <th key={index} className="border p-2">{header}</th>
               ))}
-              <td className="border p-2">
-                <Button onClick={() => removeRow(rowIndex)} variant="ghost" size="icon">
-                  <X className="h-4 w-4" />
-                </Button>
-              </td>
+              <th className="border p-2"></th>
             </tr>
-          ))}
-        </tbody>
-      </table>
-      <Button onClick={addRow} variant="outline" className="w-full">
-        Add Row
-      </Button>
-    </div>
-  );
-}
+          </thead>
+          <tbody>
+            {rows.map((row, rowIndex) => (
+              <tr key={rowIndex}>
+                <td className="border p-2 font-medium">{rowHeaders[rowIndex]}</td>
+                {row.cells.map((cell, cellIndex) => (
+                  <td key={cellIndex} className="border p-2">
+                    <Input
+                      type="number"
+                      value={cell.value}
+                      onChange={(e) => updateCell(rowIndex, cellIndex, "value", parseFloat(e.target.value))}
+                      placeholder="Cell value"
+                      className="w-full mb-2"
+                    />
+                    <div className="flex items-center mb-2">
+                      <input
+                        type="checkbox"
+                        checked={cell.isStatic}
+                        onChange={(e) => updateCell(rowIndex, cellIndex, "isStatic", e.target.checked)}
+                        className="mr-2"
+                      />
+                      <label>Static Value</label>
+                    </div>
+                    {!cell.isStatic && (
+                      <>
+                        <Input
+                          value={cell.transform_function}
+                          onChange={(e) => updateCell(rowIndex, cellIndex, "transform_function", e.target.value)}
+                          placeholder="Transform function"
+                          className="w-full mb-2"
+                        />
+                        <Select
+                          value={cell.obj_id.toString()}
+                          onValueChange={(value) => {
+                            const objId = parseInt(value);
+                            updateCell(rowIndex, cellIndex, "obj_id", objId);
+                            const obj = vizobjs[objId] as T;
+                            if (obj) {
+                              const setAttributeOptions = obj.get_set_att_selector("number");
+                              if (setAttributeOptions.length > 0) {
+                                updateCell(rowIndex, cellIndex, "set_attribute", setAttributeOptions[0].set_attribute);
+                              }
+                            }
+                          }}
+                        >
+                          <SelectTrigger className="w-full">
+                            <SelectValue placeholder="Select object" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="-1">Select object</SelectItem>
+                            {Object.entries(vizobjs).map(([id, obj]) => (
+                              <SelectItem key={id} value={id}>{obj.name}</SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                        {cell.obj_id !== -1 && (
+                          <Select
+                            value={cell.set_attribute.toString()}
+                            onValueChange={(value) => {
+                              const obj = vizobjs[cell.obj_id] as T;
+                              const setAttributeOptions = obj.get_set_att_selector("number");
+                              const selectedSetAttribute = setAttributeOptions.find(attr => attr.set_attribute.toString() === value);
+                              if (selectedSetAttribute) {
+                                updateCell(rowIndex, cellIndex, "set_attribute", selectedSetAttribute.set_attribute);
+                              }
+                            }}
+                          >
+                            <SelectTrigger className="w-full mt-2">
+                              <SelectValue placeholder="Select set attribute" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {(vizobjs[cell.obj_id] as T).get_set_att_selector("number").map((attr, index) => (
+                                <SelectItem key={index} value={attr.set_attribute.toString()}>{attr.label}</SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        )}
+                      </>
+                    )}
+                  </td>
+                ))}
+                <td className="border p-2">
+                  <Button onClick={() => removeRow(rowIndex)} variant="ghost" size="icon">
+                    <X className="h-4 w-4" />
+                  </Button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+        <Button onClick={addRow} variant="outline" className="w-full">
+          Add Row
+        </Button>
+      </div>
+    );
+  }
