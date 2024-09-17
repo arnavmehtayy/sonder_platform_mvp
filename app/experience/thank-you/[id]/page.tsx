@@ -89,7 +89,7 @@ export default function Thank_you_page({ params }: { params: { id: string } }) {
               of concepts through interactive visualizations is just beginning!
             </p>
 
-            <div className="bg-white rounded-lg p-6 mb-8 shadow-md">
+            {/* <div className="bg-white rounded-lg p-6 mb-8 shadow-md">
               <h3 className="text-2xl font-semibold text-blue-800 mb-4">Key Concepts Recap</h3>
               <ul className="space-y-3 text-gray-700">
                 <li className="flex items-start">
@@ -109,11 +109,11 @@ export default function Thank_you_page({ params }: { params: { id: string } }) {
                   <span>The lambda parameter controls the strength of the ridge term, balancing between fitting the data and resisting outliers.</span>
                 </li>
               </ul>
-            </div>
+            </div> */}
 
            
 
-            <h2 className="text-2xl font-semibold text-blue-800 mb-6 text-center">
+            {/* <h2 className="text-2xl font-semibold text-blue-800 mb-6 text-center">
               What&apos;s Next?
             </h2>
 
@@ -154,7 +154,7 @@ export default function Thank_you_page({ params }: { params: { id: string } }) {
                   </svg>
                 }
               />
-            </div>
+            </div> */}
           </div>
 
           <div className="mt-6 text-center">

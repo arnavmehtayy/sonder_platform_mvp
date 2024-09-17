@@ -40,20 +40,18 @@ import { transform_atts } from "../vizobjects/get_set_obj_attributes";
 
 
 export const experience_transforms1: experience_type = {
-  name: "Introduction to Transformations",
-  slides: [
-    "function_points",
-    "function_transformation_table",
-    "function_transformation_slider",
-    //   "intro_lin_reg",
-    //   "lin_reg_flaw",
-    //   "ridge_regression",
-    //   "ridge_regression_2",
-    //   "ridge_regression_fail",
-  ],
-  description:
-    "In this experience, you will learn about function transformations.",
-};
+    name: "Introduction to Transformations",
+    slides: [
+      "function_points",
+      "function_transformation_table",
+      "function_transformation_slider",
+      "horizontal_shift_table",
+      "horizontal_shift_slider",
+      "combined_transformation",
+    ],
+    description:
+      "In this experience, you will learn about function transformations.",
+  };
 
 const func = (x: number) => {
   return x ** 2;
@@ -220,7 +218,7 @@ export const data_transformation: { [key: string]: data_type } = {
 
 
   function_transformation_table: {
-    order: [{ type: "question", id: 0 }, { type: "control", id: 100 }, { type: "control", id: 200 }],
+    order: [{ type: "question", id: 0 }, { type: "control", id: 100 }],
     title: "Function Transformation",
     questions: [
       {
@@ -268,12 +266,7 @@ export const data_transformation: { [key: string]: data_type } = {
         rowHeaders: points_colors,
       }),
 
-      new EnablerControl({
-        id: 200,
-        desc: "Show Original Function",
-        text: "Click to show/hide the original function $f(x) = x^2$",
-        obj_ids: [1],
-    })
+      
     ],
     canvasData: [
       new CoordinateAxis({
@@ -347,7 +340,7 @@ export const data_transformation: { [key: string]: data_type } = {
       { type: "control", id: 102 },
       {type: "control", id: 103}
     ],
-    title: "Function Transformation: Vertical Shift",
+    title: "Function Transformation Slider",
     questions: [
       {
         id: 0,
@@ -392,6 +385,14 @@ export const data_transformation: { [key: string]: data_type } = {
       }),
     ],
     canvasData: [
+        new FunctionPlot({
+            id: -1,
+            name: "Original Function",
+            func: (x: number) => x ** 2,
+            color: "white",
+            isEnabled: true,
+          }),
+        
         ...points_vizobjects_true,
       new CoordinateAxis({
         id: 0,
@@ -409,7 +410,7 @@ export const data_transformation: { [key: string]: data_type } = {
         id: 1,
         name: "Original Function",
         func: (x: number) => x ** 2,
-        color: "blue",
+        color: "white",
         isEnabled: false,
       }),
       new FunctionPlot({
@@ -419,6 +420,7 @@ export const data_transformation: { [key: string]: data_type } = {
         color: "red",
         isEnabled: true,
       }),
+      
     ],
     scoreData: [],
     placement: [],
@@ -426,6 +428,317 @@ export const data_transformation: { [key: string]: data_type } = {
       new Validation_obj({
         obj_id: 2,
         answer: 10,
+        get_attribute: (obj: TransformObj) => obj.position.y,
+        error: 0.1,
+        desc: "Validate vertical shift of the transformed function",
+      }),
+    ],
+    camera_zoom: 10,
+  },
+
+
+
+
+
+
+
+  horizontal_shift_table: {
+    order: [{ type: "question", id: 0 }, { type: "control", id: 100 }],
+    title: "Function Transformation-2",
+    scoreData: [],
+    placement: [],
+    questions: [
+      {
+        id: 0,
+        text: "Consider the function $f(x) = (x-2)^2$. Fill in the table with the corresponding y-values for the given x-values.",
+      },
+    ],
+    influencesData: [],
+    controlData: [
+      new TableControl<geomobj>({
+        id: 100,
+        desc: "Function Points Table",
+        text: "Enter y-values for the given x-values for the function $f(x) = (x-2)^2$",
+        rows: [-3, -1, 2, 4, 6].map((x, index) => ({
+          cells: [
+            {
+              value: x,
+              isStatic: true,
+              transform_function: "x",
+              set_attribute: (obj: geomobj, value: number) => obj,
+              obj_id: 2 + index,
+            },
+            {
+              value: 0,
+              isStatic: false,
+              transform_function: "x",
+              set_attribute: (obj: geomobj, value: number) => {
+                const newObj = Object.assign(
+                  Object.create(Object.getPrototypeOf(obj)),
+                  obj
+                );
+                newObj.position.y = value;
+                return newObj;
+              },
+              obj_id: 2 + index,
+            },
+          ],
+        })),
+        columnHeaders: ["x", "y"],
+        rowHeaders: ["blue", "red", "green", "yellow", "purple"],
+      }),
+    ],
+    canvasData: [
+      new CoordinateAxis({
+        id: 0,
+        name: "CoordinateAxis",
+        axisLength: 200,
+        color: "white",
+        isEnabled: true,
+        tickSpacing: 5,
+        tickSize: 0.9,
+        fontSize: 1.5,
+        xLabel: "X",
+        yLabel: "Y",
+      }),
+      ...[-3, -1, 2, 4, 6].map((x, i) => new geomobj({
+        id: 2 + i,
+        position: new Vector2(x, 0),
+        color: ["blue", "red", "green", "yellow", "purple"][i],
+        geom: new THREE.CircleGeometry(),
+        scale: new Vector3(0.8, 0.8, 1),
+      })),
+    ],
+    validations: [
+      new Validation_obj({
+        obj_id: 2,
+        answer: 25,
+        get_attribute: (obj: TransformObj) => obj.position.y,
+        error: 0.01,
+        desc: "Validate y-value for x = -3",
+      }),
+      new Validation_obj({
+        obj_id: 3,
+        answer: 9,
+        get_attribute: (obj: TransformObj) => obj.position.y,
+        error: 0.01,
+        desc: "Validate y-value for x = -1",
+      }),
+      new Validation_obj({
+        obj_id: 4,
+        answer: 0,
+        get_attribute: (obj: TransformObj) => obj.position.y,
+        error: 0.01,
+        desc: "Validate y-value for x = 2",
+      }),
+      new Validation_obj({
+        obj_id: 5,
+        answer: 4,
+        get_attribute: (obj: TransformObj) => obj.position.y,
+        error: 0.01,
+        desc: "Validate y-value for x = 4",
+      }),
+      new Validation_obj({
+        obj_id: 6,
+        answer: 16,
+        get_attribute: (obj: TransformObj) => obj.position.y,
+        error: 0.01,
+        desc: "Validate y-value for x = 6",
+      }),
+    ],
+    camera_zoom: 10,
+  },
+
+  horizontal_shift_slider: {
+    placement: [],
+    scoreData: [],
+    order: [
+      { type: "question", id: 0 },
+      { type: "control", id: 102 },
+      { type: "control", id: 103 },
+    ],
+    title: "Function Transformation Slider-2",
+    questions: [
+      {
+        id: 0,
+        text: "Use the slider to transform the function $f(x) = x^2$ to $f(x) = (x-2)^2$. Observe how the points from the previous slide align with the transformed function.",
+      },
+    ],
+    influencesData: [],
+    controlData: [
+      new SliderControl({
+        id: 102,
+        obj_id: 2,
+        range: [-5, 5],
+        step_size: 1,
+        get_attribute: (obj: FunctionPlot) => obj.position.x,
+        set_attribute: (obj: FunctionPlot, value: number) => {
+          const newObj = Object.assign(
+            Object.create(Object.getPrototypeOf(obj)),
+            obj
+          );
+          newObj.position.x = value;
+          return newObj;
+        },
+        desc: "Horizontal Shift",
+        text: "Move the slider to shift the function horizontally",
+      }),
+      new SliderControl({
+        id: 103,
+        obj_id: 2,
+        range: [-20, 20],
+        step_size: 1,
+        get_attribute: (obj: FunctionPlot) => obj.position.y,
+        set_attribute: (obj: FunctionPlot, value: number) => {
+          const newObj = Object.assign(
+            Object.create(Object.getPrototypeOf(obj)),
+            obj
+          );
+          newObj.position.y = value;
+          return newObj;
+        },
+        desc: "Vertical Shift",
+        text: "Move the slider to shift the function vertically",
+      }),
+    ],
+    canvasData: [
+      new CoordinateAxis({
+        id: 0,
+        name: "CoordinateAxis",
+        axisLength: 200,
+        color: "white",
+        isEnabled: true,
+        tickSpacing: 5,
+        tickSize: 0.9,
+        fontSize: 1.5,
+        xLabel: "X",
+        yLabel: "Y",
+      }),
+      new FunctionPlot({
+        id: 1,
+        name: "Original Function",
+        func: (x: number) => x ** 2,
+        color: "white",
+        isEnabled: true,
+      }),
+      new FunctionPlot({
+        id: 2,
+        name: "Transformed Function",
+        func: (x: number) => x ** 2,
+        color: "red",
+        isEnabled: true,
+      }),
+      ...[-3, -1, 2, 4, 6].map((x, i) => new geomobj({
+        id: 3 + i,
+        position: new Vector2(x, (x-2)**2),
+        color: ["blue", "red", "green", "yellow", "purple"][i],
+        geom: new THREE.CircleGeometry(),
+        scale: new Vector3(0.8, 0.8, 1),
+      })),
+    ],
+    validations: [
+      new Validation_obj({
+        obj_id: 2,
+        answer: 2,
+        get_attribute: (obj: TransformObj) => obj.position.x,
+        error: 0.1,
+        desc: "Validate horizontal shift of the transformed function",
+      }),
+    ],
+    camera_zoom: 10,
+  },
+
+  combined_transformation: {
+    placement: [],
+    scoreData: [],
+    order: [
+      { type: "question", id: 0 },
+      { type: "control", id: 102 },
+      { type: "control", id: 103 },
+    ],
+    title: "Master Transformation",
+    questions: [
+      {
+        id: 0,
+        text: "Use the sliders to transform the function $f(x) = x^2$ to $f(x) = (x+4)^2 - 8$.",
+      },
+    ],
+    influencesData: [],
+    controlData: [
+      new SliderControl({
+        id: 102,
+        obj_id: 2,
+        range: [-10, 10],
+        step_size: 1,
+        get_attribute: (obj: FunctionPlot) => obj.position.x,
+        set_attribute: (obj: FunctionPlot, value: number) => {
+          const newObj = Object.assign(
+            Object.create(Object.getPrototypeOf(obj)),
+            obj
+          );
+          newObj.position.x = value;
+          return newObj;
+        },
+        desc: "Horizontal Shift",
+        text: "Move the slider to shift the function horizontally",
+      }),
+      new SliderControl({
+        id: 103,
+        obj_id: 2,
+        range: [-20, 20],
+        step_size: 1,
+        get_attribute: (obj: FunctionPlot) => obj.position.y,
+        set_attribute: (obj: FunctionPlot, value: number) => {
+          const newObj = Object.assign(
+            Object.create(Object.getPrototypeOf(obj)),
+            obj
+          );
+          newObj.position.y = value;
+          return newObj;
+        },
+        desc: "Vertical Shift",
+        text: "Move the slider to shift the function vertically",
+      }),
+    ],
+    canvasData: [
+      new CoordinateAxis({
+        id: 0,
+        name: "CoordinateAxis",
+        axisLength: 200,
+        color: "white",
+        isEnabled: true,
+        tickSpacing: 5,
+        tickSize: 0.9,
+        fontSize: 1.5,
+        xLabel: "X",
+        yLabel: "Y",
+      }),
+      new FunctionPlot({
+        id: 1,
+        name: "Original Function",
+        func: (x: number) => x ** 2,
+        color: "blue",
+        isEnabled: true,
+      }),
+      new FunctionPlot({
+        id: 2,
+        name: "Transformed Function",
+        func: (x: number) => x ** 2,
+        color: "red",
+        isEnabled: true,
+      }),
+    ],
+    validations: [
+      new Validation_obj({
+        obj_id: 2,
+        answer: -4,
+        get_attribute: (obj: TransformObj) => obj.position.x,
+        error: 0.1,
+        desc: "Validate horizontal shift of the transformed function",
+      }),
+      new Validation_obj({
+        obj_id: 2,
+        answer: -8,
         get_attribute: (obj: TransformObj) => obj.position.y,
         error: 0.1,
         desc: "Validate vertical shift of the transformed function",
