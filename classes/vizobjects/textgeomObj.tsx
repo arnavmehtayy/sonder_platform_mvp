@@ -1,14 +1,21 @@
-import { geomobj } from "./geomobj";
+import { geomobj, geomobjconstructor } from "./geomobj";
 import * as THREE from "three";
 import { TouchControl } from "../Controls/TouchControl";
 import { ThreeEvent } from "react-three-fiber";
 import { Text } from "@react-three/drei";
 import { text_atts,  get_attributes, dict_keys} from "./get_set_obj_attributes";
+import React from "react";
+import { EditableObjectPopup, EditableObjectPopupProps } from "@/app/Components/EditMode/EditPopups/EditableObjectPopup";
+import { TouchControlEditor } from "@/app/Components/EditMode/EditPopups/TouchControlAttributeEditor";
 
 
 /*
  * This class is used to create a object that has Text on it in the scene.
  */
+
+export interface TextGeomConstructor extends geomobjconstructor{
+  text: string;
+}
 export default class TextGeom extends geomobj {
   text: string;
 
@@ -25,7 +32,7 @@ export default class TextGeom extends geomobj {
     OnClick = undefined,
     text = "", // text on the object
     isEnabled = true,
-  }: Partial<TextGeom> & { geom: THREE.BufferGeometry; id: number }) {
+  }: TextGeomConstructor) {
     super({
       id: id,
       position: position,
@@ -63,38 +70,123 @@ export default class TextGeom extends geomobj {
     objectRef: React.RefObject<THREE.Mesh>;
   }): React.ReactElement {
     return (
-      // <group
-      //   ref={objectRef}
-      //   position={[this.position.x, this.position.y, 0]}
-      //   onPointerDown={this.isClickable ? onClickSelect : undefined}
-      //   rotation={[this.rotation.x, this.rotation.y, this.rotation.z]}
-      //   scale={[this.scale.x, this.scale.y, this.scale.z]}
-      // >
-      //   <mesh>
-      //     <primitive object={this.geom} attach="geometry" />
-      //     {material ? (
-      //       <primitive object={material} attach="material" />
-      //     ) : (
-      //       <meshBasicMaterial color={this.color} side={THREE.DoubleSide} />
-      //     )}
-      //   </mesh>
+      <group
+        ref={objectRef}
+        position={[this.position.x, this.position.y, 0]}
+        onPointerDown={this.isClickable ? onClickSelect : undefined}
+        rotation={[this.rotation.x, this.rotation.y, this.rotation.z]}
+        scale={[this.scale.x, this.scale.y, this.scale.z]}
+      >
+        <Text color="white" anchorX="center" anchorY="middle" renderOrder={10}>
+          {this.text}
+        </Text>
+        <mesh>
+          <primitive object={this.geom} attach="geometry" />
+          {material ? (
+            <primitive object={material} attach="material" />
+          ) : (
+            <meshBasicMaterial color={this.color} side={THREE.DoubleSide} />
+          )}
+        </mesh>
 
-      //   <Text color="white" anchorX="center" anchorY="middle">
-      //     {this.text}
-      //   </Text>
-      // </group>
-      super.getMesh({
-        children: (
-          <>
-            <Text color="white" anchorX="center" anchorY="middle">
-              {this.text}
-            </Text>
-          </>
-        ),
-        onClickSelect: onClickSelect,
-        objectRef: objectRef,
-        material: material,
-      })
-    );
+        
+      </group>)
+    //   super.getMesh({
+    //     children: (
+    //       <>
+    //         <Text color="white" anchorX={objectRef.current.position.x} anchorY={objectRef.current.position.y}>
+    //           {this.text}
+    //         </Text>
+    //       </>
+    //     ),
+    //     onClickSelect: onClickSelect,
+    //     objectRef: objectRef,
+    //     material: material,
+    //   })
+    // );
   }
+
+  static getPopup({
+    isOpen,
+    onClose,
+    onSave,
+  }: {
+    isOpen: boolean;
+    onClose: () => void;
+    onSave: (newObject: geomobj) => void;
+  }): React.ReactElement {
+    const [editedObject, setEditedObject] = React.useState<TextGeomConstructor>({
+      id: Date.now(), // Generate a temporary ID
+      name: "",
+      isEnabled: true,
+      position: new THREE.Vector2(0, 0),
+      rotation: new THREE.Vector3(0, 0, 0),
+      scale: new THREE.Vector3(2, 2, 2),
+      color: "#000000",
+      geom: new THREE.BufferGeometry(),
+      touch_controls: new TouchControl(),
+      param_t: 0,
+      isClickable: false,
+      text: "test",
+    });
+
+    const handleChange = (key: keyof TextGeomConstructor, value: any) => {
+      setEditedObject((prev) => ({ ...prev, [key]: value }));
+    };
+
+    const popupProps: EditableObjectPopupProps<TextGeomConstructor> = {
+      isOpen,
+      onClose,
+      object: editedObject,
+      set_object: setEditedObject,
+      onSave: (updatedObject: TextGeomConstructor) => {
+        const newObj = new TextGeom(updatedObject);
+        onSave(newObj);
+      },
+      title: `Create New Object`,
+      fields: [
+        { key: "name", label: "Name", type: "text" },
+        {
+          key: "geom",
+          label: "Geometry",
+          type: "select",
+          options: [
+            
+            { label: "Circle", value: new THREE.CircleGeometry() },
+            { label: "Box", value: new THREE.BoxGeometry() },
+            {
+              label: "Triangle",
+              value: new THREE.Triangle(
+                new THREE.Vector3(0, 0, 0),
+                new THREE.Vector3(1, 0, 0),
+                new THREE.Vector3(0, 1, 0)
+              ),
+            },
+          ],
+        },
+        {key: "text", label: "Text", type: "text"},
+        { key: "color", label: "Color", type: "color" },
+        { key: "position", label: "Position", type: "position" },
+        { key: "rotation", label: "Rotation", type: "rotation" },
+        { key: "scale", label: "Scale", type: "vector3" },
+        {
+          key: "touch_controls",
+          label: "Touch Controls",
+          type: "custom",
+          render: (value, onChange) => (
+            <TouchControlEditor
+              touchControl={value}
+              onChange={onChange}
+            />
+          ),
+        },
+        { key: "isEnabled", label: "IsVisible", type: "checkbox" },
+
+        
+      ],
+    };
+
+    return <EditableObjectPopup {...popupProps} />;
+  }
+
 }

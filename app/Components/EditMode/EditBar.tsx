@@ -43,6 +43,7 @@ import { InputNumber } from "@/classes/Controls/InputNumber";
 import { SelectControl } from "@/classes/Controls/SelectControl";
 import { EnablerControl } from "@/classes/Controls/EnablerControl";
 import { TableControl } from "@/classes/Controls/TableControl";
+import TextGeom from "@/classes/vizobjects/textgeomObj";
 
 export interface Option {
   id: number;
@@ -71,6 +72,7 @@ const controlTypes: ObjectType[] = [
   {name: "Number Input", type: InputNumber, icon: List},
   {name: "Select Input", type: SelectControl, icon: List},
   {name: "Object Enabler", type: EnablerControl, icon: List},
+
 ]
   
 const objectTypes: ObjectType[] = [
@@ -78,6 +80,7 @@ const objectTypes: ObjectType[] = [
   { name: "Geom Object", type: geomobj, icon: Circle },
   { name: "Function Object", type: FunctionPlotString, icon: LineChart },
   { name: "Axis Object", type: CoordinateAxis, icon: Axis3D },
+  {name: "Text Object", type: TextGeom, icon: HelpCircle},
 ];
 
 const questionTypes: ObjectType[] = [

@@ -14,6 +14,7 @@ import { InputNumber } from "@/classes/Controls/InputNumber";
 import { SelectControl } from "@/classes/Controls/SelectControl";
 import { EnablerControl } from "@/classes/Controls/EnablerControl";
 import { TableControl } from "@/classes/Controls/TableControl";
+import TextGeom from "@/classes/vizobjects/textgeomObj";
 
 export type EditAddType =
   | obj
@@ -26,7 +27,8 @@ export type EditAddType =
   | InputNumber
   | SelectControl
   | EnablerControl
-  | TableControl<obj>;
+  | TableControl<obj> 
+  | TextGeom;
   
 export type PopUpType = 
   | typeof LineObj
@@ -38,7 +40,8 @@ export type PopUpType =
   | typeof InputNumber 
   | typeof SelectControl
   | typeof EnablerControl
-  | typeof TableControl;
+  | typeof TableControl 
+  | typeof TextGeom;
   
 
 interface ObjectCreatorProps {

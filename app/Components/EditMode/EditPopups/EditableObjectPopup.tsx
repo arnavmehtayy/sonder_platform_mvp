@@ -25,6 +25,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { MCQOptionsInput } from "./MCQPopup";
 import { X } from "lucide-react";
 import {SelectVizObject, SelectVizObjectList} from "./SelectVizObjsPopup";
+import {Vector3Input} from "./Vector3Input";
 
 
 /*
@@ -49,7 +50,8 @@ export interface PopupQuestionProps<T, option_T> {
     | "arraynum"
     | "vizObjSelect"
     | "vizObjSelectList"
-    | "custom";
+    | "custom"
+    | "vector3";
   options?: { label: string; value: option_T }[]; // For select type
   length_of_array?: number; // For arraynum type
   showIf?: (obj: T) => boolean; // New property for conditional rendering
@@ -139,6 +141,19 @@ export function EditableObjectPopup<T>({
             />
           </div>
         );
+        case "vector3":
+          return (
+            <div className="mb-4">
+              <label className="block mb-2">{field.label}</label>
+              <Vector3Input
+                value={editedObject[field.key] as Vector3}
+                onChange={(newValue: Vector3) =>
+                  handleChange(field.key, newValue)
+                }
+                size={200}
+              />
+            </div>
+          );
       case "textarea":
         return (
           <div className="mb-4">
