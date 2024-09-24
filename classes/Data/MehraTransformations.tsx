@@ -70,6 +70,7 @@ const point_vizobjects = [];
 for (let i = 0; i < points.length; i++) {
   point_vizobjects.push(
     new geomobj({
+      name: "Point",
       id: 2 + i,
       position: points[i],
       color: points_colors[i],
@@ -83,6 +84,7 @@ const points_vizobjects_true = []
 for (let i = 0; i < points.length; i++) {
     points_vizobjects_true.push(
       new geomobj({
+        name: "Point",
         id: 2 + i,
         position: points_true[i],
         color: points_colors[i],
@@ -509,6 +511,7 @@ export const data_transformation: { [key: string]: data_type } = {
         yLabel: "Y",
       }),
       ...[-3, -1, 2, 4, 6].map((x, i) => new geomobj({
+        name: "Point",
         id: 2 + i,
         position: new Vector2(x, 0),
         color: ["blue", "red", "green", "yellow", "purple"][i],
@@ -636,6 +639,7 @@ export const data_transformation: { [key: string]: data_type } = {
         isEnabled: true,
       }),
       ...[-3, -1, 2, 4, 6].map((x, i) => new geomobj({
+        name: "Point",
         id: 3 + i,
         position: new Vector2(x, (x-2)**2),
         color: ["blue", "red", "green", "yellow", "purple"][i],

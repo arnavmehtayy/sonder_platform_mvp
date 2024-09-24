@@ -1,6 +1,9 @@
+
+
 import { InputNumber } from "../Controls/InputNumber";
 import Validation from "./Validation";
 import * as val_func from "./Validation_funcs";
+import { ValidationConstructor } from "./Validation";
 
 
 /*
@@ -8,6 +11,12 @@ import * as val_func from "./Validation_funcs";
  * This class checks if the value of the input number is equal to the answer with some tolerance allowanc
 
 */
+
+interface Validation_inputNumberConstructor extends ValidationConstructor {
+  answer: number;
+  control_id: number;
+  error: number;
+}
 export class Validation_inputNumber extends Validation {
   answer: number;
   control_id: number; // control that we are validating
@@ -39,5 +48,16 @@ export class Validation_inputNumber extends Validation {
       return this.set_valid(true) as Validation_inputNumber;
     }
     return this.set_valid(false) as Validation_inputNumber;
+  }
+
+  dataBaseSave(): Validation_inputNumberConstructor & {type: string} {
+    return {
+      is_valid: this.is_valid,
+      desc: this.desc,
+      answer: this.answer,
+      control_id: this.control_id,
+      error: this.error,
+      type: "Validation_inputNumber"
+    };
   }
 }

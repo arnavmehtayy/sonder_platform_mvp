@@ -2,11 +2,18 @@ import { TableControl } from "../Controls/TableControl";
 import Validation from "./Validation";
 import * as val_func from "./Validation_funcs";
 import { obj } from "../vizobjects/obj";
+import { ValidationConstructor } from "./Validation";
 
 /*
  * Validation class for the TableControl
  * This class checks if the values in the table cells match the expected answers within a specified tolerance
 */
+interface Validation_tableControlConstructor<T extends obj> extends ValidationConstructor {
+  answers: number[][];
+  control_id: number;
+  error: number;
+  validateCells: boolean[][];
+}
 export class Validation_tableControl<T extends obj> extends Validation {
   answers: number[][];
   control_id: number; // control that we are validating
@@ -19,11 +26,7 @@ export class Validation_tableControl<T extends obj> extends Validation {
     desc = "validation_tableControl", // description of the validation that will show on the validation on the autograder
     error = 0.001,
     validateCells,
-  }: Partial<Validation_tableControl<T>> & {
-    answers: number[][];
-    control_id: number;
-    validateCells: boolean[][];
-  }) {
+  }: Validation_tableControlConstructor<T>) {
     super({ is_valid: false, desc: desc });
     this.answers = answers;
     this.control_id = control_id;
@@ -52,5 +55,17 @@ export class Validation_tableControl<T extends obj> extends Validation {
     }
 
     return this.set_valid(isValid) as Validation_tableControl<T>;
+  }
+
+  dataBaseSave(): Validation_tableControlConstructor<T> & {type: string} {
+    return {
+      is_valid: this.is_valid,
+      desc: this.desc,
+      answers: this.answers,
+      control_id: this.control_id,
+      error: this.error,
+      validateCells: this.validateCells,
+      type: "Validation_tableControl"
+    };
   }
 }

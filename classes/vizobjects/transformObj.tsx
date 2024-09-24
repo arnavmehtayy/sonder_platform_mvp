@@ -42,7 +42,7 @@ export abstract class TransformObj extends coloredObj {
     color = "white",
     name = "TransformObj",
     isEnabled = true,
-  }: Partial<TransformObjConstructor> & { id: number }) {
+  }: TransformObjConstructor) {
     super({ id: id, name: name, color: color, isEnabled: isEnabled });
     this.position = position;
     this.rotation = rotation;
@@ -52,6 +52,20 @@ export abstract class TransformObj extends coloredObj {
 
   get_set_att_selector(type: dict_keys): get_attributes<any, any>[] {
     return [...super.get_set_att_selector(type), ...transform_atts[type]]
+  }
+
+  dataBaseSave(): TransformObjConstructor & {type: string} {
+    return {
+      id: this.id,
+      name: this.name,
+      color: this.color,
+      isEnabled: this.isEnabled,
+      position: this.position,
+      rotation: this.rotation,
+      scale: this.scale,
+      touch_controls: this.touch_controls,
+      type: 'TransformObj'
+    };
   }
 
   abstract getMesh({

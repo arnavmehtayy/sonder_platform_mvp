@@ -1,4 +1,4 @@
-import React from 'react';
+import React from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { X } from "lucide-react";
@@ -14,12 +14,12 @@ export function ObjectEditor({ object, onChange }: ObjectEditorProps) {
   };
 
   const renderField = (key: string, value: any) => {
-    if (typeof value === 'string' || typeof value === 'number') {
+    if (typeof value === "string" || typeof value === "number") {
       return (
         <Input
           value={value}
           onChange={(e) => handleChange(key, e.target.value)}
-          type={typeof value === 'number' ? 'number' : 'text'}
+          type={typeof value === "number" ? "number" : "text"}
         />
       );
     } else if (Array.isArray(value)) {
@@ -28,22 +28,33 @@ export function ObjectEditor({ object, onChange }: ObjectEditorProps) {
           {value.map((item, index) => (
             <div key={index} className="flex items-center mb-2">
               <Input
-                value={item ?? ''}
-                type={typeof item === 'number' ? 'number' : 'text'}
+                value={item ?? ""}
+                type={typeof item === "number" ? "number" : "text"}
                 onChange={(e) => {
                   const newValue = e.target.value;
-                  if (newValue === "" || (typeof item === 'number' && /^-?\d*\.?\d*$/.test(newValue))) {
+                  if (
+                    newValue === "" ||
+                    (typeof item === "number" && /^-?\d*\.?\d*$/.test(newValue))
+                  ) {
                     const newArray = [...value];
-                    newArray[index] = newValue === "" ? null : 
-                      (typeof item === 'number' ? parseFloat(newValue) : newValue);
+                    newArray[index] =
+                      newValue === ""
+                        ? null
+                        : typeof item === "number"
+                        ? parseFloat(newValue)
+                        : newValue;
                     handleChange(key, newArray);
                   }
                 }}
                 onBlur={(e) => {
                   const newValue = e.target.value;
                   const newArray = [...value];
-                  newArray[index] = newValue === "" ? null : 
-                    (typeof item === 'number' ? parseFloat(newValue) : newValue);
+                  newArray[index] =
+                    newValue === ""
+                      ? null
+                      : typeof item === "number"
+                      ? parseFloat(newValue)
+                      : newValue;
                   handleChange(key, newArray);
                 }}
                 onWheel={(e) => e.currentTarget.blur()}
@@ -62,7 +73,7 @@ export function ObjectEditor({ object, onChange }: ObjectEditorProps) {
             </div>
           ))}
           <Button
-            onClick={() => handleChange(key, [...value, ''])}
+            onClick={() => handleChange(key, [...value, ""])}
             variant="outline"
             size="sm"
             className="mt-2"
@@ -71,8 +82,13 @@ export function ObjectEditor({ object, onChange }: ObjectEditorProps) {
           </Button>
         </div>
       );
-    } else if (typeof value === 'object' && value !== null) {
-      return <ObjectEditor object={value} onChange={(newValue) => handleChange(key, newValue)} />;
+    } else if (typeof value === "object" && value !== null) {
+      return (
+        <ObjectEditor
+          object={value}
+          onChange={(newValue) => handleChange(key, newValue)}
+        />
+      );
     }
     return null;
   };

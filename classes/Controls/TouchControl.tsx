@@ -1,3 +1,5 @@
+'use client'
+
 import * as THREE from "three";
 import { TransformObj } from "../vizobjects/transformObj";
 
@@ -31,6 +33,7 @@ export class TouchControl {
     this.rotate = rotate;
     this.translate = translate;
   }
+
 
   // change the position, scale and rotation of a vizobject used by the storage system
   static populate_vizobj({

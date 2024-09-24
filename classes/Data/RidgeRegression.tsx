@@ -133,6 +133,7 @@ const CoordinateAxisObj = new CoordinateAxis({
 });
 
 let reg_line: LineObj = new LineObj({
+  name: "Line",
   id: 1000,
   start: new Vector2(0, 0),
   end: new Vector2(0, 0),
@@ -141,6 +142,7 @@ let reg_line: LineObj = new LineObj({
 });
 
 let reg_ref_line: LineObj = new LineObj({
+  name: "Line",
   id: 1001,
   start: new Vector2(0, 0),
   end: new Vector2(0, 0),
@@ -174,6 +176,7 @@ const reg_line_2_ref = LineObj.set_slope_intercept(
 const reg_line3 = LineObj.set_slope_intercept(reg_line, -7.4, 4, [-30, 30]);
 
 let reg_line_3_ref = new LineObj({
+  name: "Line",
   id: 1000,
   start: new Vector2(0, 0),
   end: new Vector2(0, 0),
@@ -190,6 +193,7 @@ reg_line_3_ref = LineObj.set_slope_intercept(
 for (let i = 0; i < num_new_points; i++) {
   new_point_objs.push(
     new geomobj({
+      name: `(${new_points[i].x}, ${new_points[i].y})`,
       id: i + 60,
       geom: new THREE.CircleGeometry(0.23, 128),
       position: new_points[i],
@@ -202,6 +206,7 @@ for (let i = 0; i < num_new_points; i++) {
 for (let i = 0; i < num_points; i++) {
   point_objs.push(
     new geomobj({
+      name: `(${points[i].x}, ${points[i].y})`,
       id: i,
       geom: new THREE.CircleGeometry(0.23, 128),
       position: points[i],
@@ -210,6 +215,7 @@ for (let i = 0; i < num_points; i++) {
   );
 
   MSE_lines[i + num_points] = new LineObj({
+    name: "MSE",
     id: i + num_points,
     start: points[i],
     end: new Vector2(0, 0),
@@ -220,6 +226,7 @@ for (let i = 0; i < num_points; i++) {
   for (let i = 0; i < points_tech_companies.length; i++) {
     pointobjs_tech_companies.push(
       new geomobj({
+        name: `(${points_tech_companies[i].x}, ${points_tech_companies[i].y})`,
         id: 65 + i,
         geom: new THREE.CircleGeometry(0.23, 128),
         position: points_tech_companies[i],
@@ -230,6 +237,7 @@ for (let i = 0; i < num_points; i++) {
 
   for (let i = 0; i < points_tech_companies.length; i++) {
     MSE_tech_companies[i + 65 + points_tech_companies.length] = new LineObj({
+      name: "MSE",
       id: i + 65 + points_tech_companies.length,
       start: points_tech_companies[i],
       end: new Vector2(0, 0),
@@ -475,6 +483,7 @@ export const data_regression: { [key: string]: data_type } = {
     scoreData: [
       new Score<number>({
         text: "Line Score",
+        desc: "$ \\sum_{i=1}^{30} \\text{dist}(\\text{line}, (x_i, y_i))^2 $",
         score_id: 0,
         obj_list: line_MSE_scorers,
         to_string: (val) => (Math.round(val * 10) / 10).toString(),
@@ -568,6 +577,7 @@ The $\\textbf{green line}$ is the line of best fit that you identified in the la
     scoreData: [
       new Score<number>({
         text: "Line Score Including Pink Data",
+        desc: "$ \\sum_{i=1}^{40} \\text{dist}(\\text{line}, (x_i, y_i))^2 $",
         score_id: 0,
         obj_list: [...line_MSE_scorers, ...line_MSE__tech_scorers],
         to_string: (val) => (Math.round(val * 10) / 10).toString(),

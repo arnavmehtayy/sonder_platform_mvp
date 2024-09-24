@@ -1,6 +1,7 @@
 import Validation from "./Validation";
 import { obj } from "../vizobjects/obj";
 import { relation } from "./Validation_obj";
+import { ValidationConstructor } from "./Validation";
 
 /*
  * this class stores information to validate a score
@@ -9,6 +10,13 @@ import { relation } from "./Validation_obj";
  * attributes: score_id, target_score, error, relation, comparator
  */
 
+interface Validation_score_constructor<score_T, obj_T extends obj> extends ValidationConstructor {
+  score_id: number;
+  target_score: score_T;
+  error: number;
+  relation: relation;
+  comparator?: (a: score_T, b: score_T) => number;
+}
 export default class Validation_score<
   score_T,
   obj_T extends obj
@@ -26,12 +34,7 @@ export default class Validation_score<
     relation,
     comparator = (a, b) => (a > b ? 1 : a < b ? -1 : 0),
     desc = "validation_score",
-  }: Partial<Validation_score<score_T, obj_T>> & {
-    score_id: number;
-    target_score: number;
-    error: number;
-    relation: relation;
-  }) {
+  }: Validation_score_constructor<score_T, obj_T>) {
     super({ is_valid: false, desc: desc });
     this.score_id = score_id;
     this.target_score = target_score;
@@ -78,5 +81,18 @@ export default class Validation_score<
         break;
     }
     return this.set_valid(false) as Validation_score<string, obj_T>;
+  }
+
+  dataBaseSave(): Validation_score_constructor<score_T, obj_T> & {type: string} {
+    return {
+      is_valid: this.is_valid,
+      desc: this.desc,
+      score_id: this.score_id,
+      target_score: this.target_score,
+      error: this.error,
+      relation: this.relation,
+      comparator: this.comparator,
+      type: "Validation_score"
+    };
   }
 }

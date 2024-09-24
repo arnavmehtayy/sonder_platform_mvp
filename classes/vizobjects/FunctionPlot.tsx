@@ -32,6 +32,7 @@ export default class FunctionPlot extends TransformObj {
   OnClick?: (event: ThreeEvent<MouseEvent>) => void;
 
   constructor({
+    name = "FunctionPlot",
     id,
     position = new THREE.Vector2(0, 0),
     rotation = new THREE.Vector3(0, 0, 0),
@@ -53,7 +54,7 @@ export default class FunctionPlot extends TransformObj {
       scale,
       color,
       touch_controls,
-      name: "FunctionPlot",
+      name: name,
       isEnabled,
     });
     this.func = func;
@@ -66,6 +67,26 @@ export default class FunctionPlot extends TransformObj {
 
   get_set_att_selector(type: dict_keys): get_attributes<any, any>[] {
     return [...super.get_set_att_selector(type), ...functionplot_atts[type]]
+  }
+
+  dataBaseSave(): FunctionPlotConstructor & {type: string} {
+    return {
+      id: this.id,
+      name: this.name,
+      position: this.position,
+      rotation: this.rotation,
+      scale: this.scale,
+      color: this.color,
+      touch_controls: this.touch_controls,
+      func: this.func,
+      xRange: this.xRange,
+      numPoints: this.numPoints,
+      lineWidth: this.lineWidth,
+      isClickable: this.isClickable,
+      OnClick: this.OnClick,
+      isEnabled: this.isEnabled,
+      type: 'FunctionPlot'
+    };
   }
   
   // method that returns the physical three.js mesh representation of the object

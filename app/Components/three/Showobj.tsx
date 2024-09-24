@@ -1,3 +1,6 @@
+
+'use client'
+
 import { useStore, getObjectSelector, SelectObjectControl } from "@/app/store";
 import React, { memo, useRef, useState, useEffect } from "react";
 import coloredObj from "@/classes/vizobjects/coloredObj";

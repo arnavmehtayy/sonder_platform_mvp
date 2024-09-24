@@ -6,6 +6,7 @@ import {
   EditableObjectPopupProps,
 } from "@/app/Components/EditMode/EditPopups/EditableObjectPopup";
 import { obj_atts,  get_attributes, dict_keys} from "./get_set_obj_attributes";
+
 /*
     This is the base class for every object in the scene.
     This class is used to store the information about a object in the threejs scene
@@ -56,6 +57,16 @@ export class obj {
     return obj_atts[type]
   }
 
+  dataBaseSave(): objconstructor & {type: string}
+  {
+    return {
+      id: this.id,
+      name: this.name,
+      isEnabled: this.isEnabled,
+      type: 'Obj'
+    }
+  }
+
   // method that returns the physical three.js mesh representation of the object
   // this is used to render the object in the vizexperience
   getMesh({
@@ -82,6 +93,8 @@ export class obj {
       </mesh>
     );
   }
+
+
 
   // method for teh popup that a editing user will use to populate the object
   // this is used by the editing system

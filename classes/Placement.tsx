@@ -38,6 +38,20 @@ function ShowPlacement({id}: {id: number}) {
   return null;
 }
 
+interface PlacementConstructor {
+  id: number;
+  object_ids: number[];
+  grid?: [number, number];
+  cellSize?: number;
+  geometry?: THREE.BufferGeometry;
+  gridVectors?: THREE.Vector2[];
+  text?: string;
+  desc?: string;
+  color?: string;
+  isClickable?: boolean;
+  max_placements?: number;
+}
+
 export default class Placement {
   id: number
   object_ids: number[]; // the ids of the objects that can be placed
@@ -65,7 +79,7 @@ export default class Placement {
     color = "blue",
     max_placements = 1,
     isClickable = true,
-  }: Partial<Placement> & { object_ids: number[], id: number }) {
+  }: PlacementConstructor) {
     this.desc = desc;
     this.object_ids = object_ids;
     this.grid = grid;
@@ -108,6 +122,23 @@ export default class Placement {
     );
     newObj.numObjectsPlaced = num
     return newObj;
+  }
+
+  dataBaseSave(): PlacementConstructor & {type: string} {
+    return {
+      id: this.id,
+      object_ids: this.object_ids,
+      grid: this.grid,
+      cellSize: this.cellSize,
+      geometry: this.geometry,
+      gridVectors: this.gridVectors,
+      text: this.text,
+      desc: this.desc,
+      color: this.color,
+      isClickable: this.isClickable,
+      max_placements: this.max_placements,
+      type: "Placement"
+    };
   }
 
   render() {

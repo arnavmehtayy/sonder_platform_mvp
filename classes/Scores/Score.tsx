@@ -1,8 +1,11 @@
+'use client'
+
 import { obj } from "../vizobjects/obj";
 import { objectScorer } from "./objectScorer";
 import React, { useEffect, useState } from "react";
 import { getObjectSelector2, useStore } from "@/app/store";
 import Latex from "react-latex-next";
+
 
 
 /*
@@ -52,6 +55,15 @@ export function ShowScore({ score }: { score: Score<any> }) {
   );
 }
 
+interface ScoreConstructor<Score_T> {
+  score_id: number;
+  text: string;
+  desc: string;
+  obj_list: objectScorer<any>[];
+  transformation: (vals: number[]) => Score_T;
+  to_string?: (score: Score_T) => string;
+}
+
 export class Score<Score_T> {
   score_id: number;
   text: string;
@@ -68,12 +80,7 @@ export class Score<Score_T> {
     desc = "",
     transformation,
     to_string = (score) => score as string,
-  }: Partial<Score<Score_T>> & {
-    text: string;
-    score_id: number;
-    obj_list: objectScorer<any>[];
-    transformation: (vals: number[]) => Score_T;
-  }) {
+  }: ScoreConstructor<Score_T>) {
     this.text = text;
     this.to_string = to_string;
     this.score_id = score_id;
@@ -102,6 +109,18 @@ export class Score<Score_T> {
     tolerance: number = 0.1
   ): boolean {
     return Math.abs(comparer(this.computeValue(obj_list), target)) < tolerance;
+  }
+
+  dataBaseSave(): ScoreConstructor<Score_T> & {type: string} {
+    return {
+      score_id: this.score_id,
+      text: this.text,
+      desc: this.desc,
+      obj_list: this.obj_list,
+      transformation: this.transformation,
+      to_string: this.to_string,
+      type: 'Score'
+    };
   }
 
   render(): React.ReactNode {

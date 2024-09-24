@@ -42,7 +42,7 @@ export const initDataSets: { default: data_type; [key: string]: data_type } = {
     title: "Question default",
     order: [{ type: "question", id: 0}],
     questions: [{id: 0, text: "This is default"}, {id: 1, text: "This"}],
-    validations: [new Validation_test()],
+    validations: [new Validation_test({is_valid: true, desc: "default"})],
     influencesData: [],
     controlData: [
     ],

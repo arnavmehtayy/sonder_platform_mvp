@@ -1,9 +1,15 @@
+import { is } from "@react-three/fiber/dist/declarations/src/core/utils";
 import { obj } from "../vizobjects/obj";
 
 /*
  * This is the parent class for all the Validation classes
 
 */
+export interface ValidationConstructor {
+  is_valid?: boolean;
+  desc: string;
+}
+
 export default abstract class Validation {
   desc: string; // description of the validation that will show on the validation on the autograder
   is_valid: boolean; // this is the boolean that tells if the validation is valid or not
@@ -11,14 +17,13 @@ export default abstract class Validation {
   // every validator must have a method to compute the validity of the object
   abstract computeValidity(obj: any | obj[]): Validation; 
 
+  abstract dataBaseSave(): ValidationConstructor & {type: string};
+
   constructor({
     is_valid,
     desc = "validation",
-  }: Partial<Validation> & {
-    is_valid: boolean;
-    desc: string;
-  }) {
-    this.is_valid = is_valid;
+  }: ValidationConstructor) {
+    this.is_valid = is_valid || false;
     this.desc = desc;
   }
 

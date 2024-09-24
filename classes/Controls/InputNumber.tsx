@@ -1,10 +1,15 @@
+"use client";
+
 import { Control } from "./Control";
 import { useStore, setInputNumberValueSelector } from "@/app/store";
 import Latex from "react-latex-next";
 import React from "react";
 import { Interface } from "readline";
 import { ControlConstructor } from "./Control";
-import { EditableObjectPopup, EditableObjectPopupProps } from "@/app/Components/EditMode/EditPopups/EditableObjectPopup";
+import {
+  EditableObjectPopup,
+  EditableObjectPopupProps,
+} from "@/app/Components/EditMode/EditPopups/EditableObjectPopup";
 
 /*
 
@@ -22,40 +27,40 @@ interface InputNumberConstructor extends ControlConstructor {
   step?: number;
 }
 
-function ShowInputNumber({control} : {control: InputNumber}) {
+function ShowInputNumber({ control }: { control: InputNumber }) {
   const setValue = useStore(setInputNumberValueSelector(control.id));
-    const value = control.value;
-    const isClickable = control.isClickable;
+  const value = control.value;
+  const isClickable = control.isClickable;
 
-    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-      if (!isClickable) return;
-      const newValue = e.target.value === "" ? "" : Number(e.target.value);
-      setValue(newValue);
-    };
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (!isClickable) return;
+    const newValue = e.target.value === "" ? "" : Number(e.target.value);
+    setValue(newValue);
+  };
 
-    return (
-      <div
-        className={`bg-white rounded-lg shadow-md p-4 ${
-          !isClickable ? "opacity-50" : ""
-        } relative`}
-      >
-        <h3 className="text-lg font-semibold text-blue-800 mb-2">
-          <Latex>{control.desc}</Latex>
-        </h3>
-        <p className="text-gray-600 mb-2">
-          <Latex>{control.text}</Latex>
-        </p>
-        <div className="relative">
-          <input
-            type="number"
-            value={value}
-            onChange={handleChange}
-            placeholder={control.placeholder}
-            disabled={!isClickable}
-            min={control.min}
-            max={control.max}
-            step={control.step}
-            className={`
+  return (
+    <div
+      className={`bg-white rounded-lg shadow-md p-4 ${
+        !isClickable ? "opacity-50" : ""
+      } relative`}
+    >
+      <h3 className="text-lg font-semibold text-blue-800 mb-2">
+        <Latex>{control.desc}</Latex>
+      </h3>
+      <p className="text-gray-600 mb-2">
+        <Latex>{control.text}</Latex>
+      </p>
+      <div className="relative">
+        <input
+          type="number"
+          value={value}
+          onChange={handleChange}
+          placeholder={control.placeholder}
+          disabled={!isClickable}
+          min={control.min}
+          max={control.max}
+          step={control.step}
+          className={`
               w-full px-3 py-2 text-base rounded-md border transition-all duration-200 ease-in-out
               ${
                 isClickable
@@ -64,12 +69,11 @@ function ShowInputNumber({control} : {control: InputNumber}) {
               }
               focus:outline-none
             `}
-          />
-        </div>
+        />
       </div>
-    );
+    </div>
+  );
 }
-
 
 export class InputNumber extends Control {
   value: number | ""; // the value of the input number in the box
@@ -89,7 +93,7 @@ export class InputNumber extends Control {
     min = 0,
     max = 100,
     step = 1,
-  }: Partial<InputNumberConstructor> & { id: number, value: number }) {
+  }: InputNumberConstructor) {
     super({ id: id, desc: desc, text: text });
     this.value = value;
     this.placeholder = placeholder;
@@ -100,7 +104,7 @@ export class InputNumber extends Control {
   }
 
   // change the value of the input number used by the storage system
-  setValue(value: number | "") { 
+  setValue(value: number | "") {
     const new_obj = Object.assign(
       Object.create(Object.getPrototypeOf(this)),
       this
@@ -109,9 +113,23 @@ export class InputNumber extends Control {
     return new_obj;
   }
 
+  dataBaseSave(): InputNumberConstructor & { type: string } {
+    return {
+      id: this.id,
+      value: this.value || 0,
+      desc: this.desc,
+      text: this.text,
+      placeholder: this.placeholder,
+      initial_value: this.initial_value,
+      min: this.min,
+      max: this.max,
+      step: this.step,
+      type: "InputNumber",
+    };
+  }
+
   render(): React.ReactNode {
     return <ShowInputNumber control={this} />;
-    
   }
 
   static getPopup({
@@ -123,17 +141,18 @@ export class InputNumber extends Control {
     onClose: () => void;
     onSave: (obj: InputNumber) => void;
   }) {
-    const [editedObject, setEditedObject] = React.useState<InputNumberConstructor>({
-      id: Date.now(),
-      value: 0,
-      desc: "input a number",
-      text: "here you need to input a number",
-      placeholder: "number",
-      initial_value: 0,
-      min: 0,
-      max: 100,
-      step: 1,
-    });
+    const [editedObject, setEditedObject] =
+      React.useState<InputNumberConstructor>({
+        id: Date.now() % 10000,
+        value: 0,
+        desc: "input a number",
+        text: "here you need to input a number",
+        placeholder: "number",
+        initial_value: 0,
+        min: 0,
+        max: 100,
+        step: 1,
+      });
 
     const popupProps: EditableObjectPopupProps<InputNumberConstructor> = {
       isOpen,
@@ -157,5 +176,4 @@ export class InputNumber extends Control {
     };
     return <EditableObjectPopup {...popupProps} />;
   }
-
 }

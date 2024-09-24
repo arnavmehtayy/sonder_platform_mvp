@@ -1,4 +1,6 @@
-import { SliderControl } from "./SliderControl";
+'use client'
+
+import { SliderControl, SliderControlConstructor } from "./SliderControl";
 import * as THREE from "three";
 import { TransformObj } from "../vizobjects/transformObj";
 import { obj } from "../vizobjects/obj";
@@ -34,12 +36,7 @@ export class SlideContTrans<T extends TransformObj> extends SliderControl<T> {
       new THREE.Vector2(5 * Math.sin(t), 5 * Math.cos(t)), // default to a circle path
     desc = "slider control trans",
     text = "this is a slider control trans",
-  }: Partial<SlideContTrans<T>> & {
-    id: number;
-    obj_id: number;
-    action: action_typ;
-    range: [number, number];
-  }) {
+  }: SlideContTrans<T>) {
     super({
       id: id,
       obj_id: obj_id,
@@ -91,6 +88,18 @@ export class SlideContTrans<T extends TransformObj> extends SliderControl<T> {
           att_funcs.set_path_pos(obj, this.param_curve(t), t) as T;
         break;
     }
+  }
+
+  dataBaseSave(): SliderControlConstructor<T> & {type: string} {
+    return {
+      id: this.id,
+      obj_id: this.obj_id,
+      range: this.range,
+      step_size: this.step_size,
+      desc: this.desc,
+      text: this.text,
+      type: "SliderContTrans"
+    };
   }
 
   // method to render the slider control onto the sidebar

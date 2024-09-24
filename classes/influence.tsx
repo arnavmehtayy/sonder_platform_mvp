@@ -10,6 +10,16 @@ import { obj } from "./vizobjects/obj";
   * set_attribute: function that sets the attribute of the worker object
   * transformation: function that takes the attribute of the master object and computes the attribute of the worker object
 */
+
+export interface InfluenceConstructor<T, master_T extends obj, worker_T extends obj> {
+  influence_id: number;
+  master_id: number;
+  worker_id: number;
+  get_attribute: (vizobj: master_T) => T;
+  set_attribute: (vizobj: worker_T, value: T) => worker_T;
+  transformation: (value: T, worker: worker_T, master: master_T) => T;
+}
+
 export class Influence<T, master_T extends obj, worker_T extends obj> {
   influence_id: number;
   master_id: number; // the id of the object that is the influencer
@@ -25,14 +35,7 @@ export class Influence<T, master_T extends obj, worker_T extends obj> {
     get_attribute,
     set_attribute,
     transformation,
-  }: {
-    influence_id: number;
-    master_id: number;
-    worker_id: number;
-    get_attribute: (vizobj: master_T) => T;
-    set_attribute: (vizobj: worker_T, value: T) => worker_T;
-    transformation: (value: T, worker: worker_T, master: master_T) => T;
-  }) {
+  }: InfluenceConstructor<T, master_T, worker_T>) {
     this.influence_id = influence_id;
     this.master_id = master_id;
     this.worker_id = worker_id;
@@ -54,5 +57,17 @@ export class Influence<T, master_T extends obj, worker_T extends obj> {
       master
     );
     return influence.set_attribute(worker, value);
+  }
+
+  dataBaseSave(): InfluenceConstructor<T, master_T, worker_T> & {type: string} {
+    return {
+      influence_id: this.influence_id,
+      master_id: this.master_id,
+      worker_id: this.worker_id,
+      get_attribute: this.get_attribute,
+      set_attribute: this.set_attribute,
+      transformation: this.transformation,
+      type: "influence"
+    };
   }
 }

@@ -10,13 +10,11 @@ import {
   EditableObjectPopupProps,
 } from "@/app/Components/EditMode/EditPopups/EditableObjectPopup";
 import React from "react";
-import { Axis_atts,  get_attributes, dict_keys} from "./get_set_obj_attributes";
-
+import { Axis_atts, get_attributes, dict_keys } from "./get_set_obj_attributes";
 
 /*
  * This class is used to create a Coordinate Axis (2D coordinate graph) in the scene.
  */
-
 
 interface CoordinateAxisConstructor extends TransformObjConstructor {
   axisLength?: number;
@@ -31,8 +29,6 @@ interface CoordinateAxisConstructor extends TransformObjConstructor {
 }
 
 export default class CoordinateAxis extends TransformObj {
-  
-
   axisLength: number;
   tickSpacing: number;
   tickSize: number;
@@ -46,6 +42,7 @@ export default class CoordinateAxis extends TransformObj {
 
   constructor({
     id,
+    name = "CoordinateAxis",
     position = new THREE.Vector2(0, 0),
     rotation = new THREE.Vector3(0, 0, 0),
     scale = new THREE.Vector3(1, 1, 1),
@@ -69,7 +66,7 @@ export default class CoordinateAxis extends TransformObj {
       scale,
       color,
       touch_controls,
-      name: "CoordinateAxis",
+      name: name,
       isEnabled,
     });
     this.axisLength = axisLength;
@@ -84,7 +81,30 @@ export default class CoordinateAxis extends TransformObj {
   }
 
   get_set_att_selector(type: dict_keys): get_attributes<any, any>[] {
-    return [...super.get_set_att_selector(type), ...Axis_atts[type]]
+    return [...super.get_set_att_selector(type), ...Axis_atts[type]];
+  }
+
+  dataBaseSave(): CoordinateAxisConstructor & { type: string } {
+    return {
+      id: this.id,
+      name: this.name,
+      position: this.position,
+      rotation: this.rotation,
+      scale: this.scale,
+      color: this.color,
+      touch_controls: this.touch_controls,
+      axisLength: this.axisLength,
+      tickSpacing: this.tickSpacing,
+      tickSize: this.tickSize,
+      showLabels: this.showLabels,
+      fontSize: this.fontSize,
+      lineWidth: this.lineWidth,
+      xLabel: this.xLabel,
+      yLabel: this.yLabel,
+      isClickable: this.isClickable,
+      isEnabled: this.isEnabled,
+      type: "CoordinateAxis",
+    };
   }
 
   // method that returns the physical three.js mesh representation of the object
@@ -249,23 +269,23 @@ export default class CoordinateAxis extends TransformObj {
     onClose: () => void;
     onSave: (obj: CoordinateAxis) => void;
   }) {
-
-    const [editedObject, setEditedObject] = React.useState<CoordinateAxisConstructor>({
-      id: Date.now(),
-      name: "CoordinateAxis",
-      isEnabled: true,
-      color: "#000000",
-      touch_controls: new TouchControl(),
-      axisLength: 60,
-      isClickable: false,
-      tickSpacing: 2,
-      tickSize: 0.2,
-      showLabels: true,
-      fontSize: 0.6,
-      lineWidth: 4,
-      xLabel: "",
-      yLabel: "",  
-    });
+    const [editedObject, setEditedObject] =
+      React.useState<CoordinateAxisConstructor>({
+        id: Date.now() % 10000,
+        name: "CoordinateAxis",
+        isEnabled: true,
+        color: "#000000",
+        touch_controls: new TouchControl(),
+        axisLength: 60,
+        isClickable: false,
+        tickSpacing: 2,
+        tickSize: 0.2,
+        showLabels: true,
+        fontSize: 0.6,
+        lineWidth: 4,
+        xLabel: "",
+        yLabel: "",
+      });
 
     const popupProps: EditableObjectPopupProps<CoordinateAxisConstructor> = {
       isOpen,
@@ -284,10 +304,8 @@ export default class CoordinateAxis extends TransformObj {
         { key: "showLabels", label: "Show Labels", type: "checkbox" },
         { key: "xLabel", label: "X Label", type: "text" },
         { key: "yLabel", label: "Y Label", type: "text" },
-
       ],
     };
     return <EditableObjectPopup {...popupProps} />;
-    
-}
+  }
 }

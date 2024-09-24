@@ -21,13 +21,23 @@ export default abstract class coloredObj extends obj {
     name = "TransformObj",
     color = "#FFFFFF",
     isEnabled = true,
-  }: Partial<coloredObjConstructor> & { id: number; isEnabled: boolean }) {
+  }: coloredObjConstructor) {
     super({ id: id, name: name, isEnabled: isEnabled });
     this.color = color;
   }
 
   get_set_att_selector(type: dict_keys): get_attributes<any, any>[] {
     return [...super.get_set_att_selector(type), ...color_atts[type]]
+  }
+
+  dataBaseSave(): coloredObjConstructor & {type: string} {
+    return {
+      id: this.id,
+      name: this.name,
+      color: this.color,
+      isEnabled: this.isEnabled,
+      type: 'ColoredObj'
+    };
   }
 
 

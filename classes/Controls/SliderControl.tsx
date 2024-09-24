@@ -1,8 +1,14 @@
+"use client";
+
 import { obj } from "../vizobjects/obj";
 import { Control, ControlConstructor } from "./Control";
-import { useStore, setSliderControlValueSelector, getSliderControlValueSelector } from "@/app/store";
-import React from 'react';
-import Latex from 'react-latex-next';
+import {
+  useStore,
+  setSliderControlValueSelector,
+  getSliderControlValueSelector,
+} from "@/app/store";
+import React from "react";
+import Latex from "react-latex-next";
 import {
   EditableObjectPopup,
   EditableObjectPopupProps,
@@ -10,16 +16,17 @@ import {
 
 /*
  *  This is the class that holds information about the slider control
-  *  The slider control is used to change the value of an attribute of an object using a number slider
-  * the attributes of this class are: 
-  * obj_id (object who the control is controlling)
-  * range, step_size, 
-  * get_attribute (function to get the attribute of the object that the control is controlling),
-  * set_attribute (function to set the attribute of the object that the control is controlling)
-*/
+ *  The slider control is used to change the value of an attribute of an object using a number slider
+ * the attributes of this class are:
+ * obj_id (object who the control is controlling)
+ * range, step_size,
+ * get_attribute (function to get the attribute of the object that the control is controlling),
+ * set_attribute (function to set the attribute of the object that the control is controlling)
+ */
 // This class is the base class used to create a slider control for any object in the scene
 
-export interface SliderControlConstructor<T extends obj> extends ControlConstructor {
+export interface SliderControlConstructor<T extends obj>
+  extends ControlConstructor {
   obj_id: number;
   range: [number, number];
   step_size?: number;
@@ -27,38 +34,46 @@ export interface SliderControlConstructor<T extends obj> extends ControlConstruc
   set_attribute?: (obj: T, value: number) => T;
 }
 
-export function ShowSliderControl({control} : {control: SliderControl<any>}) {
+export function ShowSliderControl({
+  control,
+}: {
+  control: SliderControl<any>;
+}) {
   const setValue = useStore(setSliderControlValueSelector(control.id));
-    const getValue = useStore(getSliderControlValueSelector(control.id));
+  const getValue = useStore(getSliderControlValueSelector(control.id));
 
-    return (
-      <div className={`bg-white rounded-lg shadow-md p-4 ${!control.isClickable ? "opacity-50" : ""} relative`}>
-        <h3 className="text-lg font-semibold text-blue-800 mb-2">
-          <Latex>{control.desc}</Latex>
-        </h3>
-        <p className="text-gray-600 mb-2">
-          <Latex>{control.text}</Latex>
-        </p>
-        <div className="relative pt-1">
-          <input
-            type="range"
-            min={control.range[0]}
-            max={control.range[1]}
-            step={control.step_size}
-            value={getValue}
-            onChange={(e) => setValue(Number(e.target.value))}
-            className="w-full h-2 bg-blue-200 rounded-lg appearance-none cursor-pointer"
-            disabled={!control.isClickable}
-          />
-          <div className="flex justify-between items-center mt-2">
-            <span className="text-sm text-gray-600">{control.range[0]}</span>
-            <span className="text-sm font-medium text-blue-600">
-              {getValue.toFixed(2)}
-            </span>
-            <span className="text-sm text-gray-600">{control.range[1]}</span>
-          </div>
+  return (
+    <div
+      className={`bg-white rounded-lg shadow-md p-4 ${
+        !control.isClickable ? "opacity-50" : ""
+      } relative`}
+    >
+      <h3 className="text-lg font-semibold text-blue-800 mb-2">
+        <Latex>{control.desc}</Latex>
+      </h3>
+      <p className="text-gray-600 mb-2">
+        <Latex>{control.text}</Latex>
+      </p>
+      <div className="relative pt-1">
+        <input
+          type="range"
+          min={control.range[0]}
+          max={control.range[1]}
+          step={control.step_size}
+          value={getValue}
+          onChange={(e) => setValue(Number(e.target.value))}
+          className="w-full h-2 bg-blue-200 rounded-lg appearance-none cursor-pointer"
+          disabled={!control.isClickable}
+        />
+        <div className="flex justify-between items-center mt-2">
+          <span className="text-sm text-gray-600">{control.range[0]}</span>
+          <span className="text-sm font-medium text-blue-600">
+            {getValue.toFixed(2)}
+          </span>
+          <span className="text-sm text-gray-600">{control.range[1]}</span>
         </div>
-        <style jsx>{`
+      </div>
+      <style jsx>{`
         input[type="range"] {
           -webkit-appearance: none;
           margin: 10px 0;
@@ -135,9 +150,8 @@ export function ShowSliderControl({control} : {control: SliderControl<any>}) {
           box-shadow: none;
         }
       `}</style>
-      </div>
-      
-    );
+    </div>
+  );
 }
 
 export class SliderControl<T extends obj> extends Control {
@@ -171,7 +185,7 @@ export class SliderControl<T extends obj> extends Control {
   }
 
   // method to get the value of the slider control given the instance of the object that the control is controlling
-  getSliderValue(obj: T): number { 
+  getSliderValue(obj: T): number {
     if (obj) {
       return this.get_attribute(obj as T);
     } else {
@@ -186,6 +200,18 @@ export class SliderControl<T extends obj> extends Control {
     } else {
       return obj;
     }
+  }
+
+  dataBaseSave(): SliderControlConstructor<T> & { type: string } {
+    return {
+      id: this.id,
+      desc: this.desc,
+      text: this.text,
+      obj_id: this.obj_id,
+      range: this.range,
+      step_size: this.step_size,
+      type: "SliderControl",
+    };
   }
 
   render(): React.ReactNode {
@@ -222,25 +248,27 @@ export class SliderControl<T extends obj> extends Control {
     //     </div>
     //   </div>
     // );
-
   }
-    static getPopup({
-      isOpen,
-      onClose,
-      onSave,
-    }: {
-      isOpen: boolean;
-      onClose: () => void;
-      onSave: (obj: SliderControl<any>) => void;
-    }) {
-      const [editedObject, setEditedObject] = React.useState<SliderControlConstructor<any>>({
-        id: Date.now(),
-        obj_id: -1,
-        range: [0, 100],
-        step_size: 1,
-      });
+  static getPopup({
+    isOpen,
+    onClose,
+    onSave,
+  }: {
+    isOpen: boolean;
+    onClose: () => void;
+    onSave: (obj: SliderControl<any>) => void;
+  }) {
+    const [editedObject, setEditedObject] = React.useState<
+      SliderControlConstructor<any>
+    >({
+      id: Date.now() % 10000,
+      obj_id: -1,
+      range: [0, 100],
+      step_size: 1,
+    });
 
-      const popupProps: EditableObjectPopupProps<SliderControlConstructor<any>> = {
+    const popupProps: EditableObjectPopupProps<SliderControlConstructor<any>> =
+      {
         isOpen,
         onClose,
         object: editedObject,
@@ -253,14 +281,9 @@ export class SliderControl<T extends obj> extends Control {
         fields: [
           { key: "obj_id", label: "Object ID", type: "number" },
           { key: "step_size", label: "Step Size", type: "number" },
-          
         ],
-        
       };
 
-      return <EditableObjectPopup {...popupProps} />;
-    }
-
-
-  
+    return <EditableObjectPopup {...popupProps} />;
+  }
 }

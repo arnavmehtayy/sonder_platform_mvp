@@ -1,3 +1,6 @@
+
+'use client'
+
 import React, { useState, useEffect } from 'react';
 import { Input } from "@/components/ui/input";
 import { Vector3 } from 'three';

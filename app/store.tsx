@@ -183,7 +183,7 @@ export const useStore = create<State>((set, get) => ({
       } else if (element instanceof Placement) {
         updatedState = {
           placement: { ...state.placement, [element.id]: element },
-          order: [...state.order, { type: "placement", id: element.id}], // currently only one placement allowed
+          order: [...state.order, { type: "placement", id: element.id}], 
         };
       } else if (element instanceof Influence) {
         if (!state.influences[element.master_id]) {

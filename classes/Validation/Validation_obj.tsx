@@ -2,6 +2,7 @@ import Validation from "./Validation";
 import { Vector2, Vector3 } from "three";
 import { TransformObj } from "../vizobjects/transformObj";
 import * as Val_func from "./Validation_funcs";
+import { ValidationConstructor } from "./Validation";
 
 export type value_typ = number | Vector2 | Vector3; // the possible types of the attribute that is to be validated 
 export type relation = "==" | ">" | "<" | ">=" | "<=" | "!="; // the possible relations that can be used in the comparison
@@ -15,6 +16,13 @@ export type relation = "==" | ">" | "<" | ">=" | "<=" | "!="; // the possible re
  * relation: the relation that is to be used in the comparison
 */
 
+interface Validation_obj_constructor<T extends value_typ> extends ValidationConstructor {
+  answer: T;
+  obj_id: number;
+  get_attribute: (obj: TransformObj) => T;
+  error: number;
+  relation: relation;
+}
 export default class Validation_obj<T extends value_typ> extends Validation {
   answer: T; // the answer that the attribute should be
   obj_id: number; // the id of the object that is to be validated
@@ -94,5 +102,18 @@ export default class Validation_obj<T extends value_typ> extends Validation {
     }
 
     return this.set_valid(false) as Validation_obj<T>;
+  }
+
+  dataBaseSave(): Validation_obj_constructor<T> & {type: string} {
+    return {
+      is_valid: this.is_valid,
+      desc: this.desc,
+      answer: this.answer,
+      obj_id: this.obj_id,
+      get_attribute: this.get_attribute,
+      error: this.error,
+      relation: this.relation,
+      type: "Validation_obj"
+    };
   }
 }

@@ -3,17 +3,19 @@ import * as THREE from "three";
 import { TouchControl } from "../Controls/TouchControl";
 import { ThreeEvent } from "react-three-fiber";
 import { Text } from "@react-three/drei";
-import { text_atts,  get_attributes, dict_keys} from "./get_set_obj_attributes";
+import { text_atts, get_attributes, dict_keys } from "./get_set_obj_attributes";
 import React from "react";
-import { EditableObjectPopup, EditableObjectPopupProps } from "@/app/Components/EditMode/EditPopups/EditableObjectPopup";
+import {
+  EditableObjectPopup,
+  EditableObjectPopupProps,
+} from "@/app/Components/EditMode/EditPopups/EditableObjectPopup";
 import { TouchControlEditor } from "@/app/Components/EditMode/EditPopups/TouchControlAttributeEditor";
-
 
 /*
  * This class is used to create a object that has Text on it in the scene.
  */
 
-export interface TextGeomConstructor extends geomobjconstructor{
+export interface TextGeomConstructor extends geomobjconstructor {
   text: string;
 }
 export default class TextGeom extends geomobj {
@@ -32,8 +34,10 @@ export default class TextGeom extends geomobj {
     OnClick = undefined,
     text = "", // text on the object
     isEnabled = true,
+    name = "TextGeom",
   }: TextGeomConstructor) {
     super({
+      name: name,
       id: id,
       position: position,
       rotation: rotation,
@@ -50,8 +54,27 @@ export default class TextGeom extends geomobj {
     this.name = text;
   }
 
+  dataBaseSave(): TextGeomConstructor & { type: string } {
+    return {
+      id: this.id,
+      name: this.name,
+      position: this.position,
+      rotation: this.rotation,
+      scale: this.scale,
+      color: this.color,
+      geom: this.geom,
+      touch_controls: this.touch_controls,
+      param_t: this.param_t,
+      isClickable: this.isClickable,
+      OnClick: this.OnClick,
+      text: this.text,
+      isEnabled: this.isEnabled,
+      type: "TextGeom",
+    };
+  }
+
   get_set_att_selector(type: dict_keys): get_attributes<any, any>[] {
-    return [...super.get_set_att_selector(type), ...text_atts[type]]
+    return [...super.get_set_att_selector(type), ...text_atts[type]];
   }
   // method that returns the physical three.js mesh representation of the object
   // this is used to render the object in the vizexperience
@@ -88,9 +111,8 @@ export default class TextGeom extends geomobj {
             <meshBasicMaterial color={this.color} side={THREE.DoubleSide} />
           )}
         </mesh>
-
-        
-      </group>)
+      </group>
+    );
     //   super.getMesh({
     //     children: (
     //       <>
@@ -115,20 +137,22 @@ export default class TextGeom extends geomobj {
     onClose: () => void;
     onSave: (newObject: geomobj) => void;
   }): React.ReactElement {
-    const [editedObject, setEditedObject] = React.useState<TextGeomConstructor>({
-      id: Date.now(), // Generate a temporary ID
-      name: "",
-      isEnabled: true,
-      position: new THREE.Vector2(0, 0),
-      rotation: new THREE.Vector3(0, 0, 0),
-      scale: new THREE.Vector3(2, 2, 2),
-      color: "#000000",
-      geom: new THREE.BufferGeometry(),
-      touch_controls: new TouchControl(),
-      param_t: 0,
-      isClickable: false,
-      text: "test",
-    });
+    const [editedObject, setEditedObject] = React.useState<TextGeomConstructor>(
+      {
+        id: Date.now() % 10000, // Generate a temporary ID
+        name: "",
+        isEnabled: true,
+        position: new THREE.Vector2(0, 0),
+        rotation: new THREE.Vector3(0, 0, 0),
+        scale: new THREE.Vector3(2, 2, 2),
+        color: "#000000",
+        geom: new THREE.BufferGeometry(),
+        touch_controls: new TouchControl(),
+        param_t: 0,
+        isClickable: false,
+        text: "test",
+      }
+    );
 
     const handleChange = (key: keyof TextGeomConstructor, value: any) => {
       setEditedObject((prev) => ({ ...prev, [key]: value }));
@@ -151,7 +175,6 @@ export default class TextGeom extends geomobj {
           label: "Geometry",
           type: "select",
           options: [
-            
             { label: "Circle", value: new THREE.CircleGeometry() },
             { label: "Box", value: new THREE.BoxGeometry() },
             {
@@ -164,7 +187,7 @@ export default class TextGeom extends geomobj {
             },
           ],
         },
-        {key: "text", label: "Text", type: "text"},
+        { key: "text", label: "Text", type: "text" },
         { key: "color", label: "Color", type: "color" },
         { key: "position", label: "Position", type: "position" },
         { key: "rotation", label: "Rotation", type: "rotation" },
@@ -174,19 +197,13 @@ export default class TextGeom extends geomobj {
           label: "Touch Controls",
           type: "custom",
           render: (value, onChange) => (
-            <TouchControlEditor
-              touchControl={value}
-              onChange={onChange}
-            />
+            <TouchControlEditor touchControl={value} onChange={onChange} />
           ),
         },
         { key: "isEnabled", label: "IsVisible", type: "checkbox" },
-
-        
       ],
     };
 
     return <EditableObjectPopup {...popupProps} />;
   }
-
 }

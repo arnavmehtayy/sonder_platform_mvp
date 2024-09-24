@@ -1,3 +1,5 @@
+'use client'
+
 import React, { useState, useContext, useRef } from "react";
 import { useFrame } from "@react-three/fiber";
 import * as THREE from "three";
@@ -179,6 +181,7 @@ export const PlacementControl = ({
       addObject(
         obj_id,
         new geomobj({
+          name: "added_obj",
           id: obj_id,
           position: position,
           geom: placement.geometry,

@@ -18,14 +18,12 @@ import { Input } from "@/components/ui/input";
 import { Slider } from "@/components/ui/slider";
 import { Switch } from "@/components/ui/switch";
 import { Separator } from "@/components/ui/separator";
-import { dict_keys, get_attributes  } from "./get_set_obj_attributes";
-import {TouchControlEditor} from "@/app/Components/EditMode/EditPopups/TouchControlAttributeEditor";
-
+import { dict_keys, get_attributes } from "./get_set_obj_attributes";
+import { TouchControlEditor } from "@/app/Components/EditMode/EditPopups/TouchControlAttributeEditor";
 
 /*
  * This class creates a geometric object on the scene (Any object that is rendered using THREE.BufferGeometry).
  */
-
 
 export interface geomobjconstructor extends TransformObjConstructor {
   color?: string;
@@ -51,7 +49,7 @@ export class geomobj extends TransformObj {
     OnClick = undefined,
     isEnabled = true,
     name = "geomobj",
-  }: Partial<geomobjconstructor> & { geom: THREE.BufferGeometry; id: number }) {
+  }: geomobjconstructor) {
     super({
       position: position,
       rotation: rotation,
@@ -66,7 +64,17 @@ export class geomobj extends TransformObj {
     this.OnClick = OnClick;
   }
 
-
+  dataBaseSave(): geomobjconstructor & { type: string } {
+    return {
+      ...super.dataBaseSave(),
+      color: this.color,
+      geom: this.geom,
+      param_t: this.param_t,
+      isClickable: this.isClickable,
+      OnClick: this.OnClick,
+      type: "GeomObj",
+    };
+  }
 
   // method that returns the physical three.js mesh representation of the object
   // this is used to render the object in the vizexperience
@@ -132,7 +140,7 @@ export class geomobj extends TransformObj {
   }
 
   get_set_att_selector(type: dict_keys): get_attributes<any, any>[] {
-    return [...super.get_set_att_selector(type)]
+    return [...super.get_set_att_selector(type)];
   }
 
   static getPopup({
@@ -145,7 +153,7 @@ export class geomobj extends TransformObj {
     onSave: (newObject: geomobj) => void;
   }): React.ReactElement {
     const [editedObject, setEditedObject] = React.useState<geomobjconstructor>({
-      id: Date.now(), // Generate a temporary ID
+      id: Date.now() % 10000, // Generate a temporary ID
       name: "",
       isEnabled: true,
       position: new THREE.Vector2(0, 0),
@@ -179,7 +187,6 @@ export class geomobj extends TransformObj {
           label: "Geometry",
           type: "select",
           options: [
-            
             { label: "Circle", value: new THREE.CircleGeometry() },
             { label: "Box", value: new THREE.BoxGeometry() },
             {
@@ -201,22 +208,16 @@ export class geomobj extends TransformObj {
           label: "Touch Controls",
           type: "custom",
           render: (value, onChange) => (
-            <TouchControlEditor
-              touchControl={value}
-              onChange={onChange}
-            />
+            <TouchControlEditor touchControl={value} onChange={onChange} />
           ),
         },
         { key: "isEnabled", label: "IsVisible", type: "checkbox" },
-
-        
       ],
     };
 
     return <EditableObjectPopup {...popupProps} />;
   }
 }
-
 
 // function TouchControlEditor({ touchControl, onChange }: TouchControlEditorProps) {
 //   const updateTouchControl = (key: keyof TouchControl, value: any) => {
@@ -243,5 +244,3 @@ export class geomobj extends TransformObj {
 //     </div>
 //   );
 // }
-
-

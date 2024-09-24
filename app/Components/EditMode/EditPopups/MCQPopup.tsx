@@ -1,3 +1,5 @@
+'use client'
+
 import React, { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -16,7 +18,7 @@ interface MCQOptionsInputProps {
 
 export function MCQOptionsInput({ options, onChange }: MCQOptionsInputProps) {
   const handleAddOption = () => {
-    const newOption: MCQOption = { id: Date.now().toString(), label: '' };
+    const newOption: MCQOption = { id:(Date.now() % 10000).toString(), label: '' };
     onChange([...options, newOption]);
   };
 

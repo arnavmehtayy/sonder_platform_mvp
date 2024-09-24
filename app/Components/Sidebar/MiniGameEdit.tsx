@@ -6,6 +6,7 @@ import {
   useStore,
   getStateName,
   getPlacementSelector,
+  State,
   UpdateValidationSelector,
   getPlacementListSelector,
 } from "@/app/store";
@@ -27,6 +28,7 @@ export function MinigameEdit({}: {}) {
 
   const updateValidation = useStore(UpdateValidationSelector);
   const validationInstance = useStore((state) => state.validations);
+  const [stateName, setStateName] = useState("");
 
   const handleValidationUpdate = () => {
     updateValidation();
@@ -38,14 +40,64 @@ export function MinigameEdit({}: {}) {
 
   useEffect(() => {
     const checkAllValidations = () => {
-      const allValid = validationInstance.every((validation) =>
-        validation.get_isValid()
+      const allValid = validationInstance.every((validation) => {
+        console.log(validation)
+        return validation.get_isValid()
+      }
       );
       setAllValidationsValid(allValid);
     };
 
     checkAllValidations();
   }, [validationInstance]);
+
+  const handleSaveState = async () => {
+    if (stateName) {
+      try {
+        const currentState = useStore.getState();
+        const response = await fetch('/api/supabase/DataBaseAPI', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ stateName, state: currentState }),
+        });
+  
+        if (!response.ok) {
+          throw new Error('Failed to save state');
+        }
+  
+        alert(`State "${stateName}" saved successfully!`);
+      } catch (error) {
+        console.error("Error saving state:", error);
+        alert("Error saving state. Please try again.");
+      }
+    } else {
+      alert("Please enter a state name before saving.");
+    }
+  };
+  
+  const handleLoadState = async () => {
+    if (stateName) {
+      try {
+        const response = await fetch(`/api/supabase/DataBaseAPI?stateName=${encodeURIComponent(stateName)}`);
+  
+        if (!response.ok) {
+          throw new Error('Failed to load state');
+        }
+  
+        const loadedState: Partial<State> = await response.json();
+        console.log(loadedState)
+        useStore.setState(loadedState);
+        alert(`State "${stateName}" loaded successfully!`);
+      } catch (error) {
+        console.error("Error loading state:", error);
+        alert("Error loading state. Please try again.");
+      }
+    } else {
+      alert("Please enter a state name to load.");
+    }
+  };
 
   return (
       <div className="flex flex-col md:flex-row h-screen bg-gray-100">
@@ -74,6 +126,32 @@ export function MinigameEdit({}: {}) {
           <br />
           <br />
           <br />
+
+          <div className="mt-4 p-4 bg-white rounded shadow">
+            <h3 className="text-lg font-semibold mb-2">State Management</h3>
+            <input
+              type="text"
+              value={stateName}
+              onChange={(e) => setStateName(e.target.value)}
+              placeholder="Enter state name"
+              className="w-full p-2 border rounded mb-2"
+            />
+            <div className="flex space-x-2">
+              <button
+                onClick={handleSaveState}
+                className="flex-1 bg-blue-500 text-white p-2 rounded hover:bg-blue-600 transition"
+              >
+                Save State
+              </button>
+              <button
+                onClick={handleLoadState}
+                className="flex-1 bg-green-500 text-white p-2 rounded hover:bg-green-600 transition"
+              >
+                Load State
+              </button>
+            </div>
+          </div>
+
         </div>
       </div>
   );

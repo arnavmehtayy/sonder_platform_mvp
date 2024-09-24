@@ -11,9 +11,16 @@ export type DummyDataSupportedTypes =
   | number[]
   | string[];
 
+
+interface DummyDataStorageConstructor<T extends DummyDataSupportedTypes> {
+  id: number;
+  name: string;
+  data: T;
+}
+
 export class DummyDataStorage<T extends DummyDataSupportedTypes> extends obj {
   data: T;
-  constructor({ id, name, data }: { id: number; name: string; data: T }) {
+  constructor({ id, name, data }: DummyDataStorageConstructor<T>) {
     super({ id: id, name: name, isEnabled: true });
     this.data = data;
   }
@@ -23,6 +30,7 @@ export class DummyDataStorage<T extends DummyDataSupportedTypes> extends obj {
   static setData<T extends DummyDataSupportedTypes>(
     obj: DummyDataStorage<T>,
     data: T
+    
   ): DummyDataStorage<T> {
     const newObj = Object.assign(
       Object.create(Object.getPrototypeOf(obj)),
@@ -30,5 +38,14 @@ export class DummyDataStorage<T extends DummyDataSupportedTypes> extends obj {
     );
     newObj.data = data;
     return newObj;
+  }
+
+  dataBaseSave(): DummyDataStorageConstructor<T> & {type: string} {
+    return {
+      id: this.id,
+      name: this.name,
+      data: this.data,
+      type: 'DummyDataStorage'
+    };
   }
 }
