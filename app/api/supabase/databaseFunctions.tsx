@@ -1,8 +1,17 @@
 import { db } from '@/app/db/index';
 import { states, questions, orders, vizobjects, controls, influences, scores, placements, validations } from '@/app/db/schema';
+import { State } from '@/app/store';
+import { Control } from '@/classes/Controls/Control';
+import { Influence } from '@/classes/influence';
+import { obj } from '@/classes/vizobjects/obj';
 import { eq } from 'drizzle-orm';
+import { Score } from '@/classes/Scores/Score';
+import Placement from '@/classes/Placement';
+import Validation from '@/classes/Validation/Validation';
 
-export async function saveStateToDatabase(stateName: string, state: any) {
+export async function saveStateToDatabase(stateName: string, state: State) {
+
+
   await db.transaction(async (tx) => {
     // Check if the state already exists
     const existingState = await tx.select().from(states).where(eq(states.state_name, stateName)).limit(1);
@@ -40,7 +49,6 @@ export async function saveStateToDatabase(stateName: string, state: any) {
     await tx.delete(validations).where(eq(validations.stateId, stateId));
 
     // Insert questions
-    // Insert questions
     if (state.questions && Object.keys(state.questions).length > 0) {
         await tx.insert(questions).values(
           Object.entries(state.questions).map(([id, text]) => ({
@@ -65,11 +73,10 @@ export async function saveStateToDatabase(stateName: string, state: any) {
       // Insert vizobjects
       if (state.vizobjs && Object.keys(state.vizobjs).length > 0) {
         await tx.insert(vizobjects).values(
-          Object.values(state.vizobjs).map((obj: any) => ({
+          Object.values(state.vizobjs).map((obj: obj) => ({
             stateId,
             objId: obj.id,
-            objData: obj,
-            constructor: obj.constructor?.name || 'Unknown'
+            objData: obj.dataBaseSave(),
           }))
         );
       }
@@ -77,11 +84,10 @@ export async function saveStateToDatabase(stateName: string, state: any) {
       // Insert controls
       if (state.controls && Object.keys(state.controls).length > 0) {
         await tx.insert(controls).values(
-          Object.values(state.controls).map((control: any) => ({
+          Object.values(state.controls).map((control: Control) => ({
             stateId,
             controlId: control.id,
-            controlData: control,
-            constructor: control.constructor?.name || 'Unknown'
+            controlData: control.dataBaseSave()
           }))
         );
       }
@@ -90,11 +96,10 @@ export async function saveStateToDatabase(stateName: string, state: any) {
       if (state.influences && Object.keys(state.influences).length > 0) {
         const influenceValues = Object.entries(state.influences).flatMap(([masterId, influenceList]) => {
           if (Array.isArray(influenceList) && influenceList.length > 0) {
-            return influenceList.map((influence: any) => ({
+            return influenceList.map((influence: Influence<any, any, any>) => ({
               stateId,
               masterId: parseInt(masterId),
-              influenceData: influence,
-              constructor: influence.constructor?.name || 'Unknown'
+              influenceData: influence.dataBaseSave(),
             }));
           }
           return [];
@@ -107,11 +112,10 @@ export async function saveStateToDatabase(stateName: string, state: any) {
       // Insert scores
       if (state.scores && Object.keys(state.scores).length > 0) {
         await tx.insert(scores).values(
-          Object.values(state.scores).map((score: any) => ({
+          Object.values(state.scores).map((score: Score<any>) => ({
             stateId,
             scoreId: score.score_id,
-            scoreData: score,
-            constructor: score.constructor?.name || 'Unknown'
+            scoreData: score.dataBaseSave(),
           }))
         );
       }
@@ -119,11 +123,10 @@ export async function saveStateToDatabase(stateName: string, state: any) {
       // Insert placements
       if (state.placement && Object.keys(state.placement).length > 0) {
         await tx.insert(placements).values(
-          Object.values(state.placement).map((placement: any) => ({
+          Object.values(state.placement).map((placement: Placement) => ({
             stateId,
             placementId: placement.id,
-            placementData: placement,
-            constructor: placement.constructor?.name || 'Unknown'
+            placementData: placement.dataBaseSave(),
           }))
         );
       }
@@ -131,10 +134,9 @@ export async function saveStateToDatabase(stateName: string, state: any) {
       // Insert validations
       if (state.validations && state.validations.length > 0) {
         await tx.insert(validations).values(
-          state.validations.map((validation: any) => ({
+          state.validations.map((validation: Validation) => ({
             stateId,
-            validationData: validation,
-            constructor: validation.constructor?.name || 'Unknown'
+            validationData: validation.dataBaseSave()
           }))
         );
       }

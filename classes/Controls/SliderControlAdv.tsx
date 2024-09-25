@@ -1,4 +1,4 @@
-"use client";
+
 import { obj } from "../vizobjects/obj";
 import { SliderControl, SliderControlConstructor } from "./SliderControl";
 import {

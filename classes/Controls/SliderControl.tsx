@@ -1,4 +1,4 @@
-"use client";
+
 
 import { obj } from "../vizobjects/obj";
 import { Control, ControlConstructor } from "./Control";

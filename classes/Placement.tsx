@@ -38,7 +38,7 @@ function ShowPlacement({id}: {id: number}) {
   return null;
 }
 
-interface PlacementConstructor {
+export interface PlacementConstructor {
   id: number;
   object_ids: number[];
   grid?: [number, number];

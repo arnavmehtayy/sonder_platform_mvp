@@ -1,4 +1,4 @@
-'use client'
+
 
 import { SliderControl, SliderControlConstructor } from "./SliderControl";
 import * as THREE from "three";

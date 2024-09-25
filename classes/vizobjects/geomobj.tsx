@@ -21,6 +21,22 @@ import { Separator } from "@/components/ui/separator";
 import { dict_keys, get_attributes } from "./get_set_obj_attributes";
 import { TouchControlEditor } from "@/app/Components/EditMode/EditPopups/TouchControlAttributeEditor";
 
+// List of 2D geometries with simple parameters
+type PredefinedGeometry = {
+  type: 'circle' | 'rectangle' | 'triangle' | 'regular-polygon';
+  params: {
+    radius?: number;
+    width?: number;
+    height?: number;
+    sideLength?: number;
+    numSides?: number;
+  };
+};
+
+
+
+
+
 /*
  * This class creates a geometric object on the scene (Any object that is rendered using THREE.BufferGeometry).
  */
@@ -62,6 +78,29 @@ export class geomobj extends TransformObj {
     });
     this.geom = geom;
     this.OnClick = OnClick;
+  }
+
+  private createPredefinedGeometry(geomDef: PredefinedGeometry): THREE.BufferGeometry {
+    switch (geomDef.type) {
+      case 'circle':
+        return new THREE.CircleGeometry(geomDef.params.radius || 1, 32);
+      case 'rectangle':
+        return new THREE.PlaneGeometry(geomDef.params.width || 1, geomDef.params.height || 1);
+      case 'triangle':
+        const triangleShape = new THREE.Shape();
+        const sideLength = geomDef.params.sideLength || 1;
+        triangleShape.moveTo(0, 0);
+        triangleShape.lineTo(sideLength, 0);
+        triangleShape.lineTo(sideLength / 2, sideLength * Math.sqrt(3) / 2);
+        triangleShape.lineTo(0, 0);
+        return new THREE.ShapeGeometry(triangleShape);
+      case 'regular-polygon':
+        const numSides = geomDef.params.numSides || 5;
+        const radius = geomDef.params.radius || 1;
+        return new THREE.CircleGeometry(radius, numSides);
+      default:
+        return new THREE.CircleGeometry(1, 32);
+    }
   }
 
   dataBaseSave(): geomobjconstructor & { type: string } {

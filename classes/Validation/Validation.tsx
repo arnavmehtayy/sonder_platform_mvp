@@ -17,7 +17,17 @@ export default abstract class Validation {
   // every validator must have a method to compute the validity of the object
   abstract computeValidity(obj: any | obj[]): Validation; 
 
-  abstract dataBaseSave(): ValidationConstructor & {type: string};
+  
+
+  // abstract dataBaseSave(): ValidationConstructor & {type: string};
+
+  dataBaseSave(): ValidationConstructor & { type: string } {
+    return {
+      is_valid: this.is_valid,
+      desc: this.desc,
+      type: this.constructor.name // This will give us the name of the specific Validation subclass
+    };
+  }
 
   constructor({
     is_valid,

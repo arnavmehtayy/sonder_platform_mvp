@@ -1,4 +1,4 @@
-"use client";
+
 import { Control, ControlConstructor } from "./Control";
 import { useStore, setMultiChoiceOptionsSelector } from "@/app/store";
 import Latex from "react-latex-next";

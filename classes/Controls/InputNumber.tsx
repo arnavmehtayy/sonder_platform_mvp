@@ -1,4 +1,4 @@
-"use client";
+
 
 import { Control } from "./Control";
 import { useStore, setInputNumberValueSelector } from "@/app/store";

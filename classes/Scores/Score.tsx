@@ -1,4 +1,4 @@
-'use client'
+
 
 import { obj } from "../vizobjects/obj";
 import { objectScorer } from "./objectScorer";
@@ -55,7 +55,7 @@ export function ShowScore({ score }: { score: Score<any> }) {
   );
 }
 
-interface ScoreConstructor<Score_T> {
+export interface ScoreConstructor<Score_T> {
   score_id: number;
   text: string;
   desc: string;

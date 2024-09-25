@@ -1,4 +1,4 @@
-'use client'
+
 
 import * as THREE from "three";
 import { TransformObj } from "../vizobjects/transformObj";
