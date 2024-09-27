@@ -14,8 +14,9 @@ import {
   dict_keys,
   FunctionPlotString_atts,
 } from "./get_set_obj_attributes";
+import { TransformObj, TransformObjConstructor } from "./transformObj";
 
-export default class FunctionPlotString extends geomobj {
+export default class FunctionPlotString extends TransformObj {
   func: (x: number, t: number) => number;
   xRange: [number, number];
   numPoints: number;
@@ -25,17 +26,13 @@ export default class FunctionPlotString extends geomobj {
   isParametric: boolean;
 
   constructor({
+    name = "FunctionPlot",
     id,
-    name = "FunctionPlotString",
     position = new THREE.Vector2(0, 0),
     rotation = new THREE.Vector3(0, 0, 0),
     scale = new THREE.Vector3(1, 1, 1),
     color = "white",
-    geom = new THREE.PlaneGeometry(0.1, 0.1),
     touch_controls = new TouchControl(),
-    param_t = 0,
-    isClickable = false,
-    OnClick = undefined,
     functionString = "x",
     xRange = [-10, 10],
     numPoints = 100,
@@ -51,11 +48,7 @@ export default class FunctionPlotString extends geomobj {
       rotation: rotation,
       scale: scale,
       color: color,
-      geom: geom,
       touch_controls: touch_controls,
-      param_t: param_t,
-      isClickable: isClickable,
-      OnClick: OnClick,
       isEnabled: isEnabled,
     });
     this.functionString = functionString;
@@ -153,7 +146,7 @@ export default class FunctionPlotString extends geomobj {
   }
 }
 
-interface FunctionPlotStringConstructor extends geomobjconstructor {
+interface FunctionPlotStringConstructor extends TransformObjConstructor {
   id: number;
   position?: THREE.Vector2;
   rotation?: THREE.Vector3;
@@ -187,7 +180,6 @@ const FunctionPlotPopup: React.FC<{
       tValue: 0,
       isParametric: false,
       name: "FunctionPlot",
-      geom: new THREE.PlaneGeometry(0.1, 0.1),
     });
 
   const popupProps: EditableObjectPopupProps<FunctionPlotStringConstructor> = {

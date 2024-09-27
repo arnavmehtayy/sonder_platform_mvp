@@ -74,8 +74,8 @@ for (let i = 0; i < points.length; i++) {
       id: 2 + i,
       position: points[i],
       color: points_colors[i],
-      geom: new THREE.CircleGeometry(),
-      scale: new Vector3(0.8, 0.8, 1),
+      geom_json: { type: "circle", params: { radius: 0.8 } },
+      scale: new Vector3(1, 1, 1),
     })
   );
 }
@@ -88,8 +88,8 @@ for (let i = 0; i < points.length; i++) {
         id: 2 + i,
         position: points_true[i],
         color: points_colors[i],
-        geom: new THREE.CircleGeometry(),
-        scale: new Vector3(0.8, 0.8, 1),
+        geom_json: { type: "circle", params: { radius: 0.8 } },
+      scale: new Vector3(1, 1, 1),
       })
     );
   }
@@ -515,8 +515,8 @@ export const data_transformation: { [key: string]: data_type } = {
         id: 2 + i,
         position: new Vector2(x, 0),
         color: ["blue", "red", "green", "yellow", "purple"][i],
-        geom: new THREE.CircleGeometry(),
-        scale: new Vector3(0.8, 0.8, 1),
+        geom_json: { type: "circle", params: { radius: 0.8 } },
+      scale: new Vector3(1, 1, 1),
       })),
     ],
     validations: [
@@ -643,8 +643,8 @@ export const data_transformation: { [key: string]: data_type } = {
         id: 3 + i,
         position: new Vector2(x, (x-2)**2),
         color: ["blue", "red", "green", "yellow", "purple"][i],
-        geom: new THREE.CircleGeometry(),
-        scale: new Vector3(0.8, 0.8, 1),
+        geom_json: { type: "circle", params: { radius: 0.8 } },
+      scale: new Vector3(1, 1, 1),
       })),
     ],
     validations: [

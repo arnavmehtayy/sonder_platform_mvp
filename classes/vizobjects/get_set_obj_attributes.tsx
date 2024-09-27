@@ -440,3 +440,27 @@ export const Dummy_atts: dict_get_attributes<DummyDataStorage<any>> = {
         },
     ],
 }
+
+export const atts: {
+  obj: dict_get_attributes<obj>;
+  coloredObj: dict_get_attributes<coloredObj>;
+  TransformObj: dict_get_attributes<TransformObj>;
+  DummyDataStorage: dict_get_attributes<DummyDataStorage<any>>;
+  CoordinateAxis: dict_get_attributes<CoordinateAxis>;
+  FunctionPlot: dict_get_attributes<FunctionPlot>;
+  FunctionPlotString: dict_get_attributes<FunctionPlotString>;
+  TextGeom: dict_get_attributes<TextGeom>;
+  LineObj: dict_get_attributes<LineObj>;
+} = {
+  obj: obj_atts,
+  coloredObj: color_atts,
+  TransformObj: transform_atts,
+  DummyDataStorage: Dummy_atts,
+  CoordinateAxis: Axis_atts,
+  FunctionPlot: functionplot_atts,
+  FunctionPlotString: FunctionPlotString_atts,
+  TextGeom: text_atts,
+  LineObj: line_atts,
+
+
+}

@@ -54,8 +54,9 @@ export function ShowScore({ score }: { score: Score<any> }) {
     </div> : null
   );
 }
+type score_typ = number // add more to this later
 
-export interface ScoreConstructor<Score_T> {
+export interface ScoreConstructor<Score_T extends score_typ> {
   score_id: number;
   text: string;
   desc: string;
@@ -64,7 +65,8 @@ export interface ScoreConstructor<Score_T> {
   to_string?: (score: Score_T) => string;
 }
 
-export class Score<Score_T> {
+
+export class Score<Score_T extends score_typ> {
   score_id: number;
   text: string;
   desc: string;
@@ -79,7 +81,7 @@ export class Score<Score_T> {
     obj_list,
     desc = "",
     transformation,
-    to_string = (score) => score as string,
+    to_string = (score) => score.toString(),
   }: ScoreConstructor<Score_T>) {
     this.text = text;
     this.to_string = to_string;

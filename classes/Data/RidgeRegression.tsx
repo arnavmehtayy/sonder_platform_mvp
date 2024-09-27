@@ -195,7 +195,8 @@ for (let i = 0; i < num_new_points; i++) {
     new geomobj({
       name: `(${new_points[i].x}, ${new_points[i].y})`,
       id: i + 60,
-      geom: new THREE.CircleGeometry(0.23, 128),
+      geom_json: {type: 'circle', params: {radius: 0.23}},
+      // geom: new THREE.CircleGeometry(0.23, 128),
       position: new_points[i],
       color: "rgb(0,200,25)",
       isEnabled: false,
@@ -208,7 +209,7 @@ for (let i = 0; i < num_points; i++) {
     new geomobj({
       name: `(${points[i].x}, ${points[i].y})`,
       id: i,
-      geom: new THREE.CircleGeometry(0.23, 128),
+      geom_json: {type: 'circle', params: {radius: 0.23}},
       position: points[i],
       color: "white",
     })
@@ -228,7 +229,7 @@ for (let i = 0; i < num_points; i++) {
       new geomobj({
         name: `(${points_tech_companies[i].x}, ${points_tech_companies[i].y})`,
         id: 65 + i,
-        geom: new THREE.CircleGeometry(0.23, 128),
+        geom_json: {type: 'circle', params: {radius: 0.23}},
         position: points_tech_companies[i],
         color: "violet",
       })
@@ -313,7 +314,7 @@ for (let i = 0; i < outlier_positions.length; i++) {
   outlier_objs.push(
     new geomobj({
       id: 150 + i,
-      geom: new THREE.CircleGeometry(0.3, 128),
+      geom_json: {type: 'circle', params: {radius: 0.3}},
       position: outlier_positions[i],
       color: "violet",
       name: `(${outlier_positions[i].x}, ${outlier_positions[i].y})`,

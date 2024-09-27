@@ -22,7 +22,7 @@ import { dict_keys, get_attributes } from "./get_set_obj_attributes";
 import { TouchControlEditor } from "@/app/Components/EditMode/EditPopups/TouchControlAttributeEditor";
 
 // List of 2D geometries with simple parameters
-type PredefinedGeometry = {
+export type PredefinedGeometry = {
   type: 'circle' | 'rectangle' | 'triangle' | 'regular-polygon';
   params: {
     radius?: number;
@@ -43,7 +43,7 @@ type PredefinedGeometry = {
 
 export interface geomobjconstructor extends TransformObjConstructor {
   color?: string;
-  geom: THREE.BufferGeometry;
+  geom_json: PredefinedGeometry
   param_t?: number;
   isClickable?: boolean;
   OnClick?: ((obj: geomobj) => void) | undefined;
@@ -51,6 +51,7 @@ export interface geomobjconstructor extends TransformObjConstructor {
 
 export class geomobj extends TransformObj {
   geom: THREE.BufferGeometry; // the geometry of the object
+  geom_json: PredefinedGeometry
   isClickable: boolean = false; // whether the object on the screen can be clicked or not
   OnClick: ((obj: geomobj) => void) | undefined;
   constructor({
@@ -59,7 +60,7 @@ export class geomobj extends TransformObj {
     rotation = new THREE.Vector3(0, 0, 0),
     scale = new THREE.Vector3(1, 1, 1),
     color = "blue",
-    geom, // geom remains a required parameter
+    geom_json = {type: 'circle', params: {radius: 2}},
     touch_controls = new TouchControl(),
     param_t = 0, // the parametric parameter if the object is following a parametric object
     OnClick = undefined,
@@ -76,7 +77,8 @@ export class geomobj extends TransformObj {
       isEnabled: isEnabled,
       name: name,
     });
-    this.geom = geom;
+    this.geom_json = geom_json
+    this.geom = this.createPredefinedGeometry(geom_json);
     this.OnClick = OnClick;
   }
 
@@ -107,11 +109,11 @@ export class geomobj extends TransformObj {
     return {
       ...super.dataBaseSave(),
       color: this.color,
-      geom: this.geom,
       param_t: this.param_t,
       isClickable: this.isClickable,
       OnClick: this.OnClick,
       type: "GeomObj",
+      geom_json: this.geom_json
     };
   }
 
@@ -199,10 +201,10 @@ export class geomobj extends TransformObj {
       rotation: new THREE.Vector3(0, 0, 0),
       scale: new THREE.Vector3(2, 2, 2),
       color: "#000000",
-      geom: new THREE.BufferGeometry(),
       touch_controls: new TouchControl(),
       param_t: 0,
       isClickable: false,
+      geom_json: {type: "circle", params:{radius:1}}
     });
 
     const handleChange = (key: keyof geomobjconstructor, value: any) => {
@@ -222,20 +224,14 @@ export class geomobj extends TransformObj {
       fields: [
         { key: "name", label: "Name", type: "text" },
         {
-          key: "geom",
+          key: "geom_json",
           label: "Geometry",
           type: "select",
           options: [
-            { label: "Circle", value: new THREE.CircleGeometry() },
-            { label: "Box", value: new THREE.BoxGeometry() },
-            {
-              label: "Triangle",
-              value: new THREE.Triangle(
-                new THREE.Vector3(0, 0, 0),
-                new THREE.Vector3(1, 0, 0),
-                new THREE.Vector3(0, 1, 0)
-              ),
-            },
+            { label: "Circle", value: { type: "circle", params: { radius: 1 } } },
+            { label: "Rectangle", value: { type: "rectangle", params: { width: 1, height: 1 } } },
+            { label: "Triangle", value: { type: "triangle", params: { sideLength: 1 } } },
+            { label: "Regular Polygon", value: { type: "regular-polygon", params: { radius: 1, numSides: 5 } } },
           ],
         },
         { key: "color", label: "Color", type: "color" },

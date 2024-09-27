@@ -2,18 +2,16 @@ import { Vector2, Vector3 } from "three";
 import { TouchControlAttributes } from "../Controls/TouchControl";
 import { DummyDataSupportedTypes } from "../vizobjects/DummyDataStore";
 import * as THREE from "three";
+import { PredefinedGeometry } from "../vizobjects/geomobj";
+import { value_typ, relation } from "../Validation/Validation_obj";
 
-// Base interface for all objects
-interface BaseObjectModel {
+// Obj
+export interface ObjModel {
+  isClickable: boolean;
   id: number;
   name: string;
   isEnabled: boolean;
-  type: string;
-}
-
-// Obj
-export interface ObjModel extends BaseObjectModel {
-  isClickable: boolean;
+  type: string; // this is for the model and does not exist in the obj class
 }
 
 // ColoredObj
@@ -58,10 +56,20 @@ export interface FunctionPlotModel extends TransformObjModel {
   lineWidth: number;
 }
 
+// FunctionPlotString
+export interface FunctionPlotStringModel extends TransformObjModel {
+  functionString: string;
+  xRange: [number, number];
+  numPoints: number;
+  lineWidth: number;
+  tValue: number;
+  isParametric: boolean;
+}
+
 // GeomObj
 export interface GeomObjModel extends TransformObjModel {
-  geom: string; // Serialized geometry type
-  param_t: number;
+  geom_json: PredefinedGeometry;
+  isClickable: boolean;
 }
 
 // LineObj
@@ -82,6 +90,142 @@ export interface TextGeomModel extends GeomObjModel {
   text: string;
 }
 
+// VALIDATIONS
+
+export interface ValidationModel {
+  is_valid: boolean;
+  desc: string;
+}
+
+// Validation_obj Model
+export type SerializableValueType =
+  | number
+  | { x: number; y: number }
+  | { x: number; y: number; z: number };
+
+// Update the ValidationObjModel
+export interface ValidationObjModel extends ValidationModel {
+  answer: SerializableValueType;
+  obj_id: number;
+  error: number;
+  relation: relation;
+}
+
+// Validation_score Model
+export interface ValidationScoreModel extends ValidationModel {
+  score_id: number;
+  target_score: number;
+  error: number;
+  relation: relation;
+}
+
+// Validation_tableControl Model
+export interface ValidationTableControlModel extends ValidationModel {
+  answers: number[][];
+  control_id: number;
+  error: number;
+  validateCells: boolean[][];
+}
+
+// Validation_select Model
+export interface ValidationSelectModel extends ValidationModel {
+  answer: number[];
+  control_id: number;
+}
+
+// Validation_test Model
+export interface ValidationTestModel extends ValidationModel {
+  // No additional properties
+}
+
+// ValidationMultiChoice Model
+export interface ValidationMultiChoiceModel extends ValidationModel {
+  answer: number[];
+  control_id: number;
+}
+
+// Validation_inputNumber Model
+export interface ValidationInputNumberModel extends ValidationModel {
+  answer: number;
+  control_id: number;
+  error: number;
+}
+
+// Base Control Model
+export interface ControlModel {
+  id: number;
+  desc: string;
+  text: string;
+  isClickable: boolean;
+  type: string;
+}
+
+// SliderControl Model
+export interface SliderControlModel extends ControlModel {
+  range: [number, number];
+  value: number;
+  step: number;
+  onChange: string; // We'll store this as a string representation of the function
+}
+
+// SelectControl Model
+export interface SelectControlModel extends ControlModel {
+  options: { value: number; label: string }[];
+  selected: number[];
+}
+
+// TableControl Model
+export interface TableControlModel extends ControlModel {
+  rows: {
+    cells: {
+      value: number;
+      isEditable: boolean;
+    }[];
+  }[];
+}
+
+// ButtonControl Model
+export interface ButtonControlModel extends ControlModel {
+  onClick: string; // We'll store this as a string representation of the function
+}
+
+// MultiChoiceControl Model
+export interface MultiChoiceControlModel extends ControlModel {
+  choices: string[];
+  selected: number[];
+}
+
+// InputNumberControl Model
+export interface InputNumberControlModel extends ControlModel {
+  value: number;
+  min?: number;
+  max?: number;
+  step?: number;
+}
+
+
+
+// Union type for all control models
+export type ControlObjectModel =
+  | ControlModel
+  | SliderControlModel
+  | SelectControlModel
+  | TableControlModel
+  | ButtonControlModel
+  | MultiChoiceControlModel
+  | InputNumberControlModel;
+
+// Union type for all validation models
+export type ValidationObjectModel =
+  | ValidationModel
+  | ValidationObjModel
+  | ValidationScoreModel
+  | ValidationTableControlModel
+  | ValidationSelectModel
+  | ValidationTestModel
+  | ValidationMultiChoiceModel
+  | ValidationInputNumberModel;
+
 // Union type for all models
 export type VizObjectModel =
   | ObjModel
@@ -94,25 +238,17 @@ export type VizObjectModel =
   | LineObjModel
   | TextGeomModel;
 
+
 // Helper function to convert Vector2 to a plain object
 export function vector2ToPlain(vec: Vector2): { x: number; y: number } {
   return { x: vec.x, y: vec.y };
 }
 
 // Helper function to convert Vector3 to a plain object
-export function vector3ToPlain(vec: Vector3): { x: number; y: number; z: number } {
+export function vector3ToPlain(vec: Vector3): {
+  x: number;
+  y: number;
+  z: number;
+} {
   return { x: vec.x, y: vec.y, z: vec.z };
-}
-
-// Helper function to serialize a function
-export function serializeFunction(func: Function): string {
-  return func.toString();
-}
-
-// Helper function to serialize geometry
-export function serializeGeometry(geom: THREE.BufferGeometry): string {
-  return JSON.stringify({
-    type: geom.type,
-    // Add other relevant properties as needed
-  });
 }

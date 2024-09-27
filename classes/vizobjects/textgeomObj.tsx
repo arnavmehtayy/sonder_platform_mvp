@@ -27,7 +27,7 @@ export default class TextGeom extends geomobj {
     rotation = new THREE.Vector3(0, 0, 0),
     scale = new THREE.Vector3(1, 1, 1),
     color = "blue",
-    geom, // geom remains a required parameter
+    geom_json, // geom remains a required parameter
     touch_controls = new TouchControl(),
     param_t = 0, // the parametric parameter if the object is following a parametric object
     isClickable = true, // if this is false then this object cannot detect a click at all
@@ -43,12 +43,12 @@ export default class TextGeom extends geomobj {
       rotation: rotation,
       scale: scale,
       color: color,
-      geom: geom,
       touch_controls: touch_controls,
       param_t: param_t,
       isClickable: isClickable,
       OnClick: OnClick,
       isEnabled: isEnabled,
+      geom_json: geom_json
     });
     this.text = text;
     this.name = text;
@@ -62,7 +62,6 @@ export default class TextGeom extends geomobj {
       rotation: this.rotation,
       scale: this.scale,
       color: this.color,
-      geom: this.geom,
       touch_controls: this.touch_controls,
       param_t: this.param_t,
       isClickable: this.isClickable,
@@ -70,6 +69,7 @@ export default class TextGeom extends geomobj {
       text: this.text,
       isEnabled: this.isEnabled,
       type: "TextGeom",
+      geom_json: this.geom_json
     };
   }
 
@@ -146,11 +146,11 @@ export default class TextGeom extends geomobj {
         rotation: new THREE.Vector3(0, 0, 0),
         scale: new THREE.Vector3(2, 2, 2),
         color: "#000000",
-        geom: new THREE.BufferGeometry(),
         touch_controls: new TouchControl(),
         param_t: 0,
         isClickable: false,
         text: "test",
+        geom_json: {type: 'circle', params: {radius: 1}}
       }
     );
 
@@ -171,20 +171,14 @@ export default class TextGeom extends geomobj {
       fields: [
         { key: "name", label: "Name", type: "text" },
         {
-          key: "geom",
+          key: "geom_json",
           label: "Geometry",
           type: "select",
           options: [
-            { label: "Circle", value: new THREE.CircleGeometry() },
-            { label: "Box", value: new THREE.BoxGeometry() },
-            {
-              label: "Triangle",
-              value: new THREE.Triangle(
-                new THREE.Vector3(0, 0, 0),
-                new THREE.Vector3(1, 0, 0),
-                new THREE.Vector3(0, 1, 0)
-              ),
-            },
+            { label: "Circle", value: { type: "circle", params: { radius: 1 } } },
+            { label: "Rectangle", value: { type: "rectangle", params: { width: 1, height: 1 } } },
+            { label: "Triangle", value: { type: "triangle", params: { sideLength: 1 } } },
+            { label: "Regular Polygon", value: { type: "regular-polygon", params: { radius: 1, numSides: 5 } } },
           ],
         },
         { key: "text", label: "Text", type: "text" },
