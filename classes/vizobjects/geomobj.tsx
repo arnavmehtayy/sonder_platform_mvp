@@ -44,6 +44,7 @@ export type PredefinedGeometry = {
 export interface geomobjconstructor extends TransformObjConstructor {
   color?: string;
   geom_json: PredefinedGeometry
+  geom?: THREE.BufferGeometry
   param_t?: number;
   isClickable?: boolean;
   OnClick?: ((obj: geomobj) => void) | undefined;
@@ -61,6 +62,7 @@ export class geomobj extends TransformObj {
     scale = new THREE.Vector3(1, 1, 1),
     color = "blue",
     geom_json = {type: 'circle', params: {radius: 2}},
+    geom = undefined,
     touch_controls = new TouchControl(),
     param_t = 0, // the parametric parameter if the object is following a parametric object
     OnClick = undefined,
@@ -78,7 +80,7 @@ export class geomobj extends TransformObj {
       name: name,
     });
     this.geom_json = geom_json
-    this.geom = this.createPredefinedGeometry(geom_json);
+    this.geom = geom ? geom: this.createPredefinedGeometry(geom_json);
     this.OnClick = OnClick;
     this.type = "GeomObj";
   }
