@@ -185,6 +185,7 @@ export const PlacementControl = ({
           id: obj_id,
           position: position,
           geom: placement.geometry,
+          geom_json: {type:'circle', params: {radius: 0.2}},
           color: placement.color,
         })
       );
