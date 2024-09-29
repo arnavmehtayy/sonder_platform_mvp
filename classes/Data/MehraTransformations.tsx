@@ -166,35 +166,50 @@ export const data_transformation: { [key: string]: data_type } = {
         new Validation_obj({
           obj_id: 2,
           answer: 25,
-          get_attribute: (obj: TransformObj) => obj.position.y,
+          get_attribute_json: {
+            obj_type: "GeomObj",
+            func: "position-y"
+          },
           error: 0.01,
           desc: "Validate y-value for x = -5",
         }),
         new Validation_obj({
           obj_id: 3,
           answer: 9,
-          get_attribute: (obj: TransformObj) => obj.position.y,
+          get_attribute_json: {
+            obj_type: "GeomObj",
+            func: "position-y"
+          },
           error: 0.01,
           desc: "Validate y-value for x = -3",
         }),
         new Validation_obj({
           obj_id: 4,
           answer: 0,
-          get_attribute: (obj: TransformObj) => obj.position.y,
+          get_attribute_json: {
+            obj_type: "GeomObj",
+            func: "position-y"
+          },
           error: 0.01,
           desc: "Validate y-value for x = 0",
         }),
         new Validation_obj({
           obj_id: 5,
           answer: 4,
-          get_attribute: (obj: TransformObj) => obj.position.y,
+          get_attribute_json: {
+            obj_type: "GeomObj",
+            func: "position-y"
+          },
           error: 0.01,
           desc: "Validate y-value for x = 2",
         }),
         new Validation_obj({
           obj_id: 6,
           answer: 16,
-          get_attribute: (obj: TransformObj) => obj.position.y,
+          get_attribute_json: {
+            obj_type: "GeomObj",
+            func: "position-y"
+          },
           error: 0.01,
           desc: "Validate y-value for x = 4",
         }),
@@ -286,35 +301,50 @@ export const data_transformation: { [key: string]: data_type } = {
       new Validation_obj({
         obj_id: 2,
         answer: 35,
-        get_attribute: (obj: TransformObj) => obj.position.y,
+        get_attribute_json: {
+          obj_type: "GeomObj",
+          func: "position-y"
+        },
         error: 0.01,
         desc: "Validate y-value for x = -5",
       }),
       new Validation_obj({
         obj_id: 3,
         answer: 19,
-        get_attribute: (obj: TransformObj) => obj.position.y,
+        get_attribute_json: {
+          obj_type: "GeomObj",
+          func: "position-y"
+        },
         error: 0.01,
         desc: "Validate y-value for x = -3",
       }),
       new Validation_obj({
         obj_id: 4,
         answer: 10,
-        get_attribute: (obj: TransformObj) => obj.position.y,
+        get_attribute_json: {
+          obj_type: "GeomObj",
+          func: "position-y"
+        },
         error: 0.01,
         desc: "Validate y-value for x = 0",
       }),
       new Validation_obj({
         obj_id: 5,
         answer: 14,
-        get_attribute: (obj: TransformObj) => obj.position.y,
+        get_attribute_json: {
+          obj_type: "GeomObj",
+          func: "position-y"
+        },
         error: 0.01,
         desc: "Validate y-value for x = 2",
       }),
       new Validation_obj({
         obj_id: 6,
         answer: 26,
-        get_attribute: (obj: TransformObj) => obj.position.y,
+        get_attribute_json: {
+          obj_type: "GeomObj",
+          func: "position-y"
+        },
         error: 0.01,
         desc: "Validate y-value for x = 4",
       }),
@@ -418,14 +448,20 @@ export const data_transformation: { [key: string]: data_type } = {
       new Validation_obj({
         obj_id: 2,
         answer: 10,
-        get_attribute: (obj: TransformObj) => obj.position.y,
+        get_attribute_json: {
+          obj_type: "GeomObj",
+          func: "position-y"
+        },
         error: 0.1,
         desc: "Validate vertical shift of the transformed function",
       }),
       new Validation_obj({
         obj_id: 2,
         answer: 0,
-        get_attribute: (obj: TransformObj) => obj.position.x,
+        get_attribute_json: {
+          obj_type: "GeomObj",
+          func: "position-x"
+        },
         error: 0.1,
         desc: "Validate horizontal shift of the transformed function",
       }),
@@ -511,35 +547,50 @@ export const data_transformation: { [key: string]: data_type } = {
       new Validation_obj({
         obj_id: 2,
         answer: 25,
-        get_attribute: (obj: TransformObj) => obj.position.y,
+        get_attribute_json: {
+          obj_type: "GeomObj",
+          func: "position-y"
+        },
         error: 0.01,
         desc: "Validate y-value for x = -3",
       }),
       new Validation_obj({
         obj_id: 3,
         answer: 9,
-        get_attribute: (obj: TransformObj) => obj.position.y,
+        get_attribute_json: {
+          obj_type: "GeomObj",
+          func: "position-y"
+        },
         error: 0.01,
         desc: "Validate y-value for x = -1",
       }),
       new Validation_obj({
         obj_id: 4,
         answer: 0,
-        get_attribute: (obj: TransformObj) => obj.position.y,
+        get_attribute_json: {
+          obj_type: "GeomObj",
+          func: "position-y"
+        },
         error: 0.01,
         desc: "Validate y-value for x = 2",
       }),
       new Validation_obj({
         obj_id: 5,
         answer: 4,
-        get_attribute: (obj: TransformObj) => obj.position.y,
+        get_attribute_json: {
+          obj_type: "GeomObj",
+          func: "position-y"
+        },
         error: 0.01,
         desc: "Validate y-value for x = 4",
       }),
       new Validation_obj({
         obj_id: 6,
         answer: 16,
-        get_attribute: (obj: TransformObj) => obj.position.y,
+        get_attribute_json: {
+          obj_type: "GeomObj",
+          func: "position-y"
+        },
         error: 0.01,
         desc: "Validate y-value for x = 6",
       }),
@@ -639,7 +690,10 @@ export const data_transformation: { [key: string]: data_type } = {
       new Validation_obj({
         obj_id: 2,
         answer: 2,
-        get_attribute: (obj: TransformObj) => obj.position.x,
+        get_attribute_json: {
+          obj_type: "GeomObj",
+          func: "position-x"
+        },
         error: 0.1,
         desc: "Validate horizontal shift of the transformed function",
       }),
@@ -647,7 +701,10 @@ export const data_transformation: { [key: string]: data_type } = {
       new Validation_obj({
         obj_id: 2,
         answer: 0,
-        get_attribute: (obj: TransformObj) => obj.position.y,
+        get_attribute_json: {
+          obj_type: "GeomObj",
+          func: "position-y"
+        },
         error: 0.1,
         desc: "Validate verticle shift of the transformed function",
       }),
@@ -741,14 +798,20 @@ export const data_transformation: { [key: string]: data_type } = {
       new Validation_obj({
         obj_id: 2,
         answer: -4,
-        get_attribute: (obj: TransformObj) => obj.position.x,
+        get_attribute_json: {
+          obj_type: "GeomObj",
+          func: "position-x"
+        },
         error: 0.1,
         desc: "Validate horizontal shift of the transformed function",
       }),
       new Validation_obj({
         obj_id: 2,
         answer: -8,
-        get_attribute: (obj: TransformObj) => obj.position.y,
+        get_attribute_json: {
+          obj_type: "GeomObj",
+          func: "position-y"
+        },
         error: 0.1,
         desc: "Validate vertical shift of the transformed function",
       }),

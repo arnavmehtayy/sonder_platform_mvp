@@ -9,10 +9,10 @@ import CoordinateAxis from "./CoordinateAxis";
 import { DummyDataStorage } from "./DummyDataStore";
 import FunctionPlotString from "./FunctionPlotString";
 
-export type get_att_type = number | string | boolean;
+export type att_type = number | string | boolean;
 export interface get_attributes<
   T extends obj,
-  V extends get_att_type = get_att_type
+  V extends att_type = att_type
 > {
   get_attribute: (obj: T) => V;
   set_attribute: (obj: T, value: V) => T;

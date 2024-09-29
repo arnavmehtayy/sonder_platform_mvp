@@ -3,49 +3,63 @@ import { Vector2, Vector3 } from "three";
 import { TransformObj } from "../vizobjects/transformObj";
 import * as Val_func from "./Validation_funcs";
 import { ValidationConstructor } from "./Validation";
+import { att_type, atts } from "../vizobjects/get_set_obj_attributes";
+import { obj, object_types } from "../vizobjects/obj";
 
-export type value_typ = number | Vector2 | Vector3; // the possible types of the attribute that is to be validated 
+export type value_typ = att_type; // the possible types of the attribute that is to be validated
 export type relation = "==" | ">" | "<" | ">=" | "<=" | "!="; // the possible relations that can be used in the comparison
 
 /*
  * this class stores information to validate a vizobjects attribute
  * T represents the type of the attribute that is to be validated
- * the attributes of this class are: answer, obj_id, 
+ * the attributes of this class are: answer, obj_id,
  * get_attribute: function that gets the attribute of the object
  * error: the error that is allowed in the comparison
  * relation: the relation that is to be used in the comparison
-*/
+ */
 
-interface Validation_obj_constructor<T extends value_typ> extends ValidationConstructor {
+interface Attribute_get {
+  obj_type: object_types;
+  func: string;
+}
+
+interface Validation_obj_constructor<T extends value_typ>
+  extends ValidationConstructor {
   answer: T;
   obj_id: number;
-  get_attribute: (obj: TransformObj) => T;
-  error: number;
-  relation: relation;
+  // get_attribute: (obj: TransformObj) => T;
+  get_attribute_json: Attribute_get;
+  error?: number;
+  relation?: relation;
 }
 export default class Validation_obj<T extends value_typ> extends Validation {
   answer: T; // the answer that the attribute should be
   obj_id: number; // the id of the object that is to be validated
-  get_attribute: (obj: TransformObj) => T; // function that gets the attribute of the object
+  get_attribute_json: Attribute_get; // function that gets the attribute of the object
+  get_attribute: (obj: obj) => T;
   error: number;
   relation: relation; // this is the relation that is to be used in the comparison
 
   constructor({
     obj_id,
     answer,
-    get_attribute,
+    get_attribute_json,
     error = 0,
     relation = "==",
     desc = "validation_obj",
-  }: Partial<Validation_obj<T>> & {
-    obj_id: number;
-    answer: T;
-    get_attribute: (obj: TransformObj) => T;
-  }) {
+  }: Validation_obj_constructor<T>) {
     super({ is_valid: false, desc: desc });
     this.answer = answer;
     this.obj_id = obj_id;
-    this.get_attribute = get_attribute;
+    this.get_attribute_json = get_attribute_json;
+    this.get_attribute = atts[get_attribute_json.obj_type]![
+      typeof this.answer === "number"
+        ? "number"
+        : typeof this.answer === "string"
+        ? "string"
+        : "boolean"
+    ][get_attribute_json.func].get_attribute as (obj: obj) => T;
+
     this.error = error;
     this.relation = relation;
   }
@@ -104,16 +118,16 @@ export default class Validation_obj<T extends value_typ> extends Validation {
     return this.set_valid(false) as Validation_obj<T>;
   }
 
-  dataBaseSave(): Validation_obj_constructor<T> & {type: string} {
+  dataBaseSave(): Validation_obj_constructor<T> & { type: string } {
     return {
       is_valid: this.is_valid,
       desc: this.desc,
       answer: this.answer,
       obj_id: this.obj_id,
-      get_attribute: this.get_attribute,
+      get_attribute_json: this.get_attribute_json,
       error: this.error,
       relation: this.relation,
-      type: "Validation_obj"
+      type: "Validation_obj",
     };
   }
 }

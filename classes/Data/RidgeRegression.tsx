@@ -847,11 +847,23 @@ For reference, the $\\textbf{green line}$ represents the true relation between t
         answer: [outlier_objs[2].id, outlier_objs[3].id],
         desc: "2 outliers decrease the slope",
       }),
-      new Validation_obj<Vector2>({
+      new Validation_obj<number>({
         obj_id: 998,
-        desc: "outlier placed correctly",
-        answer: outlier_placement_choices[1],
-        get_attribute: att_funcs.get_position,
+        desc: "outlier placed correctly-x",
+        answer: outlier_placement_choices[1].x,
+        get_attribute_json: {
+          obj_type: "GeomObj",
+          func: "position-x"
+        },
+      }),
+      new Validation_obj<number>({
+        obj_id: 998,
+        desc: "outlier placed correctly-y",
+        answer: outlier_placement_choices[1].y,
+        get_attribute_json: {
+          obj_type: "GeomObj",
+          func: "position-y"
+        },
       }),
       new ValidationMultiChoice({
         control_id: 2,
