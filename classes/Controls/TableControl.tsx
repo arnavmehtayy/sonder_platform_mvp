@@ -20,11 +20,12 @@ import {
 } from "@/components/ui/select";
 import { X } from "lucide-react";
 import Latex from "react-latex-next";
+import { AttributePairSet_json } from "./SliderControlAdv";
+import { atts } from "../vizobjects/get_set_obj_attributes";
 
 interface TableCell<T extends obj> {
   value: number;
-  transform_function: string;
-  set_attribute: (obj: T, value: number) => T;
+  attribute_pair: AttributePairSet_json;
   obj_id: number;
   isStatic: boolean;
 }
@@ -64,18 +65,20 @@ export class TableControl<T extends obj> extends Control {
     this.rowHeaders = rowHeaders;
   }
 
-  setCellValue(rowIndex: number, cellIndex: number, value: number): T | null {
+  setCellValue(rowIndex: number, cellIndex: number, value: number | ''): T | null {
     const cell = this.rows[rowIndex].cells[cellIndex];
     const obj = useStore.getState().vizobjs[cell.obj_id] as T;
-
+  
     if (obj) {
+      const numericValue = value === '' ? 0 : value;
       const transformedValue = this.evaluateTransformFunction(
-        cell.transform_function,
-        value
+        cell.attribute_pair.transform_function,
+        numericValue
       );
-      return cell.set_attribute(obj, transformedValue);
+      const setAttribute = atts[cell.attribute_pair.obj_type]!["number"][cell.attribute_pair.func].set_attribute;
+      return setAttribute(obj, transformedValue);
     }
-
+  
     return null;
   }
 
@@ -322,17 +325,26 @@ function TableEditor<T extends obj>({
   columnHeaders: string[];
   rowHeaders: string[];
 }) {
+  const vizobjs = useStore.getState().vizobjs;
+
   const updateCell = (
     rowIndex: number,
     cellIndex: number,
-    field: keyof TableCell<T>,
+    field: keyof TableCell<T> | keyof AttributePairSet_json,
     value: any
   ) => {
     const newRows = [...rows];
-    newRows[rowIndex].cells[cellIndex] = {
-      ...newRows[rowIndex].cells[cellIndex],
-      [field]: value,
-    };
+    if (field === "transform_function" || field === "func" || field === "obj_type") {
+      newRows[rowIndex].cells[cellIndex].attribute_pair = {
+        ...newRows[rowIndex].cells[cellIndex].attribute_pair,
+        [field]: value,
+      };
+    } else {
+      newRows[rowIndex].cells[cellIndex] = {
+        ...newRows[rowIndex].cells[cellIndex],
+        [field]: value,
+      };
+    }
     onChange(newRows);
   };
 
@@ -340,8 +352,11 @@ function TableEditor<T extends obj>({
     const newRow: TableRow<T> = {
       cells: columnHeaders.map(() => ({
         value: 0,
-        transform_function: "",
-        set_attribute: () => ({} as T),
+        attribute_pair: {
+          transform_function: "x",
+          func: "",
+          obj_type: 'Obj'
+        },
         obj_id: -1,
         isStatic: false,
       })),
@@ -352,8 +367,6 @@ function TableEditor<T extends obj>({
   const removeRow = (index: number) => {
     onChange(rows.filter((_, i) => i !== index));
   };
-
-  const vizobjs = useStore.getState().vizobjs;
 
   return (
     <div className="space-y-4">
@@ -370,25 +383,26 @@ function TableEditor<T extends obj>({
           </tr>
         </thead>
         <tbody>
-          {rows.map((row, rowIndex) => (
-            <tr key={rowIndex}>
-              <td className="border p-2 font-medium">{rowHeaders[rowIndex]}</td>
-              {row.cells.map((cell, cellIndex) => (
-                <td key={cellIndex} className="border p-2">
-                  <Input
-                    type="number"
-                    value={cell.value}
-                    onChange={(e) =>
-                      updateCell(
-                        rowIndex,
-                        cellIndex,
-                        "value",
-                        parseFloat(e.target.value)
-                      )
-                    }
-                    placeholder="Cell value"
-                    className="w-full mb-2"
-                  />
+        {rows.map((row, rowIndex) => (
+  <tr key={rowIndex}>
+    <td className="border p-2 font-medium">{rowHeaders[rowIndex]}</td>
+    {row.cells.map((cell, cellIndex) => (
+      <td key={cellIndex} className="border p-2">
+        <Input
+          type="number"
+          value={cell.value.toString()}
+          onChange={(e) => {
+            const value = e.target.value;
+            updateCell(
+              rowIndex,
+              cellIndex,
+              "value",
+              value === '' ? '' : parseFloat(value) || 0
+            );
+          }}
+          placeholder="Cell value"
+          className="w-full mb-2"
+        />
                   <div className="flex items-center mb-2">
                     <input
                       type="checkbox"
@@ -408,7 +422,7 @@ function TableEditor<T extends obj>({
                   {!cell.isStatic && (
                     <>
                       <Input
-                        value={cell.transform_function}
+                        value={cell.attribute_pair.transform_function}
                         onChange={(e) =>
                           updateCell(
                             rowIndex,
@@ -417,7 +431,7 @@ function TableEditor<T extends obj>({
                             e.target.value
                           )
                         }
-                        placeholder="Transform function"
+                        placeholder="Transform function (e.g., 2*x + 1)"
                         className="w-full mb-2"
                       />
                       <Select
@@ -427,16 +441,10 @@ function TableEditor<T extends obj>({
                           updateCell(rowIndex, cellIndex, "obj_id", objId);
                           const obj = vizobjs[objId] as T;
                           if (obj) {
-                            const setAttributeOptions =
-                              obj.get_set_att_selector("number");
-                            if (setAttributeOptions.length > 0) {
-                              updateCell(
-                                rowIndex,
-                                cellIndex,
-                                "set_attribute",
-                                setAttributeOptions[0].set_attribute
-                              );
-                            }
+                            updateCell(rowIndex, cellIndex, "obj_type", obj.type);
+                            const setAttributeOptions = obj.get_set_att_selector("number");
+                            const firstKey = Object.keys(setAttributeOptions)[0];
+                            updateCell(rowIndex, cellIndex, "func", firstKey);
                           }
                         }}
                       >
@@ -454,40 +462,20 @@ function TableEditor<T extends obj>({
                       </Select>
                       {cell.obj_id !== -1 && (
                         <Select
-                          value={cell.set_attribute.toString()}
+                          value={cell.attribute_pair.func}
                           onValueChange={(value) => {
-                            const obj = vizobjs[cell.obj_id] as T;
-                            const setAttributeOptions =
-                              obj.get_set_att_selector("number");
-                            const selectedSetAttribute =
-                              setAttributeOptions.find(
-                                (attr) =>
-                                  attr.set_attribute.toString() === value
-                              );
-                            if (selectedSetAttribute) {
-                              updateCell(
-                                rowIndex,
-                                cellIndex,
-                                "set_attribute",
-                                selectedSetAttribute.set_attribute
-                              );
-                            }
+                            updateCell(rowIndex, cellIndex, "func", value);
                           }}
                         >
                           <SelectTrigger className="w-full mt-2">
                             <SelectValue placeholder="Select set attribute" />
                           </SelectTrigger>
                           <SelectContent>
-                            {(vizobjs[cell.obj_id] as T)
-                              .get_set_att_selector("number")
-                              .map((attr, index) => (
-                                <SelectItem
-                                  key={index}
-                                  value={attr.set_attribute.toString()}
-                                >
-                                  {attr.label}
-                                </SelectItem>
-                              ))}
+                            {Object.keys((vizobjs[cell.obj_id] as T).get_set_att_selector("number")).map((attr) => (
+                              <SelectItem key={attr} value={attr}>
+                                {attr}
+                              </SelectItem>
+                            ))}
                           </SelectContent>
                         </Select>
                       )}

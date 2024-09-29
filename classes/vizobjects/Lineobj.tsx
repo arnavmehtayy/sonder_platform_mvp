@@ -68,6 +68,7 @@ export class LineObj extends coloredObj {
     this.point2 = point2;
     this.slope = slope;
     this.intercept = intercept;
+    this.type = "LineObj";
 
     if (constructionType === "slopeIntercept") {
       this.updateEndpoints();
@@ -190,8 +191,8 @@ export class LineObj extends coloredObj {
   }
 
   // write a function that given a type of output you want from your get_set_att_selector, it returns a list of attributes that can be controlled
-  get_set_att_selector(type: dict_keys): get_attributes<any, any>[] {
-    return [...super.get_set_att_selector(type), ...line_atts[type]];
+  get_set_att_selector(type: dict_keys): {[key: string]: get_attributes<any, any>} {
+    return {...super.get_set_att_selector(type), ...line_atts[type]};
   }
   // method that returns the physical three.js mesh representation of the object
   // this is used to render the object in the vizexperience

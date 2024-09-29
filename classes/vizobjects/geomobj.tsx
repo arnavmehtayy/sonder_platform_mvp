@@ -80,6 +80,7 @@ export class geomobj extends TransformObj {
     this.geom_json = geom_json
     this.geom = this.createPredefinedGeometry(geom_json);
     this.OnClick = OnClick;
+    this.type = "GeomObj";
   }
 
   private createPredefinedGeometry(geomDef: PredefinedGeometry): THREE.BufferGeometry {
@@ -180,8 +181,8 @@ export class geomobj extends TransformObj {
     );
   }
 
-  get_set_att_selector(type: dict_keys): get_attributes<any, any>[] {
-    return [...super.get_set_att_selector(type)];
+  get_set_att_selector(type: dict_keys): {[key: string]: get_attributes<any, any>} {
+    return {...super.get_set_att_selector(type)};
   }
 
   static getPopup({

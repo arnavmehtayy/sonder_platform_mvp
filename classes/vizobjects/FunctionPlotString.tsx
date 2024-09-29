@@ -59,13 +59,14 @@ export default class FunctionPlotString extends TransformObj {
     this.name = name;
     this.tValue = tValue;
     this.isParametric = isParametric;
+    this.type = "FunctionPlotString";
   }
 
-  get_set_att_selector(type: dict_keys): get_attributes<any, any>[] {
-    return [
+  get_set_att_selector(type: dict_keys): {[key: string]: get_attributes<any, any>} {
+    return {
       ...super.get_set_att_selector(type),
       ...FunctionPlotString_atts[type],
-    ];
+    };
   }
 
   parseFunction(functionString: string): (x: number, t: number) => number {

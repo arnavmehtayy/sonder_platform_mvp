@@ -11,7 +11,7 @@ export interface ObjModel {
   id: number;
   name: string;
   isEnabled: boolean;
-  type: string; // this is for the model and does not exist in the obj class
+  type: string; 
 }
 
 // ColoredObj

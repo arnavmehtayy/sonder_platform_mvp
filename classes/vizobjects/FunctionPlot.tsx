@@ -63,10 +63,11 @@ export default class FunctionPlot extends TransformObj {
     this.lineWidth = lineWidth;
     this.isClickable = isClickable;
     this.OnClick = OnClick;
+    this.type = 'FunctionPlot';
   }
 
-  get_set_att_selector(type: dict_keys): get_attributes<any, any>[] {
-    return [...super.get_set_att_selector(type), ...functionplot_atts[type]]
+  get_set_att_selector(type: dict_keys): {[key: string]: get_attributes<any, any>} {
+    return {...super.get_set_att_selector(type), ...functionplot_atts[type]}
   }
 
   dataBaseSave(): FunctionPlotConstructor & {type: string} {

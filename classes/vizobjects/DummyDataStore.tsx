@@ -23,6 +23,7 @@ export class DummyDataStorage<T extends DummyDataSupportedTypes> extends obj {
   constructor({ id, name, data }: DummyDataStorageConstructor<T>) {
     super({ id: id, name: name, isEnabled: true });
     this.data = data;
+    this.type = "DummyDataStorage";
   }
 
   // method to set the data for this data storage object

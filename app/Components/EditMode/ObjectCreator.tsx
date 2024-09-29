@@ -15,6 +15,7 @@ import { SelectControl } from "@/classes/Controls/SelectControl";
 import { EnablerControl } from "@/classes/Controls/EnablerControl";
 import { TableControl } from "@/classes/Controls/TableControl";
 import TextGeom from "@/classes/vizobjects/textgeomObj";
+import FunctionPlotString from "@/classes/vizobjects/FunctionPlotString";
 
 export type EditAddType =
   | obj
@@ -28,7 +29,8 @@ export type EditAddType =
   | SelectControl
   | EnablerControl
   | TableControl<obj> 
-  | TextGeom;
+  | TextGeom
+  | FunctionPlotString;
   
 export type PopUpType = 
   | typeof LineObj
@@ -41,7 +43,8 @@ export type PopUpType =
   | typeof SelectControl
   | typeof EnablerControl
   | typeof TableControl 
-  | typeof TextGeom;
+  | typeof TextGeom
+  | typeof FunctionPlotString;
   
 
 interface ObjectCreatorProps {

@@ -1,5 +1,5 @@
 
-import { obj } from "../vizobjects/obj";
+import { obj, object_types } from "../vizobjects/obj";
 import { SliderControl, SliderControlConstructor } from "./SliderControl";
 import {
   useStore,
@@ -25,19 +25,27 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
+import { atts, dict_get_attributes} from "../vizobjects/get_set_obj_attributes";
 
-interface AttributePairSet<T extends obj> {
+interface AttributePairSet {
   transform_function: string;
-  set_attribute: (obj: T, value: number) => T;
+  set_attribute: (obj: any, value: any) => any;
+}
+
+export interface AttributePairSet_json {
+  transform_function: string;
+  func: string
+  obj_type: object_types
 }
 
 export interface SliderControlAdvancedConstructor<T extends obj>
   extends SliderControlConstructor<T> {
-  attribute_pairs: AttributePairSet<T>[];
+  attribute_pairs: AttributePairSet_json[];
 }
 
 export class SliderControlAdvanced<T extends obj> extends SliderControl<T> {
-  attribute_pairs: AttributePairSet<T>[];
+  attribute_pairs: AttributePairSet[];
+  attribute_JSON: AttributePairSet_json[];
   localValue: number;
 
   constructor({
@@ -59,11 +67,22 @@ export class SliderControlAdvanced<T extends obj> extends SliderControl<T> {
       desc,
       text,
     });
-    this.attribute_pairs = attribute_pairs;
+    console.log(attribute_pairs)
+    this.attribute_pairs = attribute_pairs.map(
+      (pair: AttributePairSet_json) => {
+        return {
+          transform_function: pair.transform_function,
+          set_attribute: atts[pair.obj_type]!["number"][pair.func].set_attribute
+        }
+      }
+    )
+    this.attribute_JSON = attribute_pairs
+      
+    
     this.localValue = (range[0] + range[1]) / 2; // Initialize local value to the middle of the range
   }
 
-  setSliderValue(obj: T, value: number): T {
+  setSliderValue(obj: T, value: number): T { // override the setSliderValue method
     this.localValue = value; // Update the local value
     if (obj) {
       return this.attribute_pairs.reduce((updatedObj, pair) => {
@@ -100,7 +119,7 @@ export class SliderControlAdvanced<T extends obj> extends SliderControl<T> {
       obj_id: this.obj_id,
       range: this.range,
       step_size: this.step_size,
-      attribute_pairs: this.attribute_pairs,
+      attribute_pairs: this.attribute_JSON,
       type: "SliderControlAdv",
     };
   }
@@ -165,8 +184,8 @@ export class SliderControlAdvanced<T extends obj> extends SliderControl<T> {
   }
 }
 interface AttributePairsEditorProps {
-  pairs: AttributePairSet<any>[];
-  onChange: (pairs: AttributePairSet<any>[]) => void;
+  pairs: AttributePairSet_json[];
+  onChange: (pairs: AttributePairSet_json[]) => void;
   objectId: number;
 }
 
@@ -176,18 +195,20 @@ export default function AttributePairsEditor({
   objectId,
 }: AttributePairsEditorProps) {
   const object = useStore(getObjectSelector(objectId));
+  const type = object ? object.type : 'Obj'
   const setAttributeOptions = object
     ? object.get_set_att_selector("number")
-    : [];
-  console.log(object, setAttributeOptions);
+    : {};
 
   const addPair = () => {
-    if (setAttributeOptions.length > 0) {
+    if (Object.keys(setAttributeOptions).length > 0) {
+      const firstKey = Object.keys(setAttributeOptions)[0];
       onChange([
         ...pairs,
         {
-          transform_function: "",
-          set_attribute: setAttributeOptions[0].set_attribute, // this needs to change will not work if set_attribute is empty
+          transform_function: "x",
+          func: firstKey,
+          obj_type: type
         },
       ]);
     }
@@ -195,8 +216,8 @@ export default function AttributePairsEditor({
 
   const updatePair = (
     index: number,
-    field: keyof AttributePairSet<any>,
-    value: any
+    field: keyof AttributePairSet_json,
+    value: string
   ) => {
     const newPairs = [...pairs];
     newPairs[index] = { ...newPairs[index], [field]: value };
@@ -222,25 +243,16 @@ export default function AttributePairsEditor({
               className="w-full"
             />
             <Select
-              value={setAttributeOptions
-                .findIndex((attr) => attr.set_attribute === pair.set_attribute)
-                .toString()}
-              onValueChange={(value) => {
-                const selectedIndex = parseInt(value);
-                updatePair(
-                  index,
-                  "set_attribute",
-                  setAttributeOptions[selectedIndex].set_attribute
-                );
-              }}
+              value={pair.func}
+              onValueChange={(value) => updatePair(index, "func", value)}
             >
               <SelectTrigger className="w-full">
                 <SelectValue placeholder="Select attribute" />
               </SelectTrigger>
               <SelectContent>
-                {setAttributeOptions.map((attr, attrIndex) => (
-                  <SelectItem key={attrIndex} value={attrIndex.toString()}>
-                    {attr.label}
+                {Object.keys(setAttributeOptions).map((attr) => (
+                  <SelectItem key={attr} value={attr}>
+                    {attr}
                   </SelectItem>
                 ))}
               </SelectContent>

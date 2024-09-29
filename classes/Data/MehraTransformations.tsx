@@ -124,31 +124,20 @@ const functionPointsTableControl = new TableControl<geomobj>({
         {
           value: x,
           isStatic: true,
-          transform_function: "x",
-          set_attribute: (obj: geomobj, value: number) => {
-            // const newObj = Object.assign(
-            //     Object.create(Object.getPrototypeOf(obj)),
-            //     obj
-            //   );
-            // newObj.position.y = value;
-
-            // return newObj;
-            return obj;
+          attribute_pair: {
+            transform_function: 'x',
+            obj_type: "GeomObj",
+            func: 'position-y'
           },
           obj_id: 2 + index,
         },
         {
           value: 0,  // Initial y-value, to be filled by user
           isStatic: false,
-          transform_function: "x",
-          set_attribute: (obj: geomobj, value: number) => {
-            const newObj = Object.assign(
-                Object.create(Object.getPrototypeOf(obj)),
-                obj
-              );
-            newObj.position.y = value;
-
-            return newObj;
+          attribute_pair: {
+            transform_function: 'x',
+            obj_type: "GeomObj",
+            func: 'position-y'
           },
           obj_id: 2 + index,
         },
@@ -239,21 +228,20 @@ export const data_transformation: { [key: string]: data_type } = {
             {
               value: x,
               isStatic: true,
-              transform_function: "x",
-              set_attribute: (obj: geomobj, value: number) => obj,
+              attribute_pair: {
+                transform_function: 'x',
+                obj_type: "GeomObj",
+                func: 'position-y'
+              },
               obj_id: 2 + index,
             },
             {
               value: 0,
               isStatic: false,
-              transform_function: "x",
-              set_attribute: (obj: geomobj, value: number) => {
-                const newObj = Object.assign(
-                  Object.create(Object.getPrototypeOf(obj)),
-                  obj
-                );
-                newObj.position.y = value;
-                return newObj;
+              attribute_pair: {
+                transform_function: 'x',
+                obj_type: "GeomObj",
+                func: 'position-y'
               },
               obj_id: 2 + index,
             },
@@ -473,21 +461,21 @@ export const data_transformation: { [key: string]: data_type } = {
             {
               value: x,
               isStatic: true,
-              transform_function: "x",
-              set_attribute: (obj: geomobj, value: number) => obj,
+              
+              attribute_pair: {
+                transform_function: 'x',
+                obj_type: "GeomObj",
+                func: 'position-y'
+              },
               obj_id: 2 + index,
             },
             {
               value: 0,
               isStatic: false,
-              transform_function: "x",
-              set_attribute: (obj: geomobj, value: number) => {
-                const newObj = Object.assign(
-                  Object.create(Object.getPrototypeOf(obj)),
-                  obj
-                );
-                newObj.position.y = value;
-                return newObj;
+              attribute_pair: {
+                transform_function: 'x',
+                obj_type: "GeomObj",
+                func: 'position-y'
               },
               obj_id: 2 + index,
             },

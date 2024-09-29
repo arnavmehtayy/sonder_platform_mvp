@@ -1,5 +1,5 @@
 import coloredObj from "./coloredObj";
-import { obj } from "./obj";
+import { obj, object_types } from "./obj";
 import { TransformObj } from "./transformObj";
 import TextGeom from "./textgeomObj";
 import { LineObj } from "./Lineobj";
@@ -14,23 +14,21 @@ export interface get_attributes<
   T extends obj,
   V extends get_att_type = get_att_type
 > {
-  label: string;
   get_attribute: (obj: T) => V;
   set_attribute: (obj: T, value: V) => T;
 }
 
 export type dict_keys = "number" | "string" | "boolean";
 export interface dict_get_attributes<T extends obj> {
-    ["number"]: get_attributes<T, number>[];
-    ["string"]: get_attributes<T, string>[];
-    ["boolean"]: get_attributes<T, boolean>[];
+  number: { [key: string]: get_attributes<T, number> };
+  string: { [key: string]: get_attributes<T, string> };
+  boolean: { [key: string]: get_attributes<T, boolean> };
 }
 
 export const obj_atts: dict_get_attributes<obj> = {
-  number: [],
-  string: [
-    {
-      label: "name",
+  number: {},
+  string: {
+    name: {
       get_attribute: (obj: obj) => obj.name,
       set_attribute: (obj: obj, value: string) => {
         const newObj = Object.assign(
@@ -41,14 +39,13 @@ export const obj_atts: dict_get_attributes<obj> = {
         return newObj;
       },
     },
-  ],
-  boolean: [],
+  },
+  boolean: {},
 };
 export const color_atts: dict_get_attributes<coloredObj> = {
-  number: [],
-  string: [
-    {
-      label: "color",
+  number: {},
+  string: {
+    color: {
       get_attribute: (obj: coloredObj) => obj.color,
       set_attribute: (obj: coloredObj, value: string) => {
         const newObj = Object.assign(
@@ -59,13 +56,12 @@ export const color_atts: dict_get_attributes<coloredObj> = {
         return newObj;
       },
     },
-  ],
-  boolean: [],
+  },
+  boolean: {},
 };
 export const transform_atts: dict_get_attributes<TransformObj> = {
-  number: [
-    {
-      label: "position-x",
+  number: {
+    "position-x": {
       get_attribute: (obj: TransformObj) => obj.position.x,
       set_attribute: (obj: TransformObj, value: number) => {
         const newObj = Object.assign(
@@ -76,8 +72,7 @@ export const transform_atts: dict_get_attributes<TransformObj> = {
         return newObj;
       },
     },
-    {
-      label: "position-y",
+    "position-y": {
       get_attribute: (obj: TransformObj) => obj.position.y,
       set_attribute: (obj: TransformObj, value: number) => {
         const newObj = Object.assign(
@@ -88,8 +83,7 @@ export const transform_atts: dict_get_attributes<TransformObj> = {
         return newObj;
       },
     },
-    {
-      label: "rotation-z",
+    "rotation-z": {
       get_attribute: (obj: TransformObj) => obj.rotation.z,
       set_attribute: (obj: TransformObj, value: number) => {
         const newObj = Object.assign(
@@ -100,8 +94,7 @@ export const transform_atts: dict_get_attributes<TransformObj> = {
         return newObj;
       },
     },
-    {
-      label: "scale-x",
+    "scale-x": {
       get_attribute: (obj: TransformObj) => obj.scale.x,
       set_attribute: (obj: TransformObj, value: number) => {
         const newObj = Object.assign(
@@ -112,8 +105,7 @@ export const transform_atts: dict_get_attributes<TransformObj> = {
         return newObj;
       },
     },
-    {
-      label: "scale-y",
+    "scale-y": {
       get_attribute: (obj: TransformObj) => obj.scale.y,
       set_attribute: (obj: TransformObj, value: number) => {
         const newObj = Object.assign(
@@ -124,15 +116,14 @@ export const transform_atts: dict_get_attributes<TransformObj> = {
         return newObj;
       },
     },
-  ],
-  string: [],
-  boolean: [],
+  },
+  string: {},
+  boolean: {},
 };
 export const text_atts: dict_get_attributes<TextGeom> = {
-  number: [],
-  string: [
-    {
-      label: "text",
+  number: {},
+  string: {
+    text: {
       get_attribute: (obj: TextGeom) => obj.text,
       set_attribute: (obj: TextGeom, value: string) => {
         const newObj = Object.assign(
@@ -143,13 +134,12 @@ export const text_atts: dict_get_attributes<TextGeom> = {
         return newObj;
       },
     },
-  ],
-  boolean: [],
+  },
+  boolean: {},
 };
 export const line_atts: dict_get_attributes<LineObj> = {
-  number: [
-    {
-      label: "line_width",
+  number: {
+    line_width: {
       get_attribute: (obj: LineObj) => obj.line_width,
       set_attribute: (obj: LineObj, value: number) => {
         const newObj = Object.assign(
@@ -160,8 +150,7 @@ export const line_atts: dict_get_attributes<LineObj> = {
         return newObj;
       },
     },
-    {
-      label: "start-x",
+    "start-x": {
       get_attribute: (obj: LineObj) => obj.start.x,
       set_attribute: (obj: LineObj, value: number) => {
         const newObj = Object.assign(
@@ -172,8 +161,7 @@ export const line_atts: dict_get_attributes<LineObj> = {
         return newObj;
       },
     },
-    {
-      label: "start-y",
+    "start-y": {
       get_attribute: (obj: LineObj) => obj.start.y,
       set_attribute: (obj: LineObj, value: number) => {
         const newObj = Object.assign(
@@ -184,8 +172,7 @@ export const line_atts: dict_get_attributes<LineObj> = {
         return newObj;
       },
     },
-    {
-      label: "end-x",
+    "end-x": {
       get_attribute: (obj: LineObj) => obj.end.x,
       set_attribute: (obj: LineObj, value: number) => {
         const newObj = Object.assign(
@@ -196,8 +183,7 @@ export const line_atts: dict_get_attributes<LineObj> = {
         return newObj;
       },
     },
-    {
-      label: "end-y",
+    "end-y": {
       get_attribute: (obj: LineObj) => obj.end.y,
       set_attribute: (obj: LineObj, value: number) => {
         const newObj = Object.assign(
@@ -208,8 +194,7 @@ export const line_atts: dict_get_attributes<LineObj> = {
         return newObj;
       },
     },
-    {
-      label: "slope",
+    slope: {
       get_attribute: (obj: LineObj) => obj.get_slope_intercept()[1],
       set_attribute: (obj: LineObj, value: number) => {
         const newObj = Object.assign(
@@ -222,8 +207,7 @@ export const line_atts: dict_get_attributes<LineObj> = {
         return newObj;
       },
     },
-    {
-      label: "intercept",
+    intercept: {
       get_attribute: (obj: LineObj) => obj.get_slope_intercept()[0],
       set_attribute: (obj: LineObj, value: number) => {
         const newObj = Object.assign(
@@ -236,65 +220,57 @@ export const line_atts: dict_get_attributes<LineObj> = {
         return newObj;
       },
     },
-    {
-      label: "point1-x",
+    "point1-x": {
       get_attribute: (obj: LineObj) => obj.point1?.x || 0,
       set_attribute: (obj: LineObj, value: number) => {
         const newObj = Object.assign(
           Object.create(Object.getPrototypeOf(obj)),
           obj
         );
-        newObj.set_points(value, 'point1-x');
+        newObj.set_points(value, "point1-x");
         return newObj;
       },
     },
-    {
-      label: "point1-y",
+    "point1-y": {
       get_attribute: (obj: LineObj) => obj.point1?.y || 0,
       set_attribute: (obj: LineObj, value: number) => {
         const newObj = Object.assign(
           Object.create(Object.getPrototypeOf(obj)),
           obj
         );
-        newObj.set_points(value, 'point1-y');
+        newObj.set_points(value, "point1-y");
         return newObj;
       },
-    }
-    ,
-    {
-      label: "point2-x",
+    },
+    "point2-x": {
       get_attribute: (obj: LineObj) => obj.point2?.x || 0,
       set_attribute: (obj: LineObj, value: number) => {
         const newObj = Object.assign(
           Object.create(Object.getPrototypeOf(obj)),
           obj
         );
-        newObj.set_points(value, 'point2-x');
+        newObj.set_points(value, "point2-x");
         return newObj;
       },
-
     },
-    {
-      label: "point2-y",
+    "point2-y": {
       get_attribute: (obj: LineObj) => obj.point2?.y || 0,
       set_attribute: (obj: LineObj, value: number) => {
         const newObj = Object.assign(
           Object.create(Object.getPrototypeOf(obj)),
           obj
         );
-        newObj.set_points(value, 'point2-y');
+        newObj.set_points(value, "point2-y");
         return newObj;
       },
-    }
-
-  ],
-  string: [],
-  boolean: [],
+    },
+  },
+  string: {},
+  boolean: {},
 };
 export const functionplot_atts: dict_get_attributes<FunctionPlot> = {
-  number: [
-    {
-      label: "xRange-a",
+  number: {
+    "xRange-a": {
       get_attribute: (obj: FunctionPlot) => obj.xRange[0],
       set_attribute: (obj: FunctionPlot, value: number) => {
         const newObj = Object.assign(
@@ -305,8 +281,7 @@ export const functionplot_atts: dict_get_attributes<FunctionPlot> = {
         return newObj;
       },
     },
-    {
-      label: "xRange-b",
+    "xRange-b": {
       get_attribute: (obj: FunctionPlot) => obj.xRange[1],
       set_attribute: (obj: FunctionPlot, value: number) => {
         const newObj = Object.assign(
@@ -317,8 +292,7 @@ export const functionplot_atts: dict_get_attributes<FunctionPlot> = {
         return newObj;
       },
     },
-    {
-      label: "numPoints",
+    numPoints: {
       get_attribute: (obj: FunctionPlot) => obj.numPoints,
       set_attribute: (obj: FunctionPlot, value: number) => {
         const newObj = Object.assign(
@@ -329,8 +303,7 @@ export const functionplot_atts: dict_get_attributes<FunctionPlot> = {
         return newObj;
       },
     },
-    {
-      label: "lineWidth",
+    lineWidth: {
       get_attribute: (obj: FunctionPlot) => obj.lineWidth,
       set_attribute: (obj: FunctionPlot, value: number) => {
         const newObj = Object.assign(
@@ -341,35 +314,34 @@ export const functionplot_atts: dict_get_attributes<FunctionPlot> = {
         return newObj;
       },
     },
-  ],
-  string: [],
-  boolean: [],
+  },
+  string: {},
+  boolean: {},
 };
 
-export const FunctionPlotString_atts: dict_get_attributes<FunctionPlotString> = {
-  number: [
-    {
-      label: "Parametric-t",
-      get_attribute: (obj: FunctionPlotString) => obj.tValue,
-      set_attribute: (obj: FunctionPlotString, value: number) => {
-        const newObj = Object.assign(
-          Object.create(Object.getPrototypeOf(obj)),
-          obj
-        );
-        newObj.tValue = value;
-        return newObj;
+export const FunctionPlotString_atts: dict_get_attributes<FunctionPlotString> =
+  {
+    number: {
+      "Parametric-t": {
+        get_attribute: (obj: FunctionPlotString) => obj.tValue,
+        set_attribute: (obj: FunctionPlotString, value: number) => {
+          const newObj = Object.assign(
+            Object.create(Object.getPrototypeOf(obj)),
+            obj
+          );
+          newObj.tValue = value;
+          return newObj;
+        },
       },
-    }
-  ],
-  string: [],
-  boolean: [],
-}
+    },
+    string: {},
+    boolean: {},
+  };
 
 export const Axis_atts: dict_get_attributes<CoordinateAxis> = {
-  number: [],
-  string: [
-    {
-      label: "x-label",
+  number: {},
+  string: {
+    "x-label": {
       get_attribute: (obj: CoordinateAxis) => obj.xLabel,
       set_attribute: (obj: CoordinateAxis, value: string) => {
         const newObj = Object.assign(
@@ -380,8 +352,7 @@ export const Axis_atts: dict_get_attributes<CoordinateAxis> = {
         return newObj;
       },
     },
-    {
-      label: "y-label",
+    "y-label": {
       get_attribute: (obj: CoordinateAxis) => obj.yLabel,
       set_attribute: (obj: CoordinateAxis, value: string) => {
         const newObj = Object.assign(
@@ -392,75 +363,63 @@ export const Axis_atts: dict_get_attributes<CoordinateAxis> = {
         return newObj;
       },
     },
-  ],
-  boolean: [],
+  },
+  boolean: {},
 };
 
 export const Dummy_atts: dict_get_attributes<DummyDataStorage<any>> = {
-    number: [
-        {
-            label: "data-number",
-            get_attribute: (obj: DummyDataStorage<number>) => obj.data,
-            set_attribute: (obj: DummyDataStorage<number>, value: number) => {
-                const newObj = Object.assign(
-                    Object.create(Object.getPrototypeOf(obj)),
-                    obj
-                );
-                newObj.data = value;
-                return newObj;
-            },
-        },
-    ],
-    string: [
-        {
-            label: "data-string",
-            get_attribute: (obj: DummyDataStorage<string>) => obj.data,
-            set_attribute: (obj: DummyDataStorage<string>, value: string) => {
-                const newObj = Object.assign(
-                    Object.create(Object.getPrototypeOf(obj)),
-                    obj
-                );
-                newObj.data = value;
-                return newObj;
-            },
-        },
-    ],
-    boolean: [
-        {
-            label: "data-boolean",
-            get_attribute: (obj: DummyDataStorage<boolean>) => obj.data,
-            set_attribute: (obj: DummyDataStorage<boolean>, value: boolean) => {
-                const newObj = Object.assign(
-                    Object.create(Object.getPrototypeOf(obj)),
-                    obj
-                );
-                newObj.data = value;
-                return newObj;
-            },
-        },
-    ],
-}
+  number: {
+    "data-number": {
+      get_attribute: (obj: DummyDataStorage<number>) => obj.data,
+      set_attribute: (obj: DummyDataStorage<number>, value: number) => {
+        const newObj = Object.assign(
+          Object.create(Object.getPrototypeOf(obj)),
+          obj
+        );
+        newObj.data = value;
+        return newObj;
+      },
+    },
+  },
+  string: {
+    "data-string": {
+      get_attribute: (obj: DummyDataStorage<string>) => obj.data,
+      set_attribute: (obj: DummyDataStorage<string>, value: string) => {
+        const newObj = Object.assign(
+          Object.create(Object.getPrototypeOf(obj)),
+          obj
+        );
+        newObj.data = value;
+        return newObj;
+      },
+    },
+  },
+  boolean: {
+    "data-boolean": {
+      get_attribute: (obj: DummyDataStorage<boolean>) => obj.data,
+      set_attribute: (obj: DummyDataStorage<boolean>, value: boolean) => {
+        const newObj = Object.assign(
+          Object.create(Object.getPrototypeOf(obj)),
+          obj
+        );
+        newObj.data = value;
+        return newObj;
+      },
+    },
+  },
+};
 
-export const atts: {
-  obj: dict_get_attributes<obj>;
-  coloredObj: dict_get_attributes<coloredObj>;
-  TransformObj: dict_get_attributes<TransformObj>;
-  DummyDataStorage: dict_get_attributes<DummyDataStorage<any>>;
-  CoordinateAxis: dict_get_attributes<CoordinateAxis>;
-  FunctionPlot: dict_get_attributes<FunctionPlot>;
-  FunctionPlotString: dict_get_attributes<FunctionPlotString>;
-  TextGeom: dict_get_attributes<TextGeom>;
-  LineObj: dict_get_attributes<LineObj>;
-} = {
-  obj: obj_atts,
-  coloredObj: color_atts,
-  TransformObj: transform_atts,
-  DummyDataStorage: Dummy_atts,
-  CoordinateAxis: Axis_atts,
-  FunctionPlot: functionplot_atts,
-  FunctionPlotString: FunctionPlotString_atts,
-  TextGeom: text_atts,
-  LineObj: line_atts,
-
-
-}
+export const atts: Partial<{
+  [key in object_types]: dict_get_attributes<any>;
+}> = {
+  "Obj": obj_atts,
+  "ColoredObj": color_atts,
+  "TransformObj": transform_atts,
+  "DummyDataStorage": Dummy_atts,
+  "CoordinateAxis": Axis_atts,
+  "FunctionPlot": functionplot_atts,
+  "FunctionPlotString": FunctionPlotString_atts,
+  "TextGeomObj": text_atts,
+  "LineObj": line_atts,
+  "GeomObj": transform_atts
+};

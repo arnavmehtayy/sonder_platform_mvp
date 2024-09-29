@@ -12,6 +12,9 @@ import { obj_atts,  get_attributes, dict_keys} from "./get_set_obj_attributes";
     This class is used to store the information about a object in the threejs scene
     The attributes of this class are: id, name, isClickable, isEnabled
 */
+
+export type object_types = "Obj" | "ColoredObj" | "CoordinateAxis" | "DummyDataStorage" | "FunctionPlot" | "FunctionPlotString" | 
+"GeomObj" | "LineObj" | "TextGeomObj" | "TransformObj"
 export interface objconstructor {
   id: number;
   name: string;
@@ -24,8 +27,10 @@ export class obj {
   name: string;
   isClickable: boolean = false; // whether the object on the screen can be clicked or not
   isEnabled: boolean; // whether the object can be visible or not
+  type: object_types // the type of object
 
   constructor({ id, name, isEnabled = true }: objconstructor) {
+    this.type = "Obj";
     this.id = id;
     this.name = name;
     this.isEnabled = isEnabled;
@@ -53,7 +58,7 @@ export class obj {
     return obj;
   }
 
-  get_set_att_selector(type: dict_keys): get_attributes<any, any>[] {
+  get_set_att_selector(type: dict_keys): {[key: string]: get_attributes<any, any>} {
     return obj_atts[type]
   }
 

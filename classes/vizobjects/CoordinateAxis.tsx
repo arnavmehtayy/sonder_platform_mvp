@@ -78,10 +78,11 @@ export default class CoordinateAxis extends TransformObj {
     this.xLabel = xLabel;
     this.yLabel = yLabel;
     this.isClickable = isClickable;
+    this.type = "CoordinateAxis";
   }
 
-  get_set_att_selector(type: dict_keys): get_attributes<any, any>[] {
-    return [...super.get_set_att_selector(type), ...Axis_atts[type]];
+  get_set_att_selector(type: dict_keys): {[key: string]: get_attributes<any, any>} {
+    return {...super.get_set_att_selector(type), ...Axis_atts[type]};
   }
 
   dataBaseSave(): CoordinateAxisConstructor & { type: string } {

@@ -24,10 +24,11 @@ export default abstract class coloredObj extends obj {
   }: coloredObjConstructor) {
     super({ id: id, name: name, isEnabled: isEnabled });
     this.color = color;
+    this.type = "ColoredObj";
   }
 
-  get_set_att_selector(type: dict_keys): get_attributes<any, any>[] {
-    return [...super.get_set_att_selector(type), ...color_atts[type]]
+  get_set_att_selector(type: dict_keys): {[key: string]: get_attributes<any, any>} {
+    return {...super.get_set_att_selector(type), ...color_atts[type]}
   }
 
   dataBaseSave(): coloredObjConstructor & {type: string} {
