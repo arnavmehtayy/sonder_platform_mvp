@@ -1,19 +1,17 @@
-import coloredObj from "./coloredObj";
-import { obj, object_types } from "./obj";
+
 import { TransformObj } from "./transformObj";
 import TextGeom from "./textgeomObj";
 import { LineObj } from "./Lineobj";
 import { Vector2 } from "three";
 import FunctionPlot from "./FunctionPlot";
 import CoordinateAxis from "./CoordinateAxis";
-import { DummyDataStorage } from "./DummyDataStore";
 import FunctionPlotString from "./FunctionPlotString";
+import { DummyDataStorage, DummyDataSupportedTypes } from "./DummyDataStore";
+import coloredObj from "./coloredObj";
+import { obj, object_types } from "./obj";
 
 export type att_type = number | string | boolean;
-export interface get_attributes<
-  T extends obj,
-  V extends att_type = att_type
-> {
+export interface get_attributes<T extends obj, V extends att_type = att_type> {
   get_attribute: (obj: T) => V;
   set_attribute: (obj: T, value: V) => T;
 }
@@ -333,6 +331,30 @@ export const FunctionPlotString_atts: dict_get_attributes<FunctionPlotString> =
           return newObj;
         },
       },
+
+      "xRange-a": {
+      get_attribute: (obj: FunctionPlotString) => obj.xRange[0],
+      set_attribute: (obj: FunctionPlotString, value: number) => {
+        const newObj = Object.assign(
+          Object.create(Object.getPrototypeOf(obj)),
+          obj
+        );
+        newObj.xRange = [value, obj.xRange[1]];
+        return newObj;
+      },
+    },
+    "xRange-b": {
+      get_attribute: (obj: FunctionPlotString) => obj.xRange[1],
+      set_attribute: (obj: FunctionPlotString, value: number) => {
+        const newObj = Object.assign(
+          Object.create(Object.getPrototypeOf(obj)),
+          obj
+        );
+        newObj.xRange = [obj.xRange[0], value];
+        return newObj;
+      },
+    },
+
     },
     string: {},
     boolean: {},
@@ -409,17 +431,69 @@ export const Dummy_atts: dict_get_attributes<DummyDataStorage<any>> = {
   },
 };
 
+
+
+
+// export const dummy_data_atts: dict_get_attributes<DummyDataStorage<DummyDataSupportedTypes>> = {
+//   number: {
+//     "variable_num": {
+//       get_attribute: (obj: DummyDataStorage<DummyDataSupportedTypes>) => {
+//         if (typeof obj.data === "number") {
+//           return obj.data;
+//         }
+//         return 0; // Default value if data is not a number
+//       },
+//       set_attribute: (obj: DummyDataStorage<DummyDataSupportedTypes>, value: number) => {
+//         const newObj = Object.assign(Object.create(Object.getPrototypeOf(obj)), obj);
+//         newObj.data = value;
+//         return newObj;
+//       },
+//     },
+//   },
+//   string: {
+//     "variable_str": {
+//       get_attribute: (obj: DummyDataStorage<DummyDataSupportedTypes>) => {
+//         if (typeof obj.data === "string") {
+//           return obj.data;
+//         }
+//         return ""; // Default value if data is not a string
+//       },
+//       set_attribute: (obj: DummyDataStorage<DummyDataSupportedTypes>, value: string) => {
+//         const newObj = Object.assign(Object.create(Object.getPrototypeOf(obj)), obj);
+//         newObj.data = value;
+//         return newObj;
+//       },
+//     },
+//   },
+//   boolean: {
+//     "variable_bool": {
+//       get_attribute: (obj: DummyDataStorage<DummyDataSupportedTypes>) => {
+//         if (typeof obj.data === "boolean") {
+//           return obj.data;
+//         }
+//         return false; // Default value if data is not a boolean
+//       },
+//       set_attribute: (obj: DummyDataStorage<DummyDataSupportedTypes>, value: boolean) => {
+//         const newObj = Object.assign(Object.create(Object.getPrototypeOf(obj)), obj);
+//         newObj.data = value;
+//         return newObj;
+//       },
+//     },
+//   },
+// };
+
 export const atts: Partial<{
   [key in object_types]: dict_get_attributes<any>;
 }> = {
-  "Obj": obj_atts,
-  "ColoredObj": color_atts,
-  "TransformObj": transform_atts,
-  "DummyDataStorage": Dummy_atts,
-  "CoordinateAxis": Axis_atts,
-  "FunctionPlot": functionplot_atts,
-  "FunctionPlotString": FunctionPlotString_atts,
-  "TextGeomObj": text_atts,
-  "LineObj": line_atts,
-  "GeomObj": transform_atts
+  Obj: obj_atts,
+  ColoredObj: color_atts,
+  TransformObj: transform_atts,
+  DummyDataStorage: Dummy_atts,
+  CoordinateAxis: Axis_atts,
+  FunctionPlot: functionplot_atts,
+  FunctionPlotString: FunctionPlotString_atts,
+  TextGeomObj: text_atts,
+  LineObj: line_atts,
+  GeomObj: transform_atts,
+
 };

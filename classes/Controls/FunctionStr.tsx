@@ -7,7 +7,6 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { X } from "lucide-react";
 import { atts } from '../vizobjects/get_set_obj_attributes';
-import { SelectVizObjectList } from '@/app/Components/EditMode/EditPopups/SelectVizObjsPopup';
 
 interface AttributePairGet {
     obj_id: number;
@@ -117,16 +116,6 @@ export const FunctionStrEditor: React.FC<FunctionStrEditorProps> = ({ value, onC
         setSymbols(symbols.filter((_, i) => i !== index));
     };
 
-    const handleObjectSelection = (index: number) => (selectedIds: number[]) => {
-        if (selectedIds.length > 0) {
-            const obj_id = selectedIds[0];
-            const selectedObj = objects.find(obj => obj.id === obj_id);
-            if (selectedObj) {
-                updateSymbol(index, { obj_id, obj_type: selectedObj.type as object_types });
-            }
-        }
-    };
-
     return (
         <div className="space-y-4">
             <Input
@@ -146,7 +135,26 @@ export const FunctionStrEditor: React.FC<FunctionStrEditorProps> = ({ value, onC
                             placeholder="Symbol (e.g., y)"
                             className="w-full"
                         />
-                        <SelectVizObjectList handleChange={handleObjectSelection(index)} />
+                        <Select
+                            value={symbol.obj_id.toString()}
+                            onValueChange={(value) => {
+                                const selectedObj = objects.find(obj => obj.id === parseInt(value));
+                                if (selectedObj) {
+                                    updateSymbol(index, { obj_id: selectedObj.id, obj_type: selectedObj.type as object_types, attribute: '' });
+                                }
+                            }}
+                        >
+                            <SelectTrigger className="w-full">
+                                <SelectValue placeholder="Select an object" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                {objects.map((obj) => (
+                                    <SelectItem key={obj.id} value={obj.id.toString()}>
+                                        {obj.name}
+                                    </SelectItem>
+                                ))}
+                            </SelectContent>
+                        </Select>
                         {symbol.obj_id !== -1 && atts[symbol.obj_type] && (
                             <Select
                                 value={symbol.attribute}

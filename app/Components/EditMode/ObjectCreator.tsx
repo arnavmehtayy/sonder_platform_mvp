@@ -16,6 +16,7 @@ import { EnablerControl } from "@/classes/Controls/EnablerControl";
 import { TableControl } from "@/classes/Controls/TableControl";
 import TextGeom from "@/classes/vizobjects/textgeomObj";
 import FunctionPlotString from "@/classes/vizobjects/FunctionPlotString";
+import { DummyDataStorage } from "@/classes/vizobjects/DummyDataStore";
 
 export type EditAddType =
   | obj
@@ -30,7 +31,8 @@ export type EditAddType =
   | EnablerControl
   | TableControl<obj> 
   | TextGeom
-  | FunctionPlotString;
+  | FunctionPlotString
+  | DummyDataStorage<any>;
   
 export type PopUpType = 
   | typeof LineObj
@@ -44,7 +46,8 @@ export type PopUpType =
   | typeof EnablerControl
   | typeof TableControl 
   | typeof TextGeom
-  | typeof FunctionPlotString;
+  | typeof FunctionPlotString
+  | typeof DummyDataStorage<any>;
   
 
 interface ObjectCreatorProps {

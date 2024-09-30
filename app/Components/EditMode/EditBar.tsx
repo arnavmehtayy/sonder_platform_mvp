@@ -44,6 +44,8 @@ import { SelectControl } from "@/classes/Controls/SelectControl";
 import { EnablerControl } from "@/classes/Controls/EnablerControl";
 import { TableControl } from "@/classes/Controls/TableControl";
 import TextGeom from "@/classes/vizobjects/textgeomObj";
+import { DummyDataInput } from "./EditPopups/DummyDataInput";
+import { DummyDataStorage } from "@/classes/vizobjects/DummyDataStore";
 
 export interface Option {
   id: number;
@@ -81,6 +83,7 @@ const objectTypes: ObjectType[] = [
   { name: "Function Object", type: FunctionPlotString, icon: LineChart },
   { name: "Axis Object", type: CoordinateAxis, icon: Axis3D },
   {name: "Text Object", type: TextGeom, icon: HelpCircle},
+  {name: "Variable", type: DummyDataStorage, icon: HelpCircle}
 ];
 
 const questionTypes: ObjectType[] = [

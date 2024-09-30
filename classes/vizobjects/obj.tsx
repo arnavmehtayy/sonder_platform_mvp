@@ -14,7 +14,7 @@ import { obj_atts,  get_attributes, dict_keys} from "./get_set_obj_attributes";
 */
 
 export type object_types = "Obj" | "ColoredObj" | "CoordinateAxis" | "DummyDataStorage" | "FunctionPlot" | "FunctionPlotString" | 
-"GeomObj" | "LineObj" | "TextGeomObj" | "TransformObj"
+"GeomObj" | "LineObj" | "TextGeomObj" | "TransformObj" | "DummyDataStorage"
 export interface objconstructor {
   id: number;
   name: string;
