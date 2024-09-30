@@ -217,21 +217,25 @@ export function EditableObjectPopup<T>({
         <SelectVizObjectList handleChange={(selectedObjects) => handleChange(field.key, selectedObjects)} />
       );
       case "select":
+        
+        console.log(field.options, editedObject[field.key])
         return (
           <div className="mb-4">
             <label className="block mb-2">{field.label}</label>
             <Select
-              value={editedObject[field.key] as string}
-              onValueChange={(value) => handleChange(field.key, value)}
+              value={JSON.stringify(editedObject[field.key])}
+              onValueChange={(value) => handleChange(field.key, JSON.parse(value))}
             >
               <SelectTrigger>
-                <SelectValue placeholder="Select an option" />
+                <SelectValue>
+                  {field.options?.find(option => JSON.stringify(option.value) === JSON.stringify(editedObject[field.key]))?.label || "Select an option"}
+                </SelectValue>
               </SelectTrigger>
               <SelectContent>
                 {field.options?.map((option, index) => (
                   <SelectItem
-                    key={`${option.value}-${index}`}
-                    value={option.value}
+                    key={`${JSON.stringify(option.value)}-${index}`}
+                    value={JSON.stringify(option.value)}
                   >
                     {option.label}
                   </SelectItem>

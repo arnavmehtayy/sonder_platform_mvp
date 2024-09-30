@@ -22,6 +22,7 @@ import { Validation_inputNumber } from "@/classes/Validation/Validation_inputNum
 import { EnablerControl } from "@/classes/Controls/EnablerControl";
 import { Option } from "@/classes/Controls/MultiChoiceClass";
 import { Question } from "@/classes/Question";
+import FunctionPlotString from "@/classes/vizobjects/FunctionPlotString";
 
 /*
 
@@ -432,6 +433,12 @@ export const useStore = create<State>((set, get) => ({
           );
         });
       }
+
+      Object.values(updatedState.vizobjs).forEach((obj) => {
+        if (obj instanceof FunctionPlotString) {
+          obj.func = obj.parseFunction(obj.functionStr);
+        }
+      });
 
       return updatedState;
     });
