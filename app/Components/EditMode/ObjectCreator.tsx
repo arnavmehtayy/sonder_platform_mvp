@@ -17,6 +17,7 @@ import { TableControl } from "@/classes/Controls/TableControl";
 import TextGeom from "@/classes/vizobjects/textgeomObj";
 import FunctionPlotString from "@/classes/vizobjects/FunctionPlotString";
 import { DummyDataStorage } from "@/classes/vizobjects/DummyDataStore";
+import { FunctionScore } from "@/classes/Scores/FunctionScore";
 
 export type EditAddType =
   | obj
@@ -32,7 +33,8 @@ export type EditAddType =
   | TableControl<obj> 
   | TextGeom
   | FunctionPlotString
-  | DummyDataStorage<any>;
+  | DummyDataStorage<any>
+  | FunctionScore;
   
 export type PopUpType = 
   | typeof LineObj
@@ -47,7 +49,8 @@ export type PopUpType =
   | typeof TableControl 
   | typeof TextGeom
   | typeof FunctionPlotString
-  | typeof DummyDataStorage<any>;
+  | typeof DummyDataStorage<any>
+  | typeof FunctionScore;
   
 
 interface ObjectCreatorProps {

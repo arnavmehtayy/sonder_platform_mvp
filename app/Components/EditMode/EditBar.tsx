@@ -46,6 +46,7 @@ import { TableControl } from "@/classes/Controls/TableControl";
 import TextGeom from "@/classes/vizobjects/textgeomObj";
 import { DummyDataInput } from "./EditPopups/DummyDataInput";
 import { DummyDataStorage } from "@/classes/vizobjects/DummyDataStore";
+import { FunctionScore } from "@/classes/Scores/FunctionScore";
 
 export interface Option {
   id: number;
@@ -67,6 +68,11 @@ export const EditBar: React.FC = () => {
   const [selectedObjectType, setSelectedObjectType] =
     useState<ObjectType | null>(null);
 
+
+
+const ScoreType: ObjectType[] = [
+  {name: "Score", type: FunctionScore, icon: Sliders}
+]
 
 
 const controlTypes: ObjectType[] = [
@@ -96,19 +102,24 @@ const questionTypes: ObjectType[] = [
     <>
       <div className="fixed top-4 left-1/2 transform -translate-x-1/2 z-10 flex space-x-2">
       <DropDownMenu
+          ObjectList={ScoreType}
+          setSelectedObjectType={setSelectedObjectType}
+          label="Score"
+          />
+      <DropDownMenu
           ObjectList={controlTypes}
           setSelectedObjectType={setSelectedObjectType}
-          label="Add Control"
+          label="Control"
           />
         <DropDownMenu
           ObjectList={questionTypes}
           setSelectedObjectType={setSelectedObjectType}
-          label="Add Question"
+          label="Question"
         />
         <DropDownMenu
           ObjectList={objectTypes}
           setSelectedObjectType={setSelectedObjectType}
-          label="Add Object"
+          label="Object"
         />
         
         {/* <DropdownMenu>
