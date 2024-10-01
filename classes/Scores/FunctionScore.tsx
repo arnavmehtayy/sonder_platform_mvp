@@ -10,8 +10,12 @@ import { useStore } from '@/app/store';
 import { objectScorer } from "./objectScorer";
 import { atts } from '../vizobjects/get_set_obj_attributes';
 
-export interface FunctionScoreConstructor extends ScoreConstructor<number>{
+export interface FunctionScoreConstructor{
+  score_id: number
   functionStr: FunctionStr;
+  text: string;
+  desc: string;
+  to_string?: (score: number) => string
 }
 
 export class FunctionScore extends Score<number> {
@@ -79,9 +83,7 @@ export class FunctionScore extends Score<number> {
       score_id: Date.now() % 10000,
       text: "",
       desc: "",
-      functionStr: new FunctionStr(Date.now() % 10000, "x", []),
-      obj_list: [],
-      transformation: () => 0
+      functionStr: new FunctionStr(Date.now() % 10000, "x", [])
     });
 
     const handleFunctionStrChange = (newFunctionStr: FunctionStr) => {
