@@ -107,7 +107,9 @@ export class SliderControlAdvanced<T extends obj> extends SliderControl<T> {
     }
   }
 
-  getSliderValue(): number {
+  getSliderValue(obj: T): number {
+    // This overrides the method in SliderControl
+    // Instead of using the get_attribute function, we return the local value
     return this.localValue;
   }
 

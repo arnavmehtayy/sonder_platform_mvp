@@ -10,7 +10,7 @@ import { useStore } from '@/app/store';
 import { objectScorer } from "./objectScorer";
 import { atts } from '../vizobjects/get_set_obj_attributes';
 
-export interface FunctionScoreConstructor{
+export interface FunctionScoreConstructor extends ScoreConstructor<number>{
   score_id: number
   functionStr: FunctionStr;
   text: string;
@@ -60,15 +60,16 @@ export class FunctionScore extends Score<number> {
     });
   }
 
-//   dataBaseSave(): FunctionScoreConstructor<Score_T> & { type: string } {
-//     return {
-//       score_id: this.score_id,
-//       text: this.text,
-//       desc: this.desc,
-//       functionStr: this.functionStr,
-//       type: 'FunctionScore',
-//     };
-//   }
+  dataBaseSave(): FunctionScoreConstructor & { type: string } {
+    return {
+      score_id: this.score_id,
+      text: this.text,
+      desc: this.desc,
+      functionStr: this.functionStr,
+      type: 'FunctionScore',
+      obj_list: [],
+    };
+  }
 
   static getPopup({
     isOpen,
@@ -83,7 +84,9 @@ export class FunctionScore extends Score<number> {
       score_id: Date.now() % 10000,
       text: "",
       desc: "",
-      functionStr: new FunctionStr(Date.now() % 10000, "x", [])
+      functionStr: new FunctionStr(Date.now() % 10000, "x", []),
+      obj_list: [], // this will be populated by the constructor
+      transformation: () => 0 // this is useless comes from parent class
     });
 
     const handleFunctionStrChange = (newFunctionStr: FunctionStr) => {

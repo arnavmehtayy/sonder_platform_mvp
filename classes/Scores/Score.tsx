@@ -61,7 +61,7 @@ export interface ScoreConstructor<Score_T extends score_typ> {
   text: string;
   desc: string;
   obj_list: objectScorer<any>[];
-  transformation: (vals: number[]) => Score_T;
+  transformation?: (vals: number[]) => Score_T;
   to_string?: (score: Score_T) => string;
 }
 
@@ -80,7 +80,7 @@ export class Score<Score_T extends score_typ> {
     score_id,
     obj_list,
     desc = "",
-    transformation,
+    transformation = (vals) => vals[0] as Score_T,
     to_string = (score) => score.toString(),
   }: ScoreConstructor<Score_T>) {
     this.text = text;

@@ -434,9 +434,13 @@ export const useStore = create<State>((set, get) => ({
         });
       }
 
+      // Check if the updated object is part of any FunctionPlotString's symbols
       Object.values(updatedState.vizobjs).forEach((obj) => {
         if (obj instanceof FunctionPlotString) {
-          obj.func = obj.parseFunction(obj.functionStr);
+          const isRelevant = obj.functionStr.symbols.some(symbol => symbol.obj_id === id);
+          if (isRelevant) {
+            obj.func = obj.parseFunction(obj.functionStr);
+          }
         }
       });
 
