@@ -18,13 +18,11 @@ import { FunctionStr, FunctionStrEditor, FunctionStrConstructor } from '../Contr
 import { useStore } from '@/app/store';
 
 export default class FunctionPlotString extends TransformObj {
-  func: (x: number, t: number) => number;
+  func: (x: number) => number;
   xRange: [number, number];
   numPoints: number;
   lineWidth: number;
   functionStr: FunctionStr;
-  tValue: number;
-  isParametric: boolean;
 
   constructor({
     name = "FunctionPlot",
@@ -39,8 +37,6 @@ export default class FunctionPlotString extends TransformObj {
     numPoints = 100,
     lineWidth = 2,
     isEnabled = true,
-    tValue = 0,
-    isParametric = false,
   }: FunctionPlotStringConstructor) {
     super({
       name: name,
@@ -58,8 +54,6 @@ export default class FunctionPlotString extends TransformObj {
     this.numPoints = numPoints;
     this.lineWidth = lineWidth;
     this.name = name;
-    this.tValue = tValue;
-    this.isParametric = isParametric;
     this.type = "FunctionPlotString";
   }
 
@@ -70,10 +64,10 @@ export default class FunctionPlotString extends TransformObj {
     };
   }
 
-  parseFunction(functionStr: FunctionStr): (x: number, t: number) => number {
+  parseFunction(functionStr: FunctionStr): (x: number) => number {
     const func = functionStr.get_function();
     const getState = useStore.getState;
-    return (x: number, t: number) => {
+    return (x: number) => {
       return func(x, getState);
     };
   }
@@ -85,8 +79,6 @@ export default class FunctionPlotString extends TransformObj {
       xRange: this.xRange,
       numPoints: this.numPoints,
       lineWidth: this.lineWidth,
-      tValue: this.tValue,
-      isParametric: this.isParametric,
       type: "FunctionPlotString",
     };
   }
@@ -111,7 +103,7 @@ export default class FunctionPlotString extends TransformObj {
 
     for (let i = 0; i < this.numPoints; i++) {
       const x = xMin + i * step;
-      const y = this.func(x, this.tValue);
+      const y = this.func(x);
       points.push(new THREE.Vector3(x, y, 0));
     }
 
@@ -160,8 +152,6 @@ interface FunctionPlotStringConstructor extends TransformObjConstructor {
   numPoints?: number;
   lineWidth?: number;
   isEnabled?: boolean;
-  tValue?: number;
-  isParametric?: boolean;
 }
 
 const FunctionPlotPopup: React.FC<{
@@ -175,12 +165,10 @@ const FunctionPlotPopup: React.FC<{
     id: Date.now() % 10000,
     functionStr: new FunctionStr(Date.now() % 10000, "x", []),
     xRange: [-10, 10],
-    numPoints: 200,
+    numPoints: 500,
     lineWidth: 2,
     isEnabled: true,
     color: "#000000",
-    tValue: 0,
-    isParametric: false,
     name: "FunctionPlot",
   });
 
@@ -229,8 +217,6 @@ const FunctionPlotPopup: React.FC<{
       { key: "lineWidth", label: "Line Width", type: "number" },
       { key: "color", label: "Color", type: "color" },
       { key: "xRange", label: "X Range", type: "arraynum", length_of_array: 2 },
-      { key: "tValue", label: "T Value", type: "number" },
-      { key: "isParametric", label: "Is Parametric", type: "checkbox" },
     ],
   };
 

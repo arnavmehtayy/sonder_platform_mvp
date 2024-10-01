@@ -320,17 +320,7 @@ export const functionplot_atts: dict_get_attributes<FunctionPlot> = {
 export const FunctionPlotString_atts: dict_get_attributes<FunctionPlotString> =
   {
     number: {
-      "Parametric-t": {
-        get_attribute: (obj: FunctionPlotString) => obj.tValue,
-        set_attribute: (obj: FunctionPlotString, value: number) => {
-          const newObj = Object.assign(
-            Object.create(Object.getPrototypeOf(obj)),
-            obj
-          );
-          newObj.tValue = value;
-          return newObj;
-        },
-      },
+      
 
       "xRange-a": {
       get_attribute: (obj: FunctionPlotString) => obj.xRange[0],
