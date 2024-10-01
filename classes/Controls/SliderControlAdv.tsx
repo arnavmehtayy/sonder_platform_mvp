@@ -1,4 +1,3 @@
-
 import { obj, object_types } from "../vizobjects/obj";
 import { SliderControl, SliderControlConstructor } from "./SliderControl";
 import {
@@ -14,7 +13,6 @@ import {
 import React from "react";
 import Latex from "react-latex-next";
 import { ShowSliderControl } from "./SliderControl";
-import * as math from "mathjs";
 import { Button } from "@/components/ui/button";
 import { X } from "react-feather";
 import {
@@ -26,16 +24,17 @@ import {
 } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import { atts, dict_get_attributes} from "../vizobjects/get_set_obj_attributes";
+import { FunctionStr, FunctionStrEditor } from './FunctionStr';
 
 interface AttributePairSet {
-  transform_function: string;
+  transform_function: FunctionStr;
   set_attribute: (obj: any, value: any) => any;
 }
 
 export interface AttributePairSet_json {
-  transform_function: string;
-  func: string
-  obj_type: object_types
+  transform_function: FunctionStr;
+  func: string;
+  obj_type: object_types;
 }
 
 export interface SliderControlAdvancedConstructor<T extends obj>
@@ -67,7 +66,7 @@ export class SliderControlAdvanced<T extends obj> extends SliderControl<T> {
       desc,
       text,
     });
-    console.log(attribute_pairs)
+    console.log(attribute_pairs);
     this.attribute_pairs = attribute_pairs.map(
       (pair: AttributePairSet_json) => {
         return {
@@ -75,21 +74,17 @@ export class SliderControlAdvanced<T extends obj> extends SliderControl<T> {
           set_attribute: atts[pair.obj_type]!["number"][pair.func].set_attribute
         }
       }
-    )
-    this.attribute_JSON = attribute_pairs
-      
+    );
+    this.attribute_JSON = attribute_pairs;
     
-    this.localValue = (range[0] + range[1]) / 2; // Initialize local value to the middle of the range
+    this.localValue = (range[0] + range[1]) / 2;
   }
 
-  setSliderValue(obj: T, value: number): T { // override the setSliderValue method
-    this.localValue = value; // Update the local value
+  setSliderValue(obj: T, value: number): T {
+    this.localValue = value;
     if (obj) {
       return this.attribute_pairs.reduce((updatedObj, pair) => {
-        const transformedValue = this.evaluateTransformFunction(
-          pair.transform_function,
-          value
-        );
+        const transformedValue = pair.transform_function.get_function()(value, useStore.getState);
         return pair.set_attribute(updatedObj, transformedValue);
       }, obj);
     } else {
@@ -97,19 +92,7 @@ export class SliderControlAdvanced<T extends obj> extends SliderControl<T> {
     }
   }
 
-  private evaluateTransformFunction(expression: string, value: number): number {
-    try {
-      const scope = { x: value };
-      return math.evaluate(expression, scope);
-    } catch (error) {
-      console.error(`Error evaluating transform function: ${error}`);
-      return value; // Return original value if there's an error
-    }
-  }
-
   getSliderValue(obj: T): number {
-    // This overrides the method in SliderControl
-    // Instead of using the get_attribute function, we return the local value
     return this.localValue;
   }
 
@@ -185,22 +168,24 @@ export class SliderControlAdvanced<T extends obj> extends SliderControl<T> {
     return <EditableObjectPopup {...popupProps} />;
   }
 }
+
 interface AttributePairsEditorProps {
   pairs: AttributePairSet_json[];
   onChange: (pairs: AttributePairSet_json[]) => void;
   objectId: number;
 }
 
-export default function AttributePairsEditor({
+function AttributePairsEditor({
   pairs,
   onChange,
   objectId,
 }: AttributePairsEditorProps) {
   const object = useStore(getObjectSelector(objectId));
-  const type = object ? object.type : 'Obj'
+  const type = object ? object.type : 'Obj';
   const setAttributeOptions = object
     ? object.get_set_att_selector("number")
     : {};
+  const [showAdvanced, setShowAdvanced] = React.useState(false);
 
   const addPair = () => {
     if (Object.keys(setAttributeOptions).length > 0) {
@@ -208,7 +193,7 @@ export default function AttributePairsEditor({
       onChange([
         ...pairs,
         {
-          transform_function: "x",
+          transform_function: new FunctionStr(Date.now() % 10000, "x", []),
           func: firstKey,
           obj_type: type
         },
@@ -219,7 +204,7 @@ export default function AttributePairsEditor({
   const updatePair = (
     index: number,
     field: keyof AttributePairSet_json,
-    value: string
+    value: any
   ) => {
     const newPairs = [...pairs];
     newPairs[index] = { ...newPairs[index], [field]: value };
@@ -232,18 +217,25 @@ export default function AttributePairsEditor({
 
   return (
     <div className="space-y-4">
+      <div className="flex items-center mb-4">
+        <input
+          type="checkbox"
+          id="showAdvanced"
+          checked={showAdvanced}
+          onChange={(e) => setShowAdvanced(e.target.checked)}
+          className="mr-2"
+        />
+        <label htmlFor="showAdvanced">Show Advanced Options</label>
+      </div>
       {pairs.map((pair, index) => (
         <div key={index} className="flex items-center space-x-2">
           <div className="flex-grow space-y-2">
-            <Input
-              type="text"
-              value={pair.transform_function}
-              onChange={(e) =>
-                updatePair(index, "transform_function", e.target.value)
-              }
-              placeholder="Transform function (e.g., 2*x + 1)"
-              className="w-full"
-            />
+            {showAdvanced && (
+              <FunctionStrEditor
+                value={pair.transform_function}
+                onChange={(value) => updatePair(index, "transform_function", value)}
+              />
+            )}
             <Select
               value={pair.func}
               onValueChange={(value) => updatePair(index, "func", value)}
