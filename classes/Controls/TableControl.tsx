@@ -2,7 +2,7 @@
 
 import React from "react";
 import { Control, ControlConstructor } from "./Control";
-import { obj } from "../vizobjects/obj";
+import { obj, object_types } from "../vizobjects/obj";
 import { useStore, getObjectSelector, setVizObjSelector } from "@/app/store";
 import {
   EditableObjectPopup,
@@ -20,13 +20,15 @@ import {
 } from "@/components/ui/select";
 import { X } from "lucide-react";
 import Latex from "react-latex-next";
-import { AttributePairSet_json } from "./SliderControlAdv";
 import { atts } from "../vizobjects/get_set_obj_attributes";
+import { FunctionStr, FunctionStrEditor } from './FunctionStr';
 
 interface TableCell<T extends obj> {
   value: number;
-  attribute_pair: AttributePairSet_json;
+  functionStr: FunctionStr;
   obj_id: number;
+  obj_type: object_types;
+  attribute: string;
   isStatic: boolean;
 }
 
@@ -71,25 +73,13 @@ export class TableControl<T extends obj> extends Control {
   
     if (obj) {
       const numericValue = value === '' ? 0 : value;
-      const transformedValue = this.evaluateTransformFunction(
-        cell.attribute_pair.transform_function,
-        numericValue
-      );
-      const setAttribute = atts[cell.attribute_pair.obj_type]!["number"][cell.attribute_pair.func].set_attribute;
+      const func = cell.functionStr.get_function();
+      const transformedValue = func(numericValue, useStore.getState);
+      const setAttribute = atts[cell.obj_type]!["number"][cell.attribute].set_attribute;
       return setAttribute(obj, transformedValue);
     }
   
     return null;
-  }
-
-  private evaluateTransformFunction(expression: string, value: number): number {
-    try {
-      const scope = { x: value };
-      return math.evaluate(expression, scope);
-    } catch (error) {
-      console.error(`Error evaluating transform function: ${error}`);
-      return value;
-    }
   }
 
   dataBaseSave(): TableControlConstructor<T> & { type: string } {
@@ -326,25 +316,19 @@ function TableEditor<T extends obj>({
   rowHeaders: string[];
 }) {
   const vizobjs = useStore.getState().vizobjs;
+  const [showAdvanced, setShowAdvanced] = React.useState(false);
 
   const updateCell = (
     rowIndex: number,
     cellIndex: number,
-    field: keyof TableCell<T> | keyof AttributePairSet_json,
+    field: keyof TableCell<T>,
     value: any
   ) => {
     const newRows = [...rows];
-    if (field === "transform_function" || field === "func" || field === "obj_type") {
-      newRows[rowIndex].cells[cellIndex].attribute_pair = {
-        ...newRows[rowIndex].cells[cellIndex].attribute_pair,
-        [field]: value,
-      };
-    } else {
-      newRows[rowIndex].cells[cellIndex] = {
-        ...newRows[rowIndex].cells[cellIndex],
-        [field]: value,
-      };
-    }
+    newRows[rowIndex].cells[cellIndex] = {
+      ...newRows[rowIndex].cells[cellIndex],
+      [field]: value,
+    };
     onChange(newRows);
   };
 
@@ -352,12 +336,10 @@ function TableEditor<T extends obj>({
     const newRow: TableRow<T> = {
       cells: columnHeaders.map(() => ({
         value: 0,
-        attribute_pair: {
-          transform_function: "x",
-          func: "",
-          obj_type: 'Obj'
-        },
+        functionStr: new FunctionStr(Date.now() % 10000, "x", []),
         obj_id: -1,
+        obj_type: 'Obj',
+        attribute: '',
         isStatic: false,
       })),
     };
@@ -370,6 +352,16 @@ function TableEditor<T extends obj>({
 
   return (
     <div className="space-y-4">
+      <div className="flex items-center mb-4">
+        <input
+          type="checkbox"
+          id="showAdvanced"
+          checked={showAdvanced}
+          onChange={(e) => setShowAdvanced(e.target.checked)}
+          className="mr-2"
+        />
+        <label htmlFor="showAdvanced">Show Advanced Options</label>
+      </div>
       <table className="w-full border-collapse">
         <thead>
           <tr>
@@ -383,26 +375,26 @@ function TableEditor<T extends obj>({
           </tr>
         </thead>
         <tbody>
-        {rows.map((row, rowIndex) => (
-  <tr key={rowIndex}>
-    <td className="border p-2 font-medium">{rowHeaders[rowIndex]}</td>
-    {row.cells.map((cell, cellIndex) => (
-      <td key={cellIndex} className="border p-2">
-        <Input
-          type="number"
-          value={cell.value.toString()}
-          onChange={(e) => {
-            const value = e.target.value;
-            updateCell(
-              rowIndex,
-              cellIndex,
-              "value",
-              value === '' ? '' : parseFloat(value) || 0
-            );
-          }}
-          placeholder="Cell value"
-          className="w-full mb-2"
-        />
+          {rows.map((row, rowIndex) => (
+            <tr key={rowIndex}>
+              <td className="border p-2 font-medium">{rowHeaders[rowIndex]}</td>
+              {row.cells.map((cell, cellIndex) => (
+                <td key={cellIndex} className="border p-2">
+                  <Input
+                    type="number"
+                    value={cell.value.toString()}
+                    onChange={(e) => {
+                      const value = e.target.value;
+                      updateCell(
+                        rowIndex,
+                        cellIndex,
+                        "value",
+                        value === '' ? '' : parseFloat(value) || 0
+                      );
+                    }}
+                    placeholder="Cell value"
+                    className="w-full mb-2"
+                  />
                   <div className="flex items-center mb-2">
                     <input
                       type="checkbox"
@@ -421,19 +413,14 @@ function TableEditor<T extends obj>({
                   </div>
                   {!cell.isStatic && (
                     <>
-                      <Input
-                        value={cell.attribute_pair.transform_function}
-                        onChange={(e) =>
-                          updateCell(
-                            rowIndex,
-                            cellIndex,
-                            "transform_function",
-                            e.target.value
-                          )
-                        }
-                        placeholder="Transform function (e.g., 2*x + 1)"
-                        className="w-full mb-2"
-                      />
+                      {showAdvanced && (
+                        <FunctionStrEditor
+                          value={cell.functionStr}
+                          onChange={(value) =>
+                            updateCell(rowIndex, cellIndex, "functionStr", value)
+                          }
+                        />
+                      )}
                       <Select
                         value={cell.obj_id.toString()}
                         onValueChange={(value) => {
@@ -444,11 +431,11 @@ function TableEditor<T extends obj>({
                             updateCell(rowIndex, cellIndex, "obj_type", obj.type);
                             const setAttributeOptions = obj.get_set_att_selector("number");
                             const firstKey = Object.keys(setAttributeOptions)[0];
-                            updateCell(rowIndex, cellIndex, "func", firstKey);
+                            updateCell(rowIndex, cellIndex, "attribute", firstKey);
                           }
                         }}
                       >
-                        <SelectTrigger className="w-full">
+                        <SelectTrigger className="w-full mt-2">
                           <SelectValue placeholder="Select object" />
                         </SelectTrigger>
                         <SelectContent>
@@ -462,13 +449,13 @@ function TableEditor<T extends obj>({
                       </Select>
                       {cell.obj_id !== -1 && (
                         <Select
-                          value={cell.attribute_pair.func}
+                          value={cell.attribute}
                           onValueChange={(value) => {
-                            updateCell(rowIndex, cellIndex, "func", value);
+                            updateCell(rowIndex, cellIndex, "attribute", value);
                           }}
                         >
                           <SelectTrigger className="w-full mt-2">
-                            <SelectValue placeholder="Select set attribute" />
+                            <SelectValue placeholder="Select attribute" />
                           </SelectTrigger>
                           <SelectContent>
                             {Object.keys((vizobjs[cell.obj_id] as T).get_set_att_selector("number")).map((attr) => (
