@@ -10,6 +10,7 @@ import {
   EditableObjectPopupProps,
 } from "@/app/Components/EditMode/EditPopups/EditableObjectPopup";
 import { TouchControlEditor } from "@/app/Components/EditMode/EditPopups/TouchControlAttributeEditor";
+import GeneralTransformControl from "@/app/Components/three/GeneralTransCont";
 
 /*
  * This class is used to create a object that has Text on it in the scene.
@@ -94,6 +95,7 @@ export default class TextGeom extends geomobj {
     objectRef: React.RefObject<THREE.Mesh>;
   }): React.ReactElement {
     return (
+      <>
       <group
         ref={objectRef}
         position={[this.position.x, this.position.y, 0]}
@@ -101,9 +103,6 @@ export default class TextGeom extends geomobj {
         rotation={[this.rotation.x, this.rotation.y, this.rotation.z]}
         scale={[this.scale.x, this.scale.y, this.scale.z]}
       >
-        <Text color="white" anchorX="center" anchorY="middle" renderOrder={10}>
-          {this.text}
-        </Text>
         <mesh>
           <primitive object={this.geom} attach="geometry" />
           {material ? (
@@ -112,7 +111,49 @@ export default class TextGeom extends geomobj {
             <meshBasicMaterial color={this.color} side={THREE.DoubleSide} />
           )}
         </mesh>
+        <Text 
+          color="white" 
+          anchorX="center" 
+          anchorY="middle" 
+          renderOrder={1}
+          maxWidth={Math.min(this.scale.x, this.scale.y) * 1.8} // Reduced to ensure text stays within boundaries
+          fontSize={Math.min(this.scale.x, this.scale.y) * 0.4} // Reduced to ensure text stays within boundaries
+          position={[0, 0, 0.01]} // Slightly in front of the geometry
+          textAlign="center"
+          overflowWrap="break-word"
+          clipRect={[-this.scale.x / 2, -this.scale.y / 2, this.scale.x, this.scale.y]} // Clip text to geometry boundaries
+        >
+          {this.text}
+        </Text>
       </group>
+      
+      {this.touch_controls.scale && (
+          <GeneralTransformControl
+            mode="scale"
+            vizObjId={this.id}
+            touchControl={this.touch_controls.scale}
+            obj_ref={objectRef}
+          />
+        )}
+        {this.touch_controls.rotate && (
+          <GeneralTransformControl
+            mode="rotate"
+            vizObjId={this.id}
+            touchControl={this.touch_controls.rotate}
+            obj_ref={objectRef}
+          />
+        )}
+        {this.touch_controls.translate && (
+          <GeneralTransformControl
+            mode="translate"
+            vizObjId={this.id}
+            touchControl={this.touch_controls.translate}
+            obj_ref={objectRef}
+          />
+        )}
+      </>
+
+      
     );
     //   super.getMesh({
     //     children: (

@@ -1,4 +1,4 @@
-
+// note there is no inheritance in these dictionaries this is a flaw I right now manually update it
 import { TransformObj } from "./transformObj";
 import TextGeom from "./textgeomObj";
 import { LineObj } from "./Lineobj";
@@ -119,7 +119,63 @@ export const transform_atts: dict_get_attributes<TransformObj> = {
   boolean: {},
 };
 export const text_atts: dict_get_attributes<TextGeom> = {
-  number: {},
+  number: {
+    "position-x": {
+      get_attribute: (obj: TransformObj) => obj.position.x,
+      set_attribute: (obj: TransformObj, value: number) => {
+        const newObj = Object.assign(
+          Object.create(Object.getPrototypeOf(obj)),
+          obj
+        );
+        newObj.position.x = value;
+        return newObj;
+      },
+    },
+    "position-y": {
+      get_attribute: (obj: TransformObj) => obj.position.y,
+      set_attribute: (obj: TransformObj, value: number) => {
+        const newObj = Object.assign(
+          Object.create(Object.getPrototypeOf(obj)),
+          obj
+        );
+        newObj.position.y = value;
+        return newObj;
+      },
+    },
+    "rotation-z": {
+      get_attribute: (obj: TransformObj) => obj.rotation.z,
+      set_attribute: (obj: TransformObj, value: number) => {
+        const newObj = Object.assign(
+          Object.create(Object.getPrototypeOf(obj)),
+          obj
+        );
+        newObj.rotation.z = value;
+        return newObj;
+      },
+    },
+    "scale-x": {
+      get_attribute: (obj: TransformObj) => obj.scale.x,
+      set_attribute: (obj: TransformObj, value: number) => {
+        const newObj = Object.assign(
+          Object.create(Object.getPrototypeOf(obj)),
+          obj
+        );
+        newObj.scale.x = value;
+        return newObj;
+      },
+    },
+    "scale-y": {
+      get_attribute: (obj: TransformObj) => obj.scale.y,
+      set_attribute: (obj: TransformObj, value: number) => {
+        const newObj = Object.assign(
+          Object.create(Object.getPrototypeOf(obj)),
+          obj
+        );
+        newObj.scale.y = value;
+        return newObj;
+      },
+    },
+  },
   string: {
     text: {
       get_attribute: (obj: TextGeom) => obj.text,
