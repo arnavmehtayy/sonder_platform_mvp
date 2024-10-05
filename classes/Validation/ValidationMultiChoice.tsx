@@ -1,5 +1,7 @@
-import { MultiChoiceClass } from "../Controls/MultiChoiceClass";
+import { MultiChoiceClass, MultiChoiceConstructor, Option } from "../Controls/MultiChoiceClass";
 import Validation, { ValidationConstructor } from "./Validation";
+import React from "react";
+import { Checkbox } from "@radix-ui/react-checkbox";
 
 
 /*
@@ -49,10 +51,77 @@ export class ValidationMultiChoice extends Validation {
             type: 'ValidationMultiChoice'
         }
     }
-
-
-
-
-
-
 }
+
+    
+    export interface MultiChoiceEditorProps {
+        onChange: (value: ValidationMultiChoice) => void;
+        value: MultiChoiceConstructor
+        options: Option[]
+        id: number
+
+    }
+    
+    export const MultiChoiceEditor: React.FC<MultiChoiceEditorProps> = ({onChange, value, options, id}) => {
+        const [addValidation, setAddValidation] = React.useState(false);
+        const [validationAnswer, setValidationAnswer] = React.useState<number[]>([]);
+      
+        const handleValidationChange = (optionId: number) => {
+          setValidationAnswer(prev => 
+            prev.includes(optionId)
+              ? prev.filter(id => id !== optionId)
+              : [...prev, optionId]
+          );
+        };
+      
+        React.useEffect(() => {
+          if (addValidation) {
+            const newValidation = new ValidationMultiChoice({
+              answer: validationAnswer,
+              control_id: id,
+              desc: "Validation for " + value.title
+            });
+            onChange(newValidation);
+          } else {
+            // onChange(undefined);
+          }
+        }, [addValidation, validationAnswer, id, value.title]);
+      
+        return (
+          <div className="space-y-4">
+            <div className="flex items-center space-x-2">
+              <Checkbox
+                id="add-validation"
+                checked={addValidation}
+                onCheckedChange={(checked) => setAddValidation(checked as boolean)}
+              />
+              <label htmlFor="add-validation" className="text-sm font-medium text-gray-700">
+                Add Validation
+              </label>
+            </div>
+            {addValidation && (
+              <div className="space-y-2">
+                <p className="text-sm font-medium text-gray-700">Select correct answer(s):</p>
+                {options.map((option) => (
+                  <div key={option.id} className="flex items-center space-x-2">
+                    <Checkbox
+                      id={`option-${option.id}`}
+                      checked={validationAnswer.includes(option.id)}
+                      onCheckedChange={() => handleValidationChange(option.id)}
+                    />
+                    <label htmlFor={`option-${option.id}`} className="text-sm text-gray-600">
+                      {option.label}
+                    </label>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        );
+      };
+
+
+
+
+
+

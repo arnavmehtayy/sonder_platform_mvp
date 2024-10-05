@@ -18,6 +18,7 @@ import TextGeom from "@/classes/vizobjects/textgeomObj";
 import FunctionPlotString from "@/classes/vizobjects/FunctionPlotString";
 import { DummyDataStorage } from "@/classes/vizobjects/DummyDataStore";
 import { FunctionScore } from "@/classes/Scores/FunctionScore";
+import { ValidationMultiChoice } from "@/classes/Validation/ValidationMultiChoice";
 
 export type EditAddType =
   | obj
@@ -67,8 +68,11 @@ export function ObjectCreator({ ObjectType, onClose }: ObjectCreatorProps) {
     onClose();
   };
 
-  const handleSaveObject = (newObject: EditAddType) => {
+  const handleSaveObject = (newObject: EditAddType, validation?: ValidationMultiChoice) => {
     addElement(newObject);
+    if (validation) {
+      addElement(validation);
+    }
     handleClosePopup();
   };
 

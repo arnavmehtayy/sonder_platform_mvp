@@ -7,6 +7,8 @@ import {
   EditableObjectPopup,
   EditableObjectPopupProps,
 } from "@/app/Components/EditMode/EditPopups/EditableObjectPopup";
+import { MultiChoiceEditor } from "../Validation/ValidationMultiChoice";
+import { ValidationMultiChoice } from "../Validation/ValidationMultiChoice";
 
 /*
  * This class is responsible for storing information about a multiple choice question
@@ -24,7 +26,6 @@ export interface MultiChoiceConstructor extends ControlConstructor {
   description: string;
   isMultiSelect?: boolean;
 }
-
 function ShowMultiChoice({ control }: { control: MultiChoiceClass }) {
   const setSelectedOptions = useStore(setMultiChoiceOptionsSelector);
   const selectedOptions = control.selectedOptions;
@@ -115,7 +116,6 @@ function ShowMultiChoice({ control }: { control: MultiChoiceClass }) {
     </div>
   );
 }
-
 export class MultiChoiceClass extends Control {
   options: Option[]; // the options of the multiple choice question
   isMultiSelect: boolean; // whether the multiple choice question allows multi option select or not
@@ -156,6 +156,14 @@ export class MultiChoiceClass extends Control {
     };
   }
 
+  static createValidation(multiChoiceId: number, correctAnswers: number[]): ValidationMultiChoice {
+    return new ValidationMultiChoice({
+      answer: correctAnswers,
+      control_id: multiChoiceId,
+      desc: `Validation for MultiChoice ${multiChoiceId}`
+    });
+  }
+
   static getPopup({
     isOpen,
     onClose,
@@ -163,21 +171,21 @@ export class MultiChoiceClass extends Control {
   }: {
     isOpen: boolean;
     onClose: () => void;
-    onSave: (obj: MultiChoiceClass) => void;
+    onSave: (obj: MultiChoiceClass, validation?: ValidationMultiChoice) => void;
   }) {
-    const [editedObject, setEditedObject] =
-      React.useState<MultiChoiceConstructor>({
-        id: Date.now() % 10000,
-        title: "",
-        options: [],
-        isMultiSelect: false,
-        description: "",
-      });
-
+    const [editedObject, setEditedObject] = React.useState<MultiChoiceConstructor>({
+      id: Date.now() % 10000,
+      title: "",
+      options: [],
+      isMultiSelect: false,
+      description: "",
+    });
+    const [validation, setValidation] = React.useState<ValidationMultiChoice | undefined>(undefined);
+  
     const handleChange = (field: string, value: any) => {
       setEditedObject((prev) => ({ ...prev, [field]: value }));
     };
-
+  
     const popupProps: EditableObjectPopupProps<MultiChoiceConstructor> = {
       isOpen,
       onClose,
@@ -185,7 +193,7 @@ export class MultiChoiceClass extends Control {
       set_object: setEditedObject,
       onSave: (updatedObject: MultiChoiceConstructor) => {
         const newObj = new MultiChoiceClass(updatedObject);
-        onSave(newObj);
+        onSave(newObj, validation);
       },
       title: `Create New Multiple Choice Question`,
       fields: [
@@ -198,8 +206,16 @@ export class MultiChoiceClass extends Control {
           type: "checkbox",
         },
       ],
+      additionalContent: (
+        <MultiChoiceEditor
+          onChange={(newValidation) => setValidation(newValidation)}
+          value={editedObject}
+          options={editedObject.options}
+          id={editedObject.id}
+        />
+      ),
     };
-
+  
     return <EditableObjectPopup {...popupProps} />;
   }
 

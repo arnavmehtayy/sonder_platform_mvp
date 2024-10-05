@@ -28,6 +28,7 @@ import { MCQOptionsInput } from "./MCQPopup";
 import { X } from "lucide-react";
 import {SelectVizObject, SelectVizObjectList} from "./SelectVizObjsPopup";
 import {Vector3Input} from "./Vector3Input";
+import { MultiChoiceEditor } from "@/classes/Validation/ValidationMultiChoice";
 
 
 /*
@@ -53,7 +54,8 @@ export interface PopupQuestionProps<T, option_T> {
     | "vizObjSelect"
     | "vizObjSelectList"
     | "custom"
-    | "vector3";
+    | "vector3"
+    | "validation";
   options?: { label: string; value: option_T }[]; // For select type
   length_of_array?: number; // For arraynum type
   showIf?: (obj: T) => boolean; // New property for conditional rendering
@@ -68,6 +70,7 @@ export interface EditableObjectPopupProps<T> {
   onSave: (updatedObject: T) => void; // Function to save the edited object when user clicks save
   title: string;
   fields: Array<PopupQuestionProps<T, any>>; // The fields that will be displayed in the popup
+  additionalContent?: React.ReactNode;
 }
 
 export function EditableObjectPopup<T>({
@@ -78,6 +81,7 @@ export function EditableObjectPopup<T>({
   onSave,
   title,
   fields,
+  additionalContent
 }: EditableObjectPopupProps<T>) {
   const [editedObject, setEditedObject] = [object, set_object];
 
@@ -117,7 +121,8 @@ export function EditableObjectPopup<T>({
           );
         }
         return null;
-
+      case "validation":
+        return field.render ? field.render(editedObject[field.key], (newValue) => handleChange(field.key, newValue)) : null;
 
       case "checkbox":
         return (
@@ -394,9 +399,11 @@ export function EditableObjectPopup<T>({
             {fields.map((field, index) => (
               <React.Fragment key={`${field.key as string}-${index}`}>
                 {renderField(field)}
+                
               </React.Fragment>
             ))}
           </div>
+          {additionalContent}
         </ScrollArea>
         <DialogFooter>
           <Button onClick={handleSave}>Save changes</Button>
