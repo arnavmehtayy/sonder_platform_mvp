@@ -23,6 +23,8 @@ import { EnablerControl } from "@/classes/Controls/EnablerControl";
 import { Option } from "@/classes/Controls/MultiChoiceClass";
 import { Question } from "@/classes/Question";
 import FunctionPlotString from "@/classes/vizobjects/FunctionPlotString";
+import { TableControl } from "@/classes/Controls/TableControl";
+import { SliderControlAdvanced } from "@/classes/Controls/SliderControlAdv";
 
 /*
 
@@ -106,6 +108,9 @@ export type State = {
   addElement: (element: EditAddType) => void;
   setIsPlacementModeIndividual:  (id: number, val: boolean) => void
   setNumObjectsPlaced: (id: number, num: number) => void
+  setOrder: (newOrder: OrderItem[]) => void;
+  deleteOrderItem: (id: number, type: string) => void;
+  
 
 };
 
@@ -123,6 +128,47 @@ export const useStore = create<State>((set, get) => ({
   scores: {},
   placement: [],
   isSelectActive: false,
+
+  setOrder: (newOrder: OrderItem[]) => {
+    set({ order: newOrder });
+  },
+
+  deleteOrderItem: (id: number, type: string) => {
+    set((state) => {
+      const newOrder = state.order.filter(item => !(item.id === id && item.type === type));
+      
+      // Delete the corresponding object based on the type
+      switch (type) {
+        case 'control':
+          delete state.controls[id];
+          break;
+        case 'score':
+          delete state.scores[id];
+          break;
+        case 'placement':
+          delete state.placement[id];
+          break;
+        case 'question':
+          delete state.questions[id];
+          break;
+      }
+
+      const newValidations = state.validations.filter(validation => {
+        if (validation instanceof Validation_obj) {
+          return validation.obj_id !== id;
+        } else if (validation instanceof Validation_select || validation instanceof Validation_inputNumber || validation instanceof ValidationMultiChoice) {
+          return validation.control_id !== id;
+        } else if (validation instanceof Validation_score) {
+          return validation.score_id !== id;
+        }
+        return true;
+      });
+
+      return { order: newOrder, validations: newValidations };
+
+    });
+  },
+  
 
   setNumObjectsPlaced: (id: number, num: number) => {
     set((state) => {
@@ -451,15 +497,72 @@ export const useStore = create<State>((set, get) => ({
   // Deletes a viz object from the vizobjs list
 
   deleteVizObj: (id: number) => {
-    if (id in get().vizobjs) {
-      set((state) => {
+    let wasDeleted = false;
+    set((state) => {
+      if (id in state.vizobjs) {
         const updatedVizobjs = { ...state.vizobjs };
         delete updatedVizobjs[id];
-        return { vizobjs: updatedVizobjs };
-      });
-      return true;
-    }
-    return false;
+        wasDeleted = true;
+  
+        // Remove corresponding validations
+        const newValidations = state.validations.filter(validation => {
+          if (validation instanceof Validation_obj) {
+            return validation.obj_id !== id;
+          }
+          return true;
+        });
+  
+        // Remove corresponding influences
+        const updatedInfluences = { ...state.influences };
+        delete updatedInfluences[id];
+        Object.keys(updatedInfluences).forEach(masterId => {
+          updatedInfluences[Number(masterId)] = updatedInfluences[Number(masterId)].filter(
+            influence => influence.worker_id !== id
+          );
+        });
+
+        // Remove corresponding Controls and update order
+        const updatedControls = { ...state.controls };
+        let newOrder = [...state.order];
+        Object.keys(updatedControls).forEach(controlId => {
+          const control = updatedControls[Number(controlId)];
+          if (control instanceof SelectControl) {
+            control.selectable = control.selectable.filter(objId => objId !== id);
+            control.selected = control.selected.filter(objId => objId !== id);
+          } else if (control instanceof EnablerControl) {
+            control.obj_ids = control.obj_ids.filter(objId => objId !== id);
+            if (control.obj_ids.length === 0) {
+              delete updatedControls[Number(controlId)];
+              newOrder = newOrder.filter(item => !(item.type === 'control' && item.id === Number(controlId)));
+            }
+          } else if (control instanceof TableControl) {
+            control.rows = control.rows.map(row => ({
+              cells: row.cells.map(cell => {
+                if (cell.obj_id === id) {
+                  return { ...cell, obj_id: -1, obj_type: 'Obj', attribute: '' };
+                }
+                return cell;
+              })
+            }));
+          } else if (control instanceof SliderControlAdvanced) {
+            if (control.obj_id === id) {
+              delete updatedControls[Number(controlId)];
+              newOrder = newOrder.filter(item => !(item.type === 'control' && item.id === Number(controlId)));
+            }
+          }
+        });
+  
+        return { 
+          vizobjs: updatedVizobjs, 
+          validations: newValidations,
+          influences: updatedInfluences,
+          controls: updatedControls,
+          order: newOrder
+        };
+      }
+      return {}; // Return an empty object if no changes were made
+    });
+    return wasDeleted;
   },
 
   // given the id and a new control object resets the object in the controls list.

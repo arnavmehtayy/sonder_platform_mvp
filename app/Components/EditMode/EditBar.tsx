@@ -47,16 +47,17 @@ import TextGeom from "@/classes/vizobjects/textgeomObj";
 import { DummyDataInput } from "./EditPopups/DummyDataInput";
 import { DummyDataStorage } from "@/classes/vizobjects/DummyDataStore";
 import { FunctionScore } from "@/classes/Scores/FunctionScore";
+import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors } from '@dnd-kit/core';
+import { SortableContext, sortableKeyboardCoordinates, verticalListSortingStrategy, useSortable } from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
+import { DialogTrigger } from "@radix-ui/react-dialog";
+
+import { Trash2 } from "lucide-react";
 
 export interface Option {
   id: number;
   label: string;
 }
-
-// interface ButtonItem {
-//   name: string;
-//   icon: React.ElementType;
-// }
 
 export interface ObjectType {
   name: string;
@@ -64,53 +65,104 @@ export interface ObjectType {
   icon: React.ElementType;
 }
 
-export const EditBar: React.FC = () => {
-  const [selectedObjectType, setSelectedObjectType] =
-    useState<ObjectType | null>(null);
-
-
-
-const ScoreType: ObjectType[] = [
-  {name: "Score", type: FunctionScore, icon: Sliders}
-]
-
-
-const controlTypes: ObjectType[] = [
-  { name: "SliderControl", type: SliderControlAdvanced, icon: Sliders },
-  {name: "Number Input", type: InputNumber, icon: List},
-  {name: "Select Input", type: SelectControl, icon: List},
-  {name: "Object Enabler", type: EnablerControl, icon: List},
-
-]
+const SortableItem: React.FC<{ id: string; children: React.ReactNode }> = ({ id, children }) => {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+  } = useSortable({id: id});
   
-const objectTypes: ObjectType[] = [
-  { name: "Line Object", type: LineObj, icon: PencilLine},
-  { name: "Geom Object", type: geomobj, icon: Circle },
-  { name: "Function Object", type: FunctionPlotString, icon: LineChart },
-  { name: "Axis Object", type: CoordinateAxis, icon: Axis3D },
-  {name: "Text Object", type: TextGeom, icon: HelpCircle},
-  {name: "Variable", type: DummyDataStorage, icon: HelpCircle}
-];
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+  };
+  
+  return (
+    <li ref={setNodeRef} style={style} {...attributes} {...listeners}>
+      {children}
+    </li>
+  );
+};
 
-const questionTypes: ObjectType[] = [
-  { name: "Question", type: Question, icon: HelpCircle },
-  { name: "MCQ", type: MultiChoiceClass, icon: ListChecks },
-  {name: "Table Question", type: TableControl, icon: HelpCircle},
-];
+export const EditBar: React.FC = () => {
+  const [selectedObjectType, setSelectedObjectType] = useState<ObjectType | null>(null);
+
+  const ScoreType: ObjectType[] = [
+    {name: "Score", type: FunctionScore, icon: Sliders}
+  ];
+
+  const controlTypes: ObjectType[] = [
+    { name: "SliderControl", type: SliderControlAdvanced, icon: Sliders },
+    {name: "Number Input", type: InputNumber, icon: List},
+    {name: "Select Input", type: SelectControl, icon: List},
+    {name: "Object Enabler", type: EnablerControl, icon: List},
+  ];
+    
+  const objectTypes: ObjectType[] = [
+    { name: "Line Object", type: LineObj, icon: PencilLine},
+    { name: "Geom Object", type: geomobj, icon: Circle },
+    { name: "Function Object", type: FunctionPlotString, icon: LineChart },
+    { name: "Axis Object", type: CoordinateAxis, icon: Axis3D },
+    {name: "Text Object", type: TextGeom, icon: HelpCircle},
+    {name: "Variable", type: DummyDataStorage, icon: HelpCircle}
+  ];
+
+  const questionTypes: ObjectType[] = [
+    { name: "Question", type: Question, icon: HelpCircle },
+    { name: "MCQ", type: MultiChoiceClass, icon: ListChecks },
+    {name: "Table Question", type: TableControl, icon: HelpCircle},
+  ];
+
+  const order = useStore((state) => state.order);
+  const setOrder = useStore((state) => state.setOrder);
+  const deleteOrderItem = useStore((state) => state.deleteOrderItem);
+  const deleteVizObj = useStore((state) => state.deleteVizObj);
+  const vizobjs = useStore((state) => state.vizobjs);
+
+  const sensors = useSensors(
+    useSensor(PointerSensor),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    })
+  );
+
+  const handleDragEnd = (event: any) => {
+    const {active, over} = event;
+
+    if (active.id !== over.id) {
+      const oldIndex = order.findIndex((item) => `${item.type}-${item.id}` === active.id);
+      const newIndex = order.findIndex((item) => `${item.type}-${item.id}` === over.id);
+      
+      const newOrder = [...order];
+      const [reorderedItem] = newOrder.splice(oldIndex, 1);
+      newOrder.splice(newIndex, 0, reorderedItem);
+
+      setOrder(newOrder);
+    }
+  };
+
+  const handleDeleteItem = (id: number, type: string) => {
+    deleteOrderItem(id, type);
+    if (type === 'control' || type === 'placement' || type === 'question') {
+      deleteVizObj(id);
+    }
+  };
 
   return (
     <>
       <div className="fixed top-4 left-1/2 transform -translate-x-1/2 z-10 flex space-x-2">
-      <DropDownMenu
+        <DropDownMenu
           ObjectList={ScoreType}
           setSelectedObjectType={setSelectedObjectType}
           label="Score"
-          />
-      <DropDownMenu
+        />
+        <DropDownMenu
           ObjectList={controlTypes}
           setSelectedObjectType={setSelectedObjectType}
           label="Control"
-          />
+        />
         <DropDownMenu
           ObjectList={questionTypes}
           setSelectedObjectType={setSelectedObjectType}
@@ -121,45 +173,64 @@ const questionTypes: ObjectType[] = [
           setSelectedObjectType={setSelectedObjectType}
           label="Object"
         />
-        
-        {/* <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button className="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-md flex items-center space-x-2">
-              <Plus className="h-5 w-5" />
-              <span>Add Question</span>
-              <ChevronDown className="h-4 w-4" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent>
-            {questionTypes.map((objectType) => (
-              <DropdownMenuItem key={objectType.type.name} onSelect={() => setSelectedObjectType(objectType)}>
-                <objectType.icon className="mr-2 h-4 w-4" />
-                <span>{objectType.name}</span>
-              </DropdownMenuItem>
-            ))}
-          </DropdownMenuContent>
-        </DropdownMenu>
 
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button className="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-md flex items-center space-x-2">
-              <Plus className="h-5 w-5" />
-              <span>Add Object</span>
-              <ChevronDown className="h-4 w-4" />
+        <Dialog>
+          <DialogTrigger asChild>
+            <Button variant="outline" className="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-md flex items-center space-x-2">
+              <List className="h-5 w-5" />
+              <span>Manage Sidebar</span>
             </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent>
-            {objectTypes.map((objectType) => (
-              <DropdownMenuItem 
-                key={objectType.type.name} 
-                onSelect={() => setSelectedObjectType(objectType)}
+          </DialogTrigger>
+          <DialogContent className="sm:max-w-[425px]">
+            <DialogHeader>
+              <DialogTitle>Manage Order and Objects</DialogTitle>
+            </DialogHeader>
+            <div className="mt-4">
+              <DndContext 
+                sensors={sensors}
+                collisionDetection={closestCenter}
+                onDragEnd={handleDragEnd}
               >
-                <objectType.icon className="mr-2 h-4 w-4" />
-                <span>{objectType.name}</span>
-              </DropdownMenuItem>
-            ))}
-          </DropdownMenuContent>
-        </DropdownMenu> */}
+                <SortableContext 
+                  items={order.map(item => `${item.type}-${item.id}`)}
+                  strategy={verticalListSortingStrategy}
+                >
+                  <ul className="space-y-2">
+                    {order.map((item) => (
+                      <SortableItem key={`${item.type}-${item.id}`} id={`${item.type}-${item.id}`}>
+                        <div className="flex items-center justify-between bg-gray-100 p-2 rounded">
+                          <span>{`${item.type} - ${item.id}`}</span>
+                          <button
+                            onClick={() => handleDeleteItem(item.id, item.type)}
+                            className="text-red-500 hover:text-red-700"
+                          >
+                            <X size={16} />
+                          </button>
+                        </div>
+                      </SortableItem>
+                    ))}
+                  </ul>
+                </SortableContext>
+              </DndContext>
+            </div>
+            <div className="mt-4">
+              <h3 className="text-lg font-semibold mb-2">Scene Objects</h3>
+              <ul className="space-y-2">
+                {Object.entries(vizobjs).map(([id, obj]) => (
+                  <li key={id} className="flex items-center justify-between bg-gray-100 p-2 rounded">
+                    <span>{`${obj.name} (ID: ${id})`}</span>
+                    <button
+                      onClick={() => deleteVizObj(Number(id))}
+                      className="text-red-500 hover:text-red-700"
+                    >
+                      <Trash2 size={16} />
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </DialogContent>
+        </Dialog>
       </div>
 
       {selectedObjectType && (
