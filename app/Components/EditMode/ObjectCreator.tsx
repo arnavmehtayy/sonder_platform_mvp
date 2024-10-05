@@ -7,7 +7,6 @@ import { LineObj } from "@/classes/vizobjects/Lineobj";
 import { geomobj } from "@/classes/vizobjects/geomobj";
 import CoordinateAxis from "@/classes/vizobjects/CoordinateAxis";
 import { Question } from "@/classes/Question";
-import { Control } from "@/classes/Controls/Control";
 import { MultiChoiceClass } from "@/classes/Controls/MultiChoiceClass";
 import { SliderControlAdvanced } from "@/classes/Controls/SliderControlAdv";
 import { InputNumber } from "@/classes/Controls/InputNumber";
@@ -19,6 +18,7 @@ import FunctionPlotString from "@/classes/vizobjects/FunctionPlotString";
 import { DummyDataStorage } from "@/classes/vizobjects/DummyDataStore";
 import { FunctionScore } from "@/classes/Scores/FunctionScore";
 import { ValidationMultiChoice } from "@/classes/Validation/ValidationMultiChoice";
+import Validation from "@/classes/Validation/Validation";
 
 export type EditAddType =
   | obj
@@ -68,7 +68,7 @@ export function ObjectCreator({ ObjectType, onClose }: ObjectCreatorProps) {
     onClose();
   };
 
-  const handleSaveObject = (newObject: EditAddType, validation?: ValidationMultiChoice) => {
+  const handleSaveObject = (newObject: EditAddType, validation?: Validation) => {
     addElement(newObject);
     if (validation) {
       addElement(validation);

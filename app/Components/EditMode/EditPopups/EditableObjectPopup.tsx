@@ -121,8 +121,8 @@ export function EditableObjectPopup<T>({
           );
         }
         return null;
-      case "validation":
-        return field.render ? field.render(editedObject[field.key], (newValue) => handleChange(field.key, newValue)) : null;
+      // case "validation":
+      //   return field.render ? field.render(editedObject[field.key], (newValue) => handleChange(field.key, newValue)) : null;
 
       case "checkbox":
         return (
@@ -402,8 +402,12 @@ export function EditableObjectPopup<T>({
                 
               </React.Fragment>
             ))}
+            {additionalContent && (
+              <div className="pt-6 border-t border-gray-200">
+                {additionalContent}
+              </div>)}
           </div>
-          {additionalContent}
+          
         </ScrollArea>
         <DialogFooter>
           <Button onClick={handleSave}>Save changes</Button>

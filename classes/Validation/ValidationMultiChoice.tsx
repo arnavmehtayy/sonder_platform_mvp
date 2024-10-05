@@ -1,7 +1,11 @@
 import { MultiChoiceClass, MultiChoiceConstructor, Option } from "../Controls/MultiChoiceClass";
 import Validation, { ValidationConstructor } from "./Validation";
 import React from "react";
-import { Checkbox } from "@radix-ui/react-checkbox";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Button } from "@/components/ui/button";
+import { DialogTitle, DialogHeader} from "@/components/ui/dialog"
 
 
 /*
@@ -55,7 +59,7 @@ export class ValidationMultiChoice extends Validation {
 
     
     export interface MultiChoiceEditorProps {
-        onChange: (value: ValidationMultiChoice) => void;
+        onChange: (value: ValidationMultiChoice | undefined) => void;
         value: MultiChoiceConstructor
         options: Option[]
         id: number
@@ -65,6 +69,7 @@ export class ValidationMultiChoice extends Validation {
     export const MultiChoiceEditor: React.FC<MultiChoiceEditorProps> = ({onChange, value, options, id}) => {
         const [addValidation, setAddValidation] = React.useState(false);
         const [validationAnswer, setValidationAnswer] = React.useState<number[]>([]);
+        const [validationDesc, setValidationDesc] = React.useState("");
       
         const handleValidationChange = (optionId: number) => {
           setValidationAnswer(prev => 
@@ -79,41 +84,58 @@ export class ValidationMultiChoice extends Validation {
             const newValidation = new ValidationMultiChoice({
               answer: validationAnswer,
               control_id: id,
-              desc: "Validation for " + value.title
+              desc: validationDesc || "Validation for test"
             });
             onChange(newValidation);
-          } else {
-            // onChange(undefined);
+          } 
+          else {
+            onChange(undefined)
           }
-        }, [addValidation, validationAnswer, id, value.title]);
+        }, [addValidation, validationAnswer, validationDesc, id]);
       
         return (
-          <div className="space-y-4">
-            <div className="flex items-center space-x-2">
-              <Checkbox
-                id="add-validation"
-                checked={addValidation}
-                onCheckedChange={(checked) => setAddValidation(checked as boolean)}
-              />
-              <label htmlFor="add-validation" className="text-sm font-medium text-gray-700">
-                Add Validation
-              </label>
+          <div className="space-y-6">
+            <div className="flex items-center justify-between">
+            <DialogHeader>
+          <DialogTitle> Validation </DialogTitle>
+        </DialogHeader>
+              {/* <Label htmlFor="add-validation" className="text-sm font-medium">Validation</Label> */}
+              <Button
+                variant={addValidation ? "default" : "outline"}
+                size="sm"
+                onClick={() => setAddValidation(!addValidation)}
+              >
+                {addValidation ? "Remove Validation" : "Add Validation"}
+              </Button>
             </div>
             {addValidation && (
-              <div className="space-y-2">
-                <p className="text-sm font-medium text-gray-700">Select correct answer(s):</p>
-                {options.map((option) => (
-                  <div key={option.id} className="flex items-center space-x-2">
-                    <Checkbox
-                      id={`option-${option.id}`}
-                      checked={validationAnswer.includes(option.id)}
-                      onCheckedChange={() => handleValidationChange(option.id)}
-                    />
-                    <label htmlFor={`option-${option.id}`} className="text-sm text-gray-600">
-                      {option.label}
-                    </label>
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="validation-desc" className="text-sm font-medium">Validation Description</Label>
+                  <Input
+                    id="validation-desc"
+                    value={validationDesc}
+                    onChange={(e) => setValidationDesc(e.target.value)}
+                    placeholder="Validation for __"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label className="text-sm font-medium">Select correct answer(s):</Label>
+                  <div className="space-y-2">
+                    {options.map((option) => (
+                      <div key={option.id} className="flex items-center space-x-2 py-2">
+                        <Checkbox
+                          id={`option-${option.id}`}
+                          checked={validationAnswer.includes(option.id)}
+                          onCheckedChange={() => handleValidationChange(option.id)}
+                        />
+                        <Label htmlFor={`option-${option.id}`} className="text-sm text-gray-700 cursor-pointer">
+                          {option.label}
+                        </Label>
+                      </div>
+                    ))}
                   </div>
-                ))}
+                </div>
               </div>
             )}
           </div>
