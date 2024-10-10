@@ -1,6 +1,6 @@
 "use client";
 import React, { useState } from "react";
-import { HelpCircle, List, ChevronDown, Plus, X } from "lucide-react";
+import { HelpCircle, List, ChevronDown, Plus, Trash2 } from "lucide-react";
 import { 
   LineChart, 
   Circle, 
@@ -51,8 +51,7 @@ import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, us
 import { SortableContext, sortableKeyboardCoordinates, verticalListSortingStrategy, useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { DialogTrigger } from "@radix-ui/react-dialog";
-
-import { Trash2 } from "lucide-react";
+import { GripVertical } from 'lucide-react';
 
 export interface Option {
   id: number;
@@ -64,6 +63,8 @@ export interface ObjectType {
   type: PopUpType;
   icon: React.ElementType;
 }
+
+
 
 const SortableItem: React.FC<{ id: string; children: React.ReactNode }> = ({ id, children }) => {
   const {
@@ -80,7 +81,10 @@ const SortableItem: React.FC<{ id: string; children: React.ReactNode }> = ({ id,
   };
   
   return (
-    <li ref={setNodeRef} style={style} {...attributes} {...listeners}>
+    <li ref={setNodeRef} style={style} className="flex items-center bg-gray-100 p-2 rounded">
+      <div {...attributes} {...listeners} className="cursor-move mr-2">
+        <GripVertical size={20} />
+      </div>
       {children}
     </li>
   );
@@ -198,16 +202,14 @@ export const EditBar: React.FC = () => {
                   <ul className="space-y-2">
                     {order.map((item) => (
                       <SortableItem key={`${item.type}-${item.id}`} id={`${item.type}-${item.id}`}>
-                        <div className="flex items-center justify-between bg-gray-100 p-2 rounded">
-                          <span>{`${item.type} - ${item.id}`}</span>
-                          <button
-                            onClick={() => handleDeleteItem(item.id, item.type)}
-                            className="text-red-500 hover:text-red-700"
-                          >
-                            <X size={16} />
-                          </button>
-                        </div>
-                      </SortableItem>
+                      <div className="flex-grow">{`${item.type} - ${item.id}`}</div>
+                      <button
+                        onClick={() => handleDeleteItem(item.id, item.type)}
+                        className="text-red-500 hover:text-red-700 ml-2"
+                      >
+                        <Trash2 size={16} />
+                      </button>
+                    </SortableItem>
                     ))}
                   </ul>
                 </SortableContext>
