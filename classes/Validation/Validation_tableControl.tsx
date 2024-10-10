@@ -9,6 +9,21 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { DialogTitle, DialogHeader } from "@/components/ui/dialog";
 import { Checkbox } from "@/components/ui/checkbox";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 /*
  * Validation class for the TableControl
@@ -101,9 +116,6 @@ export const ValidationTableControlEditor: React.FC<
     desc: `Validation for `,
   });
 
-  console.log(Array(rows).fill(Array(columns).fill(true)));
-  console.log("ARNAV", validationState, rows, columns);
-
   React.useEffect(() => {
     setValidationState({
       ...validationState,
@@ -180,7 +192,6 @@ export const ValidationTableControlEditor: React.FC<
             <Label htmlFor="validation-error" className="text-sm font-medium">
               Error Tolerance
             </Label>
-
             <Input
               id="validation-error"
               value={validationState.error === 0 ? "" : validationState.error}
@@ -195,44 +206,96 @@ export const ValidationTableControlEditor: React.FC<
               type="number"
             />
           </div>
-          <div className="space-y-2">
-            <Label className="text-sm font-medium">
+          <div className="w-full max-w-3xl">
+            <h2 className="text-2xl font-bold mb-4">
               Expected Answers and Validation Cells
-            </Label>
-            <div className="grid gap-2">
-              {validationState.answers.map((row, rowIndex) => (
-                <div key={rowIndex} className="flex items-center space-x-2">
-                  {row.map((cell, colIndex) => (
-                    <div key={colIndex} className="flex flex-col items-center">
-                      <Input
-                        type="number"
-                        value={cell}
-                        onChange={(e) =>
-                          updateAnswerCell(
-                            rowIndex,
-                            colIndex,
-                            Number(e.target.value)
-                          )
-                        }
-                        className="w-20"
-                      />
-                      <Checkbox
-                        checked={
-                          validationState.validateCells[rowIndex][colIndex]
-                        }
-                        onCheckedChange={(checked) =>
-                          updateValidateCell(
-                            rowIndex,
-                            colIndex,
-                            checked as boolean
-                          )
-                        }
-                      />
-                    </div>
+            </h2>
+            {validationState.answers.length === 0 ? (
+              <p>
+                No answers available. Please add some answers to begin
+                validation.
+              </p>
+            ) : (
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead className="w-[100px]">Row</TableHead>
+                    {validationState.answers[0].map((_, colIndex) => (
+                      <TableHead key={colIndex} className="text-center">
+                        Column {colIndex + 1}
+                      </TableHead>
+                    ))}
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {validationState.answers.map((row, rowIndex) => (
+                    <TableRow key={rowIndex}>
+                      <TableCell className="font-medium">
+                        {rowIndex + 1}
+                      </TableCell>
+                      {row.map((cell, colIndex) => (
+                        <TableCell key={colIndex} className="p-2">
+                          <div className="flex flex-col items-center space-y-2">
+                            <TooltipProvider>
+                              <Tooltip>
+                                <TooltipTrigger asChild>
+                                  <div className="flex items-center space-x-2">
+                                    <Checkbox
+                                      id={`validate-${rowIndex}-${colIndex}`}
+                                      checked={
+                                        validationState.validateCells[rowIndex][
+                                          colIndex
+                                        ]
+                                      }
+                                      onCheckedChange={(checked) =>
+                                        updateValidateCell(
+                                          rowIndex,
+                                          colIndex,
+                                          checked === true
+                                        )
+                                      }
+                                    />
+                                    <Label
+                                      htmlFor={`validate-${rowIndex}-${colIndex}`}
+                                      className="text-sm cursor-pointer"
+                                    >
+                                      Include
+                                    </Label>
+                                  </div>
+                                </TooltipTrigger>
+                                <TooltipContent>
+                                  <p>
+                                    Check to include this cell in validation
+                                  </p>
+                                </TooltipContent>
+                              </Tooltip>
+                            </TooltipProvider>
+                            {validationState.validateCells[rowIndex][
+                              colIndex
+                            ] && (
+                              <Input
+                                type="number"
+                                value={cell === 0 ? "" : cell}
+                                onChange={(e) => {
+                                  const value = e.target.value;
+                                  updateAnswerCell(
+                                    rowIndex,
+                                    colIndex,
+                                    value === "" ? 0 : Number(value)
+                                  );
+                                }}
+                                className="w-20 text-center"
+                                placeholder="Value"
+                              />
+                            )}
+                          </div>
+                        </TableCell>
+                      ))}
+                    </TableRow>
                   ))}
-                </div>
-              ))}
-            </div>
+                </TableBody>
+              </Table>
+            )}
           </div>
         </div>
       )}

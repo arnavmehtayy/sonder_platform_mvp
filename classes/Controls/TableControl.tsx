@@ -308,7 +308,7 @@ function HeadersEditor({
 
   return (
     <div className="space-y-2">
-      <label className="block font-medium">{label}</label>
+      {/* <label className="block font-medium">{label}</label> */}
       {headers.map((header, index) => (
         <div key={index} className="flex items-center space-x-2">
           <Input
