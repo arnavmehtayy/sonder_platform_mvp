@@ -10,8 +10,14 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
-import { DialogTitle, DialogHeader} from "@/components/ui/dialog";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { DialogTitle, DialogHeader } from "@/components/ui/dialog";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { geomobj, geomobjconstructor } from "../vizobjects/geomobj";
 
 export type value_typ = att_type; // the possible types of the attribute that is to be validated
@@ -62,7 +68,7 @@ export default class Validation_obj<T extends value_typ> extends Validation {
     this.answer = answer;
     this.obj_id = obj_id;
     this.get_attribute_json = get_attribute_json;
-    console.log(get_attribute_json)
+    console.log(get_attribute_json);
     this.get_attribute = atts[get_attribute_json.obj_type]![
       typeof this.answer === "number"
         ? "number"
@@ -149,30 +155,32 @@ export interface ValidationObjEditorProps {
   id: number;
 }
 
-export const ValidationObjEditor: React.FC<ValidationObjEditorProps> = ({ onChange, value, id }) => {
+export const ValidationObjEditor: React.FC<ValidationObjEditorProps> = ({
+  onChange,
+  value,
+  id,
+}) => {
   const [addValidation, setAddValidation] = React.useState(false);
-  const [validationAnswer, setValidationAnswer] = React.useState<number>(0);
-  const [validationDesc, setValidationDesc] = React.useState("");
-  const [selectedAttribute, setSelectedAttribute] = React.useState<string>("");
-  const [selectedRelation, setSelectedRelation] = React.useState<relation>("==");
-  const [error, setError] = React.useState<number>(0);
+  const [validationState, setValidationState] = React.useState<Validation_obj_constructor<number>>({
+    answer: 0,
+    obj_id: id,
+    get_attribute_json: { obj_type: "GeomObj", func: "" },
+    error: 0,
+    relation: "==",
+    desc: `Validation for ${value.name}`,
+  });
 
   React.useEffect(() => {
-    if (addValidation && selectedAttribute) {
-      const validation_constructor: Validation_obj_constructor<number> = 
-      {
-        answer: validationAnswer,
-        obj_id: id,
-        get_attribute_json: { obj_type: "GeomObj", func: selectedAttribute },
-        error: error,
-        relation: selectedRelation,
-        desc: validationDesc || `Validation for ${value.name}`
-      }
-      onChange(validation_constructor);
+    if (addValidation && validationState.get_attribute_json.func) {
+      onChange(validationState);
     } else {
       onChange(undefined);
     }
-  }, [addValidation, validationAnswer, validationDesc, selectedAttribute, selectedRelation, error, id, value.name]);
+  }, [addValidation, validationState, onChange]);
+
+  const handleInputChange = (field: keyof Validation_obj_constructor<number>, value: any) => {
+    setValidationState(prev => ({ ...prev, [field]: value }));
+  };
 
   return (
     <div className="space-y-6">
@@ -191,59 +199,83 @@ export const ValidationObjEditor: React.FC<ValidationObjEditorProps> = ({ onChan
       {addValidation && (
         <div className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="validation-desc" className="text-sm font-medium">Validation Description</Label>
+            <Label htmlFor="validation-desc" className="text-sm font-medium">
+              Validation Description
+            </Label>
             <Input
               id="validation-desc"
-              value={validationDesc}
-              onChange={(e) => setValidationDesc(e.target.value)}
+              value={validationState.desc}
+              onChange={(e) => handleInputChange("desc", e.target.value)}
               placeholder="Validation for __"
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="attribute-select" className="text-sm font-medium">Select Attribute</Label>
-            <Select onValueChange={setSelectedAttribute} value={selectedAttribute}>
+            <Label htmlFor="attribute-select" className="text-sm font-medium">
+              Select Attribute
+            </Label>
+            <Select
+              onValueChange={(value) => handleInputChange("get_attribute_json", { ...validationState.get_attribute_json, func: value })}
+              value={validationState.get_attribute_json.func}
+            >
               <SelectTrigger id="attribute-select">
                 <SelectValue placeholder="Select attribute" />
               </SelectTrigger>
               <SelectContent>
-                {
-                  Object.keys(atts["GeomObj"]!["number"]).map((attr) => (
-                    <SelectItem key={attr} value={attr}>{attr}</SelectItem>
-                  ))
-                }
-              </SelectContent>
-            </Select>
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="relation-select" className="text-sm font-medium">Select Relation</Label>
-            <Select onValueChange={(value) => setSelectedRelation(value as relation)} value={selectedRelation}>
-              <SelectTrigger id="relation-select">
-                <SelectValue placeholder="Select relation" />
-              </SelectTrigger>
-              <SelectContent>
-                {["==", ">", "<", ">=", "<=", "!="].map((rel) => (
-                  <SelectItem key={rel} value={rel}>{rel}</SelectItem>
+                {Object.keys(atts["GeomObj"]!["number"]).map((attr) => (
+                  <SelectItem key={attr} value={attr}>
+                    {attr}
+                  </SelectItem>
                 ))}
               </SelectContent>
             </Select>
           </div>
           <div className="space-y-2">
-            <Label htmlFor="validation-answer" className="text-sm font-medium">Expected Value</Label>
+            <Label htmlFor="relation-select" className="text-sm font-medium">
+              Select Relation
+            </Label>
+            <Select
+              onValueChange={(value) => handleInputChange("relation", value as relation)}
+              value={validationState.relation}
+            >
+              <SelectTrigger id="relation-select">
+                <SelectValue placeholder="Select relation" />
+              </SelectTrigger>
+              <SelectContent>
+                {["==", ">", "<", ">=", "<=", "!="].map((rel) => (
+                  <SelectItem key={rel} value={rel}>
+                    {rel}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="validation-answer" className="text-sm font-medium">
+              Expected Value
+            </Label>
             <Input
               id="validation-answer"
-              value={validationAnswer}
-              onChange={(e) => setValidationAnswer(Number(e.target.value))}
+              value={validationState.answer === 0 ? "" : validationState.answer}
+              onChange={(e) => {
+                const value = e.target.value;
+                handleInputChange("answer", value === "" ? 0 : Number(value));
+              }}
               placeholder="Expected value"
               type="number"
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="validation-error" className="text-sm font-medium">Error Margin</Label>
+            <Label htmlFor="validation-error" className="text-sm font-medium">
+              Error Margin
+            </Label>
             <Input
               id="validation-error"
               type="number"
-              value={error}
-              onChange={(e) => setError(Number(e.target.value))}
+              value={validationState.error === 0 ? "" : validationState.error}
+              onChange={(e) => {
+                const value = e.target.value;
+                handleInputChange("error", value === "" ? 0 : Number(value));
+              }}
               placeholder="Error margin"
             />
           </div>

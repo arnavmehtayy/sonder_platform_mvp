@@ -25,6 +25,8 @@ import { Question } from "@/classes/Question";
 import FunctionPlotString from "@/classes/vizobjects/FunctionPlotString";
 import { TableControl } from "@/classes/Controls/TableControl";
 import { SliderControlAdvanced } from "@/classes/Controls/SliderControlAdv";
+import { Validation_tableControl } from "@/classes/Validation/Validation_tableControl";
+import { vizobjects } from "./db/schema";
 
 /*
 
@@ -110,6 +112,7 @@ export type State = {
   setNumObjectsPlaced: (id: number, num: number) => void
   setOrder: (newOrder: OrderItem[]) => void;
   deleteOrderItem: (id: number, type: string) => void;
+  setTableControl: (newTable: TableControl<any>) => void;
   
 
 };
@@ -128,6 +131,13 @@ export const useStore = create<State>((set, get) => ({
   scores: {},
   placement: [],
   isSelectActive: false,
+
+  setTableControl: (newTable: TableControl<any>) => {
+    set((state) => {
+      const controls_new = {...state.controls, [newTable.id]: newTable}
+      return {controls: controls_new}
+    })
+  },
 
   setOrder: (newOrder: OrderItem[]) => {
     set({ order: newOrder });
@@ -452,7 +462,13 @@ export const useStore = create<State>((set, get) => ({
           return validation.computeValidity(
             state.controls[validation.control_id] as InputNumber
           );
-        } else {
+        } 
+        else if (validation instanceof Validation_tableControl) {
+            return validation.computeValidity(
+              state.controls[validation.control_id] as TableControl<any>
+            )
+        }
+        else {
           return validation.computeValidity(null);
         }
       });
@@ -854,3 +870,5 @@ export const addElementSelector = (state: State) => (element: EditAddType) => {
 }
 
 export const getZoomSelector = (state: State) => state.camera_zoom;
+
+export const SetTableControl = (state: State) => state.setTableControl

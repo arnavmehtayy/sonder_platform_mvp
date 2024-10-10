@@ -1,9 +1,8 @@
 
-
 import React from "react";
 import { Control, ControlConstructor } from "./Control";
 import { obj, object_types } from "../vizobjects/obj";
-import { useStore, getObjectSelector, setVizObjSelector } from "@/app/store";
+import { useStore, getObjectSelector, setVizObjSelector, SetTableControl } from "@/app/store";
 import {
   EditableObjectPopup,
   EditableObjectPopupProps,
@@ -22,6 +21,7 @@ import { X } from "lucide-react";
 import Latex from "react-latex-next";
 import { atts } from "../vizobjects/get_set_obj_attributes";
 import { FunctionStr, FunctionStrEditor } from './FunctionStr';
+import { Validation_tableControl, Validation_tableControlConstructor, ValidationTableControlEditor } from "../Validation/Validation_tableControl";
 
 interface TableCell<T extends obj> {
   value: number;
@@ -68,8 +68,14 @@ export class TableControl<T extends obj> extends Control {
   }
 
   setCellValue(rowIndex: number, cellIndex: number, value: number | ''): T | null {
+
+
+
+
+
     const cell = this.rows[rowIndex].cells[cellIndex];
     const obj = useStore.getState().vizobjs[cell.obj_id] as T;
+    
   
     if (obj) {
       const numericValue = value === '' ? 0 : value;
@@ -105,7 +111,7 @@ export class TableControl<T extends obj> extends Control {
   }: {
     isOpen: boolean;
     onClose: () => void;
-    onSave: (obj: TableControl<T>) => void;
+    onSave: (obj: TableControl<T>, validation?: Validation_tableControl<any>) => void;
   }) {
     const [editedObject, setEditedObject] = React.useState<
       TableControlConstructor<T>
@@ -116,6 +122,8 @@ export class TableControl<T extends obj> extends Control {
       rowHeaders: [],
     });
 
+    const [validation, setValidation] = React.useState<Validation_tableControlConstructor<any> | undefined>(undefined);
+
     const popupProps: EditableObjectPopupProps<TableControlConstructor<T>> = {
       isOpen,
       onClose,
@@ -123,7 +131,8 @@ export class TableControl<T extends obj> extends Control {
       set_object: setEditedObject,
       onSave: (updatedObject: TableControlConstructor<T>) => {
         const newObj = new TableControl(updatedObject);
-        onSave(newObj);
+        const newVal = validation ? new Validation_tableControl(validation) : undefined
+        onSave(newObj, newVal);
       },
       title: `Create New Table Control`,
       fields: [
@@ -167,6 +176,14 @@ export class TableControl<T extends obj> extends Control {
           ),
         },
       ],
+      additionalContent: (
+        <ValidationTableControlEditor
+          onChange={(newValidation: Validation_tableControlConstructor<any> | undefined) => setValidation(newValidation)}
+          controlId={editedObject.id}
+          rows={editedObject.rows.length}
+          columns={editedObject.columnHeaders.length}
+        />
+      ),
     };
 
     return <EditableObjectPopup {...popupProps} />;
@@ -179,9 +196,16 @@ function ShowTableControl<T extends obj>({
   control: TableControl<T>;
 }) {
   const setVizObj = useStore(setVizObjSelector);
+  const setTableControl = useStore(SetTableControl);
   const [localValues, setLocalValues] = React.useState<(number | "")[][]>(
     control.rows.map((row) => row.cells.map((cell) => cell.value))
   );
+
+  const updateTableControl = React.useCallback((rowIndex: number, cellIndex: number, value: string) => {
+    const table_obj = control.clone();
+    table_obj.rows[rowIndex].cells[cellIndex].value = value === "" ? 0 : parseFloat(value);
+    setTableControl(table_obj);
+  }, [control, setTableControl]);
 
   const handleCellChange = (
     rowIndex: number,
@@ -190,10 +214,15 @@ function ShowTableControl<T extends obj>({
   ) => {
     const newValue = value === "" ? "" : parseFloat(value);
     if (newValue === "" || !isNaN(newValue)) {
+      // Update local state
       const newLocalValues = [...localValues];
       newLocalValues[rowIndex][cellIndex] = newValue;
       setLocalValues(newLocalValues);
 
+      // Update table control in the store
+      updateTableControl(rowIndex, cellIndex, value);
+
+      // Update the object
       const updatedObj = control.setCellValue(
         rowIndex,
         cellIndex,

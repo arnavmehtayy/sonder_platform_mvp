@@ -226,7 +226,6 @@ export class geomobj extends TransformObj {
       set_object: setEditedObject,
       onSave: (updatedObject: geomobjconstructor) => {
         const newObj = new geomobj(updatedObject);
-        console.log(validation)
         
         const newVal = validation ? new Validation_obj(validation) : undefined
         onSave(newObj, newVal);
