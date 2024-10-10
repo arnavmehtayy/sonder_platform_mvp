@@ -20,6 +20,9 @@ import { Switch } from "@/components/ui/switch";
 import { Separator } from "@/components/ui/separator";
 import { dict_keys, get_attributes } from "./get_set_obj_attributes";
 import { TouchControlEditor } from "@/app/Components/EditMode/EditPopups/TouchControlAttributeEditor";
+import { Validation_obj_constructor, ValidationObjEditor } from "../Validation/Validation_obj";
+import Validation_obj from "../Validation/Validation_obj";
+import Validation from "../Validation/Validation";
 
 // List of 2D geometries with simple parameters
 export type PredefinedGeometry = {
@@ -194,7 +197,7 @@ export class geomobj extends TransformObj {
   }: {
     isOpen: boolean;
     onClose: () => void;
-    onSave: (newObject: geomobj) => void;
+    onSave: (newObject: geomobj, validation?: Validation_obj<any>) => void;
   }): React.ReactElement {
     const [editedObject, setEditedObject] = React.useState<geomobjconstructor>({
       id: Date.now() % 10000, // Generate a temporary ID
@@ -209,11 +212,13 @@ export class geomobj extends TransformObj {
       isClickable: false,
       geom_json: {type: "circle", params:{radius:1}}
     });
-
+  
+    const [validation, setValidation] = React.useState<Validation_obj_constructor<any> | undefined>(undefined);
+  
     const handleChange = (key: keyof geomobjconstructor, value: any) => {
       setEditedObject((prev) => ({ ...prev, [key]: value }));
     };
-
+  
     const popupProps: EditableObjectPopupProps<geomobjconstructor> = {
       isOpen,
       onClose,
@@ -221,9 +226,12 @@ export class geomobj extends TransformObj {
       set_object: setEditedObject,
       onSave: (updatedObject: geomobjconstructor) => {
         const newObj = new geomobj(updatedObject);
-        onSave(newObj);
+        console.log(validation)
+        
+        const newVal = validation ? new Validation_obj(validation) : undefined
+        onSave(newObj, newVal);
       },
-      title: `Create New Object`,
+      title: `Create New Geometric Object`,
       fields: [
         { key: "name", label: "Name", type: "text" },
         {
@@ -251,11 +259,17 @@ export class geomobj extends TransformObj {
         },
         { key: "isEnabled", label: "IsVisible", type: "checkbox" },
       ],
+      additionalContent: (
+        <ValidationObjEditor
+          onChange={(newValidation: Validation_obj_constructor<any> | undefined) => setValidation(newValidation)}
+          value={editedObject}
+          id={editedObject.id}
+        />
+      ),
     };
-
+  
     return <EditableObjectPopup {...popupProps} />;
   }
-}
 
 // function TouchControlEditor({ touchControl, onChange }: TouchControlEditorProps) {
 //   const updateTouchControl = (key: keyof TouchControl, value: any) => {
@@ -282,3 +296,4 @@ export class geomobj extends TransformObj {
 //     </div>
 //   );
 // }
+}
