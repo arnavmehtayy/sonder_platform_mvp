@@ -4,7 +4,11 @@ import { InputNumber } from "../Controls/InputNumber";
 import Validation from "./Validation";
 import * as val_func from "./Validation_funcs";
 import { ValidationConstructor } from "./Validation";
-
+import React from "react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { DialogTitle, DialogHeader } from "@/components/ui/dialog";
 
 /*
  * Validation class for the InputNumber control
@@ -12,7 +16,7 @@ import { ValidationConstructor } from "./Validation";
 
 */
 
-interface Validation_inputNumberConstructor extends ValidationConstructor {
+export interface Validation_inputNumberConstructor extends ValidationConstructor {
   answer: number;
   control_id: number;
   error: number;
@@ -61,3 +65,90 @@ export class Validation_inputNumber extends Validation {
     };
   }
 }
+
+
+export interface ValidationInputNumberEditorProps {
+  onChange: (value: Validation_inputNumberConstructor | undefined) => void;
+  controlId: number;
+}
+
+export const ValidationInputNumberEditor: React.FC<ValidationInputNumberEditorProps> = ({
+  onChange,
+  controlId,
+}) => {
+  const [addValidation, setAddValidation] = React.useState(false);
+  const [validationState, setValidationState] = React.useState<Validation_inputNumberConstructor>({
+    answer: 0,
+    control_id: controlId,
+    error: 1,
+    desc: `Validation for Input Number`,
+  });
+
+  React.useEffect(() => {
+    if (addValidation) {
+      onChange(validationState);
+    } else {
+      onChange(undefined);
+    }
+  }, [addValidation, validationState, onChange]);
+
+  const handleInputChange = (field: keyof Validation_inputNumberConstructor, value: any) => {
+    setValidationState(prev => ({ ...prev, [field]: value }));
+  };
+
+  return (
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
+        <DialogHeader>
+          <DialogTitle>Validation</DialogTitle>
+        </DialogHeader>
+        <Button
+          variant={addValidation ? "default" : "outline"}
+          size="sm"
+          onClick={() => setAddValidation(!addValidation)}
+        >
+          {addValidation ? "Remove Validation" : "Add Validation"}
+        </Button>
+      </div>
+      {addValidation && (
+        <div className="space-y-4">
+          <div className="space-y-2">
+            <Label htmlFor="validation-desc" className="text-sm font-medium">
+              Validation Description
+            </Label>
+            <Input
+              id="validation-desc"
+              value={validationState.desc}
+              onChange={(e) => handleInputChange("desc", e.target.value)}
+              placeholder="Validation for Input Number"
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="validation-answer" className="text-sm font-medium">
+              Expected Answer
+            </Label>
+            <Input
+              id="validation-answer"
+              type="number"
+              value={validationState.answer}
+              onChange={(e) => handleInputChange("answer", parseFloat(e.target.value))}
+              placeholder="Expected answer"
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="validation-error" className="text-sm font-medium">
+              Error Tolerance
+            </Label>
+            <Input
+              id="validation-error"
+              type="number"
+              value={validationState.error}
+              onChange={(e) => handleInputChange("error", parseFloat(e.target.value))}
+              placeholder="Error tolerance"
+            />
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};

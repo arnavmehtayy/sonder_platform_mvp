@@ -11,6 +11,10 @@ import {
   EditableObjectPopupProps,
 } from "@/app/Components/EditMode/EditPopups/EditableObjectPopup";
 
+import { Validation_inputNumber, Validation_inputNumberConstructor, ValidationInputNumberEditor } from "../Validation/Validation_inputNumber";
+
+
+
 /*
 
  *  This is the class that holds information about the input number control
@@ -139,7 +143,7 @@ export class InputNumber extends Control {
   }: {
     isOpen: boolean;
     onClose: () => void;
-    onSave: (obj: InputNumber) => void;
+    onSave: (obj: InputNumber, validation?: Validation_inputNumber) => void;
   }) {
     const [editedObject, setEditedObject] =
       React.useState<InputNumberConstructor>({
@@ -154,6 +158,8 @@ export class InputNumber extends Control {
         step: 1,
       });
 
+      const [validation, setValidation] = React.useState<Validation_inputNumberConstructor | undefined>(undefined);
+
     const popupProps: EditableObjectPopupProps<InputNumberConstructor> = {
       isOpen,
       onClose,
@@ -161,7 +167,8 @@ export class InputNumber extends Control {
       set_object: setEditedObject,
       onSave: (updatedObject: InputNumberConstructor) => {
         const newObj = new InputNumber(updatedObject);
-        onSave(newObj);
+        const newVal = validation ? new Validation_inputNumber(validation) : undefined;
+        onSave(newObj, newVal);
       },
       title: `Create New Input Number`,
       fields: [
@@ -173,7 +180,12 @@ export class InputNumber extends Control {
         { key: "max", label: "Maximum Value", type: "number" },
         { key: "step", label: "Step", type: "number" },
       ],
-    };
+      additionalContent: (
+        <ValidationInputNumberEditor
+          onChange={(newValidation: Validation_inputNumberConstructor | undefined) => setValidation(newValidation)}
+          controlId={editedObject.id}
+        />
+    )};
     return <EditableObjectPopup {...popupProps} />;
   }
 }
