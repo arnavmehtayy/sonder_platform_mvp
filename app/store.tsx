@@ -872,3 +872,18 @@ export const addElementSelector = (state: State) => (element: EditAddType) => {
 export const getZoomSelector = (state: State) => state.camera_zoom;
 
 export const SetTableControl = (state: State) => state.setTableControl
+
+export const getSideBarName = (state: State) => (item: OrderItem) => {
+  switch (item.type) {
+    case 'control':
+      return state.controls[item.id]?.desc || `Control ${item.id}`;
+    case 'placement':
+      return state.placement[item.id]?.desc || `Placement ${item.id}`;
+    case 'question':
+      return state.questions[item.id] || `Question ${item.id}`;
+    case 'score':
+      return state.scores[item.id]?.desc || `Score ${item.id}`;
+    default:
+      return `Unknown ${item.type} ${item.id}`;
+  }
+}

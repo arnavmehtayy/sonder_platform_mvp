@@ -9,7 +9,7 @@ import {
   Sliders,
   PencilLine,
 } from 'lucide-react';
-import { useStore, addQuestionEditor, addMCQuestionEditor } from "@/app/store";
+import { useStore, addQuestionEditor, addMCQuestionEditor, getNameSelector, getSideBarName } from "@/app/store";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
@@ -119,6 +119,8 @@ export const EditBar: React.FC = () => {
     {name: "Table Question", type: TableControl, icon: HelpCircle},
   ];
 
+  const getName = useStore(getSideBarName)
+
   const order = useStore((state) => state.order);
   const setOrder = useStore((state) => state.setOrder);
   const deleteOrderItem = useStore((state) => state.deleteOrderItem);
@@ -202,7 +204,7 @@ export const EditBar: React.FC = () => {
                   <ul className="space-y-2">
                     {order.map((item) => (
                       <SortableItem key={`${item.type}-${item.id}`} id={`${item.type}-${item.id}`}>
-                      <div className="flex-grow">{`${item.type} - ${item.id}`}</div>
+                      <div className="flex-grow">{getName(item)}</div>
                       <button
                         onClick={() => handleDeleteItem(item.id, item.type)}
                         className="text-red-500 hover:text-red-700 ml-2"
@@ -220,7 +222,7 @@ export const EditBar: React.FC = () => {
               <ul className="space-y-2">
                 {Object.entries(vizobjs).map(([id, obj]) => (
                   <li key={id} className="flex items-center justify-between bg-gray-100 p-2 rounded">
-                    <span>{`${obj.name} (ID: ${id})`}</span>
+                    <span>{`${obj.name}`}</span>
                     <button
                       onClick={() => deleteVizObj(Number(id))}
                       className="text-red-500 hover:text-red-700"

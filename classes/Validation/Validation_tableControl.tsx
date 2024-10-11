@@ -207,9 +207,10 @@ export const ValidationTableControlEditor: React.FC<
             />
           </div>
           <div className="w-full max-w-3xl">
-            <h2 className="text-2xl font-bold mb-4">
-              Expected Answers and Validation Cells
-            </h2>
+          <Label htmlFor="validation-cellsans" className="text-sm font-medium">
+          Expected Answers
+          </Label>
+
             {validationState.answers.length === 0 ? (
               <p>
                 No answers available. Please add some answers to begin

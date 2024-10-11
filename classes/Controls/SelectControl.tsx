@@ -14,6 +14,8 @@ import {
   EditableObjectPopupProps,
 } from "@/app/Components/EditMode/EditPopups/EditableObjectPopup";
 
+import Validation_select, { Validation_selectConstructor, ValidationSelectEditor } from "../Validation/Validation_select";
+
 /*
  * This is the class that holds information about the select control
  * The select control is used to select objects on the three.js screen 
@@ -243,7 +245,7 @@ export class SelectControl extends Control {
   }: {
     isOpen: boolean;
     onClose: () => void;
-    onSave: (obj: SelectControl) => void;
+    onSave: (obj: SelectControl, validation?: Validation_select) => void;
   }) {
     const [editedObject, setEditedObject] =
       React.useState<SelectControlConstructor>({
@@ -253,6 +255,7 @@ export class SelectControl extends Control {
         desc: "select control",
         text: "this is a select control",
       });
+      const [validation, setValidation] = React.useState<Validation_selectConstructor | undefined>(undefined);
 
     const handleChange = (field: string, value: any) => {
       setEditedObject((prev) => ({ ...prev, [field]: value }));
@@ -265,7 +268,8 @@ export class SelectControl extends Control {
       set_object: setEditedObject,
       onSave: (updatedObject: SelectControlConstructor) => {
         const newObj = new SelectControl(updatedObject);
-        onSave(newObj);
+        const newVal = validation ? new Validation_select(validation) : undefined;
+        onSave(newObj, newVal);
       },
       title: `Create New Select Control`,
       fields: [
@@ -278,6 +282,13 @@ export class SelectControl extends Control {
         },
         { key: "capacity", label: "Capacity", type: "number" },
       ],
+      additionalContent: (
+        <ValidationSelectEditor
+          onChange={(newValidation: Validation_selectConstructor | undefined) => setValidation(newValidation)}
+          controlId={editedObject.id}
+          selectableObjects={editedObject.selectable}
+        />
+      ),
     };
 
     return <EditableObjectPopup {...popupProps} />;
