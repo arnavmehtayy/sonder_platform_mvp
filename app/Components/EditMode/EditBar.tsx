@@ -52,6 +52,7 @@ import { SortableContext, sortableKeyboardCoordinates, verticalListSortingStrate
 import { CSS } from '@dnd-kit/utilities';
 import { DialogTrigger } from "@radix-ui/react-dialog";
 import { GripVertical } from 'lucide-react';
+import { ToggleLeft, Type, Variable, Table, Calculator, Hash} from 'lucide-react';
 
 export interface Option {
   id: number;
@@ -93,15 +94,16 @@ const SortableItem: React.FC<{ id: string; children: React.ReactNode }> = ({ id,
 export const EditBar: React.FC = () => {
   const [selectedObjectType, setSelectedObjectType] = useState<ObjectType | null>(null);
 
+
   const ScoreType: ObjectType[] = [
-    {name: "Score", type: FunctionScore, icon: Sliders}
+    {name: "Score", type: FunctionScore, icon: Calculator}
   ];
 
   const controlTypes: ObjectType[] = [
     { name: "SliderControl", type: SliderControlAdvanced, icon: Sliders },
-    {name: "Number Input", type: InputNumber, icon: List},
-    {name: "Select Input", type: SelectControl, icon: List},
-    {name: "Object Enabler", type: EnablerControl, icon: List},
+    {name: "Number Input", type: InputNumber, icon: Hash},
+    {name: "Object Picker", type: SelectControl, icon: List},
+    {name: "Hide/Show Object", type: EnablerControl, icon: ToggleLeft},
   ];
     
   const objectTypes: ObjectType[] = [
@@ -109,14 +111,14 @@ export const EditBar: React.FC = () => {
     { name: "Geom Object", type: geomobj, icon: Circle },
     { name: "Function Object", type: FunctionPlotString, icon: LineChart },
     { name: "Axis Object", type: CoordinateAxis, icon: Axis3D },
-    {name: "Text Object", type: TextGeom, icon: HelpCircle},
-    {name: "Variable", type: DummyDataStorage, icon: HelpCircle}
+    {name: "Text Object", type: TextGeom, icon: Type},
+    {name: "Variable", type: DummyDataStorage, icon: Variable}
   ];
 
   const questionTypes: ObjectType[] = [
     { name: "Question", type: Question, icon: HelpCircle },
     { name: "MCQ", type: MultiChoiceClass, icon: ListChecks },
-    {name: "Table Question", type: TableControl, icon: HelpCircle},
+    {name: "Table Question", type: TableControl, icon: Table},
   ];
 
   const getName = useStore(getSideBarName)
