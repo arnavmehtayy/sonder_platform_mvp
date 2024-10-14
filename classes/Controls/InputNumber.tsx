@@ -12,6 +12,10 @@ import {
 } from "@/app/Components/EditMode/EditPopups/EditableObjectPopup";
 
 import { Validation_inputNumber, Validation_inputNumberConstructor, ValidationInputNumberEditor } from "../Validation/Validation_inputNumber";
+import { AttributePairSet_json, AttributePairSet } from "./SliderControlAdv";
+import { atts } from "../vizobjects/get_set_obj_attributes";
+import { AttributePairsEditor } from "./SliderControlAdv";
+import { obj } from "../vizobjects/obj";
 
 
 
@@ -29,6 +33,8 @@ interface InputNumberConstructor extends ControlConstructor {
   min?: number;
   max?: number;
   step?: number;
+  attribute_pairs?: AttributePairSet_json[];
+  obj_id? : number
 }
 
 function ShowInputNumber({ control }: { control: InputNumber }) {
@@ -86,6 +92,9 @@ export class InputNumber extends Control {
   min: number;
   max: number;
   step: number;
+  attribute_pairs: AttributePairSet[];
+  attribute_JSON: AttributePairSet_json[];
+  obj_id: number;
 
   constructor({
     id,
@@ -97,6 +106,9 @@ export class InputNumber extends Control {
     min = 0,
     max = 100,
     step = 1,
+    obj_id= -1,
+    attribute_pairs = [],
+   
   }: InputNumberConstructor) {
     super({ id: id, desc: desc, text: text });
     this.value = value;
@@ -105,6 +117,16 @@ export class InputNumber extends Control {
     this.min = min;
     this.max = max;
     this.step = step;
+    this.attribute_pairs = attribute_pairs.map(
+      (pair: AttributePairSet_json) => {
+        return {
+          transform_function: pair.transform_function,
+          set_attribute: atts[pair.obj_type]!["number"][pair.func].set_attribute
+        }
+      }
+    );
+    this.attribute_JSON = attribute_pairs;
+    this.obj_id = obj_id
   }
 
   // change the value of the input number used by the storage system
@@ -115,6 +137,18 @@ export class InputNumber extends Control {
     );
     new_obj.value = value;
     return new_obj;
+  }
+
+  setControlledObjectValue(value: number | "", obj: obj) {
+    this.value = value;
+    if (obj) {
+      return this.attribute_pairs.reduce((updatedObj, pair) => {
+        const transformedValue = pair.transform_function.get_function()(value === "" ? this.initial_value : value, useStore.getState);
+        return pair.set_attribute(updatedObj, transformedValue);
+      }, obj);
+    } else {
+      return obj;
+    }
   }
 
   dataBaseSave(): InputNumberConstructor & { type: string } {
@@ -128,6 +162,7 @@ export class InputNumber extends Control {
       min: this.min,
       max: this.max,
       step: this.step,
+      attribute_pairs: this.attribute_JSON,
       type: "InputNumber",
     };
   }
@@ -156,6 +191,8 @@ export class InputNumber extends Control {
         min: 0,
         max: 100,
         step: 1,
+        obj_id: -1,
+        attribute_pairs: []
       });
 
       const [validation, setValidation] = React.useState<Validation_inputNumberConstructor | undefined>(undefined);
@@ -179,6 +216,19 @@ export class InputNumber extends Control {
         { key: "min", label: "Minimum Value", type: "number" },
         { key: "max", label: "Maximum Value", type: "number" },
         { key: "step", label: "Step", type: "number" },
+        { key: "obj_id", label: "Object ID", type: "vizObjSelect" },
+        {
+          key: "attribute_pairs",
+          label: "Attribute Pairs",
+          type: "custom",
+          render: (value, onChange) => (
+            <AttributePairsEditor
+              pairs={value}
+              onChange={onChange}
+              objectId={editedObject.obj_id || -1}
+            />
+          ),
+        },
       ],
       additionalContent: (
         <ValidationInputNumberEditor

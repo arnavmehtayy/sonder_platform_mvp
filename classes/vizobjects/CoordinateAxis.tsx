@@ -138,11 +138,8 @@ export default class CoordinateAxis extends TransformObj {
     const labelsX = [];
     const labelsY = [];
 
-    for (
-      let i = -this.axisLength / 2;
-      i <= this.axisLength / 2;
-      i += this.tickSpacing
-    ) {
+    // Start from the middle (0) and go right
+    for (let i = 0; i <= this.axisLength / 2; i += this.tickSpacing) {
       // X-axis ticks
       ticksX.push([
         new THREE.Vector3(i, -this.tickSize / 2, 0),
@@ -157,6 +154,49 @@ export default class CoordinateAxis extends TransformObj {
 
       // Labels
       if (this.showLabels && i !== 0) {
+        labelsX.push(
+          <Text
+            key={`x-${i}`}
+            position={[i, -this.tickSize - this.fontSize / 2, 0]}
+            fontSize={this.fontSize}
+            color={material ? material.color : this.color}
+            anchorX="center"
+            anchorY="top"
+          >
+            {i.toFixed(1)}
+          </Text>
+        );
+        labelsY.push(
+          <Text
+            key={`y-${i}`}
+            position={[-this.tickSize - this.fontSize / 2, i, 0]}
+            fontSize={this.fontSize}
+            color={material ? material.color : this.color}
+            anchorX="right"
+            anchorY="middle"
+          >
+            {i.toFixed(1)}
+          </Text>
+        );
+      }
+    }
+
+    // Go left from the middle (excluding 0)
+    for (let i = -this.tickSpacing; i >= -this.axisLength / 2; i -= this.tickSpacing) {
+      // X-axis ticks
+      ticksX.push([
+        new THREE.Vector3(i, -this.tickSize / 2, 0),
+        new THREE.Vector3(i, this.tickSize / 2, 0),
+      ]);
+
+      // Y-axis ticks
+      ticksY.push([
+        new THREE.Vector3(-this.tickSize / 2, i, 0),
+        new THREE.Vector3(this.tickSize / 2, i, 0),
+      ]);
+
+      // Labels
+      if (this.showLabels) {
         labelsX.push(
           <Text
             key={`x-${i}`}

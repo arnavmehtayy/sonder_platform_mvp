@@ -315,11 +315,15 @@ export const useStore = create<State>((set, get) => ({
   setInputNumberValue: (control_id: number) => (value: number | "") => {
     set((state) => {
       const control = state.controls[control_id] as InputNumber;
-      if (control instanceof InputNumber) {
+      if (control instanceof InputNumber && state.vizobjs[control.obj_id]) {
+        const obj_id = control.obj_id
+        const viz = state.vizobjs[obj_id]
+        const updated_viz = control.setControlledObjectValue(value, viz)
         const updatedControl = control.setValue(value);
 
         return {
           controls: { ...state.controls, [control_id]: updatedControl },
+          vizobjs: {...state.vizobjs, [obj_id]: updated_viz }
         };
       }
       return {};

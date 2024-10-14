@@ -26,7 +26,7 @@ import { Input } from "@/components/ui/input";
 import { atts, dict_get_attributes} from "../vizobjects/get_set_obj_attributes";
 import { FunctionStr, FunctionStrEditor } from './FunctionStr';
 
-interface AttributePairSet {
+export interface AttributePairSet {
   transform_function: FunctionStr;
   set_attribute: (obj: any, value: any) => any;
 }
@@ -145,11 +145,12 @@ export class SliderControlAdvanced<T extends obj> extends SliderControl<T> {
       },
       title: `Create New Advanced Slider Control`,
       fields: [
-        { key: "obj_id", label: "Object ID", type: "vizObjSelect" },
+        
         { key: "desc", label: "Title", type: "title" },
         { key: "text", label: "Desc", type: "textarea" },
         { key: "step_size", label: "Step Size", type: "number" },
         { key: "range", label: "Range", type: "arraynum", length_of_array: 2 },
+        { key: "obj_id", label: "Object ID", type: "vizObjSelect" },
         {
           key: "attribute_pairs",
           label: "Attribute Pairs",
@@ -175,7 +176,7 @@ interface AttributePairsEditorProps {
   objectId: number;
 }
 
-function AttributePairsEditor({
+export function AttributePairsEditor({
   pairs,
   onChange,
   objectId,

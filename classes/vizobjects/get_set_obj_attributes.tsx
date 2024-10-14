@@ -407,7 +407,20 @@ export const FunctionPlotString_atts: dict_get_attributes<FunctionPlotString> =
   };
 
 export const Axis_atts: dict_get_attributes<CoordinateAxis> = {
-  number: {},
+  number: {
+    "axis_scale": {
+      get_attribute: (obj: CoordinateAxis) => obj.tickSpacing,
+      set_attribute: (obj: CoordinateAxis, value: number) => {
+        const newObj = Object.assign(
+          Object.create(Object.getPrototypeOf(obj)),
+          obj
+        );
+        newObj.tickSpacing = value;
+        return newObj;
+      },
+    }
+    
+  },
   string: {
     "x-label": {
       get_attribute: (obj: CoordinateAxis) => obj.xLabel,
