@@ -97,35 +97,40 @@ export default class TextGeom extends geomobj {
     return (
       <>
       <group
-        ref={objectRef}
-        position={[this.position.x, this.position.y, 0]}
-        onPointerDown={this.isClickable ? onClickSelect : undefined}
-        rotation={[this.rotation.x, this.rotation.y, this.rotation.z]}
-        scale={[this.scale.x, this.scale.y, this.scale.z]}
-      >
-        <mesh>
-          <primitive object={this.geom} attach="geometry" />
-          {material ? (
-            <primitive object={material} attach="material" />
-          ) : (
-            <meshBasicMaterial color={this.color} side={THREE.DoubleSide} />
-          )}
-        </mesh>
-        <Text 
-          color="white" 
-          anchorX="center" 
-          anchorY="middle" 
-          renderOrder={1}
-          maxWidth={Math.min(this.scale.x, this.scale.y) * 1.8} // Reduced to ensure text stays within boundaries
-          fontSize={Math.min(this.scale.x, this.scale.y) * 0.4} // Reduced to ensure text stays within boundaries
-          position={[0, 0, 0.01]} // Slightly in front of the geometry
-          textAlign="center"
-          overflowWrap="break-word"
-          clipRect={[-this.scale.x / 2, -this.scale.y / 2, this.scale.x, this.scale.y]} // Clip text to geometry boundaries
-        >
-          {this.text}
-        </Text>
-      </group>
+  ref={objectRef}
+  position={[this.position.x, this.position.y, 0]}
+  onPointerDown={this.isClickable ? onClickSelect : undefined}
+  rotation={[this.rotation.x, this.rotation.y, this.rotation.z]}
+  scale={[this.scale.x, this.scale.y, this.scale.z]}
+>
+  <mesh>
+    <primitive object={this.geom} attach="geometry" />
+    {material ? (
+      <primitive object={material} attach="material" />
+    ) : (
+      <meshBasicMaterial color={this.color} side={THREE.DoubleSide} />
+    )}
+  </mesh>
+  <Text
+    color="white"
+    anchorX="center"
+    anchorY="middle"
+    renderOrder={1}
+    maxWidth={this.scale.x * 0.9} // Reduced to 90% of the geometry width
+    fontSize={Math.min(this.scale.x, this.scale.y) * 0.4} // Reduced font size
+    position={[0, 0, 0.01]} // Slightly in front of the geometry
+    textAlign="center"
+    overflowWrap="break-word"
+    clipRect={[-this.scale.x / 2, -this.scale.y / 2, this.scale.x, this.scale.y]}
+    lineHeight={1.2} // Increased line height
+    letterSpacing={0} // Removed negative letter spacing
+    whiteSpace="normal"
+    scale={[1 / this.scale.x, 1 / this.scale.y, 1]}
+    material-depthTest={false} // Ensure text renders on top
+  >
+    {this.text}
+  </Text>
+</group>
       
       {this.touch_controls.scale && (
           <GeneralTransformControl

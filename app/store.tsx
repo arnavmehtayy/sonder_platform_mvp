@@ -27,6 +27,7 @@ import { TableControl } from "@/classes/Controls/TableControl";
 import { SliderControlAdvanced } from "@/classes/Controls/SliderControlAdv";
 import { Validation_tableControl } from "@/classes/Validation/Validation_tableControl";
 import { vizobjects } from "./db/schema";
+import Validation_sliderAdv from "@/classes/Validation/Validation_sliderAdv";
 
 /*
 
@@ -471,6 +472,11 @@ export const useStore = create<State>((set, get) => ({
             return validation.computeValidity(
               state.controls[validation.control_id] as TableControl<any>
             )
+        }
+        else if(validation instanceof Validation_sliderAdv) {
+          return validation.computeValidity(
+            state.controls[validation.control_id] as SliderControlAdvanced<any>
+          )
         }
         else {
           return validation.computeValidity(null);

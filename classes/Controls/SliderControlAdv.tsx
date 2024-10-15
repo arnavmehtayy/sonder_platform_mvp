@@ -25,6 +25,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { atts, dict_get_attributes} from "../vizobjects/get_set_obj_attributes";
 import { FunctionStr, FunctionStrEditor } from './FunctionStr';
+import Validation_sliderAdv, { Validation_sliderAdv_constructor, ValidationSliderAdvEditor } from "../Validation/Validation_sliderAdv";
 
 export interface AttributePairSet {
   transform_function: FunctionStr;
@@ -120,7 +121,7 @@ export class SliderControlAdvanced<T extends obj> extends SliderControl<T> {
   }: {
     isOpen: boolean;
     onClose: () => void;
-    onSave: (obj: SliderControlAdvanced<any>) => void;
+    onSave: (obj: SliderControlAdvanced<any>, validation?: Validation_sliderAdv) => void;
   }) {
     const [editedObject, setEditedObject] = React.useState<
       SliderControlAdvancedConstructor<any>
@@ -132,6 +133,8 @@ export class SliderControlAdvanced<T extends obj> extends SliderControl<T> {
       attribute_pairs: [],
     });
 
+    const [validation, setValidation] = React.useState<Validation_sliderAdv_constructor| undefined>(undefined);
+
     const popupProps: EditableObjectPopupProps<
       SliderControlAdvancedConstructor<any>
     > = {
@@ -141,7 +144,8 @@ export class SliderControlAdvanced<T extends obj> extends SliderControl<T> {
       set_object: setEditedObject,
       onSave: (updatedObject: SliderControlAdvancedConstructor<any>) => {
         const newObj = new SliderControlAdvanced(updatedObject);
-        onSave(newObj);
+        const newVal = validation ? new Validation_sliderAdv(validation): undefined
+        onSave(newObj, newVal);
       },
       title: `Create New Advanced Slider Control`,
       fields: [
@@ -164,6 +168,13 @@ export class SliderControlAdvanced<T extends obj> extends SliderControl<T> {
           ),
         },
       ],
+      additionalContent: (
+        <ValidationSliderAdvEditor
+          onChange={(newValidation) => setValidation(newValidation)}
+          controlId={editedObject.id}
+        />
+      ),
+
     };
 
     return <EditableObjectPopup {...popupProps} />;
