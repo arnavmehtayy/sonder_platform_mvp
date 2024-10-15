@@ -9,6 +9,7 @@ import {
 import { useStore } from '@/app/store';
 import { objectScorer } from "./objectScorer";
 import { atts } from '../vizobjects/get_set_obj_attributes';
+import Validation_score, { ValidationScoreEditor } from "../Validation/Validation_score";
 
 export interface FunctionScoreConstructor extends ScoreConstructor<number>{
   score_id: number
@@ -78,7 +79,7 @@ export class FunctionScore extends Score<number> {
   }: {
     isOpen: boolean;
     onClose: () => void;
-    onSave: (obj: FunctionScore) => void;
+    onSave: (obj: FunctionScore, validation?: Validation_score<number, obj>) => void;
   }) {
     const [editedObject, setEditedObject] = useState<FunctionScoreConstructor>({
       score_id: Date.now() % 10000,
@@ -88,6 +89,7 @@ export class FunctionScore extends Score<number> {
       obj_list: [], // this will be populated by the constructor
       transformation: () => 0 // this is useless comes from parent class
     });
+    const [validation, setValidation] = useState<Validation_score<number, obj> | undefined>(undefined);
 
     const handleFunctionStrChange = (newFunctionStr: FunctionStr) => {
       setEditedObject(prev => ({
@@ -103,11 +105,12 @@ export class FunctionScore extends Score<number> {
       set_object: setEditedObject,
       onSave: (updatedObject: FunctionScoreConstructor) => {
         const newObj = new FunctionScore(updatedObject);
-        onSave(newObj);
+        const newVal = validation ? new Validation_score(validation) : undefined;
+        onSave(newObj, newVal);
       },
       title: "Create New Function Score",
       fields: [
-        { key: "text", label: "Text", type: "text" },
+        { key: "text", label: "Text", type: "title" },
         { key: "desc", label: "Description", type: "textarea" },
         {
           key: "functionStr",
@@ -118,6 +121,12 @@ export class FunctionScore extends Score<number> {
           ),
         },
       ],
+      additionalContent: (
+        <ValidationScoreEditor
+          onChange={(newValidation: Validation_score<number, obj> | undefined) => setValidation(newValidation)}
+          scoreId={editedObject.score_id}
+        />
+    )
     };
 
     return <EditableObjectPopup {...popupProps} />;

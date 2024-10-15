@@ -255,13 +255,21 @@ export const ValidationObjEditor: React.FC<ValidationObjEditorProps> = ({
             </Label>
             <Input
               id="validation-answer"
-              value={validationState.answer === 0 ? "" : validationState.answer}
-              onChange={(e) => {
-                const value = e.target.value;
-                handleInputChange("answer", value === "" ? 0 : Number(value));
-              }}
               placeholder="Expected value"
               type="number"
+              onChange={(e) => {
+                const value = e.target.value;
+                if (value === "" || /^-?\d*\.?\d*$/.test(value)) {
+                  handleInputChange("answer", value === "" ? 0 : Number(value));
+                }
+              }}
+              onBlur={(e) => {
+                const value = e.target.value;
+                if (value !== "") {
+                  handleInputChange("answer", Number(value));
+                }
+              }}
+              onWheel={(e) => e.currentTarget.blur()}
             />
           </div>
           <div className="space-y-2">
@@ -270,13 +278,21 @@ export const ValidationObjEditor: React.FC<ValidationObjEditorProps> = ({
             </Label>
             <Input
               id="validation-error"
+              placeholder="Error margin"
               type="number"
-              value={validationState.error === 0 ? "" : validationState.error}
               onChange={(e) => {
                 const value = e.target.value;
-                handleInputChange("error", value === "" ? 0 : Number(value));
+                if (value === "" || /^-?\d*\.?\d*$/.test(value)) {
+                  handleInputChange("error", value === "" ? 0 : Number(value));
+                }
               }}
-              placeholder="Error margin"
+              onBlur={(e) => {
+                const value = e.target.value;
+                if (value !== "") {
+                  handleInputChange("error", Number(value));
+                }
+              }}
+              onWheel={(e) => e.currentTarget.blur()}
             />
           </div>
         </div>

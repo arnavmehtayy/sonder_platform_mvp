@@ -194,16 +194,21 @@ export const ValidationTableControlEditor: React.FC<
             </Label>
             <Input
               id="validation-error"
-              value={validationState.error === 0 ? "" : validationState.error}
-              onChange={(e) => {
-                const value = e.target.value;
-                handleInputChange(
-                  "error",
-                  value === "" ? 0 : Number(e.target.value)
-                );
-              }}
               placeholder="Error tolerance"
               type="number"
+              onChange={(e) => {
+                const value = e.target.value;
+                if (value === "" || /^-?\d*\.?\d*$/.test(value)) {
+                  handleInputChange("error", value === "" ? 0 : Number(value));
+                }
+              }}
+              onBlur={(e) => {
+                const value = e.target.value;
+                if (value !== "") {
+                  handleInputChange("error", Number(value));
+                }
+              }}
+              onWheel={(e) => e.currentTarget.blur()}
             />
           </div>
           <div className="w-full max-w-3xl">
@@ -275,18 +280,30 @@ export const ValidationTableControlEditor: React.FC<
                               colIndex
                             ] && (
                               <Input
+                                placeholder="Value"
                                 type="number"
-                                value={cell === 0 ? "" : cell}
                                 onChange={(e) => {
                                   const value = e.target.value;
-                                  updateAnswerCell(
-                                    rowIndex,
-                                    colIndex,
-                                    value === "" ? 0 : Number(value)
-                                  );
+                                  if (value === "" || /^-?\d*\.?\d*$/.test(value)) {
+                                    updateAnswerCell(
+                                      rowIndex,
+                                      colIndex,
+                                      value === "" ? 0 : Number(value)
+                                    );
+                                  }
                                 }}
+                                onBlur={(e) => {
+                                  const value = e.target.value;
+                                  if (value !== "") {
+                                    updateAnswerCell(
+                                      rowIndex,
+                                      colIndex,
+                                      Number(value)
+                                    );
+                                  }
+                                }}
+                                onWheel={(e) => e.currentTarget.blur()}
                                 className="w-20 text-center"
-                                placeholder="Value"
                               />
                             )}
                           </div>

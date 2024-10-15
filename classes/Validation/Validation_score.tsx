@@ -2,6 +2,13 @@ import Validation from "./Validation";
 import { obj } from "../vizobjects/obj";
 import { relation } from "./Validation_obj";
 import { ValidationConstructor } from "./Validation";
+import React from "react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { DialogTitle, DialogHeader } from "@/components/ui/dialog";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+
 
 /*
  * this class stores information to validate a score
@@ -96,3 +103,134 @@ export default class Validation_score<
     };
   }
 }
+
+export interface ValidationScoreEditorProps {
+  onChange: (value: Validation_score<number, obj> | undefined) => void;
+  scoreId: number;
+}
+
+export const ValidationScoreEditor: React.FC<ValidationScoreEditorProps> = ({
+  onChange,
+  scoreId,
+}) => {
+  const [addValidation, setAddValidation] = React.useState(false);
+  const [validationState, setValidationState] = React.useState<Validation_score_constructor<number, obj>>({
+    score_id: scoreId,
+    target_score: 0,
+    error: 0.1,
+    relation: "==",
+    desc: ``,
+  });
+
+  const handleAddRemoveValidation = () => {
+    const newAddValidation = !addValidation;
+    setAddValidation(newAddValidation);
+    if (newAddValidation) {
+      onChange(new Validation_score(validationState));
+    } else {
+      onChange(undefined);
+    }
+  };
+
+  const handleInputChange = (field: keyof Validation_score_constructor<number, obj>, value: any) => {
+    setValidationState(prev => ({ ...prev, [field]: value }));
+  };
+
+  return (
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
+        <DialogHeader>
+          <DialogTitle>Score Validation</DialogTitle>
+        </DialogHeader>
+        <Button
+          variant={addValidation ? "default" : "outline"}
+          size="sm"
+          onClick={handleAddRemoveValidation}
+        >
+          {addValidation ? "Remove Validation" : "Add Validation"}
+        </Button>
+      </div>
+      {addValidation && (
+        <div className="space-y-4">
+          <div className="space-y-2">
+            <Label htmlFor="validation-desc" className="text-sm font-medium">
+              Validation Description
+            </Label>
+            <Input
+              id="validation-desc"
+              value={validationState.desc}
+              onChange={(e) => handleInputChange("desc", e.target.value)}
+              placeholder="Validation for Score"
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="validation-target" className="text-sm font-medium">
+              Target Score
+            </Label>
+            <Input
+              placeholder="Target score"
+              id="validation-target"
+              type="number"
+              onChange={(e) => {
+                const value = e.target.value;
+                if (value === "" || /^-?\d*\.?\d*$/.test(value)) {
+                  handleInputChange("target_score", value === "" ? null : value);
+                }
+              }}
+              onBlur={(e) => {
+                const value = e.target.value;
+                if (value !== "") {
+                  handleInputChange("target_score", value);
+                }
+              }}
+              onWheel={(e) => e.currentTarget.blur()}
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="validation-error" className="text-sm font-medium">
+              Error Tolerance
+            </Label>
+            <Input
+              placeholder="Error tolerance"
+              id="validation-error"
+              type="number"
+              onChange={(e) => {
+                const value = e.target.value;
+                if (value === "" || /^-?\d*\.?\d*$/.test(value)) {
+                  handleInputChange("error", value === "" ? null : value);
+                }
+              }}
+              onBlur={(e) => {
+                const value = e.target.value;
+                if (value !== "") {
+                  handleInputChange("error", value);
+                }
+              }}
+              onWheel={(e) => e.currentTarget.blur()}
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="validation-relation" className="text-sm font-medium">
+              Relation
+            </Label>
+            <Select
+              value={validationState.relation}
+              onValueChange={(value) => handleInputChange("relation", value as relation)}
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="Select relation" />
+              </SelectTrigger>
+              <SelectContent>
+                {["==", "!=", ">", "<", ">=", "<="].map((rel) => (
+                  <SelectItem key={rel} value={rel}>
+                    {rel}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
