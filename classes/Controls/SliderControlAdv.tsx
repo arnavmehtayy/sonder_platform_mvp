@@ -67,7 +67,7 @@ export class SliderControlAdvanced<T extends obj> extends SliderControl<T> {
       desc,
       text,
     });
-    console.log(attribute_pairs);
+    // console.log(attribute_pairs);
     this.attribute_pairs = attribute_pairs.map(
       (pair: AttributePairSet_json) => {
         return {

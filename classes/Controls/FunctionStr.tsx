@@ -45,18 +45,18 @@ export class FunctionStr {
                 });
     
                 // Now update the values for symbols that have objects and attributes
-                console.log(this.symbols)
+                // console.log(this.symbols)
                 this.symbols.forEach(symbol => {
                     const obj = getState().vizobjs[symbol.obj_id];
                     if (obj && atts[symbol.obj_type]) {
                         const getter = atts[symbol.obj_type]?.number[symbol.attribute]?.get_attribute;
                         if (getter) {
-                            console.log(getter(obj))
+                            // console.log(getter(obj))
                             scope[symbol.symbol] = getter(obj) || 0;
                         }
                     }
                 });
-                console.log(scope)
+                // console.log(scope)
                 return compiledExpression.evaluate(scope);
             };
         } catch (error) {

@@ -68,7 +68,7 @@ export default class Validation_obj<T extends value_typ> extends Validation {
     this.answer = answer;
     this.obj_id = obj_id;
     this.get_attribute_json = get_attribute_json;
-    console.log(get_attribute_json);
+    // console.log(get_attribute_json);
     this.get_attribute = atts[get_attribute_json.obj_type]![
       typeof this.answer === "number"
         ? "number"

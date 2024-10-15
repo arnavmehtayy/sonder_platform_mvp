@@ -214,7 +214,7 @@ export const useStore = create<State>((set, get) => ({
   // add any element to the state (vizobj, control, score, placement, influence, validation, order)
   // this is used by the editting system.
   addElement: (element: EditAddType) => {
-    console.log(element);
+    // console.log(element);
     set((state) => {
       let updatedState: Partial<State> = {};
 
@@ -316,7 +316,7 @@ export const useStore = create<State>((set, get) => ({
   setInputNumberValue: (control_id: number) => (value: number | "") => {
     set((state) => {
       const control = state.controls[control_id] as InputNumber;
-      if (control instanceof InputNumber && state.vizobjs[control.obj_id]) {
+      if (control instanceof InputNumber) {
         const obj_id = control.obj_id
         const viz = state.vizobjs[obj_id]
         const updated_viz = control.setControlledObjectValue(value, viz)
@@ -324,7 +324,7 @@ export const useStore = create<State>((set, get) => ({
 
         return {
           controls: { ...state.controls, [control_id]: updatedControl },
-          vizobjs: {...state.vizobjs, [obj_id]: updated_viz }
+          vizobjs: updated_viz ? {...state.vizobjs, [obj_id]: updated_viz } : state.vizobjs
         };
       }
       return {};
@@ -692,12 +692,19 @@ export const setVizObjSelector2 =
 export const setSliderControlValueSelector =
   (control_id: number) => (state: State) => (value: number) => {
     const control = state.controls[control_id] as SliderControl<any>;
-    if (control && state.vizobjs[control.obj_id]) {
-      const obj_id = control.obj_id;
-      const viz = state.vizobjs[obj_id];
+    const vizobj = state.vizobjs[control.obj_id]
+    
+    if (control) {
       // use the set_attribute to update the viz
-      const updatedViz = control.setSliderValue(viz, value);
-      state.setVizObj(obj_id, updatedViz);
+      if(control instanceof SliderControlAdvanced) {
+        const new_control = control.clone() as SliderControlAdvanced<obj>
+        new_control.localValue = value
+        state.setControl(control_id, new_control)
+      }
+      const updatedViz = control.setSliderValue(vizobj, value);
+      if(updatedViz) {
+      state.setVizObj(control.obj_id, updatedViz);
+      }
     }
   };
 
@@ -721,7 +728,8 @@ export const getSliderControlValueSelector =
   (control_id: number) => (state: State) => {
     const control = state.controls[control_id] as SliderControl<any>;
     const viz = state.vizobjs[control?.obj_id]; // get the vizobject corresponding to the slider control
-    return viz && control.getSliderValue(viz);
+    
+    return control.getSliderValue(viz);
 
     // NOTE: 0 is the default value if the vizobject or control is not found
   };

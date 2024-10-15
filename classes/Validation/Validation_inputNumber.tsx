@@ -130,8 +130,18 @@ export const ValidationInputNumberEditor: React.FC<ValidationInputNumberEditorPr
             <Input
               id="validation-answer"
               type="number"
-              value={validationState.answer}
-              onChange={(e) => handleInputChange("answer", parseFloat(e.target.value))}
+              value={validationState.answer ?? ""}
+              onChange={(e) => {
+                const newValue = e.target.value;
+                if (newValue === "" || /^-?\d*\.?\d*$/.test(newValue)) {
+                  handleInputChange("answer", newValue === "" ? null : parseFloat(newValue));
+                }
+              }}
+              onBlur={(e) => {
+                const newValue = e.target.value;
+                handleInputChange("answer", newValue === "" ? null : parseFloat(newValue));
+              }}
+              onWheel={(e) => e.currentTarget.blur()}
               placeholder="Expected answer"
             />
           </div>
@@ -142,8 +152,18 @@ export const ValidationInputNumberEditor: React.FC<ValidationInputNumberEditorPr
             <Input
               id="validation-error"
               type="number"
-              value={validationState.error}
-              onChange={(e) => handleInputChange("error", parseFloat(e.target.value))}
+              value={validationState.error ?? ""}
+              onChange={(e) => {
+                const newValue = e.target.value;
+                if (newValue === "" || /^-?\d*\.?\d*$/.test(newValue)) {
+                  handleInputChange("error", newValue === "" ? null : parseFloat(newValue));
+                }
+              }}
+              onBlur={(e) => {
+                const newValue = e.target.value;
+                handleInputChange("error", newValue === "" ? null : parseFloat(newValue));
+              }}
+              onWheel={(e) => e.currentTarget.blur()}
               placeholder="Error tolerance"
             />
           </div>

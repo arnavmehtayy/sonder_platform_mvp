@@ -41,7 +41,7 @@ export function MinigameEdit({}: {}) {
   useEffect(() => {
     const checkAllValidations = () => {
       const allValid = validationInstance.every((validation) => {
-        console.log(validation)
+        // console.log(validation)
         return validation.get_isValid()
       }
       );
@@ -87,7 +87,7 @@ export function MinigameEdit({}: {}) {
         }
   
         const loadedState: Partial<State> = await response.json();
-        console.log(loadedState)
+        // console.log(loadedState)
         useStore.setState(loadedState);
         alert(`State "${stateName}" loaded successfully!`);
       } catch (error) {

@@ -60,7 +60,7 @@ export function SelectVizObjectList({handleChange}: {handleChange: (objects: num
     setSelectedVizObjects(selectedVizObjects.filter(obj => obj.id !== id));
   };
 
-  console.log("render")
+  // console.log("render")
   return (
     
       

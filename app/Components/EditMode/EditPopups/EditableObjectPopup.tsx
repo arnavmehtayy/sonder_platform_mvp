@@ -223,7 +223,7 @@ export function EditableObjectPopup<T>({
       );
       case "select":
         
-        console.log(field.options, editedObject[field.key])
+        // console.log(field.options, editedObject[field.key])
         return (
           <div className="mb-4">
             <label className="block mb-2">{field.label}</label>

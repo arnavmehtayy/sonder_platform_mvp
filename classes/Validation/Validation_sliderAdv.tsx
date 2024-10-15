@@ -39,7 +39,7 @@ export default class Validation_sliderAdv extends Validation {
 
   computeValidity(control: SliderControlAdvanced<obj>): Validation_sliderAdv {
     const value = control.localValue;
-    console.log("VALUE", value, this.target_value, this.relation)
+    // console.log("VALUE", value, this.target_value, this.relation)
     switch (this.relation) {
       case ">":
         if (value > this.target_value - this.error) {
