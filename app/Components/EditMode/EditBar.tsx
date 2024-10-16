@@ -52,7 +52,7 @@ import { SortableContext, sortableKeyboardCoordinates, verticalListSortingStrate
 import { CSS } from '@dnd-kit/utilities';
 import { DialogTrigger } from "@radix-ui/react-dialog";
 import { GripVertical } from 'lucide-react';
-import { ToggleLeft, Type, Variable, Table, Calculator, Hash} from 'lucide-react';
+import { ToggleLeft, Type, Variable, Table, Calculator, Hash, MousePointerClick} from 'lucide-react';
 import Placement from "@/classes/Placement";
 
 export interface Option {
@@ -105,7 +105,7 @@ export const EditBar: React.FC = () => {
     {name: "Number Input", type: InputNumber, icon: Hash},
     {name: "Object Picker", type: SelectControl, icon: List},
     {name: "Hide/Show Object", type: EnablerControl, icon: ToggleLeft},
-    {name: "Object Placer", type: Placement, icon: List}
+    {name: "Object Placer", type: Placement, icon: MousePointerClick}
   ];
     
   const objectTypes: ObjectType[] = [

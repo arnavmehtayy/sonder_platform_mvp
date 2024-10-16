@@ -64,8 +64,9 @@ export class geomobj extends TransformObj {
     rotation = new THREE.Vector3(0, 0, 0),
     scale = new THREE.Vector3(1, 1, 1),
     color = "blue",
-    geom_json = {type: 'circle', params: {radius: 2}},
-    geom = undefined,
+    geom_json,
+    // geom_json = {type: 'circle', params: {radius: 2}},
+    geom = new THREE.CircleGeometry(1, 32),
     touch_controls = new TouchControl(),
     param_t = 0, // the parametric parameter if the object is following a parametric object
     OnClick = undefined,
@@ -83,7 +84,7 @@ export class geomobj extends TransformObj {
       name: name,
     });
     this.geom_json = geom_json
-    this.geom = geom ? geom: this.createPredefinedGeometry(geom_json);
+    this.geom = geom_json ? this.createPredefinedGeometry(geom_json): geom;
     this.OnClick = OnClick;
     this.type = "GeomObj";
   }
@@ -236,13 +237,7 @@ export class geomobj extends TransformObj {
         {
           key: "geom_json",
           label: "Geometry",
-          type: "select",
-          options: [
-            { label: "Circle", value: { type: "circle", params: { radius: 1 } } },
-            { label: "Rectangle", value: { type: "rectangle", params: { width: 1, height: 1 } } },
-            { label: "Triangle", value: { type: "triangle", params: { sideLength: 1 } } },
-            { label: "Regular Polygon", value: { type: "regular-polygon", params: { radius: 1, numSides: 5 } } },
-          ],
+          type: "geometry",
         },
         { key: "color", label: "Color", type: "color" },
         { key: "position", label: "Position", type: "position" },

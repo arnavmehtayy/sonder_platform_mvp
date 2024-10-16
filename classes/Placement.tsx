@@ -82,7 +82,7 @@ export default class Placement {
     grid = [0, 0],
     cellSize = 0,
     geometry = new THREE.PlaneGeometry(4, 4),
-    geometry_json = {type: 'circle', params: {radius: 0.5}},
+    geometry_json, // = {type: 'circle', params: {radius: 0.5}},
     gridVectors = [],
     text = "Click to place objects",
     desc = "placement",
@@ -101,8 +101,8 @@ export default class Placement {
     this.isClickable = isClickable;
     this.id = id
     this.max_placements = max_placements;
-    this.geometry = geometry ? geometry: this.createPredefinedGeometry(geometry_json);
-    this.geom_json = geometry_json
+    this.geometry = geometry_json ? this.createPredefinedGeometry(geometry_json): geometry;
+    this.geom_json = {type: 'circle', params: {radius: 0.5}}
   }
 
   private createPredefinedGeometry(geomDef: PredefinedGeometry): THREE.BufferGeometry {
@@ -217,21 +217,25 @@ export default class Placement {
       },
       title: `Create New Placement`,
       fields: [
-        { key: "desc", label: "Description", type: "title" },
-        { key: "text", label: "Placement Text", type: "textarea" },
+        { key: "desc", label: "Title", type: "title" },
+        { key: "text", label: "Description Text", type: "textarea" },
         // { key: "grid", label: "Grid", type: "arraynum", length_of_array: 2 },
         // { key: "cellSize", label: "Cell Size", type: "number" },
-        {
-          key: "geometry_json",
+        {key: "geometry_json",
           label: "Geometry",
-          type: "select",
-          options: [
-            { label: "Circle", value: { type: "circle", params: { radius: 0.5 } } },
-            { label: "Rectangle", value: { type: "rectangle", params: { width: 1, height: 1 } } },
-            { label: "Triangle", value: { type: "triangle", params: { sideLength: 1 } } },
-            { label: "Regular Polygon", value: { type: "regular-polygon", params: { radius: 1, numSides: 5 } } },
-          ],
+          type: "geometry"
         },
+        // {
+        //   key: "geometry_json",
+        //   label: "Geometry",
+        //   type: "select",
+        //   options: [
+        //     { label: "Circle", value: { type: "circle", params: { radius: 0.5 } } },
+        //     { label: "Rectangle", value: { type: "rectangle", params: { width: 1, height: 1 } } },
+        //     { label: "Triangle", value: { type: "triangle", params: { sideLength: 1 } } },
+        //     { label: "Regular Polygon", value: { type: "regular-polygon", params: { radius: 1, numSides: 5 } } },
+        //   ],
+        // },
         { key: "gridVectors", label: "Grid Vectors", type: "custom", render: (value, onChange) => (
           <GridVectorsInput value={value} onChange={onChange} />
         )},
@@ -247,8 +251,8 @@ export default class Placement {
 
     // Start of Selection
     interface GridVectorsInputProps {
-      value: Vector2[];
-      onChange: (newValue: Vector2[]) => void;
+      value: any[];
+      onChange: (newValue: any[]) => void;
     }
     
     function GridVectorsInput({ value, onChange }: GridVectorsInputProps) {
@@ -260,72 +264,60 @@ export default class Placement {
         onChange(value.filter((_, i) => i !== index));
       };
     
-      const handleVectorChange = (index: number, axis: 'x' | 'y', newValue: string) => {
-        const parsedValue = parseFloat(newValue);
+      const handleVectorChange = (index: number, axis: 'x' | 'y', newValue: any) => {
         const newVectors = [...value];
-        newVectors[index][axis] = isNaN(parsedValue) ? 0 : parsedValue;
+        if (newValue === null) {
+          newVectors[index][axis] = 0;
+        } else {
+          const numValue = parseFloat(newValue);
+          newVectors[index][axis] = numValue;
+        }
         onChange(newVectors);
       };
     
-          // Start of Selection
-              // Start of Selection
-              return (
-                <div>
-                  {value.map((vector, index) => (
-                    <div key={index} className="flex items-center mb-2">
-                      <Input
-                        placeholder="X"
-                        type="number"
-                        value={vector.x.toString()}
-                        onChange={(e) => {
-                          const value = e.target.value;
-                          if (value === "" || /^-?\d*\.?\d*$/.test(value)) {
-                            handleVectorChange(index, 'x', value === "" ? "0" : value);
-                          }
-                        }}
-                        onBlur={(e) => {
-                          const value = e.target.value;
-                          if (value !== "") {
-                            handleVectorChange(index, 'x', value);
-                          }
-                        }}
-                        onWheel={(e) => e.currentTarget.blur()}
-                        className="mr-2"
-                      />
-                      <Input
-                        placeholder="Y"
-                        type="number"
-                        value={vector.y.toString()}
-                        onChange={(e) => {
-                          const value = e.target.value;
-                          if (value === "" || /^-?\d*\.?\d*$/.test(value)) {
-                            handleVectorChange(index, 'y', value === "" ? "0" : value);
-                          }
-                        }}
-                        onBlur={(e) => {
-                          const value = e.target.value;
-                          if (value !== "") {
-                            handleVectorChange(index, 'y', value);
-                          }
-                        }}
-                        onWheel={(e) => e.currentTarget.blur()}
-                        className="mr-2"
-                      />
-                      <Button
-                        onClick={() => handleRemoveVector(index)}
-                        variant="ghost"
-                        size="icon"
-                      >
-                        <X className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  ))}
-                  <div className="flex space-x-2 mt-2">
-                    <Button onClick={handleAddVector} variant="outline" size="sm">
-                      Add Vector
-                    </Button>
-                  </div>
-                </div>
-              );
-            }
+      return (
+        <div>
+          {value.map((vector, index) => (
+            <div key={index} className="flex items-center mb-2">
+              <Input
+                placeholder="X"
+                type="text"
+                // value={vector.x === 0 ? '' : vector.x.toString()}
+                onChange={(e) => handleVectorChange(index, 'x', e.target.value === '' ? null : e.target.value)}
+                onBlur={(e) => {
+                  const value = e.target.value;
+                  handleVectorChange(index, 'x', value === '' ? null : value);
+                }}
+                onWheel={(e) => e.currentTarget.blur()}
+                className="mr-2"
+              />
+              <Input
+                placeholder="Y"
+                type="text"
+                //value={vector.y === 0 ? '' : vector.y.toString()}
+                onChange={(e) => handleVectorChange(index, 'y', e.target.value === '' ? null : e.target.value)}
+                onBlur={(e) => {
+                  const value = e.target.value;
+                  handleVectorChange(index, 'y', value === '' ? null : value);
+                }}
+                onWheel={(e) => e.currentTarget.blur()}
+                className="mr-2"
+              />
+              <Button
+                onClick={() => handleRemoveVector(index)}
+                variant="ghost"
+                size="icon"
+              >
+                <X className="h-4 w-4" />
+              </Button>
+            </div>
+          ))}
+          <div className="flex space-x-2 mt-2">
+            <Button onClick={handleAddVector} variant="outline" size="sm">
+              Add Vector
+            </Button>
+          </div>
+        </div>
+      );
+    }
 

@@ -1,4 +1,3 @@
-
 'use client'
 
 import React, { useState, useEffect } from 'react';
@@ -39,20 +38,44 @@ export const Vector3Input: React.FC<Vector3InputProps> = ({ value, onChange, siz
   };
 
   return (
-    <div style={{ width: size, display: 'flex', flexDirection: 'column', gap: '8px' }}>
-      {(['x', 'y', 'z'] as const).map((axis) => (
-        <div key={axis} style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-          <label>{axis.toUpperCase()}:</label>
-          <Input
-            type="number"
-            value={localValues[axis]}
-            onChange={(e) => handleChange(axis, e.target.value)}
-            min={-range}
-            max={range}
-            step="0.1"
-          />
-        </div>
-      ))}
+    <div>
+      <div className="flex items-center mb-2">
+        <Input
+          placeholder="X"
+          type="text"
+          // value={localValues.x}
+          onChange={(e) => handleChange('x', e.target.value)}
+          onBlur={(e) => {
+            const value = e.target.value;
+            handleChange('x', value === '' ? '0' : value);
+          }}
+          onWheel={(e) => e.currentTarget.blur()}
+          className="mr-2"
+        />
+        <Input
+          placeholder="Y"
+          type="text"
+          // value={localValues.y}
+          onChange={(e) => handleChange('y', e.target.value)}
+          onBlur={(e) => {
+            const value = e.target.value;
+            handleChange('y', value === '' ? '0' : value);
+          }}
+          onWheel={(e) => e.currentTarget.blur()}
+          className="mr-2"
+        />
+        <Input
+          placeholder="Z"
+          type="text"
+          // value={localValues.z}
+          onChange={(e) => handleChange('z', e.target.value)}
+          onBlur={(e) => {
+            const value = e.target.value;
+            handleChange('z', value === '' ? '0' : value);
+          }}
+          onWheel={(e) => e.currentTarget.blur()}
+        />
+      </div>
     </div>
   );
 };
