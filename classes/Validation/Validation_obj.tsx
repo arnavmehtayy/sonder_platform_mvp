@@ -186,7 +186,7 @@ export const ValidationObjEditor: React.FC<ValidationObjEditorProps> = ({
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <DialogHeader>
-          <DialogTitle>Validation</DialogTitle>
+          <DialogTitle>Validate Object</DialogTitle>
         </DialogHeader>
         <Button
           variant={addValidation ? "default" : "outline"}

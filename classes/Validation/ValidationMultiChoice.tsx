@@ -97,7 +97,7 @@ export class ValidationMultiChoice extends Validation {
           <div className="space-y-6">
             <div className="flex items-center justify-between">
             <DialogHeader>
-          <DialogTitle> Validation </DialogTitle>
+          <DialogTitle> Validate Multiple Choice </DialogTitle>
         </DialogHeader>
               {/* <Label htmlFor="add-validation" className="text-sm font-medium">Validation</Label> */}
               <Button

@@ -104,7 +104,7 @@ export interface ValidationSelectEditorProps {
       <div className="space-y-6">
         <div className="flex items-center justify-between">
           <DialogHeader>
-            <DialogTitle>Validation</DialogTitle>
+            <DialogTitle>Validate Object Select</DialogTitle>
           </DialogHeader>
           <Button
             variant={addValidation ? "default" : "outline"}

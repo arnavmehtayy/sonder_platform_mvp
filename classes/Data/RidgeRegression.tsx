@@ -953,15 +953,15 @@ For reference, the $\\textbf{green line}$ represents the true relation between t
       color: "violet",
     }),
 
-    new Placement({
-      id: 1,
-      grid: [4, 4],
-      cellSize: 1,
-      gridVectors: [],
-      object_ids: [998],
-      geometry: new THREE.CircleGeometry(0.23, 128),
-      color: "violet",
-    }),
+    // new Placement({
+    //   id: 1,
+    //   grid: [4, 4],
+    //   cellSize: 1,
+    //   gridVectors: [],
+    //   object_ids: [998],
+    //   geometry: new THREE.CircleGeometry(0.23, 128),
+    //   color: "violet",
+    // }),
   
     ],
   },

@@ -154,7 +154,7 @@ export const ValidationScoreEditor: React.FC<ValidationScoreEditorProps> = ({
         <div className="space-y-4">
           <div className="space-y-2">
             <Label htmlFor="validation-desc" className="text-sm font-medium">
-              Validation Description
+              Validate Score
             </Label>
             <Input
               id="validation-desc"

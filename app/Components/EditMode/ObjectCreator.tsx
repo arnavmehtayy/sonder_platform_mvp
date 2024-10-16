@@ -19,6 +19,7 @@ import { DummyDataStorage } from "@/classes/vizobjects/DummyDataStore";
 import { FunctionScore } from "@/classes/Scores/FunctionScore";
 import { ValidationMultiChoice } from "@/classes/Validation/ValidationMultiChoice";
 import Validation from "@/classes/Validation/Validation";
+import Placement from "@/classes/Placement";
 
 export type EditAddType =
   | obj
@@ -35,7 +36,8 @@ export type EditAddType =
   | TextGeom
   | FunctionPlotString
   | DummyDataStorage<any>
-  | FunctionScore;
+  | FunctionScore
+  | Placement;
   
 export type PopUpType = 
   | typeof LineObj
@@ -51,7 +53,8 @@ export type PopUpType =
   | typeof TextGeom
   | typeof FunctionPlotString
   | typeof DummyDataStorage<any>
-  | typeof FunctionScore;
+  | typeof FunctionScore
+  | typeof Placement;
   
 
 interface ObjectCreatorProps {

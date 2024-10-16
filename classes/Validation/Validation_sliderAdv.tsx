@@ -128,7 +128,7 @@ export const ValidationSliderAdvEditor: React.FC<ValidationSliderAdvEditorProps>
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <DialogHeader>
-          <DialogTitle>Advanced Slider Validation</DialogTitle>
+          <DialogTitle>Validate Slider</DialogTitle>
         </DialogHeader>
         <Button
           variant={validationState ? "default" : "outline"}

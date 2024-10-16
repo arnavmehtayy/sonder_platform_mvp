@@ -7,7 +7,6 @@ import {
   useStore,
   setVizObjSelector,
   DeleteVizObjSelector,
-
   UpdateAllInfluencesSelector,
   getPlacementSelector,
   isPlacementModeActive2,
@@ -17,7 +16,7 @@ import {
   getPlacementSelector2,
 } from "@/app/store";
 import { geomobj } from "@/classes/vizobjects/geomobj";
-import Placement from "@/classes/Placement"; // Assuming the Placement class is in a separate file
+import Placement from "@/classes/Placement";
 
 const PlacementMarker = ({
   position,
@@ -50,99 +49,11 @@ const PlacementMarker = ({
   );
 };
 
-// type PlacementContextType = {
-//   remainingPlacements: { [key: number]: number };
-//   setRemainingPlacements: React.Dispatch<React.SetStateAction<{ [key: number]: number }>>;
-//   objectsOnScene: { [key: number]: number };
-//   setObjectsOnScene: React.Dispatch<React.SetStateAction<{ [key: number]: number }>>;
-//   showResetButton: { [key: number]: boolean };
-//   setShowResetButton: React.Dispatch<React.SetStateAction<{ [key: number]: boolean }>>;
-//   resetPlacements: () => void;
-//   placements: Placement[];
-// };
-
-// const PlacementContext = React.createContext<PlacementContextType>({
-//   remainingPlacements: {},
-//   setRemainingPlacements: () => {},
-//   objectsOnScene: {},
-//   setObjectsOnScene: () => {},
-//   showResetButton: {},
-//   setShowResetButton: () => {},
-//   resetPlacements: () => {},
-//   placements: [],
-// });
-
-// export const PlacementProvider = ({
-//   children,
-//   placements,
-// }: {
-//   children: React.ReactNode;
-//   placements: Placement[];
-// }) => {
-//   const [remainingPlacements, setRemainingPlacements] = useState(
-//     placements.reduce((acc, p, index) => ({ ...acc, [p.id]: p.max_placements }), {})
-//   );
-//   const [objectsOnScene, setObjectsOnScene] = useState(
-//     placements.reduce((acc, p, index) => ({ ...acc, [p.id]: 0 }), {})
-//   );
-//   const [showResetButton, setShowResetButton] = useState(
-//     placements.reduce((acc, p, index) => ({ ...acc, [p.id]: false }), {})
-//   );
-//   const deleteObject = useStore(DeleteVizObjSelector);
-
-//   const resetPlacements = () => {
-//     setRemainingPlacements(
-//       placements.reduce((acc, p, index) => ({ ...acc, [p.id]: p.max_placements }), {})
-//     );
-//     setObjectsOnScene(
-//       placements.reduce((acc, p, index) => ({ ...acc, [p.id]: 0 }), {})
-//     );
-    
-//     setShowResetButton(
-//       placements.reduce((acc, p, index) => ({ ...acc, [p.id]: false }), {})
-//     );
-
-//     placements.forEach(placement => {
-//       placement.object_ids.forEach((id: number) => {
-//         deleteObject(id);
-//       });
-//     });
-//   };
-
-//   return (
-//     <PlacementContext.Provider
-//       value={{
-//         remainingPlacements,
-//         setRemainingPlacements,
-//         objectsOnScene,
-//         setObjectsOnScene,
-//         showResetButton,
-//         setShowResetButton,
-//         resetPlacements,
-//         placements,
-//       }}
-//     >
-//       {children}
-//     </PlacementContext.Provider>
-//   );
-// };
-
-// export const usePlacementMode = () => useContext(PlacementContext);
-
 export const PlacementControl = ({
   placementIndex,
 }: {
   placementIndex: number;
 }) => {
-  // const {
-  //   remainingPlacements,
-  //   setRemainingPlacements,
-  //   objectsOnScene,
-  //   setObjectsOnScene,
-  //   setShowResetButton,
-  //   placements,
-  // } = usePlacementMode();
-  
   const isActivePlacement = useStore(isPlacementModeActive2)(placementIndex);
   const setIsPlacementMode = useStore(setIsPlacementModeActive2);
   const placement = useStore(getPlacementSelector(placementIndex));
@@ -152,7 +63,6 @@ export const PlacementControl = ({
   const updateAllInfluences = useStore(UpdateAllInfluencesSelector);
   const getNumObjs = useStore(getNumObjectsPlaced)(placementIndex)
   const setNumObjs = useStore(setNumObjectsPlaced)
-
 
   const createPlacementPositions = () => {
     const positions: THREE.Vector2[] = [...placement.gridVectors];
@@ -168,10 +78,6 @@ export const PlacementControl = ({
 
   const handlePlacement = (position: THREE.Vector2) => {
     if (placement.max_placements - placement.numObjectsPlaced > 0) {
-
-      // setShowResetButton(
-      //   {...placement, [placementIndex]: true}
-      // );
       const obj_id = placement.object_ids[
         placement.object_ids.length - (placement.max_placements - placement.numObjectsPlaced)
       ];
@@ -191,9 +97,10 @@ export const PlacementControl = ({
       );
 
       updateAllInfluences();
-      setNumObjs(placementIndex, placement.numObjectsPlaced + 1);
+      const newNumObjs = placement.numObjectsPlaced + 1;
+      setNumObjs(placementIndex, newNumObjs);
 
-      if (placement.numObjectsPlaced === 0 ) {
+      if (newNumObjs >= placement.max_placements) {
         setIsPlacementMode(placementIndex, false);
       }
     }
@@ -229,15 +136,12 @@ export const PlacementActivationButton = ({
   isActive: boolean;
   placement_id: number;
 }) => {
-  // const {objectsOnScene, placements } = usePlacementMode();
   const isPlacementModeActive = useStore(isPlacementModeActive2)(placement_id);
   const setIsPlacementModeActive = useStore(setIsPlacementModeActive2);
   const getNumObjs = useStore(getNumObjectsPlaced)(placement_id)
   const setNumObjs = useStore(setNumObjectsPlaced)
 
-
   const totalPlacements = useStore(state => state.placement[placement_id]).max_placements;
-
 
   return (
     <div className="flex flex-col items-end space-y-2">
@@ -247,10 +151,10 @@ export const PlacementActivationButton = ({
         </span>
         <button
           onClick={() => setIsPlacementModeActive(placement_id, !isPlacementModeActive)}
-          disabled={!isActive}
+          disabled={!isActive || getNumObjs >= totalPlacements}
           className={`
             ${isPlacementModeActive ? "bg-blue-600 hover:bg-blue-700" : "bg-gray-400 hover:bg-gray-500"}
-            ${!isActive && "opacity-50 cursor-not-allowed"}
+            ${(!isActive || getNumObjs >= totalPlacements) && "opacity-50 cursor-not-allowed"}
             text-white py-1 px-3 rounded-md text-sm font-medium transition duration-300 ease-in-out
             flex items-center
           `}
@@ -269,13 +173,11 @@ export const PlacementActivationButton = ({
 };
 
 export const ResetButton = ({ isActive, placement_id}: { isActive: boolean, placement_id: number }) => {
-  // const { showResetButton, resetPlacements } = usePlacementMode();
   const placement = useStore(getPlacementSelector2)(placement_id)
   const setplacementState = useStore(setIsPlacementModeActive2)
   const setNumPlacedObjs = useStore(setNumObjectsPlaced)
   const deleteObject = useStore(DeleteVizObjSelector)
   const reset =() => {
-    // resetPlacements();
     placement.object_ids.forEach((id: number) => {
               deleteObject(id);
             });
@@ -283,7 +185,7 @@ export const ResetButton = ({ isActive, placement_id}: { isActive: boolean, plac
     setNumPlacedObjs(placement_id, 0)
   }
 
-  if (placement.numObjectsPlaced === 0) return null; // check this
+  if (placement.numObjectsPlaced === 0) return null;
 
   return (
     <button

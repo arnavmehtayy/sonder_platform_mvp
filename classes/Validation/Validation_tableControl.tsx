@@ -165,7 +165,7 @@ export const ValidationTableControlEditor: React.FC<
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <DialogHeader>
-          <DialogTitle>Table Validation</DialogTitle>
+          <DialogTitle>Validate Table</DialogTitle>
         </DialogHeader>
         <Button
           variant={addValidation ? "default" : "outline"}
