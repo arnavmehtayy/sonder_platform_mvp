@@ -448,8 +448,8 @@ export const data_regression: { [key: string]: data_type } = {
         id: 0,
         isMultiSelect: false,
         isClickable: true,
-        title: "Score Goal",
-        description: `What score value do you think the true line of best fit would have?`,
+        desc: "Score Goal",
+        text: `What score value do you think the true line of best fit would have?`,
         options: [
           { id: 1, label: "A really large positive number" },
           { id: 2, label: "A really large negative number" },
@@ -463,8 +463,8 @@ export const data_regression: { [key: string]: data_type } = {
 
       new MultiChoiceClass({
         id: 4,
-        title: "New Data",
-        description:
+        desc: "New Data",
+        text:
           "Do you think the $\\textbf{red line}$ that you fit reasonably predicts this new data?",
         options: [
           { id: 1, label: "Yes" },
@@ -554,8 +554,8 @@ The $\\textbf{green line}$ is the line of best fit that you identified in the la
       newPointsEnablerControl,
       new MultiChoiceClass({
         id: 4,
-        title: "New Data",
-        description:
+        desc: "New Data",
+        text:
           "In hindsight, do you think our $\\textbf{red line}$ predicts this new data?",
         options: [
           { id: 1, label: "Yes" },
@@ -738,8 +738,8 @@ $\\lambda \\cdot \\text{slope}^2 $ term is pulling the $\\textbf{slope lower}$ t
       }),
       new MultiChoiceClass({
         id: 4,
-        title: "The choice of $\\lambda$",
-        description: "Choose $\\textbf{all}$ the options that are true",
+        desc: "The choice of $\\lambda$",
+        text: "Choose $\\textbf{all}$ the options that are true",
         options: [
           {
             id: 1,
@@ -768,8 +768,8 @@ $\\lambda \\cdot \\text{slope}^2 $ term is pulling the $\\textbf{slope lower}$ t
 
       new MultiChoiceClass({
         id: 8,
-        title: "Minimising the score",
-        description: "Set the value of $\\lambda$ to $\\textbf{$0.5$}$. Choose the option that is $\\textbf{most precise}$",
+        desc: "Minimising the score",
+        text: "Set the value of $\\lambda$ to $\\textbf{$0.5$}$. Choose the option that is $\\textbf{most precise}$",
         options: [
           {
             id: 1,
@@ -903,8 +903,8 @@ For reference, the $\\textbf{green line}$ represents the true relation between t
 
       new MultiChoiceClass({
         id: 2,
-        title: "Prefer Small Slopes",
-        description:
+        desc: "Prefer Small Slopes",
+        text:
           "Do you think prefering small slopes is always a good idea to control outliers?",
         options: [
           {
