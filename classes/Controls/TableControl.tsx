@@ -23,7 +23,7 @@ import { atts } from "../vizobjects/get_set_obj_attributes";
 import { FunctionStr, FunctionStrEditor } from './FunctionStr';
 import { Validation_tableControl, Validation_tableControlConstructor, ValidationTableControlEditor } from "../Validation/Validation_tableControl";
 
-interface TableCell<T extends obj> {
+export interface TableCell<T extends obj> {
   value: number;
   functionStr: FunctionStr;
   obj_id: number;
@@ -32,7 +32,7 @@ interface TableCell<T extends obj> {
   isStatic: boolean;
 }
 
-interface TableRow<T extends obj> {
+export interface TableRow<T extends obj> {
   cells: TableCell<T>[];
 }
 

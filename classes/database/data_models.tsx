@@ -4,6 +4,10 @@ import { DummyDataSupportedTypes } from "../vizobjects/DummyDataStore";
 import * as THREE from "three";
 import { PredefinedGeometry } from "../vizobjects/geomobj";
 import { value_typ, relation, Attribute_get } from "../Validation/Validation_obj";
+import { AttributePairSet_json } from "../Controls/SliderControlAdv";
+import { TableRow } from "../Controls/TableControl";
+import { obj } from "../vizobjects/obj";
+import { Option } from "../Controls/MultiChoiceClass";
 
 // Obj
 export interface ObjModel {
@@ -93,7 +97,7 @@ export interface TextGeomModel extends GeomObjModel {
 // VALIDATIONS
 
 export interface ValidationModel {
-  is_valid: boolean;
+  // is_valid: boolean; we dont need this as the system will compute it when we load it back
   desc: string;
 }
 
@@ -150,51 +154,48 @@ export interface ControlModel {
   id: number;
   desc: string;
   text: string;
-  isClickable: boolean;
+  // isClickable: boolean; do not need to store this in database
   type: string;
 }
 
 // SliderControl Model
-export interface SliderControlModel extends ControlModel {
+export interface SliderControlAdvModel extends ControlModel {
   range: [number, number];
   value: number;
   step: number;
-  onChange: string; // We'll store this as a string representation of the function
+  attribute_pairs: AttributePairSet_json; // We'll store this as a string representation of the function
 }
 
 // SelectControl Model
 export interface SelectControlModel extends ControlModel {
-  options: { value: number; label: string }[];
-  selected: number[];
+  selectable: number[]
+  capacity: number
 }
 
 // TableControl Model
 export interface TableControlModel extends ControlModel {
-  rows: {
-    cells: {
-      value: number;
-      isEditable: boolean;
-    }[];
-  }[];
+  rows: TableRow<obj>;
+  columnHeaders: string[];
+  rowHeaders: string[];
 }
 
-// ButtonControl Model
-export interface ButtonControlModel extends ControlModel {
-  onClick: string; // We'll store this as a string representation of the function
-}
 
 // MultiChoiceControl Model
 export interface MultiChoiceControlModel extends ControlModel {
-  choices: string[];
-  selected: number[];
+  options: Option[];
+  isMultiSelect?: boolean;
 }
 
 // InputNumberControl Model
 export interface InputNumberControlModel extends ControlModel {
   value: number;
-  min?: number;
-  max?: number;
-  step?: number;
+  placeholder: string;
+  initial_value: number;
+  min: number;
+  max: number;
+  step: number;
+  attribute_pairs?: AttributePairSet_json[];
+  obj_id : number
 }
 
 
@@ -202,10 +203,9 @@ export interface InputNumberControlModel extends ControlModel {
 // Union type for all control models
 export type ControlObjectModel =
   | ControlModel
-  | SliderControlModel
+  | SliderControlAdvModel
   | SelectControlModel
   | TableControlModel
-  | ButtonControlModel
   | MultiChoiceControlModel
   | InputNumberControlModel;
 

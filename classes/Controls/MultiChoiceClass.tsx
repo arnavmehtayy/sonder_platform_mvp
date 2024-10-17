@@ -22,8 +22,6 @@ export interface Option {
 
 export interface MultiChoiceConstructor extends ControlConstructor {
   options: Option[];
-  title: string;
-  description: string;
   isMultiSelect?: boolean;
 }
 function ShowMultiChoice({ control }: { control: MultiChoiceClass }) {
@@ -123,13 +121,13 @@ export class MultiChoiceClass extends Control {
 
   constructor({
     id,
-    title,
-    description,
+    desc = "MCQ",
+    text = "Choose an option below",
     isClickable = true,
     options,
     isMultiSelect = false,
   }: MultiChoiceConstructor) {
-    super({ id, desc: title, text: description, isClickable });
+    super({ id, desc: desc, text: text, isClickable });
     this.options = options;
     this.isMultiSelect = isMultiSelect;
     this.selectedOptions = []; // no options are selected initially
@@ -148,8 +146,8 @@ export class MultiChoiceClass extends Control {
   dataBaseSave(): MultiChoiceConstructor & { type: string } {
     return {
       id: this.id,
-      title: this.desc,
-      description: this.text,
+      desc: this.desc,
+      text: this.text,
       options: this.options,
       isMultiSelect: this.isMultiSelect,
       type: "MultiChoiceClass",
@@ -175,10 +173,10 @@ export class MultiChoiceClass extends Control {
   }) {
     const [editedObject, setEditedObject] = React.useState<MultiChoiceConstructor>({
       id: Date.now() % 10000,
-      title: "",
+      desc: "",
       options: [],
       isMultiSelect: false,
-      description: "",
+      text: "",
     });
     const [validation, setValidation] = React.useState<ValidationMultiChoice | undefined>(undefined);
   
@@ -197,8 +195,8 @@ export class MultiChoiceClass extends Control {
       },
       title: `Create New Multiple Choice Question`,
       fields: [
-        { key: "title", label: "Title", type: "title" },
-        { key: "description", label: "Description", type: "textarea" },
+        { key: "desc", label: "Title", type: "title" },
+        { key: "text", label: "Description", type: "textarea" },
         { key: "options", label: "Options", type: "addoptions" },
         {
           key: "isMultiSelect",

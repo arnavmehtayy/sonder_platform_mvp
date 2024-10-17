@@ -266,8 +266,8 @@ export const useStore = create<State>((set, get) => ({
       const updatedControl= { ...state.controls, [id]:  new MultiChoiceClass(
         {
           id: id,
-          title: title,
-          description: desc,
+          desc: title,
+          text: desc,
           options: options,
         })
       };
