@@ -69,7 +69,7 @@ export function Minigame({
       >
         {allValidationsValid && <CheckCircle className="text-white" size={20} />}
         <span className="text-white font-semibold">
-          {showValidation ? 'Hide' : 'Show'} Validation
+          {showValidation ? 'Hide' : 'Show'} Grader
         </span>
       </button>
 
