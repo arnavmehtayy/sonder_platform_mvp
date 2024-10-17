@@ -17,7 +17,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
  * attributes: score_id, target_score, error, relation, comparator
  */
 
-interface Validation_score_constructor<score_T, obj_T extends obj> extends ValidationConstructor {
+export interface Validation_score_constructor<score_T, obj_T extends obj> extends ValidationConstructor {
   score_id: number;
   target_score: score_T;
   error: number;
@@ -98,14 +98,13 @@ export default class Validation_score<
       target_score: this.target_score,
       error: this.error,
       relation: this.relation,
-      comparator: this.comparator,
       type: "Validation_score"
     };
   }
 }
 
 export interface ValidationScoreEditorProps {
-  onChange: (value: Validation_score<number, obj> | undefined) => void;
+  onChange: (value: Validation_score_constructor<number, obj> | undefined) => void;
   scoreId: number;
 }
 
@@ -119,8 +118,17 @@ export const ValidationScoreEditor: React.FC<ValidationScoreEditorProps> = ({
     target_score: 0,
     error: 0.1,
     relation: "==",
-    desc: ``,
+    desc: `This is a score Validator`,
+    comparator: (a,b) => a-b
   });
+
+  React.useEffect(() => {
+    if (addValidation ) {
+      onChange(validationState);
+    } else {
+      onChange(undefined);
+    }
+  }, [addValidation, validationState, onChange]);
 
   const handleAddRemoveValidation = () => {
     const newAddValidation = !addValidation;

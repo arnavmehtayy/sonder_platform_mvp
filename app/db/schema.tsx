@@ -13,7 +13,8 @@ export const states = pgTable('users_table', {
   camera_zoom: real("camera_zoom").default(20.0),
   title: text("title").notNull(),
   createdAt: timestamp('created_at').notNull().defaultNow(),
-  updatedAt: timestamp('updated_at').notNull().defaultNow().$onUpdate(() => new Date())
+  updatedAt: timestamp('updated_at').notNull().defaultNow().$onUpdate(() => new Date()),
+  
 });
 
 export const questions = pgTable('questions', {
@@ -21,6 +22,7 @@ export const questions = pgTable('questions', {
     stateId: integer('state_id').references(() => states.id, {onDelete:'cascade'}),
     questionId: integer('question_id').notNull(),
     questionText: text('question_text').notNull(),
+
   });
   
   export const orders = pgTable('orders', {

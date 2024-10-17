@@ -9,7 +9,7 @@ import {
 import { useStore } from '@/app/store';
 import { objectScorer } from "./objectScorer";
 import { atts } from '../vizobjects/get_set_obj_attributes';
-import Validation_score, { ValidationScoreEditor } from "../Validation/Validation_score";
+import Validation_score, { Validation_score_constructor, ValidationScoreEditor } from "../Validation/Validation_score";
 
 export interface FunctionScoreConstructor extends ScoreConstructor<number>{
   score_id: number
@@ -89,7 +89,7 @@ export class FunctionScore extends Score<number> {
       obj_list: [], // this will be populated by the constructor
       transformation: () => 0 // this is useless comes from parent class
     });
-    const [validation, setValidation] = useState<Validation_score<number, obj> | undefined>(undefined);
+    const [validation, setValidation] = useState<Validation_score_constructor<number, obj> | undefined>(undefined);
 
     const handleFunctionStrChange = (newFunctionStr: FunctionStr) => {
       setEditedObject(prev => ({
@@ -106,6 +106,7 @@ export class FunctionScore extends Score<number> {
       onSave: (updatedObject: FunctionScoreConstructor) => {
         const newObj = new FunctionScore(updatedObject);
         const newVal = validation ? new Validation_score(validation) : undefined;
+        console.log(newVal)
         onSave(newObj, newVal);
       },
       title: "Create New Function Score",
@@ -123,7 +124,7 @@ export class FunctionScore extends Score<number> {
       ],
       additionalContent: (
         <ValidationScoreEditor
-          onChange={(newValidation: Validation_score<number, obj> | undefined) => setValidation(newValidation)}
+          onChange={(newValidation: Validation_score_constructor<number, obj> | undefined) => setValidation(newValidation)}
           scoreId={editedObject.score_id}
         />
     )

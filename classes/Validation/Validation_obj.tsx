@@ -32,7 +32,7 @@ export type relation = "==" | ">" | "<" | ">=" | "<=" | "!="; // the possible re
  * relation: the relation that is to be used in the comparison
  */
 
-interface Attribute_get {
+export interface Attribute_get {
   obj_type: object_types;
   func: string;
 }

@@ -3,7 +3,7 @@ import { TouchControlAttributes } from "../Controls/TouchControl";
 import { DummyDataSupportedTypes } from "../vizobjects/DummyDataStore";
 import * as THREE from "three";
 import { PredefinedGeometry } from "../vizobjects/geomobj";
-import { value_typ, relation } from "../Validation/Validation_obj";
+import { value_typ, relation, Attribute_get } from "../Validation/Validation_obj";
 
 // Obj
 export interface ObjModel {
@@ -97,21 +97,17 @@ export interface ValidationModel {
   desc: string;
 }
 
-// Validation_obj Model
-export type SerializableValueType =
-  | number
-  | { x: number; y: number }
-  | { x: number; y: number; z: number };
 
-// Update the ValidationObjModel
+export type SerializableValueType = number | { x: number; y: number } | { x: number; y: number; z: number };
+
 export interface ValidationObjModel extends ValidationModel {
   answer: SerializableValueType;
   obj_id: number;
+  get_attribute_json: Attribute_get
   error: number;
   relation: relation;
 }
 
-// Validation_score Model
 export interface ValidationScoreModel extends ValidationModel {
   score_id: number;
   target_score: number;
@@ -119,36 +115,34 @@ export interface ValidationScoreModel extends ValidationModel {
   relation: relation;
 }
 
-// Validation_tableControl Model
-export interface ValidationTableControlModel extends ValidationModel {
+export interface ValidationTableControlModel<T> extends ValidationModel {
   answers: number[][];
   control_id: number;
   error: number;
   validateCells: boolean[][];
 }
 
-// Validation_select Model
 export interface ValidationSelectModel extends ValidationModel {
   answer: number[];
   control_id: number;
 }
 
-// Validation_test Model
-export interface ValidationTestModel extends ValidationModel {
-  // No additional properties
-}
-
-// ValidationMultiChoice Model
 export interface ValidationMultiChoiceModel extends ValidationModel {
   answer: number[];
   control_id: number;
 }
 
-// Validation_inputNumber Model
 export interface ValidationInputNumberModel extends ValidationModel {
   answer: number;
   control_id: number;
   error: number;
+}
+
+export interface ValidationSliderAdvModel extends ValidationModel {
+  control_id: number;
+  target_value: number;
+  error: number;
+  relation: relation;
 }
 
 // Base Control Model
@@ -220,13 +214,12 @@ export type ValidationObjectModel =
   | ValidationModel
   | ValidationObjModel
   | ValidationScoreModel
-  | ValidationTableControlModel
+  | ValidationTableControlModel<any>
   | ValidationSelectModel
-  | ValidationTestModel
   | ValidationMultiChoiceModel
   | ValidationInputNumberModel;
 
-// Union type for all models
+// Union type for all vizobject models
 export type VizObjectModel =
   | ObjModel
   | ColoredObjModel
