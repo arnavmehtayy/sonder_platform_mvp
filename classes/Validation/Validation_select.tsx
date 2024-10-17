@@ -58,13 +58,13 @@ export default class Validation_select extends Validation {
         return this.set_valid(false) as Validation_select
     }
 
-    dataBaseSave(): Validation_selectConstructor & {type: string} {
+    dataBaseSave(): Validation_selectConstructor  {
         return {
             is_valid: this.is_valid,
             desc: this.desc,
             answer: this.answer,
             control_id: this.control_id,
-            type: "Validation_select"
+            type: "V_select"
         }
     }
 }

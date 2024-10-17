@@ -85,7 +85,7 @@ export default class CoordinateAxis extends TransformObj {
     return {...super.get_set_att_selector(type), ...Axis_atts[type]};
   }
 
-  dataBaseSave(): CoordinateAxisConstructor & { type: string } {
+  dataBaseSave(): CoordinateAxisConstructor {
     return {
       id: this.id,
       name: this.name,

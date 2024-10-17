@@ -5,9 +5,14 @@ import { obj } from "../vizobjects/obj";
  * This is the parent class for all the Validation classes
 
 */
+
+export type Validation_types = "V_input" | "V_obj" | "V_score" | "V_slider" | "V_select" | "V_test" 
+ | "V_table" | "V_numberIn" | "V_MCQ"| "V" // for database to store which class to reconstruct
+
 export interface ValidationConstructor {
   is_valid?: boolean;
   desc: string;
+  type?: Validation_types
 }
 
 export default abstract class Validation {
@@ -21,11 +26,11 @@ export default abstract class Validation {
 
   // abstract dataBaseSave(): ValidationConstructor & {type: string};
 
-  dataBaseSave(): ValidationConstructor & { type: string } {
+  dataBaseSave(): ValidationConstructor {
     return {
       is_valid: this.is_valid,
       desc: this.desc,
-      type: this.constructor.name // This will give us the name of the specific Validation subclass
+      type: "V" // This will give us the name of the specific Validation subclass
     };
   }
 

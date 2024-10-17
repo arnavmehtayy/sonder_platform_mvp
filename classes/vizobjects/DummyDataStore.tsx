@@ -1,4 +1,4 @@
-import { obj } from "./obj";
+import { obj, objconstructor, object_types } from "./obj";
 import { DummyDataInput } from "@/app/Components/EditMode/EditPopups/DummyDataInput";
 import { EditableObjectPopup, EditableObjectPopupProps } from "@/app/Components/EditMode/EditPopups/EditableObjectPopup";
 import React from "react";
@@ -16,7 +16,7 @@ export type DummyDataSupportedTypes =
   | string[];
 
 
-interface DummyDataStorageConstructor<T extends DummyDataSupportedTypes> {
+interface DummyDataStorageConstructor<T extends DummyDataSupportedTypes> extends objconstructor{
   id: number;
   name: string;
   data: T;
@@ -53,12 +53,12 @@ export class DummyDataStorage<T extends DummyDataSupportedTypes> extends obj {
     return newObj;
   }
 
-  dataBaseSave(): DummyDataStorageConstructor<T> & {type: string} {
+  dataBaseSave(): DummyDataStorageConstructor<T> {
     return {
       id: this.id,
       name: this.name,
       data: this.data,
-      type: 'DummyDataStorage'
+      type: "DummyDataStorage"
     };
   }
 

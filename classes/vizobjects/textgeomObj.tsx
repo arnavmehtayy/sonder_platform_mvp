@@ -70,7 +70,7 @@ export default class TextGeom extends geomobj {
       OnClick: this.OnClick,
       text: this.text,
       isEnabled: this.isEnabled,
-      type: "TextGeom",
+      type: "TextGeomObj",
       geom_json: this.geom_json
     };
   }

@@ -70,7 +70,7 @@ export default class FunctionPlot extends TransformObj {
     return {...super.get_set_att_selector(type), ...functionplot_atts[type]}
   }
 
-  dataBaseSave(): FunctionPlotConstructor & {type: string} {
+  dataBaseSave(): FunctionPlotConstructor  {
     return {
       id: this.id,
       name: this.name,

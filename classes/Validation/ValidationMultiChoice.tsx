@@ -52,7 +52,7 @@ export class ValidationMultiChoice extends Validation {
             desc: this.desc,
             answer: this.answer,
             control_id: this.control_id,
-            type: 'ValidationMultiChoice'
+            type: "V_MCQ"
         }
     }
 }

@@ -80,7 +80,7 @@ export class Validation_tableControl<T extends obj> extends Validation {
     return this.set_valid(isValid) as Validation_tableControl<T>;
   }
 
-  dataBaseSave(): Validation_tableControlConstructor<T> & { type: string } {
+  dataBaseSave(): Validation_tableControlConstructor<T> {
     return {
       is_valid: this.is_valid,
       desc: this.desc,
@@ -88,7 +88,7 @@ export class Validation_tableControl<T extends obj> extends Validation {
       control_id: this.control_id,
       error: this.error,
       validateCells: this.validateCells,
-      type: "Validation_tableControl",
+      type: "V_table",
     };
   }
 }

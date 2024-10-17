@@ -6,8 +6,22 @@ import { PredefinedGeometry } from "../vizobjects/geomobj";
 import { value_typ, relation, Attribute_get } from "../Validation/Validation_obj";
 import { AttributePairSet_json } from "../Controls/SliderControlAdv";
 import { TableRow } from "../Controls/TableControl";
-import { obj } from "../vizobjects/obj";
+import { obj, object_types } from "../vizobjects/obj";
 import { Option } from "../Controls/MultiChoiceClass";
+import { Validation_types } from "../Validation/Validation";
+import { SideBarComponentType } from "@/app/store";
+import { AttributePairGet } from "../Controls/FunctionStr";
+import { placement_type } from "../Placement";
+
+
+// ORDER
+
+export interface OrderModel {
+  type: SideBarComponentType;
+  id: number;
+}
+
+// VIZOBJECTS
 
 // Obj
 export interface ObjModel {
@@ -15,7 +29,7 @@ export interface ObjModel {
   id: number;
   name: string;
   isEnabled: boolean;
-  type: string; 
+  type: object_types; 
 }
 
 // ColoredObj
@@ -52,22 +66,15 @@ export interface DummyDataStoreModel extends ObjModel {
   data: DummyDataSupportedTypes;
 }
 
-// FunctionPlot
-export interface FunctionPlotModel extends TransformObjModel {
-  func: string; // Serialized function
-  xRange: [number, number];
-  numPoints: number;
-  lineWidth: number;
-}
 
 // FunctionPlotString
 export interface FunctionPlotStringModel extends TransformObjModel {
-  functionString: string;
+  id: number;
+  color: string;
+  functionStr: FunctionStrModel;
   xRange: [number, number];
   numPoints: number;
   lineWidth: number;
-  tValue: number;
-  isParametric: boolean;
 }
 
 // GeomObj
@@ -94,11 +101,19 @@ export interface TextGeomModel extends GeomObjModel {
   text: string;
 }
 
+// QUESTION
+export interface QuestionModel {
+  id: number;
+  text: string
+}
+
+
 // VALIDATIONS
 
 export interface ValidationModel {
   // is_valid: boolean; we dont need this as the system will compute it when we load it back
   desc: string;
+  type: Validation_types;
 }
 
 
@@ -198,10 +213,47 @@ export interface InputNumberControlModel extends ControlModel {
   obj_id : number
 }
 
+// SCORE
 
+export interface FunctionScoreModel {
+  score_id: number
+  functionStr: FunctionStrModel;
+  text: string;
+  desc: string;
+}
+
+// string representation of a function
+export interface FunctionStrModel {
+  id: number;
+  functionString: string;
+  symbols: AttributePairGet[];
+}
+
+// PLACEMENT
+
+export interface PlacementModel {
+  id: number;
+  object_ids: number[];
+  grid: [number, number];
+  cellSize: number;
+  geometry_json: PredefinedGeometry;
+  gridVectors: { x: number; y: number };
+  text: string;
+  desc: string;
+  color: string;
+  max_placements: number;
+  type: placement_type
+}
+
+// Union type for all Placement models
+export type AllPlacementModels = PlacementModel
+
+
+// Union type for all Score models
+export type AllScoreObjectModels = FunctionScoreModel
 
 // Union type for all control models
-export type ControlObjectModel =
+export type AllControlObjectModels =
   | ControlModel
   | SliderControlAdvModel
   | SelectControlModel
@@ -210,7 +262,7 @@ export type ControlObjectModel =
   | InputNumberControlModel;
 
 // Union type for all validation models
-export type ValidationObjectModel =
+export type AllValidationObjectModels =
   | ValidationModel
   | ValidationObjModel
   | ValidationScoreModel
@@ -220,28 +272,34 @@ export type ValidationObjectModel =
   | ValidationInputNumberModel;
 
 // Union type for all vizobject models
-export type VizObjectModel =
+export type AllVizObjectModels =
   | ObjModel
-  | ColoredObjModel
-  | TransformObjModel
   | CoordinateAxisModel
   | DummyDataStoreModel
-  | FunctionPlotModel
   | GeomObjModel
   | LineObjModel
-  | TextGeomModel;
+  | TextGeomModel
+  | FunctionPlotStringModel;
 
 
 // Helper function to convert Vector2 to a plain object
-export function vector2ToPlain(vec: Vector2): { x: number; y: number } {
+export function vector2ToJson(vec: Vector2): { x: number; y: number } {
   return { x: vec.x, y: vec.y };
 }
 
 // Helper function to convert Vector3 to a plain object
-export function vector3ToPlain(vec: Vector3): {
+export function vector3ToJson(vec: Vector3): {
   x: number;
   y: number;
   z: number;
 } {
   return { x: vec.x, y: vec.y, z: vec.z };
+}
+
+export function jsonToVector2(json: { x: number; y: number }): Vector2 {
+  return new Vector2(json.x, json.y);
+}
+
+export function jsonToVector3(json: { x: number; y: number; z: number }): Vector3 {
+  return new Vector3(json.x, json.y, json.z);
 }

@@ -31,13 +31,13 @@ export default abstract class coloredObj extends obj {
     return {...super.get_set_att_selector(type), ...color_atts[type]}
   }
 
-  dataBaseSave(): coloredObjConstructor & {type: string} {
+  dataBaseSave(): coloredObjConstructor {
     return {
       id: this.id,
       name: this.name,
       color: this.color,
       isEnabled: this.isEnabled,
-      type: 'ColoredObj'
+      type: "ColoredObj"
     };
   }
 

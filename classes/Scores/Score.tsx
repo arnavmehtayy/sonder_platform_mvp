@@ -56,6 +56,8 @@ export function ShowScore({ score }: { score: Score<any> }) {
 }
 type score_typ = number // add more to this later
 
+type Score_types = "Score" | "FunctionScore"
+
 export interface ScoreConstructor<Score_T extends score_typ> {
   score_id: number;
   text: string;
@@ -63,6 +65,7 @@ export interface ScoreConstructor<Score_T extends score_typ> {
   obj_list: objectScorer<any>[];
   transformation?: (vals: number[]) => Score_T;
   to_string?: (score: Score_T) => string;
+  type?: Score_types
 }
 
 
@@ -113,7 +116,7 @@ export class Score<Score_T extends score_typ> {
     return Math.abs(comparer(this.computeValue(obj_list), target)) < tolerance;
   }
 
-  dataBaseSave(): ScoreConstructor<Score_T> & {type: string} {
+  dataBaseSave(): ScoreConstructor<Score_T>  {
     return {
       score_id: this.score_id,
       text: this.text,

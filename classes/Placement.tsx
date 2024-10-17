@@ -58,7 +58,10 @@ export interface PlacementConstructor {
   color?: string;
   isClickable?: boolean;
   max_placements?: number;
+  type?: placement_type
 }
+
+export type placement_type = "Placement"
 
 export default class Placement {
   id: number
@@ -159,7 +162,7 @@ export default class Placement {
     return newObj;
   }
 
-  dataBaseSave(): PlacementConstructor & {type: string} {
+  dataBaseSave(): PlacementConstructor  {
     return {
       id: this.id,
       object_ids: this.object_ids,

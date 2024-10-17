@@ -135,7 +135,7 @@ export default class Validation_obj<T extends value_typ> extends Validation {
     return this.set_valid(false) as Validation_obj<T>;
   }
 
-  dataBaseSave(): Validation_obj_constructor<T> & { type: string } {
+  dataBaseSave(): Validation_obj_constructor<T> {
     return {
       is_valid: this.is_valid,
       desc: this.desc,
@@ -144,7 +144,7 @@ export default class Validation_obj<T extends value_typ> extends Validation {
       get_attribute_json: this.get_attribute_json,
       error: this.error,
       relation: this.relation,
-      type: "Validation_obj",
+      type: "V_obj",
     };
   }
 }

@@ -75,7 +75,7 @@ export default class Validation_sliderAdv extends Validation {
     return this.set_valid(false) as Validation_sliderAdv;
   }
 
-  dataBaseSave(): Validation_sliderAdv_constructor & {type: string} {
+  dataBaseSave(): Validation_sliderAdv_constructor  {
     return {
       is_valid: this.is_valid,
       desc: this.desc,
@@ -83,7 +83,7 @@ export default class Validation_sliderAdv extends Validation {
       target_value: this.target_value,
       error: this.error,
       relation: this.relation,
-      type: "Validation_sliderAdv"
+      type: "V_slider"
     };
   }
 }

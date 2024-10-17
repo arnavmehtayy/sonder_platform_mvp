@@ -12,11 +12,11 @@ export default class Validation_test extends Validation {
     return this.set_valid(!this.is_valid) as Validation_test;
   }
 
-  dataBaseSave(): ValidationConstructor & {type: string} {
+  dataBaseSave(): ValidationConstructor {
     return {
       is_valid: this.is_valid,
       desc: this.desc,
-      type: 'Validation_test'
+      type: 'V_test'
     };
   }
 }

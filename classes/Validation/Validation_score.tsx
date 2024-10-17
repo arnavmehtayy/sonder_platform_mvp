@@ -90,7 +90,7 @@ export default class Validation_score<
     return this.set_valid(false) as Validation_score<string, obj_T>;
   }
 
-  dataBaseSave(): Validation_score_constructor<score_T, obj_T> & {type: string} {
+  dataBaseSave(): Validation_score_constructor<score_T, obj_T>  {
     return {
       is_valid: this.is_valid,
       desc: this.desc,
@@ -98,7 +98,7 @@ export default class Validation_score<
       target_score: this.target_score,
       error: this.error,
       relation: this.relation,
-      type: "Validation_score"
+      type: "V_score"
     };
   }
 }

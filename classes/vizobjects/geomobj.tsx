@@ -112,7 +112,7 @@ export class geomobj extends TransformObj {
     }
   }
 
-  dataBaseSave(): geomobjconstructor & { type: string } {
+  dataBaseSave(): geomobjconstructor {
     return {
       ...super.dataBaseSave(),
       color: this.color,

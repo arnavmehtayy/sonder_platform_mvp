@@ -77,7 +77,7 @@ export class LineObj extends coloredObj {
     }
   }
 
-  dataBaseSave(): LineObjConstructor & { type: string } {
+  dataBaseSave(): LineObjConstructor  {
     return {
       id: this.id,
       name: this.name,

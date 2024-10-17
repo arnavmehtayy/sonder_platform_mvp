@@ -19,6 +19,7 @@ export interface objconstructor {
   id: number;
   name: string;
   isEnabled?: boolean;
+  type?: object_types
 }
 
 
@@ -62,7 +63,7 @@ export class obj {
     return obj_atts[type]
   }
 
-  dataBaseSave(): objconstructor & {type: string}
+  dataBaseSave(): objconstructor 
   {
     return {
       id: this.id,

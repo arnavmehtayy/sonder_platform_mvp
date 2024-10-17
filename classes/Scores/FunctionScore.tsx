@@ -61,14 +61,14 @@ export class FunctionScore extends Score<number> {
     });
   }
 
-  dataBaseSave(): FunctionScoreConstructor & { type: string } {
+  dataBaseSave(): FunctionScoreConstructor {
     return {
       score_id: this.score_id,
       text: this.text,
       desc: this.desc,
       functionStr: this.functionStr,
-      type: 'FunctionScore',
       obj_list: [],
+      type: "FunctionScore"
     };
   }
 

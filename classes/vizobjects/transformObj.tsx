@@ -55,7 +55,7 @@ export abstract class TransformObj extends coloredObj {
     return {...super.get_set_att_selector(type), ...transform_atts[type]}
   }
 
-  dataBaseSave(): TransformObjConstructor & {type: string} {
+  dataBaseSave(): TransformObjConstructor  {
     return {
       id: this.id,
       name: this.name,

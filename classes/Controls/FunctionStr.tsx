@@ -8,7 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { X } from "lucide-react";
 import { atts } from '../vizobjects/get_set_obj_attributes';
 
-interface AttributePairGet {
+export interface AttributePairGet {
     obj_id: number;
     symbol: string;
     obj_type: object_types;

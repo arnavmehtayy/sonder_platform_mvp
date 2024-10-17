@@ -54,14 +54,14 @@ export class Validation_inputNumber extends Validation {
     return this.set_valid(false) as Validation_inputNumber;
   }
 
-  dataBaseSave(): Validation_inputNumberConstructor & {type: string} {
+  dataBaseSave(): Validation_inputNumberConstructor{
     return {
       is_valid: this.is_valid,
       desc: this.desc,
       answer: this.answer,
       control_id: this.control_id,
       error: this.error,
-      type: "Validation_inputNumber"
+      type: "V_numberIn"
     };
   }
 }

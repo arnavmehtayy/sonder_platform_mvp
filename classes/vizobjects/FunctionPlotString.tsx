@@ -72,7 +72,7 @@ export default class FunctionPlotString extends TransformObj {
     };
   }
 
-  dataBaseSave(): FunctionPlotStringConstructor & { type: string } {
+  dataBaseSave(): FunctionPlotStringConstructor  {
     return {
       ...super.dataBaseSave(),
       functionStr: this.functionStr,
