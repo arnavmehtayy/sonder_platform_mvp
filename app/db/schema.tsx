@@ -4,7 +4,7 @@ import { InfluenceConstructor } from '@/classes/influence';
 import { PlacementConstructor } from '@/classes/Placement';
 import { ScoreConstructor } from '@/classes/Scores/Score';
 import { ValidationConstructor } from '@/classes/Validation/Validation';
-import { PredefinedGeometry } from '@/classes/vizobjects/geomobj';
+import { geom_param_type, geom_type, PredefinedGeometry } from '@/classes/vizobjects/geomobj';
 import { objconstructor } from '@/classes/vizobjects/obj';
 import { integer, real, pgTable, serial, text, timestamp, jsonb } from 'drizzle-orm/pg-core';
 
@@ -37,7 +37,9 @@ export const GeomObj = pgTable('geom_obj', {
     rotate?: TouchControlAttributes;
     scale?: TouchControlAttributes;
   }>(),
-  geom_atts_json: jsonb('geom_json').$type<PredefinedGeometry>().notNull(),
+  geometry_type: text('geometry_type').$type<geom_type>().notNull(),
+  geometry_atts: jsonb('geometry_atts').$type<geom_param_type>().notNull()
+  // geom_atts_json: jsonb('geom_json').$type<PredefinedGeometry>().notNull(),
 });
 
 

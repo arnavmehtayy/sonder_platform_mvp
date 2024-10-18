@@ -23,20 +23,23 @@ import { TouchControlEditor } from "@/app/Components/EditMode/EditPopups/TouchCo
 import { Validation_obj_constructor, ValidationObjEditor } from "../Validation/Validation_obj";
 import Validation_obj from "../Validation/Validation_obj";
 import Validation from "../Validation/Validation";
+import { SerializedGeomObj } from "../database/Serializtypes";
 // import { db } from "@/app/db";
 // import { GeomObj } from "@/app/db/schema";
 // import { eq, and } from 'drizzle-orm';
 
 // List of 2D geometries with simple parameters
+export type geom_param_type = {
+  radius?: number;
+  width?: number;
+  height?: number;
+  sideLength?: number;
+  numSides?: number;
+};
+export type geom_type = 'circle' | 'rectangle' | 'triangle' | 'regular-polygon';
 export type PredefinedGeometry = {
-  type: 'circle' | 'rectangle' | 'triangle' | 'regular-polygon';
-  params: {
-    radius?: number;
-    width?: number;
-    height?: number;
-    sideLength?: number;
-    numSides?: number;
-  };
+  type: geom_type;
+  params: geom_param_type
 };
 
 
@@ -47,18 +50,18 @@ export type PredefinedGeometry = {
  * This class creates a geometric object on the scene (Any object that is rendered using THREE.BufferGeometry).
  */
 
-export interface SerializedGeomObj {
-  id: number;
-  name: string;
-  isEnabled: boolean;
-  position: { x: number; y: number };
-  rotation: { x: number; y: number; z: number };
-  scale: { x: number; y: number; z: number };
-  color: string;
-  touch_controls: TouchControl;
-  geom_json: PredefinedGeometry;
-  type: "GeomObj";
-}
+// export interface SerializedGeomObj {
+//   id: number;
+//   name: string;
+//   isEnabled: boolean;
+//   position: { x: number; y: number };
+//   rotation: { x: number; y: number; z: number };
+//   scale: { x: number; y: number; z: number };
+//   color: string;
+//   touch_controls: TouchControl;
+//   geom_json: PredefinedGeometry;
+//   type: "GeomObj";
+// }
 
 export interface geomobjconstructor extends TransformObjConstructor {
   color?: string;
@@ -112,12 +115,18 @@ export class geomobj extends TransformObj {
       id: this.id,
       name: this.name,
       isEnabled: this.isEnabled,
-      position: { x: this.position.x, y: this.position.y },
-      rotation: { x: this.rotation.x, y: this.rotation.y, z: this.rotation.z },
-      scale: { x: this.scale.x, y: this.scale.y, z: this.scale.z },
+      position_x: this.position.x,
+      position_y: this.position.y,
+      rotation_x: this.rotation.x,
+      rotation_y: this.rotation.y,
+      rotation_z: this.rotation.z,
+      scale_x: this.scale.x,
+      scale_y: this.scale.y,
+      scale_z: this.scale.z,
       color: this.color,
       touch_controls: this.touch_controls,
-      geom_json: this.geom_json,
+      geometry_type: this.geom_json.type,
+      geometry_params: this.geom_json.params,
       type: "GeomObj"
     };
   }
@@ -127,12 +136,15 @@ export class geomobj extends TransformObj {
       id: data.id,
       name: data.name,
       isEnabled: data.isEnabled,
-      position: new THREE.Vector2(data.position.x, data.position.y),
-      rotation: new THREE.Vector3(data.rotation.x, data.rotation.y, data.rotation.z),
-      scale: new THREE.Vector3(data.scale.x, data.scale.y, data.scale.z),
+      position: new THREE.Vector2(data.position_x, data.position_y),
+      rotation: new THREE.Vector3(data.rotation_x, data.rotation_y, data.rotation_z),
+      scale: new THREE.Vector3(data.scale_x, data.scale_y, data.scale_z),
       color: data.color,
       touch_controls: data.touch_controls,
-      geom_json: data.geom_json,
+      geom_json: {
+        type: data.geometry_type,
+        params: data.geometry_params
+      },
     });
   }
 

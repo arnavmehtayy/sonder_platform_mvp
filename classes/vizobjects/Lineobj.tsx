@@ -20,8 +20,10 @@ import React from "react";
  * This class provides functionality to convert between slope_intercept form and end points form.
  */
 
+export type LineConstTypes = "endpoints" | "slopeIntercept" | "twoPointsAndLength";
+
 interface LineObjConstructor extends coloredObjConstructor {
-  constructionType?: "endpoints" | "slopeIntercept" | "twoPointsAndLength";
+  constructionType?: LineConstTypes;
   start?: Vector2;
   end?: Vector2;
   slope?: number;
