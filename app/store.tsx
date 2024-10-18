@@ -26,7 +26,6 @@ import FunctionPlotString from "@/classes/vizobjects/FunctionPlotString";
 import { TableControl } from "@/classes/Controls/TableControl";
 import { SliderControlAdvanced } from "@/classes/Controls/SliderControlAdv";
 import { Validation_tableControl } from "@/classes/Validation/Validation_tableControl";
-import { vizobjects } from "./db/schema";
 import Validation_sliderAdv from "@/classes/Validation/Validation_sliderAdv";
 
 /*

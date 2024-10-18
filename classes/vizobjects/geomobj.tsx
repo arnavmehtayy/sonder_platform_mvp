@@ -23,6 +23,9 @@ import { TouchControlEditor } from "@/app/Components/EditMode/EditPopups/TouchCo
 import { Validation_obj_constructor, ValidationObjEditor } from "../Validation/Validation_obj";
 import Validation_obj from "../Validation/Validation_obj";
 import Validation from "../Validation/Validation";
+// import { db } from "@/app/db";
+// import { GeomObj } from "@/app/db/schema";
+// import { eq, and } from 'drizzle-orm';
 
 // List of 2D geometries with simple parameters
 export type PredefinedGeometry = {
@@ -43,6 +46,19 @@ export type PredefinedGeometry = {
 /*
  * This class creates a geometric object on the scene (Any object that is rendered using THREE.BufferGeometry).
  */
+
+export interface SerializedGeomObj {
+  id: number;
+  name: string;
+  isEnabled: boolean;
+  position: { x: number; y: number };
+  rotation: { x: number; y: number; z: number };
+  scale: { x: number; y: number; z: number };
+  color: string;
+  touch_controls: TouchControl;
+  geom_json: PredefinedGeometry;
+  type: "GeomObj";
+}
 
 export interface geomobjconstructor extends TransformObjConstructor {
   color?: string;
@@ -88,6 +104,90 @@ export class geomobj extends TransformObj {
     this.OnClick = OnClick;
     this.type = "GeomObj";
   }
+
+  
+
+  serialize(): SerializedGeomObj {
+    return {
+      id: this.id,
+      name: this.name,
+      isEnabled: this.isEnabled,
+      position: { x: this.position.x, y: this.position.y },
+      rotation: { x: this.rotation.x, y: this.rotation.y, z: this.rotation.z },
+      scale: { x: this.scale.x, y: this.scale.y, z: this.scale.z },
+      color: this.color,
+      touch_controls: this.touch_controls,
+      geom_json: this.geom_json,
+      type: "GeomObj"
+    };
+  }
+
+  static deserialize(data: SerializedGeomObj): geomobj {
+    return new geomobj({
+      id: data.id,
+      name: data.name,
+      isEnabled: data.isEnabled,
+      position: new THREE.Vector2(data.position.x, data.position.y),
+      rotation: new THREE.Vector3(data.rotation.x, data.rotation.y, data.rotation.z),
+      scale: new THREE.Vector3(data.scale.x, data.scale.y, data.scale.z),
+      color: data.color,
+      touch_controls: data.touch_controls,
+      geom_json: data.geom_json,
+    });
+  }
+
+
+  // async saveToDatabase(stateId: number) {
+  //   await db.insert(GeomObj).values({
+  //     stateId: stateId,
+  //     objId: this.id,
+  //     name: this.name,
+  //     color: this.color,
+  //     position_x: this.position.x,
+  //     position_y: this.position.y,
+  //     rotation_x: this.rotation.x,
+  //     rotation_y: this.rotation.y,
+  //     rotation_z: this.rotation.z,
+  //     scale_x: this.scale.x,
+  //     scale_y: this.scale.y,
+  //     scale_z: this.scale.z,
+  //     touch_controls: this.touch_controls,
+  //     geom_atts_json: this.geom_json,
+  //   });
+  // }
+
+
+
+  // static async loadFromDatabase(stateId: number, objId: number): Promise<geomobj | null> {
+  //   const result = await db
+  //     .select()
+  //     .from(GeomObj)
+  //     .where(and(
+  //       eq(GeomObj.stateId, stateId),
+  //       eq(GeomObj.objId, objId)
+  //     ))
+  //     .limit(1);
+
+  //   if (result.length === 0) {
+  //     return null;
+  //   }
+
+  //   const data = result[0];
+
+  //   return new geomobj({
+  //     id: data.objId,
+  //     name: data.name,
+  //     position: new THREE.Vector2(data.position_x, data.position_y),
+  //     rotation: new THREE.Vector3(data.rotation_x, data.rotation_y, data.rotation_z),
+  //     scale: new THREE.Vector3(data.scale_x, data.scale_y, data.scale_z),
+  //     color: data.color,
+  //     geom_json: data.geom_atts_json as PredefinedGeometry,
+  //     touch_controls: data.touch_controls as TouchControl,
+  //     isEnabled: true, // Assuming default value as it's not in the schema
+  //   });
+  // }
+
+
 
   private createPredefinedGeometry(geomDef: PredefinedGeometry): THREE.BufferGeometry {
     switch (geomDef.type) {

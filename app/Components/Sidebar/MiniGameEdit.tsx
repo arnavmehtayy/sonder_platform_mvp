@@ -13,6 +13,7 @@ import "../style.css";
 import ValidationComponent from "../ShowValid";
 import { OrderHandler } from "./OrderHandler";
 import { CheckCircle } from 'lucide-react';
+import { serializeState, deserializeState } from "@/classes/database/stateSerializer";
 
 export function MinigameEdit({}: {}) {
   const reset = useStore((state) => state.reset);
@@ -39,11 +40,38 @@ export function MinigameEdit({}: {}) {
   }, [validationInstance]);
 
   const handleSaveState = async () => {
-    // ... (existing save state logic)
+    try {
+      const serializedState = serializeState(useStore.getState());
+      console.log(serializedState)
+      const response = await fetch('/api/supabase/DataBaseAPI', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ stateName, state: serializedState }),
+      });
+      if (!response.ok) {
+        throw new Error('Failed to save state');
+      }
+      console.log('State saved successfully');
+    } catch (error) {
+      console.error('Error saving state:', error);
+    }
   };
   
   const handleLoadState = async () => {
-    // ... (existing load state logic)
+    try {
+      const response = await fetch(`/api/supabase/DataBaseAPI?stateName=${stateName}`);
+      if (!response.ok) {
+        throw new Error('Failed to load state');
+      }
+      const serializedState = await response.json();
+      const loadedState = deserializeState(serializedState);
+      useStore.setState(loadedState);
+      console.log('State loaded successfully');
+    } catch (error) {
+      console.error('Error loading state:', error);
+    }
   };
 
   return (

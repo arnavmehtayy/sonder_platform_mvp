@@ -1,10 +1,12 @@
 import { NextResponse } from 'next/server';
-// import { saveStateToDatabase, loadStateFromDatabase } from '@/app/api/supabase/databaseFunctions';
+import { saveStateToDatabase, loadStateFromDatabase } from '@/app/api/supabase/databaseFunctions';
 
 export async function POST(request: Request) {
+  
   const { stateName, state } = await request.json();
+  // console.log(state)
   try {
-    // await saveStateToDatabase(stateName, state);
+    await saveStateToDatabase(stateName, state);
     return NextResponse.json({ message: 'State saved successfully' });
   } catch (error) {
     console.error('Error saving state:', error);
@@ -21,8 +23,8 @@ export async function GET(request: Request) {
   }
 
   try {
-    // const loadedState = await loadStateFromDatabase(stateName);
-    // return NextResponse.json(loadedState);
+    const loadedState = await loadStateFromDatabase(stateName);
+    return NextResponse.json(loadedState);
   } catch (error) {
     console.error('Error loading state:', error);
     return NextResponse.json({ error: 'Failed to load state' }, { status: 500 });

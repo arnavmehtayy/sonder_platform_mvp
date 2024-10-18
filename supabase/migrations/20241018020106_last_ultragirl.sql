@@ -1,0 +1,1 @@
+ALTER TABLE "geom_obj" ADD COLUMN "id" serial PRIMARY KEY NOT NULL;
