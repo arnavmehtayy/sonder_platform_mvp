@@ -1,37 +1,67 @@
 import { State } from '@/app/store';
 import { geomobj } from '@/classes/vizobjects/geomobj';
-import { GeomObjInsert, GeomObjSelect } from '@/app/db/schema';
-// Import other serializable object types here
-// import { OtherObject, SerializedOtherObject } from '@/classes/otherObject';
+import { SerializeStateInsert, SerializeStateSelect } from './Serializtypes';
+import CoordinateAxis from '@/classes/vizobjects/CoordinateAxis';
+import { LineObj } from '../vizobjects/Lineobj';
+import FunctionPlotString from '../vizobjects/FunctionPlotString';
+import { DummyDataStorage } from '../vizobjects/DummyDataStore';
+import TextGeom from '../vizobjects/textgeomObj';
 
-export function serializeState(state: State) {
+export function serializeState(state: State): SerializeStateInsert {
   return {
-    ...state,
-    vizobjs: Object.fromEntries(
-      Object.entries(state.vizobjs).map(([key, obj]) => [
-        key,
-        obj instanceof geomobj ? obj.serialize() : obj
-        // Add similar serialization for other complex objects
-        // obj instanceof OtherObject ? obj.serialize() : obj
-      ])
-    ),
+    title: state.title,
+    camera_zoom: state.camera_zoom,
+    GeomObjs: Object.values(state.vizobjs).filter(obj => obj instanceof geomobj).map(obj => (obj as geomobj).serialize()),
+    LineObjs: Object.values(state.vizobjs).filter(obj => obj instanceof LineObj).map(obj => (obj as LineObj).serialize()),
+    FunctionPlotStrings: Object.values(state.vizobjs).filter(obj => obj instanceof FunctionPlotString).map(obj => (obj as FunctionPlotString).serialize()),
+    DummyDataStorages: Object.values(state.vizobjs).filter(obj => obj instanceof DummyDataStorage).map(obj => (obj as DummyDataStorage<number>).serialize()),
+    AxisObjects: Object.values(state.vizobjs).filter(obj => obj instanceof CoordinateAxis).map(obj => (obj as CoordinateAxis).serialize()),
+    TextGeoms: Object.values(state.vizobjs).filter(obj => obj instanceof TextGeom).map(obj => (obj as TextGeom).serialize()),
   };
 }
 
-export function deserializeState(serializedState: any): State {
+export function deserializeState(serializedState: SerializeStateSelect): State {
+  const vizobjs: { [key: string]: any } = {};
+
+  if (Array.isArray(serializedState.GeomObjs)) {
+    serializedState.GeomObjs.forEach(obj => {
+      vizobjs[obj.objId] = geomobj.deserialize(obj);
+    });
+  }
+
+  serializedState.LineObjs.forEach(obj => {
+    vizobjs[obj.objId] = LineObj.deserialize(obj);
+  });
+
+  serializedState.FunctionPlotStrings.forEach(obj => {
+    vizobjs[obj.objId] = FunctionPlotString.deserialize(obj);
+  });
+
+  serializedState.DummyDataStorages.forEach(obj => {
+    vizobjs[obj.objId] = DummyDataStorage.deserialize(obj);
+  });
+
+  serializedState.AxisObjects.forEach(obj => {
+    vizobjs[obj.objId] = CoordinateAxis.deserialize(obj);
+  });
+
+  serializedState.TextGeoms.forEach(obj => {
+    vizobjs[obj.objId] = TextGeom.deserialize(obj);
+  });
+
   return {
-    ...serializedState,
-    vizobjs: Object.fromEntries(
-      Object.entries(serializedState.vizobjs).map(([key, obj]) => {
-        if (obj && typeof obj === 'object') {
-          if ('objId' in obj && 'geometry_type' in obj && 'geometry_atts' in obj) {
-            // This matches the structure of GeomObjSelect
-            return [key, geomobj.deserialize(obj as GeomObjSelect)];
-          }
-          // Add cases for other serializable object types if needed
-        }
-        return [key, obj];
-      })
-    ),
-  };
+    title: serializedState.title,
+    camera_zoom: serializedState.camera_zoom,
+    vizobjs: vizobjs,
+    // questions: [],
+    // order: [],
+    // validations: [],
+    // state_name: '',
+    // // Add other required properties with default values
+    // influences: [],
+    // controls: [],
+    // scores: [],
+    // placements: [],
+    // // ... add any other missing properties
+  } as State;
 }

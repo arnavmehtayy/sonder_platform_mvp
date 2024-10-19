@@ -16,12 +16,12 @@ import {
 export interface SerializeStateInsert {
     title: string
     camera_zoom: number
-    GeomObjs: GeomObjInsert
-    LineObjs: LineObjInsert[]
-    FunctionPlotStrings: FunctionPlotStringInsert[]
-    DummyDataStorages: DummyDataStorageInsert[]
-    AxisObjects: AxisObjectInsert[]
-    TextGeoms: TextGeomInsert[]
+    GeomObjs: Omit<GeomObjInsert, 'stateId'>[]
+    LineObjs: Omit<LineObjInsert, 'stateId'>[]
+    FunctionPlotStrings: Omit<FunctionPlotStringInsert, 'stateId'>[]
+    DummyDataStorages: Omit<DummyDataStorageInsert, 'stateId'>[]
+    AxisObjects: Omit<AxisObjectInsert, 'stateId'>[]
+    TextGeoms: Omit<TextGeomInsert, 'stateId'>[]
 
     // more things depending on the state
 }
