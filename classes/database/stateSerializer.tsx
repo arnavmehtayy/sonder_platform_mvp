@@ -1,6 +1,7 @@
 import { State } from '@/app/store';
 import { geomobj } from '@/classes/vizobjects/geomobj';
 import { SerializedGeomObj } from './Serializtypes';
+import { GeomObjInsert, GeomObjSelect } from '@/app/db/schema';
 // Import other serializable object types here
 // import { OtherObject, SerializedOtherObject } from '@/classes/otherObject';
 
@@ -23,18 +24,12 @@ export function deserializeState(serializedState: any): State {
     ...serializedState,
     vizobjs: Object.fromEntries(
       Object.entries(serializedState.vizobjs).map(([key, obj]) => {
-
-        if (obj && typeof obj === 'object' && 'type' in obj) {
-          switch (obj.type) {
-            case 'GeomObj':
-              return [key, geomobj.deserialize(obj as SerializedGeomObj)];
-            // Add cases for other serializable object types
-            // case 'OtherObject':
-            //   return [key, OtherObject.deserialize(obj as SerializedOtherObject)];
-            default:
-              console.warn(`Unknown object type: ${obj.type}`);
-              return [key, obj];
+        if (obj && typeof obj === 'object') {
+          if ('objId' in obj && 'geometry_type' in obj && 'geometry_atts' in obj) {
+            // This matches the structure of GeomObjSelect
+            return [key, geomobj.deserialize(obj as GeomObjSelect)];
           }
+          // Add cases for other serializable object types if needed
         }
         return [key, obj];
       })

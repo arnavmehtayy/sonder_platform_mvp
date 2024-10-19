@@ -1,5 +1,5 @@
 import { db } from '@/app/db/index';
-import { states, GeomObj } from '@/app/db/schema';
+import { states, GeomObj, GeomObjInsert } from '@/app/db/schema';
 import { State } from '@/app/store';
 import { Control } from '@/classes/Controls/Control';
 import { Influence } from '@/classes/influence';
@@ -45,24 +45,11 @@ export async function saveStateToDatabase(stateName: string, state: any) {
 
     // Insert vizobjects
     if (state.vizobjs && Object.keys(state.vizobjs).length > 0) {
-      const geomObjValues = Object.values(state.vizobjs)
-        .filter((obj): obj is SerializedGeomObj => (obj as SerializedGeomObj).type === "GeomObj")
+      const geomObjValues = (Object.values(state.vizobjs) as  Omit<GeomObjInsert, 'stateId'>[])
+        .filter((obj) => 'geometry_type' in obj)
         .map((obj) => ({
           stateId,
-          objId: obj.id,
-          name: obj.name,
-          color: obj.color,
-          position_x: obj.position_x,
-          position_y: obj.position_y,
-          rotation_x: obj.rotation_x,
-          rotation_y: obj.rotation_y,
-          rotation_z: obj.rotation_z,
-          scale_x: obj.scale_x,
-          scale_y: obj.scale_y,
-          scale_z: obj.scale_z,
-          touch_controls: obj.touch_controls,
-          geometry_type: obj.geometry_type,
-          geometry_atts: obj.geometry_params
+          ...obj
         }));
 
       if (geomObjValues.length > 0) {
@@ -95,25 +82,7 @@ export async function loadStateFromDatabase(stateName: string): Promise<any> {
     // Process geomObj data
     geomObjData.forEach(obj => {
       if (obj.objId !== null) {
-        const serializedGeomObj: SerializedGeomObj = {
-          id: obj.objId,
-          name: obj.name,
-          isEnabled: true, // Assuming default value, adjust if needed
-          position_x: obj.position_x,
-          position_y: obj.position_y,
-          rotation_x: obj.rotation_x,
-          rotation_y: obj.rotation_y,
-          rotation_z: obj.rotation_z,
-          scale_x: obj.scale_x,
-          scale_y: obj.scale_y,
-          scale_z: obj.scale_z,
-          color: obj.color,
-          touch_controls: obj.touch_controls as TouchControl,
-          geometry_type: obj.geometry_type,
-          geometry_params: obj.geometry_atts,
-          type: "GeomObj"
-        };
-        loadedState.vizobjs[obj.objId] = serializedGeomObj;
+        loadedState.vizobjs[obj.objId] = obj;
       }
     });
 

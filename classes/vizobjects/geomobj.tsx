@@ -24,6 +24,7 @@ import { Validation_obj_constructor, ValidationObjEditor } from "../Validation/V
 import Validation_obj from "../Validation/Validation_obj";
 import Validation from "../Validation/Validation";
 import { SerializedGeomObj } from "../database/Serializtypes";
+import { GeomObjInsert, GeomObjSelect } from "@/app/db/schema";
 // import { db } from "@/app/db";
 // import { GeomObj } from "@/app/db/schema";
 // import { eq, and } from 'drizzle-orm';
@@ -110,11 +111,11 @@ export class geomobj extends TransformObj {
 
   
 
-  serialize(): SerializedGeomObj {
+  serialize(): Omit<GeomObjInsert, 'stateId'>  {
     return {
-      id: this.id,
+      objId: this.id,
       name: this.name,
-      isEnabled: this.isEnabled,
+      color: this.color,
       position_x: this.position.x,
       position_y: this.position.y,
       rotation_x: this.rotation.x,
@@ -123,27 +124,25 @@ export class geomobj extends TransformObj {
       scale_x: this.scale.x,
       scale_y: this.scale.y,
       scale_z: this.scale.z,
-      color: this.color,
       touch_controls: this.touch_controls,
       geometry_type: this.geom_json.type,
-      geometry_params: this.geom_json.params,
-      type: "GeomObj"
+      geometry_atts: this.geom_json.params
     };
   }
 
-  static deserialize(data: SerializedGeomObj): geomobj {
+  static deserialize(data: GeomObjSelect): geomobj {
     return new geomobj({
-      id: data.id,
+      id: data.objId,
       name: data.name,
-      isEnabled: data.isEnabled,
+      isEnabled: true, // Assuming default value as it's not in the schema
       position: new THREE.Vector2(data.position_x, data.position_y),
       rotation: new THREE.Vector3(data.rotation_x, data.rotation_y, data.rotation_z),
       scale: new THREE.Vector3(data.scale_x, data.scale_y, data.scale_z),
       color: data.color,
-      touch_controls: data.touch_controls,
+      touch_controls: data.touch_controls as TouchControl,
       geom_json: {
         type: data.geometry_type,
-        params: data.geometry_params
+        params: data.geometry_atts
       },
     });
   }
