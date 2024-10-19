@@ -13,6 +13,7 @@ import {
 } from "@/app/Components/EditMode/EditPopups/EditableObjectPopup";
 import { line_atts, get_attributes, dict_keys } from "./get_set_obj_attributes";
 import React from "react";
+import { LineObjInsert, LineObjSelect } from "@/app/db/schema";
 
 /*
  * This class is used to render a Line object in the scene.
@@ -79,23 +80,42 @@ export class LineObj extends coloredObj {
     }
   }
 
-  dataBaseSave(): LineObjConstructor  {
+  serialize(): Omit<LineObjInsert, 'stateId'> {
     return {
-      id: this.id,
+      objId: this.id,
       name: this.name,
       color: this.color,
-      isEnabled: this.isEnabled,
       constructionType: this.constructionType,
-      start: this.start,
-      end: this.end,
+      start_x: this.start.x,
+      start_y: this.start.y,
+      end_x: this.end.x,
+      end_y: this.end.y,
       slope: this.slope,
       intercept: this.intercept,
       line_width: this.line_width,
       length: this.length,
-      point1: this.point1,
-      point2: this.point2,
-      type: "LineObj",
+      point1_x: this.point1.x,
+      point1_y: this.point1.y,
+      point2_x: this.point2.x,
+      point2_y: this.point2.y
     };
+  }
+  
+  static deserialize(data: LineObjSelect): LineObj {
+    return new LineObj({
+      id: data.objId,
+      name: data.name,
+      color: data.color,
+      constructionType: data.constructionType as LineConstTypes,
+      start: new Vector2(data.start_x, data.start_y),
+      end: new Vector2(data.end_x, data.end_y),
+      slope: data.slope || undefined,
+      intercept: data.intercept || undefined,
+      line_width: data.line_width,
+      length: data.length || undefined,
+      point1: new Vector2(data.point1_x || undefined, data.point1_y || undefined),
+      point2: new Vector2(data.point2_x || undefined, data.point2_y || undefined)
+    });
   }
 
   public set_points(

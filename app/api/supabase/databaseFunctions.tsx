@@ -9,7 +9,6 @@ import { Score } from '@/classes/Scores/Score';
 import Placement from '@/classes/Placement';
 import Validation from '@/classes/Validation/Validation';
 import { geomobj, PredefinedGeometry } from '@/classes/vizobjects/geomobj';
-import { SerializedGeomObj } from '@/classes/database/Serializtypes';
 import * as THREE from 'three';
 import { TouchControl, TouchControlAttributes } from '@/classes/Controls/TouchControl';
 

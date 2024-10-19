@@ -93,7 +93,7 @@ const functionPointsTableControl = new TableControl<geomobj>({
     cells: [
       {
         value: x,
-        functionStr: new FunctionStr(Date.now() % 10000, "x", []),
+        functionStr: new FunctionStr( "x", []),
         obj_id: 2 + index,
         obj_type: "GeomObj",
         attribute: "position-x",
@@ -101,7 +101,7 @@ const functionPointsTableControl = new TableControl<geomobj>({
       },
       {
         value: 0,
-        functionStr: new FunctionStr(Date.now() % 10000, "x", []),
+        functionStr: new FunctionStr( "x", []),
         obj_id: 2 + index,
         obj_type: "GeomObj",
         attribute: "position-y",
@@ -162,7 +162,7 @@ export const data_transformation: { [key: string]: data_type } = {
           cells: [
             {
               value: x,
-              functionStr: new FunctionStr(Date.now() % 10000, "x", []),
+              functionStr: new FunctionStr("x", []),
               obj_id: 2 + index,
               obj_type: "GeomObj",
               attribute: "position-x",
@@ -170,7 +170,7 @@ export const data_transformation: { [key: string]: data_type } = {
             },
             {
               value: 0,
-              functionStr: new FunctionStr(Date.now() % 10000, "x", []),
+              functionStr: new FunctionStr("x", []),
               obj_id: 2 + index,
               obj_type: "GeomObj",
               attribute: "position-y",
@@ -323,7 +323,7 @@ export const data_transformation: { [key: string]: data_type } = {
           cells: [
             {
               value: x,
-              functionStr: new FunctionStr(Date.now() % 10000, "x", []),
+              functionStr: new FunctionStr( "x", []),
               obj_id: 2 + index,
               obj_type: "GeomObj",
               attribute: "position-x",
@@ -331,7 +331,7 @@ export const data_transformation: { [key: string]: data_type } = {
             },
             {
               value: 0,
-              functionStr: new FunctionStr(Date.now() % 10000, "x", []),
+              functionStr: new FunctionStr( "x", []),
               obj_id: 2 + index,
               obj_type: "GeomObj",
               attribute: "position-y",

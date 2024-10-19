@@ -11,6 +11,7 @@ import {
 } from "@/app/Components/EditMode/EditPopups/EditableObjectPopup";
 import { TouchControlEditor } from "@/app/Components/EditMode/EditPopups/TouchControlAttributeEditor";
 import GeneralTransformControl from "@/app/Components/three/GeneralTransCont";
+import { TextGeomInsert, TextGeomSelect } from "@/app/db/schema";
 
 /*
  * This class is used to create a object that has Text on it in the scene.
@@ -56,24 +57,64 @@ export default class TextGeom extends geomobj {
     this.type = "TextGeomObj";
   }
 
-  dataBaseSave(): TextGeomConstructor & { type: string } {
+  serialize(): Omit<TextGeomInsert, 'stateId'> {
     return {
-      id: this.id,
+      objId: this.id,
       name: this.name,
-      position: this.position,
-      rotation: this.rotation,
-      scale: this.scale,
       color: this.color,
+      position_x: this.position.x,
+      position_y: this.position.y,
+      rotation_x: this.rotation.x,
+      rotation_y: this.rotation.y,
+      rotation_z: this.rotation.z,
+      scale_x: this.scale.x,
+      scale_y: this.scale.y,
+      scale_z: this.scale.z,
       touch_controls: this.touch_controls,
-      param_t: this.param_t,
-      isClickable: this.isClickable,
-      OnClick: this.OnClick,
-      text: this.text,
-      isEnabled: this.isEnabled,
-      type: "TextGeomObj",
-      geom_json: this.geom_json
+      geometry_type: this.geom_json.type,
+      geometry_atts: this.geom_json.params,
+      text: this.text
     };
   }
+
+  static deserialize(data: TextGeomSelect): TextGeom {
+    return new TextGeom({
+      id: data.objId,
+      name: data.name,
+      isEnabled: true, // Assuming isEnabled is not stored in the database
+      position: new THREE.Vector2(data.position_x, data.position_y),
+      rotation: new THREE.Vector3(data.rotation_x, data.rotation_y, data.rotation_z),
+      scale: new THREE.Vector3(data.scale_x, data.scale_y, data.scale_z),
+      color: data.color,
+      touch_controls: data.touch_controls as TouchControl,
+      geom_json: {
+        type: data.geometry_type,
+        params: data.geometry_atts
+      },
+      text: data.text
+    });
+  }
+
+
+
+  // dataBaseSave(): TextGeomConstructor & { type: string } {
+  //   return {
+  //     id: this.id,
+  //     name: this.name,
+  //     position: this.position,
+  //     rotation: this.rotation,
+  //     scale: this.scale,
+  //     color: this.color,
+  //     touch_controls: this.touch_controls,
+  //     param_t: this.param_t,
+  //     isClickable: this.isClickable,
+  //     OnClick: this.OnClick,
+  //     text: this.text,
+  //     isEnabled: this.isEnabled,
+  //     type: "TextGeomObj",
+  //     geom_json: this.geom_json
+  //   };
+  // }
 
   get_set_att_selector(type: dict_keys): {[key: string]: get_attributes<any, any>} {
     return {...super.get_set_att_selector(type), ...text_atts[type]};

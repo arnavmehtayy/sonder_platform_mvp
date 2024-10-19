@@ -11,6 +11,7 @@ import {
 } from "@/app/Components/EditMode/EditPopups/EditableObjectPopup";
 import React from "react";
 import { Axis_atts, get_attributes, dict_keys } from "./get_set_obj_attributes";
+import { AxisObjectInsert, AxisObjectSelect } from "@/app/db/schema";
 
 /*
  * This class is used to create a Coordinate Axis (2D coordinate graph) in the scene.
@@ -85,14 +86,19 @@ export default class CoordinateAxis extends TransformObj {
     return {...super.get_set_att_selector(type), ...Axis_atts[type]};
   }
 
-  dataBaseSave(): CoordinateAxisConstructor {
+  serialize(): Omit<AxisObjectInsert, 'stateId'> {
     return {
-      id: this.id,
+      objId: this.id,
       name: this.name,
-      position: this.position,
-      rotation: this.rotation,
-      scale: this.scale,
       color: this.color,
+      position_x: this.position.x,
+      position_y: this.position.y,
+      rotation_x: this.rotation.x,
+      rotation_y: this.rotation.y,
+      rotation_z: this.rotation.z,
+      scale_x: this.scale.x,
+      scale_y: this.scale.y,
+      scale_z: this.scale.z,
       touch_controls: this.touch_controls,
       axisLength: this.axisLength,
       tickSpacing: this.tickSpacing,
@@ -101,11 +107,28 @@ export default class CoordinateAxis extends TransformObj {
       fontSize: this.fontSize,
       lineWidth: this.lineWidth,
       xLabel: this.xLabel,
-      yLabel: this.yLabel,
-      isClickable: this.isClickable,
-      isEnabled: this.isEnabled,
-      type: "CoordinateAxis",
+      yLabel: this.yLabel
     };
+  }
+  
+  static deserialize(data: AxisObjectSelect): CoordinateAxis {
+    return new CoordinateAxis({
+      id: data.objId,
+      name: data.name,
+      position: new THREE.Vector2(data.position_x, data.position_y),
+      rotation: new THREE.Vector3(data.rotation_x, data.rotation_y, data.rotation_z),
+      scale: new THREE.Vector3(data.scale_x, data.scale_y, data.scale_z),
+      color: data.color,
+      touch_controls: data.touch_controls as TouchControl,
+      axisLength: data.axisLength,
+      tickSpacing: data.tickSpacing,
+      tickSize: data.tickSize,
+      showLabels: data.showLabels,
+      fontSize: data.fontSize,
+      lineWidth: data.lineWidth,
+      xLabel: data.xLabel,
+      yLabel: data.yLabel
+    });
   }
 
   // method that returns the physical three.js mesh representation of the object

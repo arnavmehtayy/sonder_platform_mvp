@@ -45,6 +45,7 @@ export const GeomObj = pgTable('geom_obj', {
 
 // Existing imports...
 import { LineConstTypes } from '@/classes/vizobjects/Lineobj';
+import { AttributePairGet } from '@/classes/Controls/FunctionStr';
 
 // ... (existing code)
 
@@ -116,7 +117,9 @@ export const FunctionPlotString = pgTable('function_plot_string', {
   XRange_b: real('x_range_b').notNull(),
   numPoints: integer('num_points').notNull(),
   lineWidth: real('line_width').notNull(),
+    
   functionStr: text('function_str').notNull(),
+  symbols: jsonb('symbols').$type<AttributePairGet[]>().notNull(),
 });
 
 export const DummyDataStorage = pgTable('dummy_data_storage', {

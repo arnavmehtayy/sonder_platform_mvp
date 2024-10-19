@@ -23,7 +23,6 @@ import { TouchControlEditor } from "@/app/Components/EditMode/EditPopups/TouchCo
 import { Validation_obj_constructor, ValidationObjEditor } from "../Validation/Validation_obj";
 import Validation_obj from "../Validation/Validation_obj";
 import Validation from "../Validation/Validation";
-import { SerializedGeomObj } from "../database/Serializtypes";
 import { GeomObjInsert, GeomObjSelect } from "@/app/db/schema";
 // import { db } from "@/app/db";
 // import { GeomObj } from "@/app/db/schema";

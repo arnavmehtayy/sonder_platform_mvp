@@ -1,6 +1,5 @@
 import { State } from '@/app/store';
 import { geomobj } from '@/classes/vizobjects/geomobj';
-import { SerializedGeomObj } from './Serializtypes';
 import { GeomObjInsert, GeomObjSelect } from '@/app/db/schema';
 // Import other serializable object types here
 // import { OtherObject, SerializedOtherObject } from '@/classes/otherObject';

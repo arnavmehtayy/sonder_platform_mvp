@@ -205,7 +205,7 @@ export function AttributePairsEditor({
       onChange([
         ...pairs,
         {
-          transform_function: new FunctionStr(Date.now() % 10000, "x", []),
+          transform_function: new FunctionStr( "x", []),
           func: firstKey,
           obj_type: type
         },

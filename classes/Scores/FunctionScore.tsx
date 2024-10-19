@@ -85,7 +85,7 @@ export class FunctionScore extends Score<number> {
       score_id: Date.now() % 10000,
       text: "",
       desc: "",
-      functionStr: new FunctionStr(Date.now() % 10000, "x", []),
+      functionStr: new FunctionStr( "x", []),
       obj_list: [], // this will be populated by the constructor
       transformation: () => 0 // this is useless comes from parent class
     });

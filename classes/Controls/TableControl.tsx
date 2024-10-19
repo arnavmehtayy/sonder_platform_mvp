@@ -365,7 +365,7 @@ function TableEditor<T extends obj>({
     const newRow: TableRow<T> = {
       cells: columnHeaders.map(() => ({
         value: 0,
-        functionStr: new FunctionStr(Date.now() % 10000, "x", []),
+        functionStr: new FunctionStr( "x", []),
         obj_id: -1,
         obj_type: 'Obj',
         attribute: '',

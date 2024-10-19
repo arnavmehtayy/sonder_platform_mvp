@@ -16,6 +16,7 @@ import {
 import { TransformObj, TransformObjConstructor } from "./transformObj";
 import { FunctionStr, FunctionStrEditor, FunctionStrConstructor } from '../Controls/FunctionStr';
 import { useStore } from '@/app/store';
+import { FunctionPlotStringInsert, FunctionPlotStringSelect } from "@/app/db/schema";
 
 export default class FunctionPlotString extends TransformObj {
   func: (x: number) => number;
@@ -72,15 +73,43 @@ export default class FunctionPlotString extends TransformObj {
     };
   }
 
-  dataBaseSave(): FunctionPlotStringConstructor  {
+  serialize(): Omit<FunctionPlotStringInsert, 'stateId'> {
     return {
-      ...super.dataBaseSave(),
-      functionStr: this.functionStr,
-      xRange: this.xRange,
+      objId: this.id,
+      name: this.name,
+      color: this.color,
+      position_x: this.position.x,
+      position_y: this.position.y,
+      rotation_x: this.rotation.x,
+      rotation_y: this.rotation.y,
+      rotation_z: this.rotation.z,
+      scale_x: this.scale.x,
+      scale_y: this.scale.y,
+      scale_z: this.scale.z,
+      touch_controls: this.touch_controls,
+      functionStr: this.functionStr.functionString,
+      symbols: this.functionStr.symbols,
+      XRange_a: this.xRange[0],
+      XRange_b: this.xRange[1],
       numPoints: this.numPoints,
-      lineWidth: this.lineWidth,
-      type: "FunctionPlotString",
+      lineWidth: this.lineWidth
     };
+  }
+  
+  static deserialize(data: FunctionPlotStringSelect): FunctionPlotString {
+    return new FunctionPlotString({
+      id: data.objId,
+      name: data.name,
+      position: new THREE.Vector2(data.position_x, data.position_y),
+      rotation: new THREE.Vector3(data.rotation_x, data.rotation_y, data.rotation_z),
+      scale: new THREE.Vector3(data.scale_x, data.scale_y, data.scale_z),
+      color: data.color,
+      touch_controls: data.touch_controls as TouchControl,
+      functionStr: new FunctionStr(data.functionStr, data.symbols),
+      xRange: [data.XRange_a, data.XRange_b],
+      numPoints: data.numPoints,
+      lineWidth: data.lineWidth
+    });
   }
 
   getMesh({
@@ -163,7 +192,7 @@ const FunctionPlotPopup: React.FC<{
 
   const [editedObject, setEditedObject] = useState<FunctionPlotStringConstructor>({
     id: Date.now() % 10000,
-    functionStr: new FunctionStr(Date.now() % 10000, "x", []),
+    functionStr: new FunctionStr("x", []),
     xRange: [-10, 10],
     numPoints: 500,
     lineWidth: 2,

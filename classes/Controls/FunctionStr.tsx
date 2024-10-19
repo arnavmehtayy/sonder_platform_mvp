@@ -16,12 +16,10 @@ export interface AttributePairGet {
 }
 
 export class FunctionStr {
-    id: number;
     functionString: string;
     symbols: AttributePairGet[];
     
-    constructor(id: number, functionString: string, symbols: AttributePairGet[]) {
-        this.id = id;
+    constructor(functionString: string, symbols: AttributePairGet[]) {
         this.functionString = functionString;
         this.symbols = symbols;
     }
@@ -65,17 +63,10 @@ export class FunctionStr {
         }
     }
 
-    dataBaseSave(): FunctionStrConstructor {
-        return {
-            id: this.id,
-            functionString: this.functionString,
-            symbols: this.symbols,
-        };
-    }
+
 }
 
 export interface FunctionStrConstructor {
-    id: number;
     functionString: string;
     symbols: AttributePairGet[];
 }
@@ -93,9 +84,9 @@ export const FunctionStrEditor: React.FC<FunctionStrEditorProps> = ({ value, onC
 
     const updateFunction = useCallback(() => {
         if (value.functionString !== functionString || !arraysEqual(value.symbols, symbols)) {
-            onChange(new FunctionStr(value.id, functionString, symbols));
+            onChange(new FunctionStr(functionString, symbols));
         }
-    }, [functionString, symbols, onChange, value.id, value.functionString, value.symbols]);
+    }, [functionString, symbols, onChange, value.functionString, value.symbols]);
 
     useEffect(() => {
         updateFunction();

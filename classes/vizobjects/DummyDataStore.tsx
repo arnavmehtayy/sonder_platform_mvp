@@ -3,6 +3,7 @@ import { DummyDataInput } from "@/app/Components/EditMode/EditPopups/DummyDataIn
 import { EditableObjectPopup, EditableObjectPopupProps } from "@/app/Components/EditMode/EditPopups/EditableObjectPopup";
 import React from "react";
 import { dict_keys, Dummy_atts, get_attributes } from "./get_set_obj_attributes";
+import { DummyDataStorageInsert, DummyDataStorageSelect } from "@/app/db/schema";
 
 /*
  * this is a invisible object on the scene that stores some data
@@ -53,13 +54,20 @@ export class DummyDataStorage<T extends DummyDataSupportedTypes> extends obj {
     return newObj;
   }
 
-  dataBaseSave(): DummyDataStorageConstructor<T> {
+  serialize(): Omit<DummyDataStorageInsert, 'stateId'> {
     return {
-      id: this.id,
+      objId: this.id,
       name: this.name,
-      data: this.data,
-      type: "DummyDataStorage"
+      data: this.data as number,
     };
+  }
+  
+  static deserialize(data: DummyDataStorageSelect): DummyDataStorage<DummyDataSupportedTypes> {
+    return new DummyDataStorage({
+      id: data.objId,
+      name: data.name,
+      data: data.data 
+    });
   }
 
   static getPopup({
