@@ -1,18 +1,9 @@
 import { db } from '@/app/db/index';
-import { states, GeomObj, GeomObjInsert } from '@/app/db/schema';
-import { State } from '@/app/store';
-import { Control } from '@/classes/Controls/Control';
-import { Influence } from '@/classes/influence';
-import { obj } from '@/classes/vizobjects/obj';
+import { states, GeomObj, LineObj, FunctionPlotString, DummyDataStorage, AxisObject, TextGeom } from '@/app/db/schema';
 import { eq } from 'drizzle-orm';
-import { Score } from '@/classes/Scores/Score';
-import Placement from '@/classes/Placement';
-import Validation from '@/classes/Validation/Validation';
-import { geomobj, PredefinedGeometry } from '@/classes/vizobjects/geomobj';
-import * as THREE from 'three';
-import { TouchControl, TouchControlAttributes } from '@/classes/Controls/TouchControl';
+import { SerializeStateInsert, SerializeStateSelect } from '@/classes/database/Serializtypes';
 
-export async function saveStateToDatabase(stateName: string, state: any) {
+export async function saveStateToDatabase(stateName: string, state: SerializeStateInsert) {
   await db.transaction(async (tx) => {
     // Check if the state already exists
     const existingState = await tx.select().from(states).where(eq(states.state_name, stateName)).limit(1);
@@ -41,24 +32,35 @@ export async function saveStateToDatabase(stateName: string, state: any) {
 
     // Delete existing related records
     await tx.delete(GeomObj).where(eq(GeomObj.stateId, stateId));
+    await tx.delete(LineObj).where(eq(LineObj.stateId, stateId));
+    await tx.delete(FunctionPlotString).where(eq(FunctionPlotString.stateId, stateId));
+    await tx.delete(DummyDataStorage).where(eq(DummyDataStorage.stateId, stateId));
+    await tx.delete(AxisObject).where(eq(AxisObject.stateId, stateId));
+    await tx.delete(TextGeom).where(eq(TextGeom.stateId, stateId));
 
     // Insert vizobjects
-    if (state.vizobjs && Object.keys(state.vizobjs).length > 0) {
-      const geomObjValues = (Object.values(state.vizobjs) as  Omit<GeomObjInsert, 'stateId'>[])
-        .filter((obj) => 'geometry_type' in obj)
-        .map((obj) => ({
-          stateId,
-          ...obj
-        }));
-
-      if (geomObjValues.length > 0) {
-        await tx.insert(GeomObj).values(geomObjValues);
-      }
+    if (state.GeomObjs.length > 0) {
+      await tx.insert(GeomObj).values(state.GeomObjs.map(obj => ({ ...obj, stateId })));
+    }
+    if (state.LineObjs.length > 0) {
+      await tx.insert(LineObj).values(state.LineObjs.map(obj => ({ ...obj, stateId })));
+    }
+    if (state.FunctionPlotStrings.length > 0) {
+      await tx.insert(FunctionPlotString).values(state.FunctionPlotStrings.map(obj => ({ ...obj, stateId })));
+    }
+    if (state.DummyDataStorages.length > 0) {
+      await tx.insert(DummyDataStorage).values(state.DummyDataStorages.map(obj => ({ ...obj, stateId })));
+    }
+    if (state.AxisObjects.length > 0) {
+      await tx.insert(AxisObject).values(state.AxisObjects.map(obj => ({ ...obj, stateId })));
+    }
+    if (state.TextGeoms.length > 0) {
+      await tx.insert(TextGeom).values(state.TextGeoms.map(obj => ({ ...obj, stateId })));
     }
   });
 }
 
-export async function loadStateFromDatabase(stateName: string): Promise<any> {
+export async function loadStateFromDatabase(stateName: string): Promise<SerializeStateSelect> {
   const state = await db.transaction(async (tx) => {
     // Fetch the state
     const stateRecord = await tx.select().from(states).where(eq(states.state_name, stateName)).limit(1);
@@ -67,23 +69,25 @@ export async function loadStateFromDatabase(stateName: string): Promise<any> {
     }
     const stateId = stateRecord[0].id;
 
-    // Fetch all geomObj data
+    // Fetch all vizobject data
     const geomObjData = await tx.select().from(GeomObj).where(eq(GeomObj.stateId, stateId));
+    const lineObjData = await tx.select().from(LineObj).where(eq(LineObj.stateId, stateId));
+    const functionPlotStringData = await tx.select().from(FunctionPlotString).where(eq(FunctionPlotString.stateId, stateId));
+    const dummyDataStorageData = await tx.select().from(DummyDataStorage).where(eq(DummyDataStorage.stateId, stateId));
+    const axisObjectData = await tx.select().from(AxisObject).where(eq(AxisObject.stateId, stateId));
+    const textGeomData = await tx.select().from(TextGeom).where(eq(TextGeom.stateId, stateId));
 
     // Construct the state object
-    const loadedState: any = {
-      camera_zoom: stateRecord[0].camera_zoom || 20.0,
+    const loadedState: SerializeStateSelect = {
       title: stateRecord[0].title,
-      state_name: stateName,
-      vizobjs: {},
+      camera_zoom: stateRecord[0].camera_zoom || 20,
+      GeomObjs: geomObjData,
+      LineObjs: lineObjData,
+      FunctionPlotStrings: functionPlotStringData,
+      DummyDataStorages: dummyDataStorageData,
+      AxisObjects: axisObjectData,
+      TextGeoms: textGeomData,
     };
-
-    // Process geomObj data
-    geomObjData.forEach(obj => {
-      if (obj.objId !== null) {
-        loadedState.vizobjs[obj.objId] = obj;
-      }
-    });
 
     return loadedState;
   });

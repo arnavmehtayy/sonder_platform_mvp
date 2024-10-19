@@ -1,0 +1,1 @@
+ALTER TABLE "function_plot_string" ADD COLUMN "symbols" jsonb NOT NULL;

@@ -29,7 +29,7 @@ export interface SerializeStateInsert {
 export interface SerializeStateSelect {
     title: string
     camera_zoom: number
-    GeomObjs: GeomObjSelect
+    GeomObjs: GeomObjSelect[]
     LineObjs: LineObjSelect[]
     FunctionPlotStrings: FunctionPlotStringSelect[]
     DummyDataStorages: DummyDataStorageSelect[]

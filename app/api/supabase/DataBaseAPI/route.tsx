@@ -1,9 +1,10 @@
 import { NextResponse } from 'next/server';
 import { saveStateToDatabase, loadStateFromDatabase } from '@/app/api/supabase/databaseFunctions';
+import { SerializeStateInsert, SerializeStateSelect } from '@/classes/database/Serializtypes';
 
 export async function POST(request: Request) {
   
-  const { stateName, state } = await request.json();
+  const { stateName, state } : {stateName: string, state: SerializeStateInsert} = await request.json();
   // console.log(state)
   try {
     await saveStateToDatabase(stateName, state);
@@ -23,7 +24,7 @@ export async function GET(request: Request) {
   }
 
   try {
-    const loadedState = await loadStateFromDatabase(stateName);
+    const loadedState: SerializeStateSelect = await loadStateFromDatabase(stateName);
     return NextResponse.json(loadedState);
   } catch (error) {
     console.error('Error loading state:', error);
