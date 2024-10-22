@@ -10,7 +10,9 @@ import {
   FunctionPlotStringSelect,
   GeomObjSelect,
   LineObjSelect,
-  TextGeomSelect
+  TextGeomSelect,
+  SelectControlInsert,
+  SelectControlSelect
 } from "@/app/db/schema"
 
 export interface SerializeStateInsert {
@@ -24,6 +26,7 @@ export interface SerializeStateInsert {
     TextGeoms: Omit<TextGeomInsert, 'stateId'>[]
 
     // more things depending on the state
+    SelectControls: Omit<SelectControlInsert, 'stateId'>[]
 }
 
 export interface SerializeStateSelect {
@@ -35,6 +38,7 @@ export interface SerializeStateSelect {
     DummyDataStorages: DummyDataStorageSelect[]
     AxisObjects: AxisObjectSelect[]
     TextGeoms: TextGeomSelect[]
-
+    
     // more things depending on the state
+    SelectControls: SelectControlSelect[]
 }

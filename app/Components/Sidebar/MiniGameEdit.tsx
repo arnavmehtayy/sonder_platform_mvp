@@ -67,13 +67,15 @@ export function MinigameEdit({}: {}) {
       }
       const serializedState = await response.json();
       const loadedState = deserializeState(serializedState);
+      console.log(loadedState)
+      
       useStore.setState(loadedState);
+      console.log(useStore.getState().controls)
       console.log('State loaded successfully');
     } catch (error) {
       console.error('Error loading state:', error);
     }
   };
-
   return (
     <div className="relative flex flex-col md:flex-row h-screen bg-gray-100">
       {/* Main Three.js Experience */}

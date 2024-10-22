@@ -81,9 +81,9 @@ function GeometryInput({ value, onChange }: { value: PredefinedGeometry, onChang
   const [geometryType, setGeometryType] = React.useState(value.type);
   const [params, setParams] = React.useState(value.params);
 
+
   React.useEffect(() => {
     if (geometryType !== value.type || JSON.stringify(params) !== JSON.stringify(value.params)) {
-      console.log("ARNAV")
       onChange({ type: geometryType, params });
     }
   }, [geometryType, params, onChange, value]);
@@ -94,6 +94,11 @@ function GeometryInput({ value, onChange }: { value: PredefinedGeometry, onChang
       [paramName]: newValue
     }));
   };
+
+  // const deleteParams = () => {
+  //   setParams({});
+  // }
+  
 
   const renderParamInputs = () => {
     switch (geometryType) {
@@ -133,6 +138,7 @@ function GeometryInput({ value, onChange }: { value: PredefinedGeometry, onChang
           </div>
         );
       case 'triangle':
+        
         return (
           <div className="mt-2">
             <Label htmlFor="sideLength">Side Length</Label>
@@ -145,6 +151,7 @@ function GeometryInput({ value, onChange }: { value: PredefinedGeometry, onChang
           </div>
         );
       case 'regular-polygon':
+        
         return (
           <div className="mt-2 space-y-2">
             <>

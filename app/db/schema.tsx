@@ -9,6 +9,7 @@ import { objconstructor } from '@/classes/vizobjects/obj';
 import { integer, boolean, real, pgTable, serial, text, timestamp, jsonb } from 'drizzle-orm/pg-core';
 import { InferSelectModel, InferInsertModel } from 'drizzle-orm';
 
+// VIZOBJECTS
 
 export const states = pgTable('users_table', {
   id: serial('id').primaryKey(),
@@ -176,6 +177,129 @@ export type AxisObjectInsert = InferInsertModel<typeof AxisObject>;
 
 export type GeomObjSelect = InferSelectModel<typeof GeomObj>;
 export type GeomObjInsert = InferInsertModel<typeof GeomObj>;
+
+// VIZOBJECTS
+
+
+// CONTROLS
+
+// export const TableControl = pgTable('table_control', {
+//   id: serial('id').primaryKey(),
+//   stateId: integer('state_id').references(() => states.id, { onDelete: 'cascade' }).notNull(),
+//   controlId: integer('control_id').notNull(),
+//   desc: text('desc').notNull(),
+//   text: text('text').notNull(),
+//   columnHeaders: text('column_headers').array().notNull(),
+//   rowHeaders: text('row_headers').array().notNull(),
+// });
+
+// export const TableCell = pgTable('table_cell', {
+//   id: serial('id').primaryKey(),
+//   tableControlId: integer('table_control_id').references(() => TableControl.id, { onDelete: 'cascade' }).notNull(),
+//   rowIndex: integer('row_index').notNull(),
+//   columnIndex: integer('column_index').notNull(),
+//   value: real('value').notNull(),
+//   functionStr: text('function_str').notNull(),
+//   objId: integer('obj_id').notNull(),
+//   objType: text('obj_type').notNull(),
+//   attribute: text('attribute').notNull(),
+//   isStatic: boolean('is_static').notNull(),
+// });
+
+
+// export type TableCellSelect = InferSelectModel<typeof TableCell>;
+// export type TableCellInsert = InferInsertModel<typeof TableCell>;
+
+
+export const SelectControl = pgTable('select_control', {
+  id: serial('id').primaryKey(),
+  stateId: integer('state_id').references(() => states.id, { onDelete: 'cascade' }).notNull(),
+  controlId: integer('control_id').notNull(),
+  desc: text('desc').notNull(),
+  text: text('text').notNull(),
+  selectable: integer('selectable').array().notNull(),
+  selected: integer('selected').array().notNull(),
+  isActive: boolean('is_active').notNull(),
+  capacity: integer('capacity').notNull(),
+});
+
+// export const EnablerControl = pgTable('enabler_control', {
+//   id: serial('id').primaryKey(),
+//   stateId: integer('state_id').references(() => states.id, { onDelete: 'cascade' }).notNull(),
+//   controlId: integer('control_id').notNull(),
+//   desc: text('desc').notNull(),
+//   text: text('text').notNull(),
+//   obj_ids: jsonb('obj_ids').notNull(),
+//   ControlState: boolean('control_state').notNull(),
+// });
+
+
+// export const SliderControlAdvanced = pgTable('slider_control_advanced', {
+//   id: serial('id').primaryKey(),
+//   stateId: integer('state_id').references(() => states.id, { onDelete: 'cascade' }).notNull(),
+//   controlId: integer('control_id').notNull(),
+//   desc: text('desc').notNull(),
+//   text: text('text').notNull(),
+//   obj_id: integer('obj_id').notNull(),
+//   range: jsonb('range').notNull(),
+//   step_size: real('step_size').notNull(),
+//   attribute_pairs: jsonb('attribute_pairs').notNull(),
+// });
+
+// export const MultiChoiceControl = pgTable('multi_choice_control', {
+//   id: serial('id').primaryKey(),
+//   stateId: integer('state_id').references(() => states.id, { onDelete: 'cascade' }).notNull(),
+//   controlId: integer('control_id').notNull(),
+//   desc: text('desc').notNull(),
+//   text: text('text').notNull(),
+//   options: jsonb('options').notNull(),
+//   isMultiSelect: boolean('is_multi_select').notNull(),
+// });
+
+// export const InputNumberControl = pgTable('input_number_control', {
+//   id: serial('id').primaryKey(),
+//   stateId: integer('state_id').references(() => states.id, { onDelete: 'cascade' }).notNull(),
+//   controlId: integer('control_id').notNull(),
+//   desc: text('desc').notNull(),
+//   text: text('text').notNull(),
+//   value: real('value'),
+//   placeholder: text('placeholder'),
+//   initial_value: real('initial_value'),
+//   min: real('min'),
+//   max: real('max'),
+//   step: real('step'),
+//   obj_id: integer('obj_id'),
+//   attribute_pairs: jsonb('attribute_pairs').$type<AttributePairSet_json[]>(),
+// });
+
+// export type InputNumberControlSelect = InferSelectModel<typeof InputNumberControl>;
+// export type InputNumberControlInsert = InferInsertModel<typeof InputNumberControl>;
+
+
+
+// // Add these type definitions at the end of the file
+// export type TableControlSelect = InferSelectModel<typeof TableControl>;
+// export type TableControlInsert = InferInsertModel<typeof TableControl>;
+
+export type SelectControlSelect = InferSelectModel<typeof SelectControl>;
+export type SelectControlInsert = InferInsertModel<typeof SelectControl>;
+
+// export type EnablerControlSelect = InferSelectModel<typeof EnablerControl>;
+// export type EnablerControlInsert = InferInsertModel<typeof EnablerControl>;
+
+// export type SliderControlAdvancedSelect = InferSelectModel<typeof SliderControlAdvanced>;
+// export type SliderControlAdvancedInsert = InferInsertModel<typeof SliderControlAdvanced>;
+
+// export type MultiChoiceControlSelect = InferSelectModel<typeof MultiChoiceControl>;
+// export type MultiChoiceControlInsert = InferInsertModel<typeof MultiChoiceControl>;
+
+
+
+
+
+// CONTROLS
+
+
 
 
 

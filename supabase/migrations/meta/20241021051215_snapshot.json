@@ -1,0 +1,883 @@
+{
+  "id": "8a6a9a1c-810e-44d3-810d-b5db1a947da8",
+  "prevId": "514d8723-26e3-4b7c-86c5-c96164feec85",
+  "version": "7",
+  "dialect": "postgresql",
+  "tables": {
+    "public.axis_object": {
+      "name": "axis_object",
+      "schema": "",
+      "columns": {
+        "state_id": {
+          "name": "state_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "obj_id": {
+          "name": "obj_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "name": {
+          "name": "name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "color": {
+          "name": "color",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "position_x": {
+          "name": "position_x",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "position_y": {
+          "name": "position_y",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "rotation_x": {
+          "name": "rotation_x",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "rotation_y": {
+          "name": "rotation_y",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "rotation_z": {
+          "name": "rotation_z",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "scale_x": {
+          "name": "scale_x",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "scale_y": {
+          "name": "scale_y",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "scale_z": {
+          "name": "scale_z",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "touch_controls": {
+          "name": "touch_controls",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "axis_length": {
+          "name": "axis_length",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "tick_spacing": {
+          "name": "tick_spacing",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "tick_size": {
+          "name": "tick_size",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "show_labels": {
+          "name": "show_labels",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "font_size": {
+          "name": "font_size",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "line_width": {
+          "name": "line_width",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "x_label": {
+          "name": "x_label",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "y_label": {
+          "name": "y_label",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "axis_object_state_id_users_table_id_fk": {
+          "name": "axis_object_state_id_users_table_id_fk",
+          "tableFrom": "axis_object",
+          "tableTo": "users_table",
+          "columnsFrom": [
+            "state_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {}
+    },
+    "public.dummy_data_storage": {
+      "name": "dummy_data_storage",
+      "schema": "",
+      "columns": {
+        "state_id": {
+          "name": "state_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "obj_id": {
+          "name": "obj_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "name": {
+          "name": "name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "data": {
+          "name": "data",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "dummy_data_storage_state_id_users_table_id_fk": {
+          "name": "dummy_data_storage_state_id_users_table_id_fk",
+          "tableFrom": "dummy_data_storage",
+          "tableTo": "users_table",
+          "columnsFrom": [
+            "state_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {}
+    },
+    "public.function_plot_string": {
+      "name": "function_plot_string",
+      "schema": "",
+      "columns": {
+        "state_id": {
+          "name": "state_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "obj_id": {
+          "name": "obj_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "name": {
+          "name": "name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "color": {
+          "name": "color",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "position_x": {
+          "name": "position_x",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "position_y": {
+          "name": "position_y",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "rotation_x": {
+          "name": "rotation_x",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "rotation_y": {
+          "name": "rotation_y",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "rotation_z": {
+          "name": "rotation_z",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "scale_x": {
+          "name": "scale_x",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "scale_y": {
+          "name": "scale_y",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "scale_z": {
+          "name": "scale_z",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "touch_controls": {
+          "name": "touch_controls",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "x_range_a": {
+          "name": "x_range_a",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "x_range_b": {
+          "name": "x_range_b",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "num_points": {
+          "name": "num_points",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "line_width": {
+          "name": "line_width",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "function_str": {
+          "name": "function_str",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "symbols": {
+          "name": "symbols",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "function_plot_string_state_id_users_table_id_fk": {
+          "name": "function_plot_string_state_id_users_table_id_fk",
+          "tableFrom": "function_plot_string",
+          "tableTo": "users_table",
+          "columnsFrom": [
+            "state_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {}
+    },
+    "public.geom_obj": {
+      "name": "geom_obj",
+      "schema": "",
+      "columns": {
+        "state_id": {
+          "name": "state_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "obj_id": {
+          "name": "obj_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "name": {
+          "name": "name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "color": {
+          "name": "color",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "position_x": {
+          "name": "position_x",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "position_y": {
+          "name": "position_y",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "rotation_x": {
+          "name": "rotation_x",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "rotation_y": {
+          "name": "rotation_y",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "rotation_z": {
+          "name": "rotation_z",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "scale_x": {
+          "name": "scale_x",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "scale_y": {
+          "name": "scale_y",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "scale_z": {
+          "name": "scale_z",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "touch_controls": {
+          "name": "touch_controls",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "geometry_type": {
+          "name": "geometry_type",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "geometry_atts": {
+          "name": "geometry_atts",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "geom_obj_state_id_users_table_id_fk": {
+          "name": "geom_obj_state_id_users_table_id_fk",
+          "tableFrom": "geom_obj",
+          "tableTo": "users_table",
+          "columnsFrom": [
+            "state_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {}
+    },
+    "public.line_obj": {
+      "name": "line_obj",
+      "schema": "",
+      "columns": {
+        "state_id": {
+          "name": "state_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "obj_id": {
+          "name": "obj_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "name": {
+          "name": "name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "color": {
+          "name": "color",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "construction_type": {
+          "name": "construction_type",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "start_x": {
+          "name": "start_x",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "start_y": {
+          "name": "start_y",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "end_x": {
+          "name": "end_x",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "end_y": {
+          "name": "end_y",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "slope": {
+          "name": "slope",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "intercept": {
+          "name": "intercept",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "line_width": {
+          "name": "line_width",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "length": {
+          "name": "length",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "point1_x": {
+          "name": "point1_x",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "point1_y": {
+          "name": "point1_y",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "point2_x": {
+          "name": "point2_x",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "point2_y": {
+          "name": "point2_y",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "line_obj_state_id_users_table_id_fk": {
+          "name": "line_obj_state_id_users_table_id_fk",
+          "tableFrom": "line_obj",
+          "tableTo": "users_table",
+          "columnsFrom": [
+            "state_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {}
+    },
+    "public.select_control": {
+      "name": "select_control",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "state_id": {
+          "name": "state_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "control_id": {
+          "name": "control_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "desc": {
+          "name": "desc",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "text": {
+          "name": "text",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "selectable": {
+          "name": "selectable",
+          "type": "integer[]",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "selected": {
+          "name": "selected",
+          "type": "integer[]",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "is_active": {
+          "name": "is_active",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "capacity": {
+          "name": "capacity",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "select_control_state_id_users_table_id_fk": {
+          "name": "select_control_state_id_users_table_id_fk",
+          "tableFrom": "select_control",
+          "tableTo": "users_table",
+          "columnsFrom": [
+            "state_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {}
+    },
+    "public.text_geom": {
+      "name": "text_geom",
+      "schema": "",
+      "columns": {
+        "state_id": {
+          "name": "state_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "obj_id": {
+          "name": "obj_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "name": {
+          "name": "name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "color": {
+          "name": "color",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "position_x": {
+          "name": "position_x",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "position_y": {
+          "name": "position_y",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "rotation_x": {
+          "name": "rotation_x",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "rotation_y": {
+          "name": "rotation_y",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "rotation_z": {
+          "name": "rotation_z",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "scale_x": {
+          "name": "scale_x",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "scale_y": {
+          "name": "scale_y",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "scale_z": {
+          "name": "scale_z",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "touch_controls": {
+          "name": "touch_controls",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "geometry_type": {
+          "name": "geometry_type",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "geometry_atts": {
+          "name": "geometry_atts",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "text": {
+          "name": "text",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "text_geom_state_id_users_table_id_fk": {
+          "name": "text_geom_state_id_users_table_id_fk",
+          "tableFrom": "text_geom",
+          "tableTo": "users_table",
+          "columnsFrom": [
+            "state_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {}
+    },
+    "public.users_table": {
+      "name": "users_table",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "state_name": {
+          "name": "state_name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "camera_zoom": {
+          "name": "camera_zoom",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": false,
+          "default": 20
+        },
+        "title": {
+          "name": "title",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "users_table_state_name_unique": {
+          "name": "users_table_state_name_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "state_name"
+          ]
+        }
+      }
+    }
+  },
+  "enums": {},
+  "schemas": {},
+  "sequences": {},
+  "_meta": {
+    "columns": {},
+    "schemas": {},
+    "tables": {}
+  }
+}

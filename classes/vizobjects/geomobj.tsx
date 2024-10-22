@@ -7,7 +7,7 @@ import {
   EditableObjectPopup,
   EditableObjectPopupProps,
 } from "@/app/Components/EditMode/EditPopups/EditableObjectPopup";
-import React from "react";
+import React, { useRef } from "react";
 import GeneralTransformControl from "@/app/Components/three/GeneralTransCont";
 import { TransformObjConstructor } from "./transformObj";
 import { TouchControlAttributes } from "../Controls/TouchControl";
@@ -20,7 +20,10 @@ import { Switch } from "@/components/ui/switch";
 import { Separator } from "@/components/ui/separator";
 import { dict_keys, get_attributes } from "./get_set_obj_attributes";
 import { TouchControlEditor } from "@/app/Components/EditMode/EditPopups/TouchControlAttributeEditor";
-import { Validation_obj_constructor, ValidationObjEditor } from "../Validation/Validation_obj";
+import {
+  Validation_obj_constructor,
+  ValidationObjEditor,
+} from "../Validation/Validation_obj";
 import Validation_obj from "../Validation/Validation_obj";
 import Validation from "../Validation/Validation";
 import { GeomObjInsert, GeomObjSelect } from "@/app/db/schema";
@@ -36,15 +39,11 @@ export type geom_param_type = {
   sideLength?: number;
   numSides?: number;
 };
-export type geom_type = 'circle' | 'rectangle' | 'triangle' | 'regular-polygon';
+export type geom_type = "circle" | "rectangle" | "triangle" | "regular-polygon";
 export type PredefinedGeometry = {
   type: geom_type;
-  params: geom_param_type
+  params: geom_param_type;
 };
-
-
-
-
 
 /*
  * This class creates a geometric object on the scene (Any object that is rendered using THREE.BufferGeometry).
@@ -65,8 +64,8 @@ export type PredefinedGeometry = {
 
 export interface geomobjconstructor extends TransformObjConstructor {
   color?: string;
-  geom_json: PredefinedGeometry
-  geom?: THREE.BufferGeometry
+  geom_json: PredefinedGeometry;
+  geom?: THREE.BufferGeometry;
   param_t?: number;
   isClickable?: boolean;
   OnClick?: ((obj: geomobj) => void) | undefined;
@@ -74,7 +73,7 @@ export interface geomobjconstructor extends TransformObjConstructor {
 
 export class geomobj extends TransformObj {
   geom: THREE.BufferGeometry; // the geometry of the object
-  geom_json: PredefinedGeometry
+  geom_json: PredefinedGeometry;
   isClickable: boolean = false; // whether the object on the screen can be clicked or not
   OnClick: ((obj: geomobj) => void) | undefined;
   constructor({
@@ -102,15 +101,16 @@ export class geomobj extends TransformObj {
       isEnabled: isEnabled,
       name: name,
     });
-    this.geom_json = geom_json
-    this.geom = geom_json ? this.createPredefinedGeometry(geom_json): geom;
+    // console.log("Constructing geomobj with geom_json:", geom_json);
+    this.geom_json = geom_json;
+    this.geom = geom_json ? this.createPredefinedGeometry(geom_json) : geom;
+    // console.log("Created geometry:", this.geom);
+
     this.OnClick = OnClick;
     this.type = "GeomObj";
   }
 
-  
-
-  serialize(): Omit<GeomObjInsert, 'stateId'>  {
+  serialize(): Omit<GeomObjInsert, "stateId"> {
     return {
       objId: this.id,
       name: this.name,
@@ -125,7 +125,7 @@ export class geomobj extends TransformObj {
       scale_z: this.scale.z,
       touch_controls: this.touch_controls,
       geometry_type: this.geom_json.type,
-      geometry_atts: this.geom_json.params
+      geometry_atts: this.geom_json.params,
     };
   }
 
@@ -135,17 +135,20 @@ export class geomobj extends TransformObj {
       name: data.name,
       isEnabled: true, // Assuming default value as it's not in the schema
       position: new THREE.Vector2(data.position_x, data.position_y),
-      rotation: new THREE.Vector3(data.rotation_x, data.rotation_y, data.rotation_z),
+      rotation: new THREE.Vector3(
+        data.rotation_x,
+        data.rotation_y,
+        data.rotation_z
+      ),
       scale: new THREE.Vector3(data.scale_x, data.scale_y, data.scale_z),
       color: data.color,
       touch_controls: data.touch_controls as TouchControl,
       geom_json: {
         type: data.geometry_type,
-        params: data.geometry_atts
+        params: data.geometry_atts,
       },
     });
   }
-
 
   // async saveToDatabase(stateId: number) {
   //   await db.insert(GeomObj).values({
@@ -165,8 +168,6 @@ export class geomobj extends TransformObj {
   //     geom_atts_json: this.geom_json,
   //   });
   // }
-
-
 
   // static async loadFromDatabase(stateId: number, objId: number): Promise<geomobj | null> {
   //   const result = await db
@@ -197,28 +198,32 @@ export class geomobj extends TransformObj {
   //   });
   // }
 
-
-
-  private createPredefinedGeometry(geomDef: PredefinedGeometry): THREE.BufferGeometry {
+  private createPredefinedGeometry(
+    geomDef: PredefinedGeometry
+  ): THREE.BufferGeometry {
     switch (geomDef.type) {
-      case 'circle':
+      case "circle":
         return new THREE.CircleGeometry(geomDef.params.radius || 1, 32);
-      case 'rectangle':
-        return new THREE.PlaneGeometry(geomDef.params.width || 1, geomDef.params.height || 1);
-      case 'triangle':
+      case "rectangle":
+        return new THREE.PlaneGeometry(
+          geomDef.params.width || 1,
+          geomDef.params.height || 1
+        );
+      case "triangle":
         const triangleShape = new THREE.Shape();
         const sideLength = geomDef.params.sideLength || 1;
-        triangleShape.moveTo(0, 0);
-        triangleShape.lineTo(sideLength, 0);
-        triangleShape.lineTo(sideLength / 2, sideLength * Math.sqrt(3) / 2);
-        triangleShape.lineTo(0, 0);
+        const height = (sideLength * Math.sqrt(3)) / 2;
+        triangleShape.moveTo(-sideLength / 2, -height / 3);
+        triangleShape.lineTo(sideLength / 2, -height / 3);
+        triangleShape.lineTo(0, (height * 2) / 3);
+        triangleShape.lineTo(-sideLength / 2, -height / 3);
         return new THREE.ShapeGeometry(triangleShape);
-      case 'regular-polygon':
+      case "regular-polygon":
         const numSides = geomDef.params.numSides || 5;
         const radius = geomDef.params.radius || 1;
         return new THREE.CircleGeometry(radius, numSides);
       default:
-        return new THREE.CircleGeometry(1, 32);
+        return new THREE.CircleGeometry(3, 32);
     }
   }
 
@@ -230,7 +235,7 @@ export class geomobj extends TransformObj {
       isClickable: this.isClickable,
       OnClick: this.OnClick,
       type: "GeomObj",
-      geom_json: this.geom_json
+      geom_json: this.geom_json,
     };
   }
 
@@ -250,6 +255,11 @@ export class geomobj extends TransformObj {
     children: React.ReactElement | null;
     objectRef: React.RefObject<THREE.Mesh>;
   }): React.ReactElement {
+    // console.log(`Rendering geomobj with position: ${this.position.x}, ${this.position.y}`);
+    // console.log(`Rendering geomobj with color: ${this.color}`);
+    // console.log(`Rendering geomobj with geometry type: ${this.geom_json.type}`);
+    
+    // const objectRef_l = useRef<THREE.Mesh>(null)
     return (
       <>
         <mesh
@@ -258,8 +268,8 @@ export class geomobj extends TransformObj {
           scale={[this.scale.x, this.scale.y, this.scale.z]}
           ref={objectRef}
           onPointerDown={this.isClickable ? onClickSelect : undefined}
+          geometry={this.geom}
         >
-          <primitive object={this.geom} attach="geometry" />
           {material ? (
             <primitive object={material} attach="material" />
           ) : (
@@ -297,8 +307,10 @@ export class geomobj extends TransformObj {
     );
   }
 
-  get_set_att_selector(type: dict_keys): {[key: string]: get_attributes<any, any>} {
-    return {...super.get_set_att_selector(type)};
+  get_set_att_selector(type: dict_keys): {
+    [key: string]: get_attributes<any, any>;
+  } {
+    return { ...super.get_set_att_selector(type) };
   }
 
   static getPopup({
@@ -321,15 +333,17 @@ export class geomobj extends TransformObj {
       touch_controls: new TouchControl(),
       param_t: 0,
       isClickable: false,
-      geom_json: {type: "circle", params:{radius:1}}
+      geom_json: { type: "circle", params: { radius: 1 } },
     });
-  
-    const [validation, setValidation] = React.useState<Validation_obj_constructor<any> | undefined>(undefined);
-  
+
+    const [validation, setValidation] = React.useState<
+      Validation_obj_constructor<any> | undefined
+    >(undefined);
+
     const handleChange = (key: keyof geomobjconstructor, value: any) => {
       setEditedObject((prev) => ({ ...prev, [key]: value }));
     };
-  
+
     const popupProps: EditableObjectPopupProps<geomobjconstructor> = {
       isOpen,
       onClose,
@@ -337,8 +351,8 @@ export class geomobj extends TransformObj {
       set_object: setEditedObject,
       onSave: (updatedObject: geomobjconstructor) => {
         const newObj = new geomobj(updatedObject);
-        
-        const newVal = validation ? new Validation_obj(validation) : undefined
+
+        const newVal = validation ? new Validation_obj(validation) : undefined;
         onSave(newObj, newVal);
       },
       title: `Create New Geometric Object`,
@@ -365,39 +379,41 @@ export class geomobj extends TransformObj {
       ],
       additionalContent: (
         <ValidationObjEditor
-          onChange={(newValidation: Validation_obj_constructor<any> | undefined) => setValidation(newValidation)}
+          onChange={(
+            newValidation: Validation_obj_constructor<any> | undefined
+          ) => setValidation(newValidation)}
           value={editedObject}
           id={editedObject.id}
         />
       ),
     };
-  
+
     return <EditableObjectPopup {...popupProps} />;
   }
 
-// function TouchControlEditor({ touchControl, onChange }: TouchControlEditorProps) {
-//   const updateTouchControl = (key: keyof TouchControl, value: any) => {
-//     onChange(new TouchControl({ ...touchControl, [key]: value }));
-//   };
+  // function TouchControlEditor({ touchControl, onChange }: TouchControlEditorProps) {
+  //   const updateTouchControl = (key: keyof TouchControl, value: any) => {
+  //     onChange(new TouchControl({ ...touchControl, [key]: value }));
+  //   };
 
-//   return (
-//     <div>
-//       <TouchControlAttributeEditor
-//         label="Scale"
-//         attributes={touchControl.scale}
-//         onChange={(value) => updateTouchControl("scale", value)}
-//       />
-//       <TouchControlAttributeEditor
-//         label="Rotate"
-//         attributes={touchControl.rotate}
-//         onChange={(value) => updateTouchControl("rotate", value)}
-//       />
-//       <TouchControlAttributeEditor
-//         label="Translate"
-//         attributes={touchControl.translate}
-//         onChange={(value) => updateTouchControl("translate", value)}
-//       />
-//     </div>
-//   );
-// }
+  //   return (
+  //     <div>
+  //       <TouchControlAttributeEditor
+  //         label="Scale"
+  //         attributes={touchControl.scale}
+  //         onChange={(value) => updateTouchControl("scale", value)}
+  //       />
+  //       <TouchControlAttributeEditor
+  //         label="Rotate"
+  //         attributes={touchControl.rotate}
+  //         onChange={(value) => updateTouchControl("rotate", value)}
+  //       />
+  //       <TouchControlAttributeEditor
+  //         label="Translate"
+  //         attributes={touchControl.translate}
+  //         onChange={(value) => updateTouchControl("translate", value)}
+  //       />
+  //     </div>
+  //   );
+  // }
 }

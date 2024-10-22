@@ -15,6 +15,7 @@ import {
 } from "@/app/Components/EditMode/EditPopups/EditableObjectPopup";
 
 import Validation_select, { Validation_selectConstructor, ValidationSelectEditor } from "../Validation/Validation_select";
+import { SelectControlInsert, SelectControlSelect } from "@/app/db/schema";
 
 /*
  * This is the class that holds information about the select control
@@ -175,6 +176,30 @@ export class SelectControl extends Control {
     this.selected = selected;
     this.isActive = isActive;
     this.capacity = capacity;
+  }
+
+  serialize(): Omit<SelectControlInsert, 'stateId'> {
+    return {
+      controlId: this.id,
+      desc: this.desc,
+      text: this.text,
+      selectable: this.selectable,
+      selected: this.selected,
+      isActive: this.isActive,
+      capacity: this.capacity
+    };
+  }
+
+  static deserialize(data: SelectControlSelect): SelectControl {
+    return new SelectControl({
+      id: data.controlId,
+      desc: data.desc,
+      text: data.text,
+      selectable: data.selectable,
+      selected: data.selected,
+      isActive: data.isActive,
+      capacity: data.capacity
+    });
   }
 
   // change if this select state has been activated using the isActive button. This is used by the storage system

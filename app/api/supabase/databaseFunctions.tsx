@@ -1,5 +1,5 @@
 import { db } from '@/app/db/index';
-import { states, GeomObj, LineObj, FunctionPlotString, DummyDataStorage, AxisObject, TextGeom } from '@/app/db/schema';
+import { states, GeomObj, LineObj, FunctionPlotString, DummyDataStorage, AxisObject, TextGeom, SelectControl } from '@/app/db/schema';
 import { eq } from 'drizzle-orm';
 import { SerializeStateInsert, SerializeStateSelect } from '@/classes/database/Serializtypes';
 
@@ -37,6 +37,8 @@ export async function saveStateToDatabase(stateName: string, state: SerializeSta
     await tx.delete(DummyDataStorage).where(eq(DummyDataStorage.stateId, stateId));
     await tx.delete(AxisObject).where(eq(AxisObject.stateId, stateId));
     await tx.delete(TextGeom).where(eq(TextGeom.stateId, stateId));
+    await tx.delete(SelectControl).where(eq(SelectControl.stateId, stateId));
+
 
     // Insert vizobjects
     if (state.GeomObjs.length > 0) {
@@ -57,6 +59,9 @@ export async function saveStateToDatabase(stateName: string, state: SerializeSta
     if (state.TextGeoms.length > 0) {
       await tx.insert(TextGeom).values(state.TextGeoms.map(obj => ({ ...obj, stateId })));
     }
+    if(state.SelectControls.length > 0) {
+    await tx.insert(SelectControl).values(state.SelectControls.map(control => ({ ...control, stateId })));
+    }
   });
 }
 
@@ -76,6 +81,7 @@ export async function loadStateFromDatabase(stateName: string): Promise<Serializ
     const dummyDataStorageData = await tx.select().from(DummyDataStorage).where(eq(DummyDataStorage.stateId, stateId));
     const axisObjectData = await tx.select().from(AxisObject).where(eq(AxisObject.stateId, stateId));
     const textGeomData = await tx.select().from(TextGeom).where(eq(TextGeom.stateId, stateId));
+    const selectControlData = await tx.select().from(SelectControl).where(eq(SelectControl.stateId, stateId))
 
     // Construct the state object
     const loadedState: SerializeStateSelect = {
@@ -87,6 +93,7 @@ export async function loadStateFromDatabase(stateName: string): Promise<Serializ
       DummyDataStorages: dummyDataStorageData,
       AxisObjects: axisObjectData,
       TextGeoms: textGeomData,
+      SelectControls: selectControlData
     };
 
     return loadedState;
