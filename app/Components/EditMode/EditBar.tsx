@@ -68,29 +68,7 @@ export interface ObjectType {
 
 
 
-const SortableItem: React.FC<{ id: string; children: React.ReactNode }> = ({ id, children }) => {
-  const {
-    attributes,
-    listeners,
-    setNodeRef,
-    transform,
-    transition,
-  } = useSortable({id: id});
-  
-  const style = {
-    transform: CSS.Transform.toString(transform),
-    transition,
-  };
-  
-  return (
-    <li ref={setNodeRef} style={style} className="flex items-center bg-gray-100 p-2 rounded">
-      <div {...attributes} {...listeners} className="cursor-move mr-2">
-        <GripVertical size={20} />
-      </div>
-      {children}
-    </li>
-  );
-};
+
 
 export const EditBar: React.FC = () => {
   const [selectedObjectType, setSelectedObjectType] = useState<ObjectType | null>(null);
@@ -121,42 +99,11 @@ export const EditBar: React.FC = () => {
     {name: "Number Input", type: InputNumber, icon: Hash},
   ];
 
-  const getName = useStore(getSideBarName)
 
-  const order = useStore((state) => state.order);
-  const setOrder = useStore((state) => state.setOrder);
-  const deleteOrderItem = useStore((state) => state.deleteOrderItem);
-  const deleteVizObj = useStore((state) => state.deleteVizObj);
-  const vizobjs = useStore((state) => state.vizobjs);
+  
 
-  const sensors = useSensors(
-    useSensor(PointerSensor),
-    useSensor(KeyboardSensor, {
-      coordinateGetter: sortableKeyboardCoordinates,
-    })
-  );
+  
 
-  const handleDragEnd = (event: any) => {
-    const {active, over} = event;
-
-    if (active.id !== over.id) {
-      const oldIndex = order.findIndex((item) => `${item.type}-${item.id}` === active.id);
-      const newIndex = order.findIndex((item) => `${item.type}-${item.id}` === over.id);
-      
-      const newOrder = [...order];
-      const [reorderedItem] = newOrder.splice(oldIndex, 1);
-      newOrder.splice(newIndex, 0, reorderedItem);
-
-      setOrder(newOrder);
-    }
-  };
-
-  const handleDeleteItem = (id: number, type: string) => {
-    deleteOrderItem(id, type);
-    if (type === 'control' || type === 'placement' || type === 'question') {
-      deleteVizObj(id);
-    }
-  };
 
   return (
     <>
@@ -177,61 +124,7 @@ export const EditBar: React.FC = () => {
           label="Object"
         />
 
-        <Dialog>
-          <DialogTrigger asChild>
-            <Button variant="outline" className="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-md flex items-center space-x-2">
-              <List className="h-5 w-5" />
-              <span>Manage Sidebar</span>
-            </Button>
-          </DialogTrigger>
-          <DialogContent className="sm:max-w-[425px]">
-            <DialogHeader>
-              <DialogTitle>Manage Order and Objects</DialogTitle>
-            </DialogHeader>
-            <div className="mt-4">
-              <DndContext 
-                sensors={sensors}
-                collisionDetection={closestCenter}
-                onDragEnd={handleDragEnd}
-              >
-                <SortableContext 
-                  items={order.map(item => `${item.type}-${item.id}`)}
-                  strategy={verticalListSortingStrategy}
-                >
-                  <ul className="space-y-2">
-                    {order.map((item) => (
-                      <SortableItem key={`${item.type}-${item.id}`} id={`${item.type}-${item.id}`}>
-                      <div className="flex-grow">{getName(item)}</div>
-                      <button
-                        onClick={() => handleDeleteItem(item.id, item.type)}
-                        className="text-red-500 hover:text-red-700 ml-2"
-                      >
-                        <Trash2 size={16} />
-                      </button>
-                    </SortableItem>
-                    ))}
-                  </ul>
-                </SortableContext>
-              </DndContext>
-            </div>
-            <div className="mt-4">
-              <h3 className="text-lg font-semibold mb-2">Scene Objects</h3>
-              <ul className="space-y-2">
-                {Object.entries(vizobjs).map(([id, obj]) => (
-                  <li key={id} className="flex items-center justify-between bg-gray-100 p-2 rounded">
-                    <span>{`${obj.name}`}</span>
-                    <button
-                      onClick={() => deleteVizObj(Number(id))}
-                      className="text-red-500 hover:text-red-700"
-                    >
-                      <Trash2 size={16} />
-                    </button>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          </DialogContent>
-        </Dialog>
+        
       </div>
 
       {selectedObjectType && (
