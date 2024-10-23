@@ -12,12 +12,19 @@ import {
   LineObjSelect,
   TextGeomSelect,
   SelectControlInsert,
-  SelectControlSelect
+  SelectControlSelect,
+  OrderInsert,
+  OrderSelect,
+  SliderControlAdvancedInsert,
+  SliderControlAdvancedSelect,
+  AttributePairsInsert,
+  AttributePairsSelect
 } from "@/app/db/schema"
 
 export interface SerializeStateInsert {
     title: string
     camera_zoom: number
+    // vizobjects
     GeomObjs: Omit<GeomObjInsert, 'stateId'>[]
     LineObjs: Omit<LineObjInsert, 'stateId'>[]
     FunctionPlotStrings: Omit<FunctionPlotStringInsert, 'stateId'>[]
@@ -25,13 +32,19 @@ export interface SerializeStateInsert {
     AxisObjects: Omit<AxisObjectInsert, 'stateId'>[]
     TextGeoms: Omit<TextGeomInsert, 'stateId'>[]
 
-    // more things depending on the state
+    // controls
     SelectControls: Omit<SelectControlInsert, 'stateId'>[]
+    SliderControls: Omit<SliderControlAdvancedInsert, 'stateId'>[]
+    AttributePairs: Omit<AttributePairsInsert, 'stateId'>[]
+
+    SideBarOrder: Omit<OrderInsert, 'stateId'>[]
+
 }
 
 export interface SerializeStateSelect {
     title: string
     camera_zoom: number
+    // vizobjects
     GeomObjs: GeomObjSelect[]
     LineObjs: LineObjSelect[]
     FunctionPlotStrings: FunctionPlotStringSelect[]
@@ -39,6 +52,13 @@ export interface SerializeStateSelect {
     AxisObjects: AxisObjectSelect[]
     TextGeoms: TextGeomSelect[]
     
-    // more things depending on the state
+    
+    // controls
+    SliderControls: SliderControlAdvancedSelect[]
     SelectControls: SelectControlSelect[]
+    AttributePairs: AttributePairsSelect[]
+
+
+
+    SideBarOrder: OrderSelect[]
 }

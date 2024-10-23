@@ -26,6 +26,7 @@ import { Input } from "@/components/ui/input";
 import { atts, dict_get_attributes} from "../vizobjects/get_set_obj_attributes";
 import { FunctionStr, FunctionStrEditor } from './FunctionStr';
 import Validation_sliderAdv, { Validation_sliderAdv_constructor, ValidationSliderAdvEditor } from "../Validation/Validation_sliderAdv";
+import { AttributePairsInsert, AttributePairsSelect, SliderControlAdvancedInsert, SliderControlAdvancedSelect } from "@/app/db/schema";
 
 export interface AttributePairSet {
   transform_function: FunctionStr;
@@ -79,6 +80,46 @@ export class SliderControlAdvanced<T extends obj> extends SliderControl<T> {
     this.attribute_JSON = attribute_pairs;
     
     this.localValue = (range[0] + range[1]) / 2;
+  }
+
+  serialize(): [Omit<SliderControlAdvancedInsert, 'stateId'>, Omit<AttributePairsInsert, 'stateId'>[] ] {
+    const sliderControlData: Omit<SliderControlAdvancedInsert, 'stateId'> = {
+      id: this.id,
+      controlId: this.id,
+      desc: this.desc,
+      text: this.text,
+      obj_id: this.obj_id,
+      range: this.range,
+      step_size: this.step_size,
+    };
+
+    const attributePairs: Omit<AttributePairsInsert, 'stateId'>[] = this.attribute_JSON.map(pair => ({
+      ControlId: this.id,
+      trans_functionStr: pair.transform_function.functionString,
+      trans_symbols: pair.transform_function.symbols,
+      get_func: pair.func,
+      obj_type: pair.obj_type
+    }));
+
+    return [sliderControlData, attributePairs];
+  }
+
+  static deserialize(data: SliderControlAdvancedSelect, attributePairs: AttributePairsSelect[]): SliderControlAdvanced<any> {
+    const attribute_pairs: AttributePairSet_json[] = attributePairs.map(pair => ({
+      transform_function: new FunctionStr(pair.trans_functionStr, pair.trans_symbols),
+      func: pair.get_func,
+      obj_type: pair.obj_type
+    }));
+  
+    return new SliderControlAdvanced({
+      id: data.controlId,
+      obj_id: data.obj_id,
+      range: data.range,
+      step_size: data.step_size,
+      desc: data.desc,
+      text: data.text,
+      attribute_pairs: attribute_pairs
+    });
   }
 
   setSliderValue(obj: T, value: number): T {

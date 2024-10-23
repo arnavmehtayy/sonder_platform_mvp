@@ -1,4 +1,4 @@
-import { State } from "@/app/store";
+import { OrderItem, State } from "@/app/store";
 import { geomobj } from "@/classes/vizobjects/geomobj";
 import { SerializeStateInsert, SerializeStateSelect } from "./Serializtypes";
 import CoordinateAxis from "@/classes/vizobjects/CoordinateAxis";
@@ -9,6 +9,7 @@ import TextGeom from "../vizobjects/textgeomObj";
 import { SelectControl } from "../Controls/SelectControl";
 import { obj } from "../vizobjects/obj";
 import { Control } from "../Controls/Control";
+import { SliderControlAdvanced } from "../Controls/SliderControlAdv";
 
 export function serializeState(state: State): SerializeStateInsert {
   return {
@@ -36,12 +37,28 @@ export function serializeState(state: State): SerializeStateInsert {
     SelectControls: Object.values(state.controls)
       .filter((obj) => obj instanceof SelectControl)
       .map((obj) => (obj as SelectControl).serialize()),
+
+    SideBarOrder: Object.values(state.order).map((obj) => ({
+      type: obj.type,
+      itemId: obj.id
+    })),
+
+    SliderControls: Object.values(state.controls)
+      .filter((obj) => obj instanceof SliderControlAdvanced)
+      .map((obj) => (obj as SliderControlAdvanced<any>).serialize()[0]),
+
+
+    AttributePairs: Object.values(state.controls)
+      .filter((obj) => obj instanceof SliderControlAdvanced)
+      .flatMap((obj) => (obj as SliderControlAdvanced<any>).serialize()[1])
+        
   };
 }
 
 export function deserializeState(serializedState: SerializeStateSelect): State {
   const vizobjs: { [key: string]: obj } = {};
   const controls: { [key: string]: Control } = {};
+  
 
   if (Array.isArray(serializedState.GeomObjs)) {
     serializedState.GeomObjs.forEach((obj) => {
@@ -73,11 +90,28 @@ export function deserializeState(serializedState: SerializeStateSelect): State {
     controls[obj.controlId] = SelectControl.deserialize(obj);
   });
 
+  const order: OrderItem[] = serializedState.SideBarOrder.map((obj) => 
+   new OrderItem(obj.type, obj.itemId)
+  )
+
+  serializedState.SliderControls.forEach((sliderControl) => {
+    const relatedAttributePairs = serializedState.AttributePairs.filter(
+      pair => pair.ControlId === sliderControl.controlId
+    );
+    controls[sliderControl.controlId] = SliderControlAdvanced.deserialize(
+      sliderControl,
+      relatedAttributePairs
+    );
+  });
+
+ 
+
   return {
     title: serializedState.title,
     camera_zoom: serializedState.camera_zoom,
     vizobjs: vizobjs,
     controls: controls,
+    order: order
     // questions: [],
     // order: [],
     // validations: [],

@@ -5,7 +5,7 @@ import { PlacementConstructor } from '@/classes/Placement';
 import { ScoreConstructor } from '@/classes/Scores/Score';
 import { ValidationConstructor } from '@/classes/Validation/Validation';
 import { geom_param_type, geom_type, PredefinedGeometry } from '@/classes/vizobjects/geomobj';
-import { objconstructor } from '@/classes/vizobjects/obj';
+import { objconstructor, object_types } from '@/classes/vizobjects/obj';
 import { integer, boolean, real, pgTable, serial, text, timestamp, jsonb } from 'drizzle-orm/pg-core';
 import { InferSelectModel, InferInsertModel } from 'drizzle-orm';
 
@@ -47,6 +47,7 @@ export const GeomObj = pgTable('geom_obj', {
 // Existing imports...
 import { LineConstTypes } from '@/classes/vizobjects/Lineobj';
 import { AttributePairGet } from '@/classes/Controls/FunctionStr';
+import { SideBarComponentType } from '../store';
 
 // ... (existing code)
 
@@ -180,6 +181,17 @@ export type GeomObjInsert = InferInsertModel<typeof GeomObj>;
 
 // VIZOBJECTS
 
+// ORDER
+export const order = pgTable('order', {
+  id: serial('id').primaryKey(),
+  stateId: integer('state_id').references(() => states.id, { onDelete: 'cascade' }).notNull(),
+  type: text('type').$type<SideBarComponentType>().notNull(),
+  itemId: integer('item_id').notNull(),
+});
+
+export type OrderSelect = InferSelectModel<typeof order>;
+export type OrderInsert = InferInsertModel<typeof order>;
+
 
 // CONTROLS
 
@@ -234,17 +246,35 @@ export const SelectControl = pgTable('select_control', {
 // });
 
 
-// export const SliderControlAdvanced = pgTable('slider_control_advanced', {
-//   id: serial('id').primaryKey(),
-//   stateId: integer('state_id').references(() => states.id, { onDelete: 'cascade' }).notNull(),
-//   controlId: integer('control_id').notNull(),
-//   desc: text('desc').notNull(),
-//   text: text('text').notNull(),
-//   obj_id: integer('obj_id').notNull(),
-//   range: jsonb('range').notNull(),
-//   step_size: real('step_size').notNull(),
-//   attribute_pairs: jsonb('attribute_pairs').notNull(),
-// });
+// for each SliderControlAdvanced you also need to go to the AttributePair table and pick
+// out the corresponding list of attribute pairs to attach to it.
+export const SliderControlAdvanced = pgTable('slider_control_advanced', {
+  id: serial('id').primaryKey(),
+  stateId: integer('state_id').references(() => states.id, { onDelete: 'cascade' }).notNull(),
+  controlId: integer('control_id').notNull(),
+  desc: text('desc').notNull(),
+  text: text('text').notNull(),
+  obj_id: integer('obj_id').notNull(),
+  range: jsonb('range').$type<[number, number]>().notNull(),
+  step_size: real('step_size').notNull(),
+});
+
+export const AttributePairs = pgTable('attribute_pairs', {
+  id: serial('id').primaryKey(),
+  ControlId: integer('control_id').references(() => SliderControlAdvanced.id, { onDelete: 'cascade' }).notNull(),
+  stateId: integer('state_id').references(() => states.id, { onDelete: 'cascade' }).notNull(),
+  trans_functionStr: text('trans_functionStr').notNull(),
+  trans_symbols: jsonb('trans_symbols').$type<AttributePairGet[]>().notNull(),
+  get_func: text('func').notNull(),
+  obj_type: text('obj_type').$type<object_types>().notNull(),
+});
+
+
+export type SliderControlAdvancedSelect = InferSelectModel<typeof SliderControlAdvanced>;
+export type SliderControlAdvancedInsert = InferInsertModel<typeof SliderControlAdvanced>;
+
+export type AttributePairsSelect = InferSelectModel<typeof AttributePairs>;
+export type AttributePairsInsert = InferInsertModel<typeof AttributePairs>;
 
 // export const MultiChoiceControl = pgTable('multi_choice_control', {
 //   id: serial('id').primaryKey(),

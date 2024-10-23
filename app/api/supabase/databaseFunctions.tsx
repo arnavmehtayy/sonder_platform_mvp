@@ -1,5 +1,5 @@
 import { db } from '@/app/db/index';
-import { states, GeomObj, LineObj, FunctionPlotString, DummyDataStorage, AxisObject, TextGeom, SelectControl } from '@/app/db/schema';
+import { states, GeomObj, LineObj, FunctionPlotString, DummyDataStorage, AxisObject, TextGeom, SelectControl, order, SliderControlAdvanced, AttributePairs } from '@/app/db/schema';
 import { eq } from 'drizzle-orm';
 import { SerializeStateInsert, SerializeStateSelect } from '@/classes/database/Serializtypes';
 
@@ -38,7 +38,9 @@ export async function saveStateToDatabase(stateName: string, state: SerializeSta
     await tx.delete(AxisObject).where(eq(AxisObject.stateId, stateId));
     await tx.delete(TextGeom).where(eq(TextGeom.stateId, stateId));
     await tx.delete(SelectControl).where(eq(SelectControl.stateId, stateId));
-
+    await tx.delete(SliderControlAdvanced).where(eq(SliderControlAdvanced.stateId, stateId));
+    await tx.delete(AttributePairs).where(eq(AttributePairs.stateId, stateId));
+    await tx.delete(order).where(eq(order.stateId, stateId));
 
     // Insert vizobjects
     if (state.GeomObjs.length > 0) {
@@ -60,7 +62,16 @@ export async function saveStateToDatabase(stateName: string, state: SerializeSta
       await tx.insert(TextGeom).values(state.TextGeoms.map(obj => ({ ...obj, stateId })));
     }
     if(state.SelectControls.length > 0) {
-    await tx.insert(SelectControl).values(state.SelectControls.map(control => ({ ...control, stateId })));
+      await tx.insert(SelectControl).values(state.SelectControls.map(control => ({ ...control, stateId })));
+    }
+    if(state.SliderControls.length > 0) {
+      await tx.insert(SliderControlAdvanced).values(state.SliderControls.map(control => ({ ...control, stateId })));
+    }
+    if(state.AttributePairs.length > 0) {
+      await tx.insert(AttributePairs).values(state.AttributePairs.map(pair => ({ ...pair, stateId })));
+    }
+    if(state.SideBarOrder.length > 0) {
+      await tx.insert(order).values(state.SideBarOrder.map(item => ({ ...item, stateId })));
     }
   });
 }
@@ -81,7 +92,10 @@ export async function loadStateFromDatabase(stateName: string): Promise<Serializ
     const dummyDataStorageData = await tx.select().from(DummyDataStorage).where(eq(DummyDataStorage.stateId, stateId));
     const axisObjectData = await tx.select().from(AxisObject).where(eq(AxisObject.stateId, stateId));
     const textGeomData = await tx.select().from(TextGeom).where(eq(TextGeom.stateId, stateId));
-    const selectControlData = await tx.select().from(SelectControl).where(eq(SelectControl.stateId, stateId))
+    const selectControlData = await tx.select().from(SelectControl).where(eq(SelectControl.stateId, stateId));
+    const sliderControlData = await tx.select().from(SliderControlAdvanced).where(eq(SliderControlAdvanced.stateId, stateId));
+    const attributePairsData = await tx.select().from(AttributePairs).where(eq(AttributePairs.stateId, stateId));
+    const sideBarOrderData = await tx.select().from(order).where(eq(order.stateId, stateId));
 
     // Construct the state object
     const loadedState: SerializeStateSelect = {
@@ -93,7 +107,10 @@ export async function loadStateFromDatabase(stateName: string): Promise<Serializ
       DummyDataStorages: dummyDataStorageData,
       AxisObjects: axisObjectData,
       TextGeoms: textGeomData,
-      SelectControls: selectControlData
+      SelectControls: selectControlData,
+      SliderControls: sliderControlData,
+      AttributePairs: attributePairsData,
+      SideBarOrder: sideBarOrderData
     };
 
     return loadedState;
