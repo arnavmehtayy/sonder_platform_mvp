@@ -10,8 +10,14 @@ import { SelectControl } from "../Controls/SelectControl";
 import { obj } from "../vizobjects/obj";
 import { Control } from "../Controls/Control";
 import { SliderControlAdvanced } from "../Controls/SliderControlAdv";
+import { MultiChoiceClass } from "../Controls/MultiChoiceClass";
 
 export function serializeState(state: State): SerializeStateInsert {
+    const multiChoiceControls = Object.values(state.controls)
+    .filter((obj): obj is MultiChoiceClass => obj instanceof MultiChoiceClass)
+    .map(control => control.serialize());
+
+    console.log(multiChoiceControls)
   return {
     title: state.title,
     camera_zoom: state.camera_zoom,
@@ -50,8 +56,13 @@ export function serializeState(state: State): SerializeStateInsert {
 
     AttributePairs: Object.values(state.controls)
       .filter((obj) => obj instanceof SliderControlAdvanced)
-      .flatMap((obj) => (obj as SliderControlAdvanced<any>).serialize()[1])
-        
+      .flatMap((obj) => (obj as SliderControlAdvanced<any>).serialize()[1]),
+
+    
+    MultiChoiceControls: multiChoiceControls.map(([control, options]) => control),
+    MultiChoiceOptions: multiChoiceControls.flatMap(([control, options]) => options)
+    
+    
   };
 }
 
@@ -102,6 +113,12 @@ export function deserializeState(serializedState: SerializeStateSelect): State {
       sliderControl,
       relatedAttributePairs
     );
+  });
+  serializedState.MultiChoiceControls.forEach((control) => {
+    const relatedOptions = serializedState.MultiChoiceOptions.filter(
+      option => option.multiChoiceControlId === control.controlId
+    );
+    controls[control.controlId] = MultiChoiceClass.deserialize(control, relatedOptions);
   });
 
  

@@ -1,4 +1,3 @@
-
 import { Control, ControlConstructor } from "./Control";
 import { useStore, setMultiChoiceOptionsSelector } from "@/app/store";
 import Latex from "react-latex-next";
@@ -10,6 +9,12 @@ import {
 import { MultiChoiceEditor } from "../Validation/ValidationMultiChoice";
 import { ValidationMultiChoice } from "../Validation/ValidationMultiChoice";
 
+import {
+  MultiChoiceControlInsert,
+  MultiChoiceControlSelect,
+  MultiChoiceOptionInsert,
+  MultiChoiceOptionSelect,
+} from "@/app/db/schema";
 /*
  * This class is responsible for storing information about a multiple choice question
  * the attributes of this class are: options, isMultiSelect, selectedOptions
@@ -133,6 +138,43 @@ export class MultiChoiceClass extends Control {
     this.selectedOptions = []; // no options are selected initially
   }
 
+  serialize(): [
+    Omit<MultiChoiceControlInsert, "stateId">,
+    Omit<MultiChoiceOptionInsert, "stateId">[]
+  ] {
+    const controlData: Omit<MultiChoiceControlInsert, "stateId"> = {
+      id: this.id,
+      controlId: this.id,
+      desc: this.desc,
+      text: this.text,
+      isMultiSelect: this.isMultiSelect,
+    };
+
+    const optionsData: Omit<MultiChoiceOptionInsert, "stateId">[] =
+      this.options.map((option) => ({
+        multiChoiceControlId: this.id,
+        label: option.label,
+      }));
+
+    return [controlData, optionsData];
+  }
+
+  static deserialize(
+    data: MultiChoiceControlSelect,
+    options: MultiChoiceOptionSelect[]
+  ): MultiChoiceClass {
+    return new MultiChoiceClass({
+      id: data.controlId,
+      desc: data.desc,
+      text: data.text,
+      isMultiSelect: data.isMultiSelect,
+      options: options.map((opt) => ({
+        id: opt.id,
+        label: opt.label,
+      })),
+    });
+  }
+
   // change the selected options of the multiple choice question used by the storage system
   setOptions(options: number[]) {
     const new_obj = Object.assign(
@@ -154,11 +196,14 @@ export class MultiChoiceClass extends Control {
     };
   }
 
-  static createValidation(multiChoiceId: number, correctAnswers: number[]): ValidationMultiChoice {
+  static createValidation(
+    multiChoiceId: number,
+    correctAnswers: number[]
+  ): ValidationMultiChoice {
     return new ValidationMultiChoice({
       answer: correctAnswers,
       control_id: multiChoiceId,
-      desc: `Validation for MultiChoice ${multiChoiceId}`
+      desc: `Validation for MultiChoice ${multiChoiceId}`,
     });
   }
 
@@ -171,19 +216,22 @@ export class MultiChoiceClass extends Control {
     onClose: () => void;
     onSave: (obj: MultiChoiceClass, validation?: ValidationMultiChoice) => void;
   }) {
-    const [editedObject, setEditedObject] = React.useState<MultiChoiceConstructor>({
-      id: Date.now() % 10000,
-      desc: "",
-      options: [],
-      isMultiSelect: false,
-      text: "",
-    });
-    const [validation, setValidation] = React.useState<ValidationMultiChoice | undefined>(undefined);
-  
+    const [editedObject, setEditedObject] =
+      React.useState<MultiChoiceConstructor>({
+        id: Date.now() % 10000,
+        desc: "",
+        options: [],
+        isMultiSelect: false,
+        text: "",
+      });
+    const [validation, setValidation] = React.useState<
+      ValidationMultiChoice | undefined
+    >(undefined);
+
     const handleChange = (field: string, value: any) => {
       setEditedObject((prev) => ({ ...prev, [field]: value }));
     };
-  
+
     const popupProps: EditableObjectPopupProps<MultiChoiceConstructor> = {
       isOpen,
       onClose,
@@ -213,7 +261,7 @@ export class MultiChoiceClass extends Control {
         />
       ),
     };
-  
+
     return <EditableObjectPopup {...popupProps} />;
   }
 

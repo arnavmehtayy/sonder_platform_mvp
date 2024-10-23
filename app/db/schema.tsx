@@ -276,15 +276,27 @@ export type SliderControlAdvancedInsert = InferInsertModel<typeof SliderControlA
 export type AttributePairsSelect = InferSelectModel<typeof AttributePairs>;
 export type AttributePairsInsert = InferInsertModel<typeof AttributePairs>;
 
-// export const MultiChoiceControl = pgTable('multi_choice_control', {
-//   id: serial('id').primaryKey(),
-//   stateId: integer('state_id').references(() => states.id, { onDelete: 'cascade' }).notNull(),
-//   controlId: integer('control_id').notNull(),
-//   desc: text('desc').notNull(),
-//   text: text('text').notNull(),
-//   options: jsonb('options').notNull(),
-//   isMultiSelect: boolean('is_multi_select').notNull(),
-// });
+export const MultiChoiceControl = pgTable('multi_choice_control', {
+  id: serial('id').primaryKey(),
+  stateId: integer('state_id').references(() => states.id, { onDelete: 'cascade' }).notNull(),
+  controlId: integer('control_id').notNull(),
+  desc: text('desc').notNull(),
+  text: text('text').notNull(),
+  isMultiSelect: boolean('is_multi_select').notNull(),
+});
+
+export const MultiChoiceOption = pgTable('multi_choice_option', {
+  id: serial('id').primaryKey(),
+  multiChoiceControlId: integer('multi_choice_control_id').references(() => MultiChoiceControl.id, { onDelete: 'cascade' }).notNull(),
+  stateId: integer('state_id').references(() => states.id, { onDelete: 'cascade' }).notNull(),
+  label: text('label').notNull(),
+});
+
+export type MultiChoiceControlSelect = InferSelectModel<typeof MultiChoiceControl>;
+export type MultiChoiceControlInsert = InferInsertModel<typeof MultiChoiceControl>;
+
+export type MultiChoiceOptionSelect = InferSelectModel<typeof MultiChoiceOption>;
+export type MultiChoiceOptionInsert = InferInsertModel<typeof MultiChoiceOption>;
 
 // export const InputNumberControl = pgTable('input_number_control', {
 //   id: serial('id').primaryKey(),
