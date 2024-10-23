@@ -48,6 +48,7 @@ export const GeomObj = pgTable('geom_obj', {
 import { LineConstTypes } from '@/classes/vizobjects/Lineobj';
 import { AttributePairGet } from '@/classes/Controls/FunctionStr';
 import { SideBarComponentType } from '../store';
+import { objectScorer } from '@/classes/Scores/objectScorer';
 
 // ... (existing code)
 
@@ -355,7 +356,20 @@ export type EnablerControlInsert = InferInsertModel<typeof EnablerControl>;
 
 
 
-// CONTROLS
+// Score
+
+export const FunctionScore = pgTable('function_score', {
+  id: serial('id').primaryKey(),
+  stateId: integer('state_id').references(() => states.id, { onDelete: 'cascade' }).notNull(),
+  scoreId: integer('score_id').notNull(),
+  text: text('text').notNull(),
+  desc: text('desc').notNull(),
+  functionStr: text('function_str').notNull(),
+  functionSymbols: jsonb('function_symbols').$type<AttributePairGet[]>().notNull(),
+});
+
+export type FunctionScoreSelect = InferSelectModel<typeof FunctionScore>;
+export type FunctionScoreInsert = InferInsertModel<typeof FunctionScore>;
 
 
 

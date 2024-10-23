@@ -10,6 +10,7 @@ import { useStore } from '@/app/store';
 import { objectScorer } from "./objectScorer";
 import { atts } from '../vizobjects/get_set_obj_attributes';
 import Validation_score, { Validation_score_constructor, ValidationScoreEditor } from "../Validation/Validation_score";
+import { FunctionScoreInsert, FunctionScoreSelect } from "@/app/db/schema";
 
 export interface FunctionScoreConstructor extends ScoreConstructor<number>{
   score_id: number
@@ -70,6 +71,31 @@ export class FunctionScore extends Score<number> {
       obj_list: [],
       type: "FunctionScore"
     };
+  }
+
+  serialize(): Omit<FunctionScoreInsert, 'stateId'> {
+    return {
+      id: this.score_id,
+      scoreId: this.score_id,
+      // Base Score properties
+      text: this.text,
+      desc: this.desc,
+      // FunctionScore specific properties
+      functionStr: this.functionStr.functionString,
+      functionSymbols: this.functionStr.symbols
+    };
+  }
+
+  static deserialize(data: FunctionScoreSelect): FunctionScore {
+    const score = new FunctionScore({
+      score_id: data.scoreId,
+      text: data.text,
+      desc: data.desc,
+      obj_list: [], // this is populated by the constructor
+      functionStr: new FunctionStr(data.functionStr, data.functionSymbols)
+    });
+
+    return score;
   }
 
   static getPopup({

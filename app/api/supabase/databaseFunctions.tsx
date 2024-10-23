@@ -17,6 +17,7 @@ import {
   TableControl,
   TableCell,
   EnablerControl,
+  FunctionScore,
 } from "@/app/db/schema";
 import { eq } from "drizzle-orm";
 import {
@@ -98,6 +99,9 @@ export async function saveStateToDatabase(
     // Delete existing Table records
     await tx.delete(TableCell).where(eq(TableCell.stateId, stateId));
     await tx.delete(TableControl).where(eq(TableControl.stateId, stateId));
+
+    // Delete existing FunctionScore records
+    await tx.delete(FunctionScore).where(eq(FunctionScore.stateId, stateId));
 
     // Insert vizobjects
     if (state.GeomObjs.length > 0) {
@@ -212,6 +216,13 @@ export async function saveStateToDatabase(
         state.TableCells.map(cell => ({ ...cell, stateId }))
       );
     }
+
+    // Insert new FunctionScore records
+    if (state.FunctionScores.length > 0) {
+      await tx.insert(FunctionScore).values(
+        state.FunctionScores.map(score => ({ ...score, stateId }))
+      );
+    }
   });
 }
 
@@ -306,6 +317,11 @@ export async function loadStateFromDatabase(
       .from(TableCell)
       .where(eq(TableCell.stateId, stateId));
 
+    // Fetch FunctionScore data
+    const functionScoreData = await tx.select()
+      .from(FunctionScore)
+      .where(eq(FunctionScore.stateId, stateId));
+
     // Construct the state object
     const loadedState: SerializeStateSelect = {
       title: stateRecord[0].title,
@@ -327,6 +343,7 @@ export async function loadStateFromDatabase(
       TableControls: tableControlData,
       TableCells: tableCellData,
       EnablerControls: enablerControlData,
+      FunctionScores: functionScoreData,
     };
     return loadedState;
   });

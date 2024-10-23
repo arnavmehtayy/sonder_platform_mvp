@@ -14,6 +14,8 @@ import { MultiChoiceClass } from "../Controls/MultiChoiceClass";
 import { InputNumber } from "../Controls/InputNumber";
 import { TableControl } from "../Controls/TableControl";
 import { EnablerControl } from "../Controls/EnablerControl";
+import { FunctionScore } from "../Scores/FunctionScore";
+import { Score } from "../Scores/Score";
 
 export function serializeState(state: State): SerializeStateInsert {
     const multiChoiceControls = Object.values(state.controls)
@@ -31,6 +33,10 @@ export function serializeState(state: State): SerializeStateInsert {
     const enablerControls = Object.values(state.controls)
     .filter((obj): obj is EnablerControl => obj instanceof EnablerControl)
     .map(control => control.serialize());
+
+    const functionScores = Object.values(state.scores)
+    .filter((obj): obj is FunctionScore => obj instanceof FunctionScore)
+    .map(score => score.serialize());
 
     console.log(multiChoiceControls)
   return {
@@ -83,13 +89,14 @@ export function serializeState(state: State): SerializeStateInsert {
     TableControls: tableControls.map(([control]) => control),
     TableCells: tableControls.flatMap(([_, cells]) => cells),
     EnablerControls: enablerControls,
+    FunctionScores: functionScores,
   };
 }
 
 export function deserializeState(serializedState: SerializeStateSelect): State {
   const vizobjs: { [key: string]: obj } = {};
   const controls: { [key: string]: Control } = {};
-  
+  const scores: { [key: number]: Score<any> } = {};
 
   if (Array.isArray(serializedState.GeomObjs)) {
     serializedState.GeomObjs.forEach((obj) => {
@@ -161,12 +168,18 @@ export function deserializeState(serializedState: SerializeStateSelect): State {
     controls[control.controlId] = EnablerControl.deserialize(control);
   });
 
+  // Deserialize function scores
+  serializedState.FunctionScores.forEach((score) => {
+    scores[score.scoreId] = FunctionScore.deserialize(score);
+  });
+
   return {
     title: serializedState.title,
     camera_zoom: serializedState.camera_zoom,
     vizobjs: vizobjs,
     controls: controls,
-    order: order
+    order: order,
+    scores: scores,
     // questions: [],
     // order: [],
     // validations: [],

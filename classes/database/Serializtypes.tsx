@@ -32,7 +32,9 @@ import {
   TableCellInsert,
   TableCellSelect,
   EnablerControlInsert,
-  EnablerControlSelect
+  EnablerControlSelect,
+  FunctionScoreInsert,
+  FunctionScoreSelect
 } from "@/app/db/schema";
 
 export interface SerializeStateInsert {
@@ -45,6 +47,7 @@ export interface SerializeStateInsert {
   DummyDataStorages: Omit<DummyDataStorageInsert, "stateId">[];
   AxisObjects: Omit<AxisObjectInsert, "stateId">[];
   TextGeoms: Omit<TextGeomInsert, "stateId">[];
+  FunctionScores: Omit<FunctionScoreInsert, 'stateId'>[];
 
   // controls
   SelectControls: Omit<SelectControlInsert, "stateId">[];
@@ -71,6 +74,7 @@ export interface SerializeStateSelect {
   DummyDataStorages: DummyDataStorageSelect[];
   AxisObjects: AxisObjectSelect[];
   TextGeoms: TextGeomSelect[];
+  FunctionScores: FunctionScoreSelect[];
 
   // controls
   SliderControls: SliderControlAdvancedSelect[];
