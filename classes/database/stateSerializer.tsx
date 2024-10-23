@@ -12,6 +12,7 @@ import { Control } from "../Controls/Control";
 import { SliderControlAdvanced } from "../Controls/SliderControlAdv";
 import { MultiChoiceClass } from "../Controls/MultiChoiceClass";
 import { InputNumber } from "../Controls/InputNumber";
+import { TableControl } from "../Controls/TableControl";
 
 export function serializeState(state: State): SerializeStateInsert {
     const multiChoiceControls = Object.values(state.controls)
@@ -20,6 +21,10 @@ export function serializeState(state: State): SerializeStateInsert {
 
     const inputNumberControls = Object.values(state.controls)
     .filter((obj): obj is InputNumber => obj instanceof InputNumber)
+    .map(control => control.serialize());
+
+    const tableControls = Object.values(state.controls)
+    .filter((obj): obj is TableControl<any> => obj instanceof TableControl)
     .map(control => control.serialize());
 
     console.log(multiChoiceControls)
@@ -70,7 +75,8 @@ export function serializeState(state: State): SerializeStateInsert {
     InputNumberControls: inputNumberControls.map(([control]) => control),
     InputNumberAttributePairs: inputNumberControls.flatMap(([control, pairs]) => pairs),
     
-    
+    TableControls: tableControls.map(([control]) => control),
+    TableCells: tableControls.flatMap(([_, cells]) => cells),
   };
 }
 
@@ -136,7 +142,13 @@ export function deserializeState(serializedState: SerializeStateSelect): State {
     controls[control.controlId] = InputNumber.deserialize(control, relatedAttributePairs);
   });
 
- 
+  // Deserialize Table controls
+  serializedState.TableControls.forEach((control) => {
+    const relatedCells = serializedState.TableCells.filter(
+      cell => cell.tableControlId === control.controlId
+    );
+    controls[control.controlId] = TableControl.deserialize(control, relatedCells);
+  });
 
   return {
     title: serializedState.title,

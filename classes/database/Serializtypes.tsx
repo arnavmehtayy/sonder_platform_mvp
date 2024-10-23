@@ -27,6 +27,10 @@ import {
   InputNumberControlSelect,
   InputNumberAttributePairsInsert,
   InputNumberAttributePairsSelect,
+  TableControlInsert,
+  TableControlSelect,
+  TableCellInsert,
+  TableCellSelect
 } from "@/app/db/schema";
 
 export interface SerializeStateInsert {
@@ -50,6 +54,8 @@ export interface SerializeStateInsert {
   InputNumberAttributePairs: Omit<InputNumberAttributePairsInsert, "stateId">[];
 
   SideBarOrder: Omit<OrderInsert, "stateId">[];
+  TableControls: Omit<TableControlInsert, 'stateId'>[];
+  TableCells: Omit<TableCellInsert, 'stateId'>[];
 }
 
 export interface SerializeStateSelect {
@@ -73,4 +79,6 @@ export interface SerializeStateSelect {
   InputNumberAttributePairs: InputNumberAttributePairsSelect[];
 
   SideBarOrder: OrderSelect[];
+  TableControls: TableControlSelect[];
+  TableCells: TableCellSelect[];
 }

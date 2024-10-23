@@ -14,6 +14,8 @@ import {
   MultiChoiceOption,
   MultiChoiceControl,
   InputNumberAttributePairs,
+  TableControl,
+  TableCell,
 } from "@/app/db/schema";
 import { eq } from "drizzle-orm";
 import {
@@ -88,6 +90,10 @@ export async function saveStateToDatabase(
     
       await tx.delete(InputNumberAttributePairs).where(eq(InputNumberAttributePairs.stateId, stateId));
     await tx.delete(InputNumberControl).where(eq(InputNumberControl.stateId, stateId));
+
+    // Delete existing Table records
+    await tx.delete(TableCell).where(eq(TableCell.stateId, stateId));
+    await tx.delete(TableControl).where(eq(TableControl.stateId, stateId));
 
     // Insert vizobjects
     if (state.GeomObjs.length > 0) {
@@ -183,6 +189,18 @@ export async function saveStateToDatabase(
           );
       }
     }
+
+    // Insert new Table controls and cells
+    if (state.TableControls.length > 0) {
+      await tx.insert(TableControl).values(
+        state.TableControls.map(control => ({ ...control, stateId }))
+      );
+    }
+    if (state.TableCells.length > 0) {
+      await tx.insert(TableCell).values(
+        state.TableCells.map(cell => ({ ...cell, stateId }))
+      );
+    }
   });
 }
 
@@ -263,6 +281,15 @@ export async function loadStateFromDatabase(
       .from(InputNumberAttributePairs)
       .where(eq(InputNumberAttributePairs.stateId, stateId));
 
+    // Fetch Table data
+    const tableControlData = await tx.select()
+      .from(TableControl)
+      .where(eq(TableControl.stateId, stateId));
+    
+    const tableCellData = await tx.select()
+      .from(TableCell)
+      .where(eq(TableCell.stateId, stateId));
+
     // Construct the state object
     const loadedState: SerializeStateSelect = {
       title: stateRecord[0].title,
@@ -281,6 +308,8 @@ export async function loadStateFromDatabase(
       MultiChoiceOptions: multiChoiceOptionData,
       InputNumberControls: inputNumberControlData,
       InputNumberAttributePairs: inputNumberAttributePairsData,
+      TableControls: tableControlData,
+      TableCells: tableCellData,
     };
     return loadedState;
   });

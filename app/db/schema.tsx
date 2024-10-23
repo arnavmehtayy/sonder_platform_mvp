@@ -195,32 +195,34 @@ export type OrderInsert = InferInsertModel<typeof order>;
 
 // CONTROLS
 
-// export const TableControl = pgTable('table_control', {
-//   id: serial('id').primaryKey(),
-//   stateId: integer('state_id').references(() => states.id, { onDelete: 'cascade' }).notNull(),
-//   controlId: integer('control_id').notNull(),
-//   desc: text('desc').notNull(),
-//   text: text('text').notNull(),
-//   columnHeaders: text('column_headers').array().notNull(),
-//   rowHeaders: text('row_headers').array().notNull(),
-// });
+export const TableControl = pgTable('table_control', {
+  id: serial('id').primaryKey(),
+  stateId: integer('state_id').references(() => states.id, { onDelete: 'cascade' }).notNull(),
+  controlId: integer('control_id').notNull(),
+  desc: text('desc').notNull(),
+  text: text('text').notNull(),
+  columnHeaders: text('column_headers').array().notNull(),
+  rowHeaders: text('row_headers').array().notNull(),
+});
 
-// export const TableCell = pgTable('table_cell', {
-//   id: serial('id').primaryKey(),
-//   tableControlId: integer('table_control_id').references(() => TableControl.id, { onDelete: 'cascade' }).notNull(),
-//   rowIndex: integer('row_index').notNull(),
-//   columnIndex: integer('column_index').notNull(),
-//   value: real('value').notNull(),
-//   functionStr: text('function_str').notNull(),
-//   objId: integer('obj_id').notNull(),
-//   objType: text('obj_type').notNull(),
-//   attribute: text('attribute').notNull(),
-//   isStatic: boolean('is_static').notNull(),
-// });
+export const TableCell = pgTable('table_cell', {
+  id: serial('id').primaryKey(),
+  stateId: integer('state_id').references(() => states.id, { onDelete: 'cascade' }).notNull(),
+  tableControlId: integer('table_control_id').references(() => TableControl.id, { onDelete: 'cascade' }).notNull(),
+  rowIndex: integer('row_index').notNull(),
+  columnIndex: integer('column_index').notNull(),
+  value: real('value').notNull(),
+  trans_functionStr: text('trans_functionStr').notNull(),
+  trans_symbols: jsonb('trans_symbols').$type<AttributePairGet[]>().notNull(),
+  objId: integer('obj_id').notNull(),
+  objType: text('obj_type').$type<object_types>().notNull(),
+  attribute: text('attribute').notNull(),
+  isStatic: boolean('is_static').notNull(),
+});
 
 
-// export type TableCellSelect = InferSelectModel<typeof TableCell>;
-// export type TableCellInsert = InferInsertModel<typeof TableCell>;
+export type TableCellSelect = InferSelectModel<typeof TableCell>;
+export type TableCellInsert = InferInsertModel<typeof TableCell>;
 
 
 export const SelectControl = pgTable('select_control', {
@@ -334,8 +336,8 @@ export type InputNumberControlInsert = InferInsertModel<typeof InputNumberContro
 
 
 // // Add these type definitions at the end of the file
-// export type TableControlSelect = InferSelectModel<typeof TableControl>;
-// export type TableControlInsert = InferInsertModel<typeof TableControl>;
+export type TableControlSelect = InferSelectModel<typeof TableControl>;
+export type TableControlInsert = InferInsertModel<typeof TableControl>;
 
 export type SelectControlSelect = InferSelectModel<typeof SelectControl>;
 export type SelectControlInsert = InferInsertModel<typeof SelectControl>;

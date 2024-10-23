@@ -1,4 +1,3 @@
-
 import React from "react";
 import { Control, ControlConstructor } from "./Control";
 import { obj, object_types } from "../vizobjects/obj";
@@ -22,6 +21,7 @@ import Latex from "react-latex-next";
 import { atts } from "../vizobjects/get_set_obj_attributes";
 import { FunctionStr, FunctionStrEditor } from './FunctionStr';
 import { Validation_tableControl, Validation_tableControlConstructor, ValidationTableControlEditor } from "../Validation/Validation_tableControl";
+import { TableControlInsert, TableControlSelect, TableCellInsert, TableCellSelect } from "@/app/db/schema";
 
 export interface TableCell<T extends obj> {
   value: number;
@@ -187,6 +187,81 @@ export class TableControl<T extends obj> extends Control {
     };
 
     return <EditableObjectPopup {...popupProps} />;
+  }
+
+  serialize(): [Omit<TableControlInsert, 'stateId'>, Omit<TableCellInsert, 'stateId'>[]] {
+    const controlData: Omit<TableControlInsert, 'stateId'> = {
+      id: this.id,
+      controlId: this.id,
+      desc: this.desc,
+      text: this.text,
+      columnHeaders: this.columnHeaders,
+      rowHeaders: this.rowHeaders,
+    };
+
+    const cellsData: Omit<TableCellInsert, 'stateId'>[] = this.rows.flatMap((row, rowIndex) =>
+      row.cells.map((cell, columnIndex) => ({
+        tableControlId: this.id,
+        rowIndex: rowIndex,
+        columnIndex: columnIndex,
+        value: cell.value,
+        trans_functionStr: cell.functionStr.functionString,
+        trans_symbols: cell.functionStr.symbols,
+        objId: cell.obj_id,
+        objType: cell.obj_type,
+        attribute: cell.attribute,
+        isStatic: cell.isStatic
+      }))
+    );
+
+    return [controlData, cellsData];
+  }
+
+  static deserialize(data: TableControlSelect, cells: TableCellSelect[]): TableControl<any> {
+    // Sort cells by row and column index
+    const sortedCells = cells.sort((a, b) => {
+      if (a.rowIndex === b.rowIndex) {
+        return a.columnIndex - b.columnIndex;
+      }
+      return a.rowIndex - b.rowIndex;
+    });
+
+    // Group cells into rows
+    const rows: TableRow<any>[] = [];
+    let currentRow: TableCell<any>[] = [];
+    let currentRowIndex = 0;
+
+    sortedCells.forEach(cell => {
+      if (cell.rowIndex !== currentRowIndex) {
+        if (currentRow.length > 0) {
+          rows.push({ cells: currentRow });
+        }
+        currentRow = [];
+        currentRowIndex = cell.rowIndex;
+      }
+
+      currentRow.push({
+        value: cell.value,
+        functionStr: new FunctionStr(cell.trans_functionStr, cell.trans_symbols),
+        obj_id: cell.objId,
+        obj_type: cell.objType,
+        attribute: cell.attribute,
+        isStatic: cell.isStatic
+      });
+    });
+
+    if (currentRow.length > 0) {
+      rows.push({ cells: currentRow });
+    }
+
+    return new TableControl({
+      id: data.controlId,
+      desc: data.desc,
+      text: data.text,
+      columnHeaders: data.columnHeaders,
+      rowHeaders: data.rowHeaders,
+      rows: rows
+    });
   }
 }
 
