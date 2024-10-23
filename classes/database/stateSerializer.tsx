@@ -13,6 +13,7 @@ import { SliderControlAdvanced } from "../Controls/SliderControlAdv";
 import { MultiChoiceClass } from "../Controls/MultiChoiceClass";
 import { InputNumber } from "../Controls/InputNumber";
 import { TableControl } from "../Controls/TableControl";
+import { EnablerControl } from "../Controls/EnablerControl";
 
 export function serializeState(state: State): SerializeStateInsert {
     const multiChoiceControls = Object.values(state.controls)
@@ -25,6 +26,10 @@ export function serializeState(state: State): SerializeStateInsert {
 
     const tableControls = Object.values(state.controls)
     .filter((obj): obj is TableControl<any> => obj instanceof TableControl)
+    .map(control => control.serialize());
+
+    const enablerControls = Object.values(state.controls)
+    .filter((obj): obj is EnablerControl => obj instanceof EnablerControl)
     .map(control => control.serialize());
 
     console.log(multiChoiceControls)
@@ -77,6 +82,7 @@ export function serializeState(state: State): SerializeStateInsert {
     
     TableControls: tableControls.map(([control]) => control),
     TableCells: tableControls.flatMap(([_, cells]) => cells),
+    EnablerControls: enablerControls,
   };
 }
 
@@ -148,6 +154,11 @@ export function deserializeState(serializedState: SerializeStateSelect): State {
       cell => cell.tableControlId === control.controlId
     );
     controls[control.controlId] = TableControl.deserialize(control, relatedCells);
+  });
+
+  // Deserialize Enabler controls
+  serializedState.EnablerControls.forEach((control) => {
+    controls[control.controlId] = EnablerControl.deserialize(control);
   });
 
   return {

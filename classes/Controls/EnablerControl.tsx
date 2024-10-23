@@ -1,5 +1,3 @@
-
-
 import { Control } from "./Control";
 import React from "react";
 import { useStore, setEnablerControl } from "@/app/store";
@@ -10,6 +8,7 @@ import {
   EditableObjectPopupProps,
 } from "@/app/Components/EditMode/EditPopups/EditableObjectPopup";
 import { ControlConstructor } from "./Control";
+import { EnablerControlInsert, EnablerControlSelect } from "@/app/db/schema";
 
 export interface EnablerControlConstructor extends ControlConstructor {
   obj_ids: number[];
@@ -108,6 +107,28 @@ export class EnablerControl extends Control {
       ControlState: this.ControlState,
       type: "EnablerControl",
     };
+  }
+
+  serialize(): Omit<EnablerControlInsert, 'stateId'> {
+    return {
+      id: this.id,
+      controlId: this.id,
+      desc: this.desc,
+      text: this.text,
+      obj_ids: this.obj_ids,
+      ControlState: this.ControlState
+    };
+  }
+
+  static deserialize(data: EnablerControlSelect): EnablerControl {
+    const control = new EnablerControl({
+      id: data.controlId,
+      desc: data.desc,
+      text: data.text,
+      obj_ids: data.obj_ids,
+    });
+    control.ControlState = data.ControlState;
+    return control;
   }
 
   static getPopup({

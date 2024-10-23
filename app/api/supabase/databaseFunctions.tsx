@@ -16,6 +16,7 @@ import {
   InputNumberAttributePairs,
   TableControl,
   TableCell,
+  EnablerControl,
 } from "@/app/db/schema";
 import { eq } from "drizzle-orm";
 import {
@@ -90,6 +91,9 @@ export async function saveStateToDatabase(
     
       await tx.delete(InputNumberAttributePairs).where(eq(InputNumberAttributePairs.stateId, stateId));
     await tx.delete(InputNumberControl).where(eq(InputNumberControl.stateId, stateId));
+
+    // Delete existing Enabler records
+    await tx.delete(EnablerControl).where(eq(EnablerControl.stateId, stateId));
 
     // Delete existing Table records
     await tx.delete(TableCell).where(eq(TableCell.stateId, stateId));
@@ -190,6 +194,13 @@ export async function saveStateToDatabase(
       }
     }
 
+    // Insert new Enabler controls
+    if (state.EnablerControls.length > 0) {
+      await tx.insert(EnablerControl).values(
+        state.EnablerControls.map(control => ({ ...control, stateId }))
+      );
+    }
+
     // Insert new Table controls and cells
     if (state.TableControls.length > 0) {
       await tx.insert(TableControl).values(
@@ -281,6 +292,11 @@ export async function loadStateFromDatabase(
       .from(InputNumberAttributePairs)
       .where(eq(InputNumberAttributePairs.stateId, stateId));
 
+    // Fetch Enabler data
+    const enablerControlData = await tx.select()
+      .from(EnablerControl)
+      .where(eq(EnablerControl.stateId, stateId));
+
     // Fetch Table data
     const tableControlData = await tx.select()
       .from(TableControl)
@@ -310,6 +326,7 @@ export async function loadStateFromDatabase(
       InputNumberAttributePairs: inputNumberAttributePairsData,
       TableControls: tableControlData,
       TableCells: tableCellData,
+      EnablerControls: enablerControlData,
     };
     return loadedState;
   });

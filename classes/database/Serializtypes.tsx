@@ -30,7 +30,9 @@ import {
   TableControlInsert,
   TableControlSelect,
   TableCellInsert,
-  TableCellSelect
+  TableCellSelect,
+  EnablerControlInsert,
+  EnablerControlSelect
 } from "@/app/db/schema";
 
 export interface SerializeStateInsert {
@@ -56,6 +58,7 @@ export interface SerializeStateInsert {
   SideBarOrder: Omit<OrderInsert, "stateId">[];
   TableControls: Omit<TableControlInsert, 'stateId'>[];
   TableCells: Omit<TableCellInsert, 'stateId'>[];
+  EnablerControls: Omit<EnablerControlInsert, 'stateId'>[];
 }
 
 export interface SerializeStateSelect {
@@ -81,4 +84,5 @@ export interface SerializeStateSelect {
   SideBarOrder: OrderSelect[];
   TableControls: TableControlSelect[];
   TableCells: TableCellSelect[];
+  EnablerControls: EnablerControlSelect[];
 }

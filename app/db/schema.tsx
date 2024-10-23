@@ -237,15 +237,15 @@ export const SelectControl = pgTable('select_control', {
   capacity: integer('capacity').notNull(),
 });
 
-// export const EnablerControl = pgTable('enabler_control', {
-//   id: serial('id').primaryKey(),
-//   stateId: integer('state_id').references(() => states.id, { onDelete: 'cascade' }).notNull(),
-//   controlId: integer('control_id').notNull(),
-//   desc: text('desc').notNull(),
-//   text: text('text').notNull(),
-//   obj_ids: jsonb('obj_ids').notNull(),
-//   ControlState: boolean('control_state').notNull(),
-// });
+export const EnablerControl = pgTable('enabler_control', {
+  id: serial('id').primaryKey(),
+  stateId: integer('state_id').references(() => states.id, { onDelete: 'cascade' }).notNull(),
+  controlId: integer('control_id').notNull(),
+  desc: text('desc').notNull(),
+  text: text('text').notNull(),
+  obj_ids: integer('obj_ids').array().notNull(),
+  ControlState: boolean('control_state').notNull(),
+});
 
 
 // for each SliderControlAdvanced you also need to go to the AttributePair table and pick
@@ -342,8 +342,8 @@ export type TableControlInsert = InferInsertModel<typeof TableControl>;
 export type SelectControlSelect = InferSelectModel<typeof SelectControl>;
 export type SelectControlInsert = InferInsertModel<typeof SelectControl>;
 
-// export type EnablerControlSelect = InferSelectModel<typeof EnablerControl>;
-// export type EnablerControlInsert = InferInsertModel<typeof EnablerControl>;
+export type EnablerControlSelect = InferSelectModel<typeof EnablerControl>;
+export type EnablerControlInsert = InferInsertModel<typeof EnablerControl>;
 
 // export type SliderControlAdvancedSelect = InferSelectModel<typeof SliderControlAdvanced>;
 // export type SliderControlAdvancedInsert = InferInsertModel<typeof SliderControlAdvanced>;
