@@ -96,16 +96,13 @@ export const EditBar: React.FC = () => {
   const [selectedObjectType, setSelectedObjectType] = useState<ObjectType | null>(null);
 
 
-  const ScoreType: ObjectType[] = [
-    {name: "Score", type: FunctionScore, icon: Calculator}
-  ];
 
   const controlTypes: ObjectType[] = [
     { name: "SliderControl", type: SliderControlAdvanced, icon: Sliders },
-    {name: "Number Input", type: InputNumber, icon: Hash},
     {name: "Object Picker", type: SelectControl, icon: List},
     {name: "Hide/Show Object", type: EnablerControl, icon: ToggleLeft},
-    {name: "Object Placer", type: Placement, icon: MousePointerClick}
+    {name: "Object Placer", type: Placement, icon: MousePointerClick},
+    {name: "Score", type: FunctionScore, icon: Calculator},
   ];
     
   const objectTypes: ObjectType[] = [
@@ -118,9 +115,10 @@ export const EditBar: React.FC = () => {
   ];
 
   const questionTypes: ObjectType[] = [
-    { name: "Question", type: Question, icon: HelpCircle },
+    { name: "Text", type: Question, icon: Type },
     { name: "MCQ", type: MultiChoiceClass, icon: ListChecks },
     {name: "Table Question", type: TableControl, icon: Table},
+    {name: "Number Input", type: InputNumber, icon: Hash},
   ];
 
   const getName = useStore(getSideBarName)
@@ -163,11 +161,6 @@ export const EditBar: React.FC = () => {
   return (
     <>
       <div className="fixed top-4 left-1/2 transform -translate-x-1/2 z-10 flex space-x-2">
-        <DropDownMenu
-          ObjectList={ScoreType}
-          setSelectedObjectType={setSelectedObjectType}
-          label="Score"
-        />
         <DropDownMenu
           ObjectList={controlTypes}
           setSelectedObjectType={setSelectedObjectType}

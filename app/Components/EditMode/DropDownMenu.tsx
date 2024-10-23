@@ -20,20 +20,21 @@ export function DropDownMenu({
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button className="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-md flex items-center space-x-2">
-          <Plus className="h-5 w-5" />
+        <Button className="bg-blue-600 hover:bg-blue-800 text-white px-6 py-3 rounded-lg flex items-center space-x-3 shadow-lg transform hover:scale-105 transition-all duration-200 ease-out text-lg font-semibold">
+          <Plus className="h-6 w-6" />
           <span>{label}</span>
-          <ChevronDown className="h-4 w-4" />
+          <ChevronDown className="h-5 w-5" />
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent>
+      <DropdownMenuContent className="bg-white rounded-lg shadow-xl p-2 mt-2">
         {ObjectList.map((objectType) => (
           <DropdownMenuItem
             key={objectType.type.name}
             onSelect={() => setSelectedObjectType(objectType)}
+            className="flex items-center space-x-3 px-4 py-3 hover:bg-gray-100 rounded-md transition-colors duration-200"
           >
-            <objectType.icon className="mr-2 h-4 w-4" />
-            <span>{objectType.name}</span>
+            <objectType.icon className="h-5 w-5 text-blue-800" />
+            <span className="text-gray-700 font-medium">{objectType.name}</span>
           </DropdownMenuItem>
         ))}
       </DropdownMenuContent>
