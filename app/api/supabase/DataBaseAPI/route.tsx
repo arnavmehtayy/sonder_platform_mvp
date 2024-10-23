@@ -11,7 +11,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ message: 'State saved successfully' });
   } catch (error) {
     console.error('Error saving state:', error);
-    return NextResponse.json({ error: 'Failed to save state' }, { status: 500 });
+    return NextResponse.json({ error: 'Failed to save state', }, { status: 500 });
   }
 }
 
