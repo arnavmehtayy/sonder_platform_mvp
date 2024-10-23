@@ -11,10 +11,15 @@ import { obj } from "../vizobjects/obj";
 import { Control } from "../Controls/Control";
 import { SliderControlAdvanced } from "../Controls/SliderControlAdv";
 import { MultiChoiceClass } from "../Controls/MultiChoiceClass";
+import { InputNumber } from "../Controls/InputNumber";
 
 export function serializeState(state: State): SerializeStateInsert {
     const multiChoiceControls = Object.values(state.controls)
     .filter((obj): obj is MultiChoiceClass => obj instanceof MultiChoiceClass)
+    .map(control => control.serialize());
+
+    const inputNumberControls = Object.values(state.controls)
+    .filter((obj): obj is InputNumber => obj instanceof InputNumber)
     .map(control => control.serialize());
 
     console.log(multiChoiceControls)
@@ -56,11 +61,14 @@ export function serializeState(state: State): SerializeStateInsert {
 
     AttributePairs: Object.values(state.controls)
       .filter((obj) => obj instanceof SliderControlAdvanced)
-      .flatMap((obj) => (obj as SliderControlAdvanced<any>).serialize()[1]),
+      .flatMap((obj) => obj.serialize()[1]), // serialize the attrite pairs for the slider control and the input number
 
     
     MultiChoiceControls: multiChoiceControls.map(([control, options]) => control),
-    MultiChoiceOptions: multiChoiceControls.flatMap(([control, options]) => options)
+    MultiChoiceOptions: multiChoiceControls.flatMap(([control, options]) => options),
+
+    InputNumberControls: inputNumberControls.map(([control]) => control),
+    InputNumberAttributePairs: inputNumberControls.flatMap(([control, pairs]) => pairs),
     
     
   };
@@ -119,6 +127,13 @@ export function deserializeState(serializedState: SerializeStateSelect): State {
       option => option.multiChoiceControlId === control.controlId
     );
     controls[control.controlId] = MultiChoiceClass.deserialize(control, relatedOptions);
+  });
+
+  serializedState.InputNumberControls.forEach((control) => {
+    const relatedAttributePairs = serializedState.InputNumberAttributePairs.filter(
+      pair => pair.ControlId === control.controlId
+    );
+    controls[control.controlId] = InputNumber.deserialize(control, relatedAttributePairs);
   });
 
  

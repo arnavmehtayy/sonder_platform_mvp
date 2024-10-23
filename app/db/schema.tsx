@@ -270,6 +270,7 @@ export const AttributePairs = pgTable('attribute_pairs', {
 });
 
 
+
 export type SliderControlAdvancedSelect = InferSelectModel<typeof SliderControlAdvanced>;
 export type SliderControlAdvancedInsert = InferInsertModel<typeof SliderControlAdvanced>;
 
@@ -298,24 +299,37 @@ export type MultiChoiceControlInsert = InferInsertModel<typeof MultiChoiceContro
 export type MultiChoiceOptionSelect = InferSelectModel<typeof MultiChoiceOption>;
 export type MultiChoiceOptionInsert = InferInsertModel<typeof MultiChoiceOption>;
 
-// export const InputNumberControl = pgTable('input_number_control', {
-//   id: serial('id').primaryKey(),
-//   stateId: integer('state_id').references(() => states.id, { onDelete: 'cascade' }).notNull(),
-//   controlId: integer('control_id').notNull(),
-//   desc: text('desc').notNull(),
-//   text: text('text').notNull(),
-//   value: real('value'),
-//   placeholder: text('placeholder'),
-//   initial_value: real('initial_value'),
-//   min: real('min'),
-//   max: real('max'),
-//   step: real('step'),
-//   obj_id: integer('obj_id'),
-//   attribute_pairs: jsonb('attribute_pairs').$type<AttributePairSet_json[]>(),
-// });
+export const InputNumberControl = pgTable('input_number_control', {
+  id: serial('id').primaryKey(),
+  stateId: integer('state_id').references(() => states.id, { onDelete: 'cascade' }).notNull(),
+  controlId: integer('control_id').notNull(),
+  desc: text('desc').notNull(),
+  text: text('text').notNull(),
+  value: real('value'),
+  placeholder: text('placeholder'),
+  initial_value: real('initial_value'),
+  min: real('min'),
+  max: real('max'),
+  step: real('step'),
+  obj_id: integer('obj_id'),
+});
 
-// export type InputNumberControlSelect = InferSelectModel<typeof InputNumberControl>;
-// export type InputNumberControlInsert = InferInsertModel<typeof InputNumberControl>;
+export const InputNumberAttributePairs = pgTable('input_number_attribute_pairs', {
+  id: serial('id').primaryKey(),
+  ControlId: integer('control_id').references(() => InputNumberControl.id, { onDelete: 'cascade' }).notNull(),
+  stateId: integer('state_id').references(() => states.id, { onDelete: 'cascade' }).notNull(),
+  trans_functionStr: text('trans_functionStr').notNull(),
+  trans_symbols: jsonb('trans_symbols').$type<AttributePairGet[]>().notNull(),
+  get_func: text('func').notNull(),
+  obj_type: text('obj_type').$type<object_types>().notNull(),
+});
+
+export type InputNumberAttributePairsSelect = InferSelectModel<typeof InputNumberAttributePairs>;
+export type InputNumberAttributePairsInsert = InferInsertModel<typeof InputNumberAttributePairs>;
+
+
+export type InputNumberControlSelect = InferSelectModel<typeof InputNumberControl>;
+export type InputNumberControlInsert = InferInsertModel<typeof InputNumberControl>;
 
 
 

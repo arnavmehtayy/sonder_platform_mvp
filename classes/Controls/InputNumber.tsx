@@ -16,7 +16,8 @@ import { AttributePairSet_json, AttributePairSet } from "./SliderControlAdv";
 import { atts } from "../vizobjects/get_set_obj_attributes";
 import { AttributePairsEditor } from "./SliderControlAdv";
 import { obj } from "../vizobjects/obj";
-
+import { InputNumberControlInsert, InputNumberControlSelect, AttributePairsInsert, AttributePairsSelect } from "@/app/db/schema";
+import FunctionStr from "./FunctionStr";
 
 
 /*
@@ -128,6 +129,55 @@ export class InputNumber extends Control {
     this.attribute_JSON = attribute_pairs;
     this.obj_id = obj_id
   }
+
+  serialize(): [Omit<InputNumberControlInsert, 'stateId'>, Omit<AttributePairsInsert, 'stateId'>[]] {
+    const controlData: Omit<InputNumberControlInsert, 'stateId'> = {
+      id: this.id,
+      controlId: this.id,
+      desc: this.desc,
+      text: this.text,
+      value: this.value === "" ? null : this.value,
+      placeholder: this.placeholder,
+      initial_value: this.initial_value,
+      min: this.min,
+      max: this.max,
+      step: this.step,
+      obj_id: this.obj_id
+    };
+
+    const attributePairs: Omit<AttributePairsInsert, 'stateId'>[] = this.attribute_JSON.map(pair => ({
+      ControlId: this.id,
+      trans_functionStr: pair.transform_function.functionString,
+      trans_symbols: pair.transform_function.symbols,
+      get_func: pair.func,
+      obj_type: pair.obj_type
+    }));
+
+    return [controlData, attributePairs];
+  }
+
+  static deserialize(data: InputNumberControlSelect, attributePairs: AttributePairsSelect[]): InputNumber {
+    const attribute_pairs: AttributePairSet_json[] = attributePairs.map(pair => ({
+      transform_function: new FunctionStr(pair.trans_functionStr, pair.trans_symbols),
+      func: pair.get_func,
+      obj_type: pair.obj_type
+    }));
+
+    return new InputNumber({
+      id: data.controlId,
+      desc: data.desc,
+      text: data.text,
+      value: data.value ?? 0,
+      placeholder: data.placeholder ?? "",
+      initial_value: data.initial_value ?? 0,
+      min: data.min ?? 0,
+      max: data.max ?? 100,
+      step: data.step ?? 1,
+      obj_id: data.obj_id ?? -1,
+      attribute_pairs: attribute_pairs
+    });
+  }
+
 
   // change the value of the input number used by the storage system
   setValue(value: number | "") {

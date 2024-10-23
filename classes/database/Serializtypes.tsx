@@ -23,6 +23,10 @@ import {
   MultiChoiceControlSelect,
   MultiChoiceOptionInsert,
   MultiChoiceOptionSelect,
+  InputNumberControlInsert,
+  InputNumberControlSelect,
+  InputNumberAttributePairsInsert,
+  InputNumberAttributePairsSelect,
 } from "@/app/db/schema";
 
 export interface SerializeStateInsert {
@@ -42,6 +46,8 @@ export interface SerializeStateInsert {
   AttributePairs: Omit<AttributePairsInsert, "stateId">[];
   MultiChoiceControls: Omit<MultiChoiceControlInsert, "stateId">[];
   MultiChoiceOptions: Omit<MultiChoiceOptionInsert, "stateId">[];
+  InputNumberControls: Omit<InputNumberControlInsert, "stateId">[];
+  InputNumberAttributePairs: Omit<InputNumberAttributePairsInsert, "stateId">[];
 
   SideBarOrder: Omit<OrderInsert, "stateId">[];
 }
@@ -63,6 +69,8 @@ export interface SerializeStateSelect {
   AttributePairs: AttributePairsSelect[];
   MultiChoiceControls: MultiChoiceControlSelect[];
   MultiChoiceOptions: MultiChoiceOptionSelect[];
+  InputNumberControls: InputNumberControlSelect[];
+  InputNumberAttributePairs: InputNumberAttributePairsSelect[];
 
   SideBarOrder: OrderSelect[];
 }

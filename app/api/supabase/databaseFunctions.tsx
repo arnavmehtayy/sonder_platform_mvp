@@ -13,12 +13,16 @@ import {
   AttributePairs,
   MultiChoiceOption,
   MultiChoiceControl,
+  InputNumberAttributePairs,
 } from "@/app/db/schema";
 import { eq } from "drizzle-orm";
 import {
   SerializeStateInsert,
   SerializeStateSelect,
 } from "@/classes/database/Serializtypes";
+
+import { InputNumberControl } from '@/app/db/schema';
+
 
 export async function saveStateToDatabase(
   stateName: string,
@@ -81,6 +85,9 @@ export async function saveStateToDatabase(
     await tx
       .delete(MultiChoiceControl)
       .where(eq(MultiChoiceControl.stateId, stateId));
+    
+      await tx.delete(InputNumberAttributePairs).where(eq(InputNumberAttributePairs.stateId, stateId));
+    await tx.delete(InputNumberControl).where(eq(InputNumberControl.stateId, stateId));
 
     // Insert vizobjects
     if (state.GeomObjs.length > 0) {
@@ -151,6 +158,31 @@ export async function saveStateToDatabase(
           state.MultiChoiceOptions.map((option) => ({ ...option, stateId }))
         );
     }
+
+    if (state.InputNumberControls.length > 0) {
+      const insertedInputNumbers = await tx
+        .insert(InputNumberControl)
+        .values(state.InputNumberControls.map(control => ({ ...control, stateId })))
+        .returning({ id: InputNumberControl.id, controlId: InputNumberControl.controlId });
+
+      // Then insert their attribute pairs
+      if (state.InputNumberAttributePairs.length > 0) {
+        await tx
+          .insert(InputNumberAttributePairs)
+          .values(
+            state.InputNumberAttributePairs.map(pair => {
+              const relatedControl = insertedInputNumbers.find(
+                control => control.controlId === pair.ControlId
+              );
+              return {
+                ...pair,
+                stateId,
+                ControlId: relatedControl?.id || pair.ControlId
+              };
+            })
+          );
+      }
+    }
   });
 }
 
@@ -220,6 +252,16 @@ export async function loadStateFromDatabase(
       .select()
       .from(MultiChoiceOption)
       .where(eq(MultiChoiceOption.stateId, stateId));
+    
+      const inputNumberControlData = await tx
+      .select()
+      .from(InputNumberControl)
+      .where(eq(InputNumberControl.stateId, stateId));
+
+    const inputNumberAttributePairsData = await tx
+      .select()
+      .from(InputNumberAttributePairs)
+      .where(eq(InputNumberAttributePairs.stateId, stateId));
 
     // Construct the state object
     const loadedState: SerializeStateSelect = {
@@ -237,8 +279,9 @@ export async function loadStateFromDatabase(
       SideBarOrder: sideBarOrderData,
       MultiChoiceControls: multiChoiceControlData,
       MultiChoiceOptions: multiChoiceOptionData,
+      InputNumberControls: inputNumberControlData,
+      InputNumberAttributePairs: inputNumberAttributePairsData,
     };
-
     return loadedState;
   });
 
