@@ -128,8 +128,8 @@ export class DummyDataStorage<T extends DummyDataSupportedTypes> extends obj {
             { label: "Number", value: "number" },
             { label: "String", value: "string" },
             { label: "Boolean", value: "boolean" },
-            { label: "Number Array", value: "number[]" },
-            { label: "String Array", value: "string[]" },
+            // { label: "Number Array", value: "number[]" },
+            // { label: "String Array", value: "string[]" },
           ],
         },
         {
