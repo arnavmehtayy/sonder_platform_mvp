@@ -70,6 +70,11 @@ export function serializeState(state: State): SerializeStateInsert {
     .filter((obj): obj is Placement => obj instanceof Placement)
     .map(placement => placement.serialize());
 
+    const questions = Object.entries(state.questions).map(([id, text]) => ({
+      questionId: parseInt(id),
+      text: text
+    }));
+
     console.log(multiChoiceControls)
   return {
     title: state.title,
@@ -128,6 +133,7 @@ export function serializeState(state: State): SerializeStateInsert {
     ValidationSliders: validationSliders,
     ValidationSelects: validationSelects,
     Placements: placements,
+    Questions: questions,
   };
 }
 
@@ -225,6 +231,11 @@ export function deserializeState(serializedState: SerializeStateSelect): State {
     placements[placement.placementId] = Placement.deserialize(placement);
   });
 
+  const questions: { [key: number]: string } = {};
+  serializedState.Questions.forEach((question) => {
+    questions[question.questionId] = question.text;
+  });
+
   return {
     title: serializedState.title,
     camera_zoom: serializedState.camera_zoom,
@@ -234,6 +245,7 @@ export function deserializeState(serializedState: SerializeStateSelect): State {
     scores: scores,
     validations: validations,
     placement: placements,
+    questions: questions,
     // questions: [],
     // order: [],
     // validations: [],

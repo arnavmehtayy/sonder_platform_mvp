@@ -24,6 +24,7 @@ import {
   ValidationSlider,
   ValidationSelect,
   Placement,
+  Questions_text,
 } from "@/app/db/schema";
 import { eq } from "drizzle-orm";
 import {
@@ -118,6 +119,9 @@ export async function saveStateToDatabase(
 
     // Delete existing placement records
     await tx.delete(Placement).where(eq(Placement.stateId, stateId));
+
+    // Delete existing question records
+    await tx.delete(Questions_text).where(eq(Questions_text.stateId, stateId));
 
     // Insert vizobjects
     if (state.GeomObjs.length > 0) {
@@ -267,6 +271,12 @@ export async function saveStateToDatabase(
       await tx.insert(Placement)
         .values(state.Placements.map(p => ({ ...p, stateId })));
     }
+
+    // Insert question records
+    if (state.Questions.length > 0) {
+      await tx.insert(Questions_text)
+        .values(state.Questions.map(q => ({ ...q, stateId })));
+    }
   });
 }
 
@@ -391,6 +401,11 @@ export async function loadStateFromDatabase(
       .from(Placement)
       .where(eq(Placement.stateId, stateId));
 
+    // Fetch question data
+    const questionData = await tx.select()
+      .from(Questions_text)
+      .where(eq(Questions_text.stateId, stateId));
+
     // Construct the state object
     const loadedState: SerializeStateSelect = {
       title: stateRecord[0].title,
@@ -419,6 +434,7 @@ export async function loadStateFromDatabase(
       ValidationSliders: validationSliderData,
       ValidationSelects: validationSelectData,
       Placements: placementData,
+      Questions: questionData,
     };
     return loadedState;
   });

@@ -20,7 +20,7 @@ export function DropDownMenu({
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button className="bg-blue-600 hover:bg-blue-800 text-white px-6 py-3 rounded-lg flex items-center space-x-3 shadow-lg transform hover:scale-105 transition-all duration-200 ease-out text-lg font-semibold">
+        <Button className="bg-blue-500 hover:bg-blue-600 text-white px-6 py-3 rounded-lg flex items-center space-x-3 shadow-lg transform hover:scale-105 transition-all duration-200 ease-out text-lg font-semibold">
           <Plus className="h-6 w-6" />
           <span>{label}</span>
           <ChevronDown className="h-5 w-5" />

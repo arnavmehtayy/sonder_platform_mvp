@@ -516,6 +516,16 @@ export const Placement = pgTable('placement', {
   max_placements: integer('max_placements').notNull(),
 });
 
+export const Questions_text = pgTable('question_text', {
+  id: serial('id').primaryKey(),
+  stateId: integer('state_id').references(() => states.id, { onDelete: 'cascade' }).notNull(),
+  questionId: integer('placement_id').notNull(),
+  text: text('text').notNull(),
+})
+
 // Add type definitions
 export type PlacementSelect = InferSelectModel<typeof Placement>;
 export type PlacementInsert = InferInsertModel<typeof Placement>;
+
+export type QuestionTextSelect = InferSelectModel<typeof Questions_text>;
+export type QuestionTextInsert = InferInsertModel<typeof Questions_text>;

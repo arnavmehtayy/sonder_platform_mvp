@@ -46,7 +46,9 @@ import {
   ValidationTableControlSelect,
   ValidationSelectSelect,
   PlacementInsert,
-  PlacementSelect
+  PlacementSelect,
+  QuestionTextInsert,
+  QuestionTextSelect
 } from "@/app/db/schema";
 
 export interface SerializeStateInsert {
@@ -82,6 +84,7 @@ export interface SerializeStateInsert {
   ValidationSliders: Omit<ValidationSliderInsert, "stateId">[];
   ValidationSelects: Omit<ValidationSelectInsert, "stateId">[];
   Placements: Omit<PlacementInsert, "stateId">[];
+  Questions: Omit<QuestionTextInsert, "stateId">[];
 }
 
 export interface SerializeStateSelect {
@@ -117,4 +120,5 @@ export interface SerializeStateSelect {
   ValidationSliders: ValidationSliderSelect[];
   ValidationSelects: ValidationSelectSelect[];
   Placements: PlacementSelect[];
+  Questions: QuestionTextSelect[];
 }
