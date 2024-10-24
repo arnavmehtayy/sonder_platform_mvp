@@ -49,6 +49,8 @@ import { LineConstTypes } from '@/classes/vizobjects/Lineobj';
 import { AttributePairGet } from '@/classes/Controls/FunctionStr';
 import { SideBarComponentType } from '../store';
 import { objectScorer } from '@/classes/Scores/objectScorer';
+import { Attribute_get, relation } from '@/classes/Validation/Validation_obj';
+import { att_type } from '@/classes/vizobjects/get_set_obj_attributes';
 
 // ... (existing code)
 
@@ -433,3 +435,87 @@ export type FunctionScoreInsert = InferInsertModel<typeof FunctionScore>;
 //     validationData: jsonb('validation_data').$type<ValidationConstructor & {type: string}>().notNull(),
 //   });
 
+export const ValidationObj = pgTable('validation_obj', {
+  id: serial('id').primaryKey(),
+  stateId: integer('state_id').references(() => states.id, { onDelete: 'cascade' }).notNull(),
+  desc: text('desc').notNull(),
+  answer: jsonb('answer').$type<att_type>().notNull(),
+  obj_id: integer('obj_id').notNull(),
+  get_attribute_json: jsonb('get_attribute_json').$type<Attribute_get>().notNull(),
+  error: real('error'),
+  relation: text('relation').$type<relation>().notNull(),
+});
+
+export const ValidationTableControl = pgTable('validation_table_control', {
+  id: serial('id').primaryKey(),
+  stateId: integer('state_id').references(() => states.id, { onDelete: 'cascade' }).notNull(),
+  desc: text('desc').notNull(),
+  answers: jsonb('answers').$type<number[][]>().notNull(),
+  control_id: integer('control_id').notNull(),
+  error: real('error').notNull(),
+  validateCells: jsonb('validate_cells').$type<boolean[][]>().notNull(),
+});
+
+export const ValidationScore = pgTable('validation_score', {
+  id: serial('id').primaryKey(),
+  stateId: integer('state_id').references(() => states.id, { onDelete: 'cascade' }).notNull(),
+  desc: text('desc').notNull(),
+  score_id: integer('score_id').notNull(),
+  target_score: jsonb('target_score').notNull(),
+  error: real('error').notNull(),
+  relation: text('relation').$type<relation>().notNull(),
+});
+
+export const ValidationSlider = pgTable('validation_slider', {
+  id: serial('id').primaryKey(),
+  stateId: integer('state_id').references(() => states.id, { onDelete: 'cascade' }).notNull(),
+  desc: text('desc').notNull(),
+  control_id: integer('control_id').notNull(),
+  target_value: real('target_value').notNull(),
+  error: real('error').notNull(),
+  relation: text('relation').$type<relation>().notNull(),
+});
+
+export const ValidationSelect = pgTable('validation_select', {
+  id: serial('id').primaryKey(),
+  stateId: integer('state_id').references(() => states.id, { onDelete: 'cascade' }).notNull(),
+  desc: text('desc').notNull(),
+  answer: integer('answer').array().notNull(),
+  control_id: integer('control_id').notNull(),
+});
+
+// Add type definitions
+export type ValidationObjSelect = InferSelectModel<typeof ValidationObj>;
+export type ValidationObjInsert = InferInsertModel<typeof ValidationObj>;
+
+export type ValidationTableControlSelect = InferSelectModel<typeof ValidationTableControl>;
+export type ValidationTableControlInsert = InferInsertModel<typeof ValidationTableControl>;
+
+export type ValidationScoreSelect = InferSelectModel<typeof ValidationScore>;
+export type ValidationScoreInsert = InferInsertModel<typeof ValidationScore>;
+
+export type ValidationSliderSelect = InferSelectModel<typeof ValidationSlider>;
+export type ValidationSliderInsert = InferInsertModel<typeof ValidationSlider>;
+
+export type ValidationSelectSelect = InferSelectModel<typeof ValidationSelect>;
+export type ValidationSelectInsert = InferInsertModel<typeof ValidationSelect>;
+
+export const Placement = pgTable('placement', {
+  id: serial('id').primaryKey(),
+  stateId: integer('state_id').references(() => states.id, { onDelete: 'cascade' }).notNull(),
+  placementId: integer('placement_id').notNull(),
+  object_ids: integer('object_ids').array().notNull(),
+  grid: integer('grid').array().notNull(),
+  cellSize: real('cell_size').notNull(),
+  geometry_json: jsonb('geometry_json').$type<PredefinedGeometry>().notNull(),
+  gridVectors: jsonb('grid_vectors').$type<{x: number, y: number}[]>().notNull(),
+  text: text('text').notNull(),
+  desc: text('desc').notNull(),
+  color: text('color').notNull(),
+  isClickable: boolean('is_clickable').notNull(),
+  max_placements: integer('max_placements').notNull(),
+});
+
+// Add type definitions
+export type PlacementSelect = InferSelectModel<typeof Placement>;
+export type PlacementInsert = InferInsertModel<typeof Placement>;

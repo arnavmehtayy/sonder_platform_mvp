@@ -9,6 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { DialogTitle, DialogHeader } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { ValidationSliderInsert, ValidationSliderSelect } from "@/app/db/schema";
 
 export interface Validation_sliderAdv_constructor extends ValidationConstructor {
   control_id: number;
@@ -84,6 +85,26 @@ export default class Validation_sliderAdv extends Validation {
       error: this.error,
       relation: this.relation,
       type: "V_slider"
+    };
+  }
+
+  static deserialize(data: ValidationSliderSelect): Validation_sliderAdv {
+    return new Validation_sliderAdv({
+      control_id: data.control_id,
+      target_value: data.target_value,
+      error: data.error,
+      relation: data.relation,
+      desc: data.desc
+    });
+  }
+
+  serialize(): Omit<ValidationSliderInsert, "stateId"> {
+    return {
+      desc: this.desc,
+      control_id: this.control_id,
+      target_value: this.target_value,
+      error: this.error,
+      relation: this.relation,
     };
   }
 }

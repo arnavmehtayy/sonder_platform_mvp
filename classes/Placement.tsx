@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Vector2 } from 'three';
 import { X } from "lucide-react";
+import { PlacementInsert, PlacementSelect } from "@/app/db/schema";
 
 /*
  * This class stores information about a control that allows users to place of objects on the three.js experience
@@ -249,8 +250,39 @@ export default class Placement {
   
     return <EditableObjectPopup {...popupProps} />;
   }
-}
 
+  static deserialize(data: PlacementSelect): Placement {
+    return new Placement({
+      id: data.placementId,
+      object_ids: data.object_ids,
+      grid: data.grid as [number, number],
+      cellSize: data.cellSize,
+      geometry_json: data.geometry_json,
+      gridVectors: data.gridVectors.map((v) => new Vector2(v.x, v.y)),
+      text: data.text,
+      desc: data.desc,
+      color: data.color,
+      isClickable: data.isClickable,
+      max_placements: data.max_placements
+    });
+  }
+
+  serialize(): Omit<PlacementInsert, "stateId"> {
+    return {
+      placementId: this.id,
+      object_ids: this.object_ids,
+      grid: this.grid,
+      cellSize: this.cellSize,
+      geometry_json: this.geom_json,
+      gridVectors: this.gridVectors.map(v => {return {x: v.x, y: v.y}}),
+      text: this.text,
+      desc: this.desc,
+      color: this.color,
+      isClickable: this.isClickable,
+      max_placements: this.max_placements
+    };
+  }
+}
 
     // Start of Selection
     interface GridVectorsInputProps {
@@ -323,4 +355,3 @@ export default class Placement {
         </div>
       );
     }
-

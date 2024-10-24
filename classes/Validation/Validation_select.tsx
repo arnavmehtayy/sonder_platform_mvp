@@ -14,6 +14,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { getObjectSelector2, getNameSelector, useStore } from '@/app/store';
+import { ValidationSelectInsert, ValidationSelectSelect } from "@/app/db/schema";
 
 /* 
 * Validation class for the Select control
@@ -66,6 +67,22 @@ export default class Validation_select extends Validation {
             control_id: this.control_id,
             type: "V_select"
         }
+    }
+
+    static deserialize(data: ValidationSelectSelect): Validation_select {
+        return new Validation_select({
+            answer: data.answer,
+            control_id: data.control_id,
+            desc: data.desc
+        });
+    }
+
+    serialize(): Omit<ValidationSelectInsert, "stateId"> {
+        return {
+            desc: this.desc,
+            answer: this.answer,
+            control_id: this.control_id,
+        };
     }
 }
 

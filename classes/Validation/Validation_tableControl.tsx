@@ -24,6 +24,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { ValidationTableControlInsert, ValidationTableControlSelect } from "@/app/db/schema";
 
 /*
  * Validation class for the TableControl
@@ -89,6 +90,26 @@ export class Validation_tableControl<T extends obj> extends Validation {
       error: this.error,
       validateCells: this.validateCells,
       type: "V_table",
+    };
+  }
+
+  static deserialize(data: ValidationTableControlSelect): Validation_tableControl<any> {
+    return new Validation_tableControl({
+      answers: data.answers,
+      control_id: data.control_id,
+      desc: data.desc,
+      error: data.error,
+      validateCells: data.validateCells
+    });
+  }
+
+  serialize(): Omit<ValidationTableControlInsert, "stateId"> {
+    return {
+      desc: this.desc,
+      answers: this.answers,
+      control_id: this.control_id,
+      error: this.error,
+      validateCells: this.validateCells
     };
   }
 }

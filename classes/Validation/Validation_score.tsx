@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { DialogTitle, DialogHeader } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { ValidationScoreInsert, ValidationScoreSelect } from "@/app/db/schema";
 
 
 /*
@@ -99,6 +100,26 @@ export default class Validation_score<
       error: this.error,
       relation: this.relation,
       type: "V_score"
+    };
+  }
+
+  static deserialize(data: ValidationScoreSelect): Validation_score<any, any> {
+    return new Validation_score({
+      score_id: data.score_id,
+      target_score: data.target_score,
+      error: data.error,
+      relation: data.relation,
+      desc: data.desc
+    });
+  }
+
+  serialize(): Omit<ValidationScoreInsert, "stateId"> {
+    return {
+      desc: this.desc,
+      score_id: this.score_id,
+      target_score: this.target_score,
+      error: this.error,
+      relation: this.relation,
     };
   }
 }

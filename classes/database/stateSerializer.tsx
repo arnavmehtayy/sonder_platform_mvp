@@ -16,6 +16,13 @@ import { TableControl } from "../Controls/TableControl";
 import { EnablerControl } from "../Controls/EnablerControl";
 import { FunctionScore } from "../Scores/FunctionScore";
 import { Score } from "../Scores/Score";
+import Validation_obj from "../Validation/Validation_obj";
+import { Validation_tableControl } from "../Validation/Validation_tableControl";
+import Validation_score  from "../Validation/Validation_score";
+import Validation_sliderAdv  from "../Validation/Validation_sliderAdv";
+import  Validation_select  from "../Validation/Validation_select";
+import Validation from "../Validation/Validation";
+import Placement from "../Placement";
 
 export function serializeState(state: State): SerializeStateInsert {
     const multiChoiceControls = Object.values(state.controls)
@@ -37,6 +44,31 @@ export function serializeState(state: State): SerializeStateInsert {
     const functionScores = Object.values(state.scores)
     .filter((obj): obj is FunctionScore => obj instanceof FunctionScore)
     .map(score => score.serialize());
+
+    // Add validation serialization
+    const validationObjs = state.validations
+        .filter((obj): obj is Validation_obj<any> => obj instanceof Validation_obj)
+        .map(validation => validation.serialize());
+
+    const validationTableControls = state.validations
+        .filter((obj): obj is Validation_tableControl<any> => obj instanceof Validation_tableControl)
+        .map(validation => validation.serialize());
+
+    const validationScores = state.validations
+        .filter((obj): obj is Validation_score<any, any> => obj instanceof Validation_score)
+        .map(validation => validation.serialize());
+
+    const validationSliders = state.validations
+        .filter((obj): obj is Validation_sliderAdv => obj instanceof Validation_sliderAdv)
+        .map(validation => validation.serialize());
+
+    const validationSelects = state.validations
+        .filter((obj): obj is Validation_select => obj instanceof Validation_select)
+        .map(validation => validation.serialize());
+
+    const placements = Object.values(state.placement)
+    .filter((obj): obj is Placement => obj instanceof Placement)
+    .map(placement => placement.serialize());
 
     console.log(multiChoiceControls)
   return {
@@ -90,6 +122,12 @@ export function serializeState(state: State): SerializeStateInsert {
     TableCells: tableControls.flatMap(([_, cells]) => cells),
     EnablerControls: enablerControls,
     FunctionScores: functionScores,
+    ValidationObjs: validationObjs,
+    ValidationTableControls: validationTableControls,
+    ValidationScores: validationScores,
+    ValidationSliders: validationSliders,
+    ValidationSelects: validationSelects,
+    Placements: placements,
   };
 }
 
@@ -173,6 +211,20 @@ export function deserializeState(serializedState: SerializeStateSelect): State {
     scores[score.scoreId] = FunctionScore.deserialize(score);
   });
 
+  // Deserialize validations
+  const validations: Validation[] = [
+    ...serializedState.ValidationObjs.map(v => Validation_obj.deserialize(v)),
+    ...serializedState.ValidationTableControls.map(v => Validation_tableControl.deserialize(v)),
+    ...serializedState.ValidationScores.map(v => Validation_score.deserialize(v)),
+    ...serializedState.ValidationSliders.map(v => Validation_sliderAdv.deserialize(v)),
+    ...serializedState.ValidationSelects.map(v => Validation_select.deserialize(v))
+  ];
+
+  const placements: { [key: number]: Placement } = {};
+  serializedState.Placements.forEach((placement) => {
+    placements[placement.placementId] = Placement.deserialize(placement);
+  });
+
   return {
     title: serializedState.title,
     camera_zoom: serializedState.camera_zoom,
@@ -180,6 +232,8 @@ export function deserializeState(serializedState: SerializeStateSelect): State {
     controls: controls,
     order: order,
     scores: scores,
+    validations: validations,
+    placement: placements,
     // questions: [],
     // order: [],
     // validations: [],

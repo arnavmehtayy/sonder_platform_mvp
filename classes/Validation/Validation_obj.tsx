@@ -19,6 +19,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { geomobj, geomobjconstructor } from "../vizobjects/geomobj";
+import { ValidationObjInsert, ValidationObjSelect } from "@/app/db/schema";
 
 export type value_typ = att_type; // the possible types of the attribute that is to be validated
 export type relation = "==" | ">" | "<" | ">=" | "<=" | "!="; // the possible relations that can be used in the comparison
@@ -145,6 +146,28 @@ export default class Validation_obj<T extends value_typ> extends Validation {
       error: this.error,
       relation: this.relation,
       type: "V_obj",
+    };
+  }
+
+  static deserialize(data: ValidationObjSelect): Validation_obj<any> {
+    return new Validation_obj({
+      obj_id: data.obj_id,
+      answer: data.answer,
+      get_attribute_json: data.get_attribute_json,
+      error: data.error || 0,
+      relation: data.relation,
+      desc: data.desc,
+    });
+  }
+
+  serialize(): Omit<ValidationObjInsert, "stateId"> {
+    return {
+      desc: this.desc,
+      answer: this.answer,
+      obj_id: this.obj_id,
+      get_attribute_json: this.get_attribute_json,
+      error: this.error,
+      relation: this.relation,
     };
   }
 }

@@ -18,6 +18,12 @@ import {
   TableCell,
   EnablerControl,
   FunctionScore,
+  ValidationObj,
+  ValidationTableControl,
+  ValidationScore,
+  ValidationSlider,
+  ValidationSelect,
+  Placement,
 } from "@/app/db/schema";
 import { eq } from "drizzle-orm";
 import {
@@ -102,6 +108,16 @@ export async function saveStateToDatabase(
 
     // Delete existing FunctionScore records
     await tx.delete(FunctionScore).where(eq(FunctionScore.stateId, stateId));
+
+    // Delete existing validation records
+    await tx.delete(ValidationObj).where(eq(ValidationObj.stateId, stateId));
+    await tx.delete(ValidationTableControl).where(eq(ValidationTableControl.stateId, stateId));
+    await tx.delete(ValidationScore).where(eq(ValidationScore.stateId, stateId));
+    await tx.delete(ValidationSlider).where(eq(ValidationSlider.stateId, stateId));
+    await tx.delete(ValidationSelect).where(eq(ValidationSelect.stateId, stateId));
+
+    // Delete existing placement records
+    await tx.delete(Placement).where(eq(Placement.stateId, stateId));
 
     // Insert vizobjects
     if (state.GeomObjs.length > 0) {
@@ -223,6 +239,34 @@ export async function saveStateToDatabase(
         state.FunctionScores.map(score => ({ ...score, stateId }))
       );
     }
+
+    // Insert new validation records
+    if (state.ValidationObjs.length > 0) {
+      await tx.insert(ValidationObj)
+        .values(state.ValidationObjs.map(v => ({ ...v, stateId })));
+    }
+    if (state.ValidationTableControls.length > 0) {
+      await tx.insert(ValidationTableControl)
+        .values(state.ValidationTableControls.map(v => ({ ...v, stateId })));
+    }
+    if (state.ValidationScores.length > 0) {
+      await tx.insert(ValidationScore)
+        .values(state.ValidationScores.map(v => ({ ...v, stateId })));
+    }
+    if (state.ValidationSliders.length > 0) {
+      await tx.insert(ValidationSlider)
+        .values(state.ValidationSliders.map(v => ({ ...v, stateId })));
+    }
+    if (state.ValidationSelects.length > 0) {
+      await tx.insert(ValidationSelect)
+        .values(state.ValidationSelects.map(v => ({ ...v, stateId })));
+    }
+
+    // Insert new placement records
+    if (state.Placements.length > 0) {
+      await tx.insert(Placement)
+        .values(state.Placements.map(p => ({ ...p, stateId })));
+    }
   });
 }
 
@@ -322,6 +366,31 @@ export async function loadStateFromDatabase(
       .from(FunctionScore)
       .where(eq(FunctionScore.stateId, stateId));
 
+    // Fetch validation data
+    const validationObjData = await tx.select()
+      .from(ValidationObj)
+      .where(eq(ValidationObj.stateId, stateId));
+
+    const validationTableControlData = await tx.select()
+      .from(ValidationTableControl)
+      .where(eq(ValidationTableControl.stateId, stateId));
+
+    const validationScoreData = await tx.select()
+      .from(ValidationScore)
+      .where(eq(ValidationScore.stateId, stateId));
+
+    const validationSliderData = await tx.select()
+      .from(ValidationSlider)
+      .where(eq(ValidationSlider.stateId, stateId));
+
+    const validationSelectData = await tx.select()
+      .from(ValidationSelect)
+      .where(eq(ValidationSelect.stateId, stateId));
+
+    const placementData = await tx.select()
+      .from(Placement)
+      .where(eq(Placement.stateId, stateId));
+
     // Construct the state object
     const loadedState: SerializeStateSelect = {
       title: stateRecord[0].title,
@@ -344,6 +413,12 @@ export async function loadStateFromDatabase(
       TableCells: tableCellData,
       EnablerControls: enablerControlData,
       FunctionScores: functionScoreData,
+      ValidationObjs: validationObjData,
+      ValidationTableControls: validationTableControlData,
+      ValidationScores: validationScoreData,
+      ValidationSliders: validationSliderData,
+      ValidationSelects: validationSelectData,
+      Placements: placementData,
     };
     return loadedState;
   });

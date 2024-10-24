@@ -34,7 +34,19 @@ import {
   EnablerControlInsert,
   EnablerControlSelect,
   FunctionScoreInsert,
-  FunctionScoreSelect
+  FunctionScoreSelect,
+  ValidationObjInsert,
+  ValidationTableControlInsert,
+  ValidationScoreInsert,
+  ValidationSliderInsert,
+  ValidationSelectInsert,
+  ValidationObjSelect,
+  ValidationScoreSelect,
+  ValidationSliderSelect,
+  ValidationTableControlSelect,
+  ValidationSelectSelect,
+  PlacementInsert,
+  PlacementSelect
 } from "@/app/db/schema";
 
 export interface SerializeStateInsert {
@@ -62,6 +74,14 @@ export interface SerializeStateInsert {
   TableControls: Omit<TableControlInsert, 'stateId'>[];
   TableCells: Omit<TableCellInsert, 'stateId'>[];
   EnablerControls: Omit<EnablerControlInsert, 'stateId'>[];
+  
+  // Add validations
+  ValidationObjs: Omit<ValidationObjInsert, "stateId">[];
+  ValidationTableControls: Omit<ValidationTableControlInsert, "stateId">[];
+  ValidationScores: Omit<ValidationScoreInsert, "stateId">[];
+  ValidationSliders: Omit<ValidationSliderInsert, "stateId">[];
+  ValidationSelects: Omit<ValidationSelectInsert, "stateId">[];
+  Placements: Omit<PlacementInsert, "stateId">[];
 }
 
 export interface SerializeStateSelect {
@@ -89,4 +109,12 @@ export interface SerializeStateSelect {
   TableControls: TableControlSelect[];
   TableCells: TableCellSelect[];
   EnablerControls: EnablerControlSelect[];
+  
+  // Add validations
+  ValidationObjs: ValidationObjSelect[];
+  ValidationTableControls: ValidationTableControlSelect[];
+  ValidationScores: ValidationScoreSelect[];
+  ValidationSliders: ValidationSliderSelect[];
+  ValidationSelects: ValidationSelectSelect[];
+  Placements: PlacementSelect[];
 }
