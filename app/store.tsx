@@ -113,6 +113,7 @@ export type State = {
   setOrder: (newOrder: OrderItem[]) => void;
   deleteOrderItem: (id: number, type: string) => void;
   setTableControl: (newTable: TableControl<any>) => void;
+  deleteValidationByIndex: (index: number) => void;
   
 
 };
@@ -663,6 +664,14 @@ export const useStore = create<State>((set, get) => ({
       return { vizobjs: updatedVizobjs };
     });
   },
+
+  deleteValidationByIndex: (index: number) => {
+    set((state) => {
+      const newValidations = [...state.validations];
+      newValidations.splice(index, 1);
+      return { validations: newValidations };
+    });
+  },
 }));
 
 // get the score corresponding to some score_id
@@ -904,3 +913,25 @@ export const getSideBarName = (state: State) => (item: OrderItem) => {
       return `Unknown ${item.type} ${item.id}`;
   }
 }
+
+export const getValidationDescription = (state: State) => (validation: Validation) => {
+  if (validation instanceof Validation_obj) {
+    return validation.desc;
+  } else if (validation instanceof Validation_select) {
+    return validation.desc;
+  } else if (validation instanceof Validation_inputNumber) {
+    return validation.desc;
+  } else if (validation instanceof ValidationMultiChoice) {
+    return validation.desc;
+  } else if (validation instanceof Validation_score) {
+    return validation.desc;
+  } else if (validation instanceof Validation_tableControl) {
+    return validation.desc;
+  } else if (validation instanceof Validation_sliderAdv) {
+    return validation.desc;
+  }
+  return 'Unknown Validation';
+};
+
+export const deleteValidationByIndexSelect = (state: State) => state.deleteValidationByIndex
+

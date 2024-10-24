@@ -8,6 +8,8 @@ import {
   State,
   UpdateValidationSelector,
   getSideBarName,
+  getValidationDescription,
+  deleteValidationByIndexSelect,
 } from "@/app/store";
 import "katex/dist/katex.min.css";
 import "../style.css";
@@ -66,6 +68,8 @@ export function MinigameEdit({}: {}) {
   const deleteVizObj = useStore((state) => state.deleteVizObj);
   const vizobjs = useStore((state) => state.vizobjs);
   const getName = useStore(getSideBarName);
+  const validationDescriptions = useStore(getValidationDescription);
+  const validationDeletor = useStore(deleteValidationByIndexSelect)
 
   useEffect(() => reset("default"), []);
 
@@ -145,6 +149,7 @@ export function MinigameEdit({}: {}) {
     }
   };
 
+
   return (
     <div className="relative flex flex-col md:flex-row h-screen bg-gray-100">
       {/* Main Three.js Experience */}
@@ -220,6 +225,22 @@ export function MinigameEdit({}: {}) {
                     <span>{`${obj.name}`}</span>
                     <button
                       onClick={() => deleteVizObj(Number(id))}
+                      className="text-red-500 hover:text-red-700"
+                    >
+                      <Trash2 size={16} />
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            </div>
+            <div className="mt-4">
+              <h3 className="text-lg font-semibold mb-2">Validation Manager</h3>
+              <ul className="space-y-2">
+                {validationInstance.map((validation, index) => (
+                  <li key={index} className="flex items-center justify-between bg-gray-100 p-2 rounded">
+                    <span>{validationDescriptions(validation)}</span>
+                    <button
+                      onClick={() => validationDeletor(index)}
                       className="text-red-500 hover:text-red-700"
                     >
                       <Trash2 size={16} />
