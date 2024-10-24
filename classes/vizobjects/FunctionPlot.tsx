@@ -67,7 +67,7 @@ export default class FunctionPlot extends TransformObj {
   }
 
   get_set_att_selector(type: dict_keys): {[key: string]: get_attributes<any, any>} {
-    return {...super.get_set_att_selector(type), ...functionplot_atts[type]}
+    return { ...functionplot_atts[type]}
   }
 
   dataBaseSave(): FunctionPlotConstructor  {

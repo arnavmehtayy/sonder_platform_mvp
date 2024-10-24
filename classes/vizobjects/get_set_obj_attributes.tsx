@@ -54,9 +54,21 @@ export const color_atts: dict_get_attributes<coloredObj> = {
         return newObj;
       },
     },
+
+    name: {
+      get_attribute: (obj: coloredObj) => obj.name,
+      set_attribute: (obj: coloredObj, value: string) => {
+        const newObj = Object.assign(
+          Object.create(Object.getPrototypeOf(obj)),
+          obj
+        );
+        newObj.name = value;
+        return newObj;
+      },
+    },
   },
   boolean: {},
-};
+}
 export const transform_atts: dict_get_attributes<TransformObj> = {
   number: {
     "position-x": {
@@ -115,7 +127,30 @@ export const transform_atts: dict_get_attributes<TransformObj> = {
       },
     },
   },
-  string: {},
+  string: {
+    color: {
+      get_attribute: (obj: TransformObj & coloredObj) => obj.color,
+      set_attribute: (obj: TransformObj & coloredObj, value: string) => {
+        const newObj = Object.assign(
+          Object.create(Object.getPrototypeOf(obj)),
+          obj
+        );
+        newObj.color = value;
+        return newObj;
+      },
+    },
+    name: {
+      get_attribute: (obj: TransformObj & coloredObj) => obj.name,
+      set_attribute: (obj: TransformObj & coloredObj, value: string) => {
+        const newObj = Object.assign(
+          Object.create(Object.getPrototypeOf(obj)),
+          obj
+        );
+        newObj.name = value;
+        return newObj;
+      },
+    },
+  },
   boolean: {},
 };
 export const text_atts: dict_get_attributes<TextGeom> = {
@@ -319,7 +354,30 @@ export const line_atts: dict_get_attributes<LineObj> = {
       },
     },
   },
-  string: {},
+  string: {
+    color: {
+      get_attribute: (obj: LineObj) => obj.color,
+      set_attribute: (obj: LineObj, value: string) => {
+        const newObj = Object.assign(
+          Object.create(Object.getPrototypeOf(obj)),
+          obj
+        );
+        newObj.color = value;
+        return newObj;
+      },
+    },
+    name: {
+      get_attribute: (obj: LineObj) => obj.name,
+      set_attribute: (obj: LineObj, value: string) => {
+        const newObj = Object.assign(
+          Object.create(Object.getPrototypeOf(obj)),
+          obj
+        );
+        newObj.name = value;
+        return newObj;
+      },
+    },
+  },
   boolean: {},
 };
 export const functionplot_atts: dict_get_attributes<FunctionPlot> = {
@@ -368,8 +426,86 @@ export const functionplot_atts: dict_get_attributes<FunctionPlot> = {
         return newObj;
       },
     },
+    "position-x": {
+      get_attribute: (obj: TransformObj) => obj.position.x,
+      set_attribute: (obj: TransformObj, value: number) => {
+        const newObj = Object.assign(
+          Object.create(Object.getPrototypeOf(obj)),
+          obj
+        );
+        newObj.position.x = value;
+        return newObj;
+      },
+    },
+    "position-y": {
+      get_attribute: (obj: TransformObj) => obj.position.y,
+      set_attribute: (obj: TransformObj, value: number) => {
+        const newObj = Object.assign(
+          Object.create(Object.getPrototypeOf(obj)),
+          obj
+        );
+        newObj.position.y = value;
+        return newObj;
+      },
+    },
+    "rotation-z": {
+      get_attribute: (obj: TransformObj) => obj.rotation.z,
+      set_attribute: (obj: TransformObj, value: number) => {
+        const newObj = Object.assign(
+          Object.create(Object.getPrototypeOf(obj)),
+          obj
+        );
+        newObj.rotation.z = value;
+        return newObj;
+      },
+    },
+    "scale-x": {
+      get_attribute: (obj: TransformObj) => obj.scale.x,
+      set_attribute: (obj: TransformObj, value: number) => {
+        const newObj = Object.assign(
+          Object.create(Object.getPrototypeOf(obj)),
+          obj
+        );
+        newObj.scale.x = value;
+        return newObj;
+      },
+    },
+    "scale-y": {
+      get_attribute: (obj: TransformObj) => obj.scale.y,
+      set_attribute: (obj: TransformObj, value: number) => {
+        const newObj = Object.assign(
+          Object.create(Object.getPrototypeOf(obj)),
+          obj
+        );
+        newObj.scale.y = value;
+        return newObj;
+      },
+    },
   },
-  string: {},
+  string: {
+    color: {
+      get_attribute: (obj: TransformObj & coloredObj) => obj.color,
+      set_attribute: (obj: TransformObj & coloredObj, value: string) => {
+        const newObj = Object.assign(
+          Object.create(Object.getPrototypeOf(obj)),
+          obj
+        );
+        newObj.color = value;
+        return newObj;
+      },
+    },
+    name: {
+      get_attribute: (obj: TransformObj & coloredObj) => obj.name,
+      set_attribute: (obj: TransformObj & coloredObj, value: string) => {
+        const newObj = Object.assign(
+          Object.create(Object.getPrototypeOf(obj)),
+          obj
+        );
+        newObj.name = value;
+        return newObj;
+      },
+    },
+  },
   boolean: {},
 };
 
@@ -399,7 +535,10 @@ export const FunctionPlotString_atts: dict_get_attributes<FunctionPlotString> =
         newObj.xRange = [obj.xRange[0], value];
         return newObj;
       },
+
+      
     },
+    ...transform_atts['number']
 
     },
     string: {},
@@ -418,7 +557,87 @@ export const Axis_atts: dict_get_attributes<CoordinateAxis> = {
         newObj.tickSpacing = value;
         return newObj;
       },
+      
     }
+    ,
+    "position-x": {
+      get_attribute: (obj: TransformObj) => obj.position.x,
+      set_attribute: (obj: TransformObj, value: number) => {
+        const newObj = Object.assign(
+          Object.create(Object.getPrototypeOf(obj)),
+          obj
+        );
+        newObj.position.x = value;
+        return newObj;
+      },
+    },
+    "position-y": {
+      get_attribute: (obj: TransformObj) => obj.position.y,
+      set_attribute: (obj: TransformObj, value: number) => {
+        const newObj = Object.assign(
+          Object.create(Object.getPrototypeOf(obj)),
+          obj
+        );
+        newObj.position.y = value;
+        return newObj;
+      },
+    },
+    "rotation-x": {
+      get_attribute: (obj: TransformObj) => obj.rotation.x,
+      set_attribute: (obj: TransformObj, value: number) => {
+        const newObj = Object.assign(
+          Object.create(Object.getPrototypeOf(obj)),
+          obj
+        );
+        newObj.rotation.x = value;
+        return newObj;
+      },
+    },
+    "rotation-y": {
+      get_attribute: (obj: TransformObj) => obj.rotation.y,
+      set_attribute: (obj: TransformObj, value: number) => {
+        const newObj = Object.assign(
+          Object.create(Object.getPrototypeOf(obj)),
+          obj
+        );
+        newObj.rotation.y = value;
+        return newObj;
+      },
+    },
+    "rotation-z": {
+      get_attribute: (obj: TransformObj) => obj.rotation.z,
+      set_attribute: (obj: TransformObj, value: number) => {
+        const newObj = Object.assign(
+          Object.create(Object.getPrototypeOf(obj)),
+          obj
+        );
+        newObj.rotation.z = value;
+        return newObj;
+      },
+    },
+    "scale-x": {
+      get_attribute: (obj: TransformObj) => obj.scale.x,
+      set_attribute: (obj: TransformObj, value: number) => {
+        const newObj = Object.assign(
+          Object.create(Object.getPrototypeOf(obj)),
+          obj
+        );
+        newObj.scale.x = value;
+        return newObj;
+      },
+    },
+    "scale-y": {
+      get_attribute: (obj: TransformObj) => obj.scale.y,
+      set_attribute: (obj: TransformObj, value: number) => {
+        const newObj = Object.assign(
+          Object.create(Object.getPrototypeOf(obj)),
+          obj
+        );
+        newObj.scale.y = value;
+        return newObj;
+      },
+    },
+    
     
   },
   string: {
@@ -444,8 +663,31 @@ export const Axis_atts: dict_get_attributes<CoordinateAxis> = {
         return newObj;
       },
     },
+    color: {
+      get_attribute: (obj: TransformObj) => obj.color,
+      set_attribute: (obj: TransformObj, value: string) => {
+        const newObj = Object.assign(
+          Object.create(Object.getPrototypeOf(obj)),
+          obj
+        );
+        newObj.color = value;
+        return newObj;
+      },
+    },
+    name: {
+      get_attribute: (obj: TransformObj) => obj.name,
+      set_attribute: (obj: TransformObj, value: string) => {
+        const newObj = Object.assign(
+          Object.create(Object.getPrototypeOf(obj)),
+          obj
+        );
+        newObj.name = value;
+        return newObj;
+      },
+    },
   },
-  boolean: {},
+  boolean: {
+  },
 };
 
 export const Dummy_atts: dict_get_attributes<DummyDataStorage<any>> = {

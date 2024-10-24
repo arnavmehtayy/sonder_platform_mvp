@@ -52,7 +52,7 @@ export abstract class TransformObj extends coloredObj {
   }
 
   get_set_att_selector(type: dict_keys): {[key: string]: get_attributes<any, any>} {
-    return {...super.get_set_att_selector(type), ...transform_atts[type]}
+    return { ...transform_atts[type]}
   }
 
   dataBaseSave(): TransformObjConstructor  {

@@ -33,7 +33,7 @@ export class DummyDataStorage<T extends DummyDataSupportedTypes> extends obj {
 
   get_set_att_selector(type: dict_keys): {[key: string]: get_attributes<any, any>} {
     if (typeof this.data === 'number') {
-      return { ...Dummy_atts[type], ...super.get_set_att_selector(type) };
+      return { ...Dummy_atts[type], };
     } else {
       return {};
     }

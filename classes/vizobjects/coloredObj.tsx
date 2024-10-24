@@ -28,7 +28,7 @@ export default abstract class coloredObj extends obj {
   }
 
   get_set_att_selector(type: dict_keys): {[key: string]: get_attributes<any, any>} {
-    return {...super.get_set_att_selector(type), ...color_atts[type]}
+    return {...color_atts[type]}
   }
 
   dataBaseSave(): coloredObjConstructor {

@@ -18,7 +18,7 @@ import { Input } from "@/components/ui/input";
 import { Slider } from "@/components/ui/slider";
 import { Switch } from "@/components/ui/switch";
 import { Separator } from "@/components/ui/separator";
-import { dict_keys, get_attributes } from "./get_set_obj_attributes";
+import { dict_keys, get_attributes, transform_atts } from "./get_set_obj_attributes";
 import { TouchControlEditor } from "@/app/Components/EditMode/EditPopups/TouchControlAttributeEditor";
 import {
   Validation_obj_constructor,
@@ -310,7 +310,7 @@ export class geomobj extends TransformObj {
   get_set_att_selector(type: dict_keys): {
     [key: string]: get_attributes<any, any>;
   } {
-    return { ...super.get_set_att_selector(type) };
+    return { ...transform_atts[type] };
   }
 
   static getPopup({

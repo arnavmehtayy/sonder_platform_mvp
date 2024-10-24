@@ -117,7 +117,7 @@ export default class TextGeom extends geomobj {
   // }
 
   get_set_att_selector(type: dict_keys): {[key: string]: get_attributes<any, any>} {
-    return {...super.get_set_att_selector(type), ...text_atts[type]};
+    return { ...text_atts[type]};
   }
   // method that returns the physical three.js mesh representation of the object
   // this is used to render the object in the vizexperience

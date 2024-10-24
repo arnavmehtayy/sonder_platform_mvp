@@ -60,7 +60,6 @@ export default class FunctionPlotString extends TransformObj {
 
   get_set_att_selector(type: dict_keys): {[key: string]: get_attributes<any, any>} {
     return {
-      ...super.get_set_att_selector(type),
       ...FunctionPlotString_atts[type],
     };
   }
