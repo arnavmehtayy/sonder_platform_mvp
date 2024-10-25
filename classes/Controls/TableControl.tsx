@@ -50,8 +50,8 @@ export class TableControl<T extends obj> extends Control {
 
   constructor({
     id,
-    desc = "Table Control",
-    text = "This is a table control",
+    desc = "Number Table",
+    text = "enter the values in the table",
     rows,
     columnHeaders,
     rowHeaders,

@@ -234,18 +234,19 @@ export class InputNumber extends Control {
       React.useState<InputNumberConstructor>({
         id: Date.now() % 10000,
         value: 0,
-        desc: "input a number",
-        text: "here you need to input a number",
+        desc: "Number Input",
+        text: "input a number below",
         placeholder: "number",
         initial_value: 0,
-        min: 0,
+        min: -100,
         max: 100,
-        step: 1,
+        step: 0.01,
         obj_id: -1,
         attribute_pairs: []
       });
 
-      const [validation, setValidation] = React.useState<Validation_inputNumberConstructor | undefined>(undefined);
+    const [useInputControl, setUseInputControl] = React.useState(false);
+    const [validation, setValidation] = React.useState<Validation_inputNumberConstructor | undefined>(undefined);
 
     const popupProps: EditableObjectPopupProps<InputNumberConstructor> = {
       isOpen,
@@ -261,16 +262,38 @@ export class InputNumber extends Control {
       fields: [
         { key: "desc", label: "Description", type: "title" },
         { key: "text", label: "Text", type: "textarea" },
-        { key: "placeholder", label: "Placeholder", type: "text" },
+        { key: "placeholder", label: "Placeholder text", type: "text" },
         { key: "initial_value", label: "Initial Value", type: "number" },
-        { key: "min", label: "Minimum Value", type: "number" },
-        { key: "max", label: "Maximum Value", type: "number" },
-        { key: "step", label: "Step", type: "number" },
-        { key: "obj_id", label: "Object ID", type: "vizObjSelect" },
+        // { key: "min", label: "Minimum Value", type: "number" },
+        // { key: "max", label: "Maximum Value", type: "number" },
+        // { key: "step", label: "Step", type: "number" },
+        {
+          label: "",
+          type: "custom",
+          render: (_, onChange) => (
+            <div className="flex items-center mb-4">
+              <input
+                type="checkbox"
+                id="useInputControl"
+                checked={useInputControl}
+                onChange={(e) => setUseInputControl(e.target.checked)}
+                className="mr-2"
+              />
+              <label htmlFor="useInputControl">Enable Object Control</label>
+            </div>
+          ),
+        },
+        {
+          key: "obj_id",
+          label: "Object ID",
+          type: "vizObjSelect",
+          showIf: () => useInputControl,
+        },
         {
           key: "attribute_pairs",
-          label: "Attribute Pairs",
+          label: "Controlled Attribute",
           type: "custom",
+          showIf: () => useInputControl,
           render: (value, onChange) => (
             <AttributePairsEditor
               pairs={value}

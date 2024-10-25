@@ -168,8 +168,8 @@ export class SelectControl extends Control {
     selected = [],
     isActive = false,
     capacity = 1,
-    desc = "select control",
-    text = "this is a select control",
+    desc = "Select Objects",
+    text = "select the relevant objects on screen",
   }: SelectControlConstructor) {
     super({ id: id, desc: desc, text: text });
     this.selectable = selectable;

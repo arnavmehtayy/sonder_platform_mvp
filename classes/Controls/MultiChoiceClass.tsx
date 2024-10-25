@@ -219,10 +219,10 @@ export class MultiChoiceClass extends Control {
     const [editedObject, setEditedObject] =
       React.useState<MultiChoiceConstructor>({
         id: Date.now() % 10000,
-        desc: "",
+        desc: "below is a multiple choice question",
         options: [],
         isMultiSelect: false,
-        text: "",
+        text: "MCQ",
       });
     const [validation, setValidation] = React.useState<
       ValidationMultiChoice | undefined

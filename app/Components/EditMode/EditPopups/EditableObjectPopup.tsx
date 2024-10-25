@@ -39,7 +39,7 @@ import { PredefinedGeometry } from "@/classes/vizobjects/geomobj";
 
 */
 export interface PopupQuestionProps<T, option_T> {
-  key: keyof T; // The key of the object that will be edited
+  key?: keyof T; // Make key optional
   label: string;
   type:
     | "text"
@@ -51,7 +51,7 @@ export interface PopupQuestionProps<T, option_T> {
     | "rotation"
     | "textarea"
     | "title"
-    | "addoptions" // The type of the input field
+    | "addoptions"
     | "arraynum"
     | "vizObjSelect"
     | "vizObjSelectList"
@@ -59,11 +59,11 @@ export interface PopupQuestionProps<T, option_T> {
     | "vector3"
     | "validation"
     | "geometry";
-  options?: { label: string; value: option_T }[]; // For select type
-  length_of_array?: number; // For arraynum type
-  showIf?: (obj: T) => boolean; // New property for conditional rendering
-  render?: (value: any, onChange: (newValue: any) => void) => React.ReactNode; // New property for custom rendering
-} // option_T is the type of the options that will be displayed in the select dropdown
+  options?: { label: string; value: option_T }[];
+  length_of_array?: number;
+  showIf?: (obj: T) => boolean;
+  render?: (value: any, onChange: (newValue: any) => void) => React.ReactNode;
+}
 
 export interface EditableObjectPopupProps<T> {
   isOpen: boolean; // Whether the popup is open
@@ -75,7 +75,6 @@ export interface EditableObjectPopupProps<T> {
   fields: Array<PopupQuestionProps<T, any>>; // The fields that will be displayed in the popup
   additionalContent?: React.ReactNode;
 }
-
 // Add this new component for geometry input
 function GeometryInput({ value, onChange }: { value: PredefinedGeometry, onChange: (newValue: PredefinedGeometry) => void }) {
   const [geometryType, setGeometryType] = React.useState(value.type);
@@ -240,7 +239,10 @@ export function EditableObjectPopup<T>({
           return (
             <div className="mb-4">
               <label className="block mb-2">{field.label}</label>
-              {field.render(editedObject[field.key], (newValue) => handleChange(field.key, newValue))}
+              {field.render(
+                field.key ? editedObject[field.key] : undefined,
+                (newValue) => field.key ? handleChange(field.key, newValue) : undefined
+              )}
             </div>
           );
         }
@@ -254,8 +256,8 @@ export function EditableObjectPopup<T>({
             <input
               type="checkbox"
               id={field.key as string}
-              checked={editedObject[field.key] as boolean}
-              onChange={(e) => handleChange(field.key, e.target.checked)}
+              checked={editedObject[field.key!] as boolean}
+              onChange={(e) => handleChange(field.key!, e.target.checked)}
               className="h-5 w-5 mr-2"
             />
             <label htmlFor={field.key as string}>{field.label}</label>
@@ -266,7 +268,7 @@ export function EditableObjectPopup<T>({
         return (
           <div className="mb-4">
             <Input
-              onChange={(e) => handleChange(field.key, e.target.value)}
+              onChange={(e) => handleChange(field.key!, e.target.value)}
               placeholder={field.label}
               className="text-lg font-semibold text-blue-800 mb-2"
             />
@@ -277,9 +279,9 @@ export function EditableObjectPopup<T>({
             <div className="mb-4">
               <label className="block mb-2">{field.label}</label>
               <Vector3Input
-                value={editedObject[field.key] as Vector3}
+                value={editedObject[field.key!] as Vector3}
                 onChange={(newValue: Vector3) =>
-                  handleChange(field.key, newValue)
+                  handleChange(field.key!, newValue)
                 }
                 size={200}
               />
@@ -289,7 +291,7 @@ export function EditableObjectPopup<T>({
         return (
           <div className="mb-4">
             <Textarea
-              onChange={(e) => handleChange(field.key, e.target.value)}
+              onChange={(e) => handleChange(field.key!, e.target.value)}
               placeholder="Question Description"
               className="text-gray-600 mb-2"
             />
@@ -301,9 +303,9 @@ export function EditableObjectPopup<T>({
             <label className="block mb-2">{field.label}</label>
             <MCQOptionsInput
               options={
-                editedObject[field.key] as { id: string; label: string }[]
+                editedObject[field.key!] as { id: string; label: string }[]
               }
-              onChange={(newOptions) => handleChange(field.key, newOptions)}
+              onChange={(newOptions) => handleChange(field.key!, newOptions)}
             />
           </div>
         );
@@ -313,9 +315,9 @@ export function EditableObjectPopup<T>({
           <div className="mb-4">
             <label className="block mb-2">{field.label}</label>
             <RotationInput
-              value={editedObject[field.key] as Vector3}
+              value={editedObject[field.key!] as Vector3}
               onChange={(newValue: Vector3) =>
-                handleChange(field.key, newValue)
+                handleChange(field.key!, newValue)
               }
               size={200}
             />
@@ -326,9 +328,9 @@ export function EditableObjectPopup<T>({
           <div className="mb-4">
             <label className="block mb-2">{field.label}</label>
             <Vector2Input
-              value={editedObject[field.key] as Vector2}
+              value={editedObject[field.key!] as Vector2}
               onChange={(newValue: Vector2) =>
-                handleChange(field.key, newValue)
+                handleChange(field.key!, newValue)
               }
               size={200}
               range={10}
@@ -338,12 +340,12 @@ export function EditableObjectPopup<T>({
       
       case "vizObjSelect":
         return (
-        <SelectVizObject handleChange={(id) => handleChange(field.key, id)} />
+        <SelectVizObject handleChange={(id) => handleChange(field.key!, id)} />
       );
 
       case "vizObjSelectList":
         return (
-        <SelectVizObjectList handleChange={(selectedObjects) => handleChange(field.key, selectedObjects)} />
+        <SelectVizObjectList handleChange={(selectedObjects) => handleChange(field.key!, selectedObjects)} />
       );
       case "select":
         
@@ -352,12 +354,12 @@ export function EditableObjectPopup<T>({
           <div className="mb-4">
             <label className="block mb-2">{field.label}</label>
             <Select
-              value={JSON.stringify(editedObject[field.key])}
-              onValueChange={(value) => handleChange(field.key, JSON.parse(value))}
+              value={JSON.stringify(editedObject[field.key!])}
+              onValueChange={(value) => handleChange(field.key!, JSON.parse(value))}
             >
               <SelectTrigger>
                 <SelectValue>
-                  {field.options?.find(option => JSON.stringify(option.value) === JSON.stringify(editedObject[field.key]))?.label || "Select an option"}
+                  {field.options?.find(option => JSON.stringify(option.value) === JSON.stringify(editedObject[field.key!]))?.label || "Select an option"}
                 </SelectValue>
               </SelectTrigger>
               <SelectContent>
@@ -382,8 +384,8 @@ export function EditableObjectPopup<T>({
               id={field.key as string}
               placeholder={field.label}
               type={field.type}
-              value={editedObject[field.key] as string}
-              onChange={(e) => handleChange(field.key, e.target.value)}
+              value={editedObject[field.key!] as string}
+              onChange={(e) => handleChange(field.key!, e.target.value)}
               className="col-span-3"
             />
           </div>
@@ -395,8 +397,8 @@ export function EditableObjectPopup<T>({
             <Input
               id={field.key as string}
               type={field.type}
-              value={editedObject[field.key] as number}
-              onChange={(e) => handleChange(field.key, e.target.value)}
+              value={editedObject[field.key!] as number}
+              onChange={(e) => handleChange(field.key!, e.target.value)}
               className="col-span-3"
             />
           </div>
@@ -405,7 +407,7 @@ export function EditableObjectPopup<T>({
         return (
           <div className="mb-4">
             <label className="block mb-2">{field.label}</label>
-            {(editedObject[field.key] as any[]).map((item, index) => (
+            {(editedObject[field.key!] as any[]).map((item, index) => (
               <div key={index} className="flex items-center mb-2">
                 <Input
                   placeholder={field.label}
@@ -415,16 +417,16 @@ export function EditableObjectPopup<T>({
                   onChange={(e) => {
                     const value = e.target.value;
                     if (value === "" || /^-?\d*\.?\d*$/.test(value)) {
-                      const newArray = [...(editedObject[field.key] as any[])];
+                      const newArray = [...(editedObject[field.key!] as any[])];
                       newArray[index] = value === "" ? null : parseFloat(value);
-                      handleChange(field.key, newArray);
+                      handleChange(field.key!, newArray);
                     }
                   }}
                   onBlur={(e) => {
                     const value = e.target.value;
-                    const newArray = [...(editedObject[field.key] as any[])];
+                    const newArray = [...(editedObject[field.key!] as any[])];
                     newArray[index] = value === "" ? null : parseFloat(value);
-                    handleChange(field.key, newArray);
+                    handleChange(field.key!, newArray);
                   }}
                   onWheel={(e) => e.currentTarget.blur()}
                 />
@@ -433,9 +435,9 @@ export function EditableObjectPopup<T>({
                   <Button
                     onClick={() => {
                       const newArray = (
-                        editedObject[field.key] as any[]
+                        editedObject[field.key!] as any[]
                       ).filter((_, i) => i !== index);
-                      handleChange(field.key, newArray);
+                      handleChange(field.key!, newArray);
                     }}
                     variant="ghost"
                     size="icon"
@@ -450,10 +452,10 @@ export function EditableObjectPopup<T>({
               <Button
                 onClick={() => {
                   const newArray = [
-                    ...(editedObject[field.key] as any[]),
+                    ...(editedObject[field.key!] as any[]),
                     null,
                   ];
-                  handleChange(field.key, newArray);
+                  handleChange(field.key!, newArray);
                 }}
                 variant="outline"
                 size="sm"
@@ -476,13 +478,13 @@ export function EditableObjectPopup<T>({
               onChange={(e) => {
                 const value = e.target.value;
                 if (value === "" || /^-?\d*\.?\d*$/.test(value)) {
-                  handleChangeInt(field.key, value === "" ? null : value);
+                  handleChangeInt(field.key!, value === "" ? null : value);
                 }
               }}
               onBlur={(e) => {
                 const value = e.target.value;
                 if (value !== "") {
-                  handleChangeInt(field.key, value);
+                  handleChangeInt(field.key!, value);
                 }
               }}
               onWheel={(e) => e.currentTarget.blur()}
@@ -495,8 +497,8 @@ export function EditableObjectPopup<T>({
           <div className="mb-4">
             <label className="block mb-2">{field.label}</label>
             <GeometryInput
-              value={editedObject[field.key] as PredefinedGeometry}
-              onChange={(newValue) => handleChange(field.key, newValue)}
+              value={editedObject[field.key!] as PredefinedGeometry}
+              onChange={(newValue) => handleChange(field.key!, newValue)}
             />
           </div>
         );
@@ -511,8 +513,8 @@ export function EditableObjectPopup<T>({
               placeholder={field.label}
               id={field.key as string}
               type={field.type}
-              value={editedObject[field.key] as string | number}
-              onChange={(e) => handleChange(field.key, e.target.value)}
+              value={editedObject[field.key!] as string | number}
+              onChange={(e) => handleChange(field.key!, e.target.value)}
             />
           </div>
         );
@@ -551,3 +553,5 @@ export function EditableObjectPopup<T>({
     </Dialog>
   );
 }
+
+

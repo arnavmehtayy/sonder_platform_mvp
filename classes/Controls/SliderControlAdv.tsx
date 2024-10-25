@@ -55,8 +55,8 @@ export class SliderControlAdvanced<T extends obj> extends SliderControl<T> {
     range,
     step_size = 1,
     attribute_pairs,
-    desc = "advanced slider control",
-    text = "this is an advanced slider control",
+    desc = "Slider",
+    text = "slide the bar below to change the value",
   }: SliderControlAdvancedConstructor<T>) {
     super({
       id,
@@ -169,11 +169,12 @@ export class SliderControlAdvanced<T extends obj> extends SliderControl<T> {
     >({
       id: Date.now() % 10000,
       obj_id: -1,
-      range: [0, 100],
-      step_size: 1,
+      range: [-100, 100],
+      step_size: 0.01,
       attribute_pairs: [],
     });
 
+    const [useSliderControl, setUseSliderControl] = React.useState(false);
     const [validation, setValidation] = React.useState<Validation_sliderAdv_constructor| undefined>(undefined);
 
     const popupProps: EditableObjectPopupProps<
@@ -185,21 +186,42 @@ export class SliderControlAdvanced<T extends obj> extends SliderControl<T> {
       set_object: setEditedObject,
       onSave: (updatedObject: SliderControlAdvancedConstructor<any>) => {
         const newObj = new SliderControlAdvanced(updatedObject);
-        const newVal = validation ? new Validation_sliderAdv(validation): undefined
+        const newVal = validation ? new Validation_sliderAdv(validation): undefined;
         onSave(newObj, newVal);
       },
-      title: `Create New Advanced Slider Control`,
+      title: `Create New Slider Control`,
       fields: [
-        
         { key: "desc", label: "Title", type: "title" },
         { key: "text", label: "Desc", type: "textarea" },
         { key: "step_size", label: "Step Size", type: "number" },
         { key: "range", label: "Range", type: "arraynum", length_of_array: 2 },
-        { key: "obj_id", label: "Object ID", type: "vizObjSelect" },
+        {
+          label: "",
+          type: "custom",
+          render: (_, onChange) => (
+            <div className="flex items-center mb-4">
+              <input
+                type="checkbox"
+                id="useSliderControl"
+                checked={useSliderControl}
+                onChange={(e) => setUseSliderControl(e.target.checked)}
+                className="mr-2"
+              />
+              <label htmlFor="useSliderControl">Enable Object Control</label>
+            </div>
+          ),
+        },
+        {
+          key: "obj_id",
+          label: "Object ID",
+          type: "vizObjSelect",
+          showIf: () => useSliderControl,
+        },
         {
           key: "attribute_pairs",
-          label: "Attribute Pairs",
+          label: "Controlled Attributes",
           type: "custom",
+          showIf: () => useSliderControl,
           render: (value, onChange) => (
             <AttributePairsEditor
               pairs={value}
@@ -215,7 +237,6 @@ export class SliderControlAdvanced<T extends obj> extends SliderControl<T> {
           controlId={editedObject.id}
         />
       ),
-
     };
 
     return <EditableObjectPopup {...popupProps} />;
@@ -316,7 +337,7 @@ export function AttributePairsEditor({
         </div>
       ))}
       <Button onClick={addPair} variant="outline" className="w-full mt-3">
-        Add Attribute Pair
+        Add Controlled Attribute
       </Button>
     </div>
   );
