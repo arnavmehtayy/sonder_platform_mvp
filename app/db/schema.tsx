@@ -6,10 +6,39 @@ import { ScoreConstructor } from '@/classes/Scores/Score';
 import { ValidationConstructor } from '@/classes/Validation/Validation';
 import { geom_param_type, geom_type, PredefinedGeometry } from '@/classes/vizobjects/geomobj';
 import { objconstructor, object_types } from '@/classes/vizobjects/obj';
-import { integer, boolean, real, pgTable, serial, text, timestamp, jsonb } from 'drizzle-orm/pg-core';
+import { integer, boolean, real, pgTable, serial, text, timestamp, jsonb, uuid } from 'drizzle-orm/pg-core';
 import { InferSelectModel, InferInsertModel } from 'drizzle-orm';
+import { pgSchema } from 'drizzle-orm/pg-core';
 
 // VIZOBJECTS
+
+const authSchema = pgSchema('auth');
+
+const users = authSchema.table('users', {
+	id: uuid('id').primaryKey(),
+});
+
+export const profiles = pgTable('profiles', {
+	id: serial('id').primaryKey(),
+  user_id: uuid('user_id').references(() => users.id).notNull(),
+	firstName: text('first_name').notNull(),
+  lastName: text('last_name').notNull(),
+});
+
+
+export type ProfileSelect = InferSelectModel<typeof profiles>;
+export type ProfileInsert = InferInsertModel<typeof profiles>;
+
+export const experience = pgTable('experience_table', {
+  id: serial('id').primaryKey(),
+  desc: text('desc').notNull(),
+  title: text('title').notNull(),
+  user_id: integer('user_id').references(() => profiles.id).notNull(), // foreign key to the profile
+})
+
+export type ExperienceSelect = InferSelectModel<typeof experience>;
+export type ExperienceInsert = InferInsertModel<typeof experience>;
+
 
 export const states = pgTable('users_table', {
   id: serial('id').primaryKey(),
@@ -18,6 +47,8 @@ export const states = pgTable('users_table', {
   title: text("title").notNull(),
   createdAt: timestamp('created_at').notNull().defaultNow(),
   updatedAt: timestamp('updated_at').notNull().defaultNow().$onUpdate(() => new Date()),
+  experienceId: integer('experience_id').references(() => experience.id, { onDelete: 'cascade' }).notNull(),
+  index: integer('index').default(0)
 });
 
 export const GeomObj = pgTable('geom_obj', {
@@ -529,3 +560,9 @@ export type PlacementInsert = InferInsertModel<typeof Placement>;
 
 export type QuestionTextSelect = InferSelectModel<typeof Questions_text>;
 export type QuestionTextInsert = InferInsertModel<typeof Questions_text>;
+
+
+
+
+
+

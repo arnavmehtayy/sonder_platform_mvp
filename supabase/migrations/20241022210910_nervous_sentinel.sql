@@ -1,1 +1,0 @@
-ALTER TABLE "attribute_pairs" DROP COLUMN IF EXISTS "transform_function";

@@ -13,7 +13,7 @@ import Logo from "@/images/Sonder logo with text.png";
   relevant experience page
 */
 
-const ExperienceCard = ({
+export const ExperienceCard = ({
   name,
   slides,
   index,

@@ -25,6 +25,7 @@ import {
   ValidationSelect,
   Placement,
   Questions_text,
+  experience,
 } from "@/app/db/schema";
 import { eq } from "drizzle-orm";
 import {
@@ -37,7 +38,10 @@ import { InputNumberControl } from '@/app/db/schema';
 
 export async function saveStateToDatabase(
   stateName: string,
-  state: SerializeStateInsert
+  profileId: number,
+  state: SerializeStateInsert,
+  exp_desc: string,
+  exp_title: string
 ) {
   await db.transaction(async (tx) => {
     // Check if the state already exists
@@ -61,13 +65,24 @@ export async function saveStateToDatabase(
         .where(eq(states.state_name, stateName));
       stateId = existingState[0].id;
     } else {
-      // Insert new state
+      // First create the experience entry
+      const [insertedExperience] = await tx
+        .insert(experience)
+        .values({
+          desc: exp_desc,
+          title: exp_title,
+          user_id: profileId
+        })
+        .returning({ id: experience.id });
+
+      // Then create the state with the experience ID
       const [insertedState] = await tx
         .insert(states)
         .values({
           state_name: stateName,
           camera_zoom: state.camera_zoom,
           title: state.title,
+          experienceId: insertedExperience.id
         })
         .returning({ id: states.id });
       stateId = insertedState.id;

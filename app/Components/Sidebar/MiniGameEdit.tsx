@@ -28,6 +28,8 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import { createClient } from "@/app/utils/supabase/client";
+import { toast } from "sonner";
 
 const SortableItem: React.FC<{ id: string; children: React.ReactNode }> = ({ id, children }) => {
   const {
@@ -56,10 +58,16 @@ const SortableItem: React.FC<{ id: string; children: React.ReactNode }> = ({ id,
 export function MinigameEdit({}: {}) {
   const reset = useStore((state) => state.reset);
   const state_name = useStore(getStateName);
+  const [stateData, setStateData] = useState({
+    name: "",
+    title: "",
+    description: "",
+    profileId: null as number | null,
+  });
   const placement = useStore(getPlacementListSelector);
   const updateValidation = useStore(UpdateValidationSelector);
   const validationInstance = useStore((state) => state.validations);
-  const [stateName, setStateName] = useState("");
+
   const [showValidation, setShowValidation] = useState(true);
   const [allValidationsValid, setAllValidationsValid] = useState(false);
   const order = useStore((state) => state.order);
@@ -73,10 +81,6 @@ export function MinigameEdit({}: {}) {
 
   useEffect(() => reset("default"), []);
 
-  const handleValidationUpdate = () => {
-    updateValidation();
-  };
-
   useEffect(() => {
     const checkAllValidations = () => {
       const allValid = validationInstance.every((validation) => validation.get_isValid());
@@ -85,29 +89,81 @@ export function MinigameEdit({}: {}) {
     checkAllValidations();
   }, [validationInstance]);
 
+  useEffect(() => {
+    const fetchUserAndProfile = async () => {
+      try {
+        const supabase = await createClient();
+        const { data: { user }, error: userError } = await supabase.auth.getUser();
+        
+        if (userError || !user) {
+          console.error('No user found:', userError);
+          return;
+        }
+
+        // Fetch profile using the user ID
+        const response = await fetch(`/api/supabase/profile?userId=${user.id}`);
+        if (response.ok) {
+          const profile = await response.json();
+          setStateData(prev => ({ ...prev, profileId: profile.id }));
+        } else {
+          console.error('Error fetching profile');
+        }
+      } catch (error) {
+        console.error('Error:', error);
+      }
+    };
+
+    fetchUserAndProfile();
+  }, []);
+
+  const handleValidationUpdate = () => {
+    updateValidation();
+  };
+
   const handleSaveState = async () => {
     try {
+      const supabase = await createClient();
+      const { data: { user }, error: userError } = await supabase.auth.getUser();
+      
+      if (userError || !user) {
+        toast.error("Please log in to save your state");
+        return;
+      }
+
+      if (!stateData.profileId) {
+        toast.error("Unable to find user profile");
+        return;
+      }
+
       const serializedState = serializeState(useStore.getState());
-      console.log(serializedState)
       const response = await fetch('/api/supabase/DataBaseAPI', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ stateName, state: serializedState }),
+        body: JSON.stringify({ 
+          exp_title: stateData.name, 
+          exp_desc: stateData.description, 
+          stateName: stateData.name, 
+          state: serializedState,
+          profileId: stateData.profileId
+        }),
       });
+      
       if (!response.ok) {
         throw new Error('Failed to save state');
       }
-      console.log('State saved successfully');
+      
+      toast.success('State saved successfully');
     } catch (error) {
       console.error('Error saving state:', error);
+      toast.error('Failed to save state');
     }
   };
   
   const handleLoadState = async () => {
     try {
-      const response = await fetch(`/api/supabase/DataBaseAPI?stateName=${stateName}`);
+      const response = await fetch(`/api/supabase/DataBaseAPI?stateName=${stateData.name}`);
       if (!response.ok) {
         throw new Error('Failed to load state');
       }
@@ -258,30 +314,67 @@ export function MinigameEdit({}: {}) {
         <br />
         <br />
 
-        <div className="mt-4 p-4 bg-white rounded shadow">
-          <h3 className="text-lg font-semibold mb-2">State Management</h3>
-          <input
-            type="text"
-            value={stateName}
-            onChange={(e) => setStateName(e.target.value)}
-            placeholder="Enter state name"
-            className="w-full p-2 border rounded mb-2"
-          />
-          <div className="flex space-x-2">
-            <button
-              onClick={handleSaveState}
-              className="flex-1 bg-blue-500 text-white p-2 rounded hover:bg-blue-600 transition"
-            >
-              Save State
+        {/* Add state management */}
+        
+
+        <Dialog>
+          <DialogTrigger asChild>
+            <button className="mt-4 p-4 bg-white rounded shadow w-full">
+              State Management
             </button>
-            <button
-              onClick={handleLoadState}
-              className="flex-1 bg-green-500 text-white p-2 rounded hover:bg-green-600 transition"
-            >
-              Load State
-            </button>
-          </div>
-        </div>
+          </DialogTrigger>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>State Management</DialogTitle>
+            </DialogHeader>
+            <div className="space-y-4">
+              <div>
+                <label className="text-sm font-medium">State Name</label>
+                <input
+                  type="text"
+                  value={stateData.name}
+                  onChange={(e) => setStateData({...stateData, name: e.target.value})}
+                  placeholder="Enter state name"
+                  className="w-full p-2 border rounded"
+                />
+              </div>
+              <div>
+                <label className="text-sm font-medium">Title</label>
+                <input
+                  type="text"
+                  value={stateData.title}
+                  onChange={(e) => setStateData({...stateData, title: e.target.value})}
+                  placeholder="Enter title"
+                  className="w-full p-2 border rounded"
+                />
+              </div>
+              <div>
+                <label className="text-sm font-medium">Description</label>
+                <textarea
+                  value={stateData.description}
+                  onChange={(e) => setStateData({...stateData, description: e.target.value})}
+                  placeholder="Enter description"
+                  className="w-full p-2 border rounded"
+                  rows={3}
+                />
+              </div>
+              <div className="flex space-x-2">
+                <button
+                  onClick={handleSaveState}
+                  className="flex-1 bg-blue-500 text-white p-2 rounded hover:bg-blue-600 transition"
+                >
+                  Save State
+                </button>
+                <button
+                  onClick={handleLoadState}
+                  className="flex-1 bg-green-500 text-white p-2 rounded hover:bg-green-600 transition"
+                >
+                  Load State
+                </button>
+              </div>
+            </div>
+          </DialogContent>
+        </Dialog>
       </div>
     </div>
   );

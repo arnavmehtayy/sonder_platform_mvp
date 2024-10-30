@@ -5,148 +5,22 @@
     {
       "idx": 0,
       "version": "7",
-      "when": 1729122721137,
-      "tag": "20241016235201_nasty_warbound",
+      "when": 1730143129043,
+      "tag": "20241028191849_aberrant_the_renegades",
       "breakpoints": true
     },
     {
       "idx": 1,
       "version": "7",
-      "when": 1729122929498,
-      "tag": "20241016235529_last_hairball",
+      "when": 1730143150583,
+      "tag": "20241028191910_furry_chat",
       "breakpoints": true
     },
     {
       "idx": 2,
       "version": "7",
-      "when": 1729124576321,
-      "tag": "20241017002256_loving_black_tarantula",
-      "breakpoints": true
-    },
-    {
-      "idx": 3,
-      "version": "7",
-      "when": 1729207932498,
-      "tag": "20241017233212_bitter_vengeance",
-      "breakpoints": true
-    },
-    {
-      "idx": 4,
-      "version": "7",
-      "when": 1729216866366,
-      "tag": "20241018020106_last_ultragirl",
-      "breakpoints": true
-    },
-    {
-      "idx": 5,
-      "version": "7",
-      "when": 1729281561967,
-      "tag": "20241018195921_talented_james_howlett",
-      "breakpoints": true
-    },
-    {
-      "idx": 6,
-      "version": "7",
-      "when": 1729300333071,
-      "tag": "20241019011213_silky_night_nurse",
-      "breakpoints": true
-    },
-    {
-      "idx": 7,
-      "version": "7",
-      "when": 1729306783400,
-      "tag": "20241019025943_abnormal_puff_adder",
-      "breakpoints": true
-    },
-    {
-      "idx": 8,
-      "version": "7",
-      "when": 1729487535950,
-      "tag": "20241021051215_magenta_tomorrow_man",
-      "breakpoints": true
-    },
-    {
-      "idx": 9,
-      "version": "7",
-      "when": 1729620340307,
-      "tag": "20241022180540_bitter_quasar",
-      "breakpoints": true
-    },
-    {
-      "idx": 10,
-      "version": "7",
-      "when": 1729625722396,
-      "tag": "20241022193522_mighty_orphan",
-      "breakpoints": true
-    },
-    {
-      "idx": 11,
-      "version": "7",
-      "when": 1729631350638,
-      "tag": "20241022210910_nervous_sentinel",
-      "breakpoints": true
-    },
-    {
-      "idx": 12,
-      "version": "7",
-      "when": 1729648681569,
-      "tag": "20241023015801_bent_ghost_rider",
-      "breakpoints": true
-    },
-    {
-      "idx": 13,
-      "version": "7",
-      "when": 1729655099778,
-      "tag": "20241023034459_new_karnak",
-      "breakpoints": true
-    },
-    {
-      "idx": 14,
-      "version": "7",
-      "when": 1729659744939,
-      "tag": "20241023050224_colossal_spectrum",
-      "breakpoints": true
-    },
-    {
-      "idx": 15,
-      "version": "7",
-      "when": 1729662888936,
-      "tag": "20241023055448_next_thunderbolt_ross",
-      "breakpoints": true
-    },
-    {
-      "idx": 16,
-      "version": "7",
-      "when": 1729663236784,
-      "tag": "20241023060036_slow_solo",
-      "breakpoints": true
-    },
-    {
-      "idx": 17,
-      "version": "7",
-      "when": 1729664877813,
-      "tag": "20241023062757_dashing_red_shift",
-      "breakpoints": true
-    },
-    {
-      "idx": 18,
-      "version": "7",
-      "when": 1729743338086,
-      "tag": "20241024041538_curious_norman_osborn",
-      "breakpoints": true
-    },
-    {
-      "idx": 19,
-      "version": "7",
-      "when": 1729744382385,
-      "tag": "20241024043302_colorful_jasper_sitwell",
-      "breakpoints": true
-    },
-    {
-      "idx": 20,
-      "version": "7",
-      "when": 1729754080128,
-      "tag": "20241024071440_fast_multiple_man",
+      "when": 1730143193113,
+      "tag": "20241028191953_wild_odin",
       "breakpoints": true
     }
   ]

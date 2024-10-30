@@ -4,10 +4,10 @@ import { SerializeStateInsert, SerializeStateSelect } from '@/classes/database/S
 
 export async function POST(request: Request) {
   
-  const { stateName, state } : {stateName: string, state: SerializeStateInsert} = await request.json();
+  const { exp_title, profileId, exp_desc, stateName, state } : {exp_title: string, profileId: number, exp_desc: string, stateName: string, state: SerializeStateInsert} = await request.json();
   // console.log(state)
   try {
-    await saveStateToDatabase(stateName, state);
+    await saveStateToDatabase(stateName, profileId, state, exp_desc, exp_title);
     return NextResponse.json({ message: 'State saved successfully' });
   } catch (error) {
     console.error('Error saving state:', error);

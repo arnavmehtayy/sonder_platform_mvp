@@ -11,7 +11,6 @@ export async function POST(request: Request) {
         password,
         email_confirm: true,
       });
-
       if (error) throw error;
       return NextResponse.json({ message: 'Check your email for confirmation' });
     }
