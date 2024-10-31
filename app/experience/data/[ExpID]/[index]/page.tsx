@@ -11,9 +11,9 @@ import { MinigameDB } from '@/app/Components/Sidebar/MinigameDB';
 
 
 
-const handleLoadState = async (state_name: string) => {
+const handleLoadState = async (experienceId: number, index: number) => {
   try {
-    const response = await fetch(`/api/supabase/DataBaseAPI?stateName=${state_name}`);
+    const response = await fetch(`/api/supabase/DataBaseAPI?experienceId=${experienceId}&index=${index}`);
     if (!response.ok) {
       throw new Error('Failed to load state');
     }
@@ -31,15 +31,16 @@ const handleLoadState = async (state_name: string) => {
 
 export default function ExperiencePage() {
     const params = useParams();
-    const name = params.stateName as string
-    handleLoadState(name)
+    const index = Number(params.index)
+    const experienceId = Number(params.ExpID)
+    handleLoadState(experienceId, index)
 
 
     return (
     <div className="flex flex-col h-screen">
       <div className="flex-grow">
         <CurvedBackButton />
-        <MinigameDB />
+        <MinigameDB experienceID={experienceId} index={index}/>
         <FeedbackComponent />
       </div>
     </div>

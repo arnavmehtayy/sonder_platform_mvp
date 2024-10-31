@@ -1,12 +1,20 @@
 import { db } from "@/app/db/index";
-import { experience } from "@/app/db/schema";
+import { experience, profiles } from "@/app/db/schema";
 import { NextResponse } from 'next/server';
+import { eq } from 'drizzle-orm';
 
 export async function GET() {
   try {
     const experiences = await db
-      .select()
-      .from(experience);
+      .select({
+        id: experience.id,
+        desc: experience.desc,
+        title: experience.title,
+        firstName: profiles.firstName,
+        lastName: profiles.lastName,
+      })
+      .from(experience)
+      .leftJoin(profiles, eq(experience.user_id, profiles.id));
     
     return NextResponse.json(experiences);
   } catch (error) {

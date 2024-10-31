@@ -22,6 +22,13 @@
       "when": 1730143193113,
       "tag": "20241028191953_wild_odin",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1730329685155,
+      "tag": "20241030230805_special_the_stranger",
+      "breakpoints": true
     }
   ]
 }

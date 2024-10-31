@@ -34,24 +34,51 @@ import {
 } from "@/classes/database/Serializtypes";
 
 import { InputNumberControl } from '@/app/db/schema';
+import { and } from "drizzle-orm";
 
 
 export async function saveStateToDatabase(
-  stateName: string,
+  experienceId: number,
   profileId: number,
   state: SerializeStateInsert,
   exp_desc: string,
-  exp_title: string
+  exp_title: string,
+  index: number,
 ) {
   await db.transaction(async (tx) => {
-    // Check if the state already exists
+    let stateId: number;
+    let expId = experienceId;
+
+
+    // Check if experience exists
+    const existingExperience = await tx
+      .select()
+      .from(experience)
+      .where(eq(experience.id, experienceId))
+      .limit(1);
+
+    if (existingExperience.length === 0) {
+      // Create new experience if it doesn't exist
+      const [insertedExperience] = await tx
+        .insert(experience)
+        .values({
+          desc: exp_desc,
+          title: exp_title,
+          user_id: profileId
+        })
+        .returning({ id: experience.id });
+      expId = insertedExperience.id;
+    }
+
+    // Check if state exists for this experience and index
     const existingState = await tx
       .select()
       .from(states)
-      .where(eq(states.state_name, stateName))
+      .where(
+        and(eq(states.experienceId, expId), eq(states.index, index))
+      )
       .limit(1);
 
-    let stateId: number;
 
     if (existingState.length > 0) {
       // Update existing state
@@ -62,34 +89,10 @@ export async function saveStateToDatabase(
           title: state.title,
           updatedAt: new Date(),
         })
-        .where(eq(states.state_name, stateName));
+        .where(eq(states.id, existingState[0].id));
       stateId = existingState[0].id;
-    } else {
-      // First create the experience entry
-      const [insertedExperience] = await tx
-        .insert(experience)
-        .values({
-          desc: exp_desc,
-          title: exp_title,
-          user_id: profileId
-        })
-        .returning({ id: experience.id });
 
-      // Then create the state with the experience ID
-      const [insertedState] = await tx
-        .insert(states)
-        .values({
-          state_name: stateName,
-          camera_zoom: state.camera_zoom,
-          title: state.title,
-          experienceId: insertedExperience.id
-        })
-        .returning({ id: states.id });
-      stateId = insertedState.id;
-    }
-
-    // Delete existing related records
-    await tx.delete(GeomObj).where(eq(GeomObj.stateId, stateId));
+      await tx.delete(GeomObj).where(eq(GeomObj.stateId, stateId));
     await tx.delete(LineObj).where(eq(LineObj.stateId, stateId));
     await tx
       .delete(FunctionPlotString)
@@ -112,7 +115,7 @@ export async function saveStateToDatabase(
       .delete(MultiChoiceControl)
       .where(eq(MultiChoiceControl.stateId, stateId));
     
-      await tx.delete(InputNumberAttributePairs).where(eq(InputNumberAttributePairs.stateId, stateId));
+    await tx.delete(InputNumberAttributePairs).where(eq(InputNumberAttributePairs.stateId, stateId));
     await tx.delete(InputNumberControl).where(eq(InputNumberControl.stateId, stateId));
 
     // Delete existing Enabler records
@@ -137,6 +140,23 @@ export async function saveStateToDatabase(
 
     // Delete existing question records
     await tx.delete(Questions_text).where(eq(Questions_text.stateId, stateId));
+    } else {
+      // Create new state
+      const [insertedState] = await tx
+        .insert(states)
+        .values({
+          camera_zoom: state.camera_zoom,
+          title: state.title,
+          experienceId: expId,
+          index: index,
+          state_name: Date.now().toString()
+        })
+        .returning({ id: states.id });
+      stateId = insertedState.id;
+    }
+
+    // Delete existing related records
+    
 
     // Insert vizobjects
     if (state.GeomObjs.length > 0) {
@@ -296,17 +316,21 @@ export async function saveStateToDatabase(
 }
 
 export async function loadStateFromDatabase(
-  stateName: string
+  experienceId: number,
+  index: number,
 ): Promise<SerializeStateSelect> {
   const state = await db.transaction(async (tx) => {
     // Fetch the state
     const stateRecord = await tx
       .select()
       .from(states)
-      .where(eq(states.state_name, stateName))
+      .where(
+        eq(states.experienceId, experienceId) &&
+        eq(states.index, index)
+      )
       .limit(1);
     if (stateRecord.length === 0) {
-      throw new Error(`State "${stateName}" not found`);
+      throw new Error(`State not found for experience ${experienceId} and index ${index}`);
     }
     const stateId = stateRecord[0].id;
 
@@ -362,7 +386,7 @@ export async function loadStateFromDatabase(
       .from(MultiChoiceOption)
       .where(eq(MultiChoiceOption.stateId, stateId));
     
-      const inputNumberControlData = await tx
+    const inputNumberControlData = await tx
       .select()
       .from(InputNumberControl)
       .where(eq(InputNumberControl.stateId, stateId));

@@ -4,12 +4,23 @@ import { motion } from "framer-motion";
 import Image from "next/image";
 import Logo from "@/images/Sonder logo with text.png";
 import { ExperienceCard } from "./ExperienceHub";
+import { ChevronRight, Activity, Eye } from "lucide-react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { User } from "lucide-react";
 
 interface Experience {
   id: number;
   desc: string;
   title: string;
-  user_id: number;
+  firstName: string;
+  lastName: string;
+}
+
+interface State {
+  id: number;
+  state_name: string;
+  index: number;
 }
 
 export const ExpDBHub = () => {
@@ -20,7 +31,7 @@ export const ExpDBHub = () => {
   useEffect(() => {
     const fetchExperiences = async () => {
       try {
-        const response = await fetch('/api/experiences');
+        const response = await fetch('/api/supabase/experiences');
         if (!response.ok) {
           throw new Error('Failed to fetch experiences');
         }
@@ -82,12 +93,13 @@ export const ExpDBHub = () => {
             className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
           >
             {experiences.map((experience, index) => (
-              <ExperienceCard
+              <ExperienceCardDB
                 key={experience.id}
                 name={experience.title}
-                slides = {[]}
                 description={experience.desc}
-                index={index}
+                experienceId={experience.id}
+                firstName={experience.firstName}
+                lastName={experience.lastName}
               />
             ))}
           </motion.div>
@@ -96,5 +108,69 @@ export const ExpDBHub = () => {
     </div>
   );
 };
-  
-  
+
+
+export const ExperienceCardDB = ({
+  name,
+  description,
+  experienceId,
+  firstName,
+  lastName
+}: {
+  name: string;
+  description: string;
+  experienceId: number;
+  firstName: string;
+  lastName: string;
+}) => {
+  const [isHovered, setIsHovered] = useState(false);
+  const router = useRouter();
+
+
+  const handleClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    router.push(`/experience/data/${experienceId}/${0}`);
+    
+  };
+
+  return (
+    <motion.div
+      whileHover={{ scale: 1.05 }}
+      whileTap={{ scale: 0.95 }}
+      className="h-full"
+    >
+      <div
+        onClick={handleClick}
+        className="bg-white rounded-lg shadow-lg overflow-hidden h-full transition-all duration-300 hover:shadow-xl cursor-pointer"
+        onMouseEnter={() => setIsHovered(true)}
+        onMouseLeave={() => setIsHovered(false)}
+      >
+        <div
+          className="bg-gradient-to-r from-[#01A9B2] to-[#7AE5EC] text-white p-6"
+        >
+          <h3 className="text-2xl font-bold mb-2">{name}</h3>
+          <div className="flex items-center text-sm">
+            <User size={16} className="mr-2" />
+            <span>Created by {firstName} {lastName}</span>
+          </div>
+        </div>
+        <div className="p-6">
+          <p className="text-gray-600 mb-4">{description}</p>
+          <div className="flex justify-between items-center">
+            <span className="text-[#257276] font-semibold flex items-center">
+              Start Experience
+              <ChevronRight
+                size={20}
+                className={`ml-1 transition-transform duration-300 ${
+                  isHovered ? "translate-x-1" : ""
+                }`}
+              />
+              {/* traslate arrow forward when hovering as user feedback to click to go to experience */}
+            </span>
+            <Activity size={24} className="text-[#18D9E4]" />
+          </div>
+        </div>
+      </div>
+    </motion.div>
+  );
+};

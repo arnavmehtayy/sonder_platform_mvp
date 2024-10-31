@@ -24,10 +24,10 @@ export default function ExperiencePage() {
 
  
 
-  if (!experience || experience.slides.length <= Number(slideIndex)) { // if the viztool is not found
+  // if (!experience || experience.slides.length <= Number(slideIndex)) { // if the viztool is not found
     
-    return <div>Experience not found</div>; 
-  } 
+  //   return <div>Experience not found</div>; 
+  // } 
   return (
     <div className="flex flex-col h-screen">
       <div className="flex-grow">

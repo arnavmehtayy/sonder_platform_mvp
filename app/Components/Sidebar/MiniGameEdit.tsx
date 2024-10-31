@@ -63,6 +63,8 @@ export function MinigameEdit({}: {}) {
     title: "",
     description: "",
     profileId: null as number | null,
+    experienceId: 0,
+    index: 0,
   });
   const placement = useStore(getPlacementListSelector);
   const updateValidation = useStore(UpdateValidationSelector);
@@ -146,7 +148,9 @@ export function MinigameEdit({}: {}) {
           exp_desc: stateData.description, 
           stateName: stateData.name, 
           state: serializedState,
-          profileId: stateData.profileId
+          profileId: stateData.profileId,
+          experienceId: stateData.experienceId,
+          index: stateData.index
         }),
       });
       
@@ -163,19 +167,18 @@ export function MinigameEdit({}: {}) {
   
   const handleLoadState = async () => {
     try {
-      const response = await fetch(`/api/supabase/DataBaseAPI?stateName=${stateData.name}`);
+      const response = await fetch(`/api/supabase/DataBaseAPI?experienceId=${stateData.experienceId}&index=${stateData.index}`);
       if (!response.ok) {
         throw new Error('Failed to load state');
       }
       const serializedState = await response.json();
       const loadedState = deserializeState(serializedState);
-      console.log(loadedState)
       
       useStore.setState(loadedState);
-      console.log(useStore.getState().controls)
-      console.log('State loaded successfully');
+      toast.success('State loaded successfully');
     } catch (error) {
       console.error('Error loading state:', error);
+      toast.error('Failed to load state');
     }
   };
 
@@ -315,8 +318,6 @@ export function MinigameEdit({}: {}) {
         <br />
 
         {/* Add state management */}
-        
-
         <Dialog>
           <DialogTrigger asChild>
             <button className="mt-4 p-4 bg-white rounded shadow w-full">
@@ -356,6 +357,26 @@ export function MinigameEdit({}: {}) {
                   placeholder="Enter description"
                   className="w-full p-2 border rounded"
                   rows={3}
+                />
+              </div>
+              <div>
+                <label className="text-sm font-medium">Experience ID</label>
+                <input
+                  type="number"
+                  value={stateData.experienceId}
+                  onChange={(e) => setStateData({...stateData, experienceId: parseInt(e.target.value) || 0})}
+                  placeholder="Enter experience ID"
+                  className="w-full p-2 border rounded"
+                />
+              </div>
+              <div>
+                <label className="text-sm font-medium">Index</label>
+                <input
+                  type="number"
+                  value={stateData.index}
+                  onChange={(e) => setStateData({...stateData, index: parseInt(e.target.value) || 0})}
+                  placeholder="Enter index"
+                  className="w-full p-2 border rounded"
                 />
               </div>
               <div className="flex space-x-2">
