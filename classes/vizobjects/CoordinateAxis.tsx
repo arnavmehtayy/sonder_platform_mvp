@@ -169,7 +169,8 @@ export default class CoordinateAxis extends TransformObj {
       new THREE.Vector3(0, this.tickSize / 2, 0),
     ]);
 
-    if (this.showLabels) {
+    // Only show origin label in number line mode
+    if (this.showLabels && this.constructionType === "numberLine") {
       labelsX.push(
         <Text
           key="x-0"

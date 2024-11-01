@@ -156,6 +156,7 @@ export const FunctionPlotString = pgTable('function_plot_string', {
     
   functionStr: text('function_str').notNull(),
   symbols: jsonb('symbols').$type<AttributePairGet[]>().notNull(),
+  axisId: integer('axis_id').default(-1),
 });
 
 export const DummyDataStorage = pgTable('dummy_data_storage', {

@@ -17,6 +17,7 @@ import { TransformObj, TransformObjConstructor } from "./transformObj";
 import { FunctionStr, FunctionStrEditor, FunctionStrConstructor } from '../Controls/FunctionStr';
 import { useStore } from '@/app/store';
 import { FunctionPlotStringInsert, FunctionPlotStringSelect } from "@/app/db/schema";
+import CoordinateAxis from "./CoordinateAxis";
 
 export default class FunctionPlotString extends TransformObj {
   func: (x: number) => number;
@@ -24,6 +25,7 @@ export default class FunctionPlotString extends TransformObj {
   numPoints: number;
   lineWidth: number;
   functionStr: FunctionStr;
+  axisId: number;
 
   constructor({
     name = "FunctionPlot",
@@ -38,6 +40,7 @@ export default class FunctionPlotString extends TransformObj {
     numPoints = 100,
     lineWidth = 2,
     isEnabled = true,
+    axisId = -1,
   }: FunctionPlotStringConstructor) {
     super({
       name: name,
@@ -56,6 +59,7 @@ export default class FunctionPlotString extends TransformObj {
     this.lineWidth = lineWidth;
     this.name = name;
     this.type = "FunctionPlotString";
+    this.axisId = axisId;
   }
 
   get_set_att_selector(type: dict_keys): {[key: string]: get_attributes<any, any>} {
@@ -91,7 +95,8 @@ export default class FunctionPlotString extends TransformObj {
       XRange_a: this.xRange[0],
       XRange_b: this.xRange[1],
       numPoints: this.numPoints,
-      lineWidth: this.lineWidth
+      lineWidth: this.lineWidth,
+      axisId: this.axisId,
     };
   }
   
@@ -107,7 +112,8 @@ export default class FunctionPlotString extends TransformObj {
       functionStr: new FunctionStr(data.functionStr, data.symbols),
       xRange: [data.XRange_a, data.XRange_b],
       numPoints: data.numPoints,
-      lineWidth: data.lineWidth
+      lineWidth: data.lineWidth,
+      axisId: data.axisId || -1,
     });
   }
 
@@ -135,11 +141,16 @@ export default class FunctionPlotString extends TransformObj {
       points.push(new THREE.Vector3(x, y, 0));
     }
 
+    const position: [x: number, y: number, z:number] = this.axisId ? 
+      [this.position.x + (useStore.getState().vizobjs[this.axisId] as CoordinateAxis)?.position.x || 0, 
+       this.position.y + (useStore.getState().vizobjs[this.axisId] as CoordinateAxis)?.position.y || 0, 
+       0] :
+      [this.position.x, this.position.y, 0];
 
     return (
       <group
         ref={objectRef}
-        position={[this.position.x, this.position.y, 0]}
+        position={position}
         rotation={[this.rotation.x, this.rotation.y, this.rotation.z]}
         scale={[this.scale.x, this.scale.y, this.scale.z]}
         onPointerDown={this.isClickable ? onClickSelect : undefined}
@@ -180,6 +191,7 @@ interface FunctionPlotStringConstructor extends TransformObjConstructor {
   numPoints?: number;
   lineWidth?: number;
   isEnabled?: boolean;
+  axisId?: number;
 }
 
 const FunctionPlotPopup: React.FC<{
@@ -245,6 +257,20 @@ const FunctionPlotPopup: React.FC<{
       { key: "lineWidth", label: "Line Width", type: "number" },
       { key: "color", label: "Color", type: "color" },
       { key: "xRange", label: "X Range", type: "arraynum", length_of_array: 2 },
+      {
+        key: "axisId",
+        label: "Plot On Axis",
+        type: "select",
+        options: [
+          { label: "None (Origin)", value: 0 },
+          ...Object.entries(useStore.getState().vizobjs)
+            .filter(([_, obj]) => obj instanceof CoordinateAxis)
+            .map(([id, obj]) => ({
+              label: obj.name,
+              value: parseInt(id),
+            })),
+        ],
+      },
     ],
   };
 
