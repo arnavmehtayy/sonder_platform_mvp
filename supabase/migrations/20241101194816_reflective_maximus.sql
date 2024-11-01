@@ -1,0 +1,1 @@
+ALTER TABLE "axis_object" ADD COLUMN "is_number_line" boolean DEFAULT false NOT NULL;

@@ -193,6 +193,7 @@ export const AxisObject = pgTable('axis_object', {
   lineWidth: real('line_width').notNull(),
   xLabel: text('x_label').notNull(),
   yLabel: text('y_label').notNull(),
+  isNumberLine: boolean('is_number_line').notNull().default(false),
 });
 
 export type TextGeomSelect = InferSelectModel<typeof TextGeom>;

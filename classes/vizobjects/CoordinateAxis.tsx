@@ -17,7 +17,10 @@ import { AxisObjectInsert, AxisObjectSelect } from "@/app/db/schema";
  * This class is used to create a Coordinate Axis (2D coordinate graph) in the scene.
  */
 
+export type AxisConstTypes = "coordinate" | "numberLine";
+
 interface CoordinateAxisConstructor extends TransformObjConstructor {
+  constructionType?: AxisConstTypes;
   axisLength?: number;
   tickSpacing?: number;
   tickSize?: number;
@@ -30,6 +33,7 @@ interface CoordinateAxisConstructor extends TransformObjConstructor {
 }
 
 export default class CoordinateAxis extends TransformObj {
+  constructionType: AxisConstTypes;
   axisLength: number;
   tickSpacing: number;
   tickSize: number;
@@ -49,6 +53,7 @@ export default class CoordinateAxis extends TransformObj {
     scale = new THREE.Vector3(1, 1, 1),
     color = "white",
     touch_controls = new TouchControl(),
+    constructionType = "coordinate",
     axisLength = 60,
     tickSpacing = 2,
     tickSize = 0.2,
@@ -70,6 +75,7 @@ export default class CoordinateAxis extends TransformObj {
       name: name,
       isEnabled,
     });
+    this.constructionType = constructionType;
     this.axisLength = axisLength;
     this.tickSpacing = tickSpacing;
     this.tickSize = tickSize;
@@ -107,7 +113,8 @@ export default class CoordinateAxis extends TransformObj {
       fontSize: this.fontSize,
       lineWidth: this.lineWidth,
       xLabel: this.xLabel,
-      yLabel: this.yLabel
+      yLabel: this.yLabel,
+      isNumberLine: this.constructionType === "numberLine"
     };
   }
   
@@ -120,6 +127,7 @@ export default class CoordinateAxis extends TransformObj {
       scale: new THREE.Vector3(data.scale_x, data.scale_y, data.scale_z),
       color: data.color,
       touch_controls: data.touch_controls as TouchControl,
+      constructionType: data.isNumberLine ? "numberLine" : "coordinate",
       axisLength: data.axisLength,
       tickSpacing: data.tickSpacing,
       tickSize: data.tickSize,
@@ -151,71 +159,37 @@ export default class CoordinateAxis extends TransformObj {
       new THREE.Vector3(-this.axisLength / 2, 0, 0),
       new THREE.Vector3(this.axisLength / 2, 0, 0),
     ];
-    const yAxisPoints = [
-      new THREE.Vector3(0, -this.axisLength / 2, 0),
-      new THREE.Vector3(0, this.axisLength / 2, 0),
-    ];
 
     const ticksX = [];
-    const ticksY = [];
     const labelsX = [];
-    const labelsY = [];
 
-    // Start from the middle (0) and go right
-    for (let i = 0; i <= this.axisLength / 2; i += this.tickSpacing) {
-      // X-axis ticks
-      ticksX.push([
-        new THREE.Vector3(i, -this.tickSize / 2, 0),
-        new THREE.Vector3(i, this.tickSize / 2, 0),
-      ]);
+    // Add tick and label for origin (0)
+    ticksX.push([
+      new THREE.Vector3(0, -this.tickSize / 2, 0),
+      new THREE.Vector3(0, this.tickSize / 2, 0),
+    ]);
 
-      // Y-axis ticks
-      ticksY.push([
-        new THREE.Vector3(-this.tickSize / 2, i, 0),
-        new THREE.Vector3(this.tickSize / 2, i, 0),
-      ]);
-
-      // Labels
-      if (this.showLabels && i !== 0) {
-        labelsX.push(
-          <Text
-            key={`x-${i}`}
-            position={[i, -this.tickSize - this.fontSize / 2, 0]}
-            fontSize={this.fontSize}
-            color={material ? material.color : this.color}
-            anchorX="center"
-            anchorY="top"
-          >
-            {i.toFixed(1)}
-          </Text>
-        );
-        labelsY.push(
-          <Text
-            key={`y-${i}`}
-            position={[-this.tickSize - this.fontSize / 2, i, 0]}
-            fontSize={this.fontSize}
-            color={material ? material.color : this.color}
-            anchorX="right"
-            anchorY="middle"
-          >
-            {i.toFixed(1)}
-          </Text>
-        );
-      }
+    if (this.showLabels) {
+      labelsX.push(
+        <Text
+          key="x-0"
+          position={[0, -this.tickSize - this.fontSize / 2, 0]}
+          fontSize={this.fontSize}
+          color={material ? material.color : this.color}
+          anchorX="center"
+          anchorY="top"
+        >
+          {(0).toFixed(1)}
+        </Text>
+      );
     }
 
-    // Go left from the middle (excluding 0)
-    for (let i = -this.tickSpacing; i >= -this.axisLength / 2; i -= this.tickSpacing) {
+    // Start from the first tick after 0 and go right
+    for (let i = this.tickSpacing; i <= this.axisLength / 2; i += this.tickSpacing) {
       // X-axis ticks
       ticksX.push([
         new THREE.Vector3(i, -this.tickSize / 2, 0),
         new THREE.Vector3(i, this.tickSize / 2, 0),
-      ]);
-
-      // Y-axis ticks
-      ticksY.push([
-        new THREE.Vector3(-this.tickSize / 2, i, 0),
-        new THREE.Vector3(this.tickSize / 2, i, 0),
       ]);
 
       // Labels
@@ -232,14 +206,27 @@ export default class CoordinateAxis extends TransformObj {
             {i.toFixed(1)}
           </Text>
         );
-        labelsY.push(
+      }
+    }
+
+    // Go left from the first tick before 0
+    for (let i = -this.tickSpacing; i >= -this.axisLength / 2; i -= this.tickSpacing) {
+      // X-axis ticks
+      ticksX.push([
+        new THREE.Vector3(i, -this.tickSize / 2, 0),
+        new THREE.Vector3(i, this.tickSize / 2, 0),
+      ]);
+
+      // Labels
+      if (this.showLabels) {
+        labelsX.push(
           <Text
-            key={`y-${i}`}
-            position={[-this.tickSize - this.fontSize / 2, i, 0]}
+            key={`x-${i}`}
+            position={[i, -this.tickSize - this.fontSize / 2, 0]}
             fontSize={this.fontSize}
             color={material ? material.color : this.color}
-            anchorX="right"
-            anchorY="middle"
+            anchorX="center"
+            anchorY="top"
           >
             {i.toFixed(1)}
           </Text>
@@ -247,81 +234,172 @@ export default class CoordinateAxis extends TransformObj {
       }
     }
 
-    // Add axis labels
-    const xAxisLabel = (
-      <Text
-        position={[
-          this.axisLength / 4 + 2 * this.fontSize,
-          -this.tickSize - 2 * this.fontSize,
-          0,
-        ]}
-        fontSize={this.fontSize * 2}
-        color={material ? material.color : this.color}
-        anchorX="left"
-        anchorY="top"
-      >
-        {this.xLabel}
-      </Text>
-    );
+    if (this.constructionType === "coordinate") {
+      // Only create y-axis elements if we're in coordinate mode
+      const yAxisPoints = [
+        new THREE.Vector3(0, -this.axisLength / 2, 0),
+        new THREE.Vector3(0, this.axisLength / 2, 0),
+      ];
 
-    const yAxisLabel = (
-      <Text
-        position={[
-          -this.tickSize - 3 * this.fontSize,
-          this.axisLength / 4 + 2 * this.fontSize,
-          0,
-        ]}
-        fontSize={this.fontSize * 2}
-        color={material ? material.color : this.color}
-        anchorX="right"
-        anchorY="bottom"
-        rotation={[0, 0, Math.PI / 2]}
-      >
-        {this.yLabel}
-      </Text>
-    );
+      const ticksY = [];
+      const labelsY = [];
 
-    return (
-      <group
-        ref={objectRef}
-        position={[this.position.x, this.position.y, 0]}
-        rotation={[this.rotation.x, this.rotation.y, this.rotation.z]}
-        scale={[this.scale.x, this.scale.y, this.scale.z]}
-        onPointerDown={this.isClickable ? onClickSelect : undefined}
-      >
-        {ticksX.map((points, i) => (
+      // Start from the middle (0) and go up
+      for (let i = 0; i <= this.axisLength / 2; i += this.tickSpacing) {
+        ticksY.push([
+          new THREE.Vector3(-this.tickSize / 2, i, 0),
+          new THREE.Vector3(this.tickSize / 2, i, 0),
+        ]);
+
+        if (this.showLabels && i !== 0) {
+          labelsY.push(
+            <Text
+              key={`y-${i}`}
+              position={[-this.tickSize - this.fontSize / 2, i, 0]}
+              fontSize={this.fontSize}
+              color={material ? material.color : this.color}
+              anchorX="right"
+              anchorY="middle"
+            >
+              {i.toFixed(1)}
+            </Text>
+          );
+        }
+      }
+
+      // Go down from the middle (excluding 0)
+      for (let i = -this.tickSpacing; i >= -this.axisLength / 2; i -= this.tickSpacing) {
+        ticksY.push([
+          new THREE.Vector3(-this.tickSize / 2, i, 0),
+          new THREE.Vector3(this.tickSize / 2, i, 0),
+        ]);
+
+        if (this.showLabels) {
+          labelsY.push(
+            <Text
+              key={`y-${i}`}
+              position={[-this.tickSize - this.fontSize / 2, i, 0]}
+              fontSize={this.fontSize}
+              color={material ? material.color : this.color}
+              anchorX="right"
+              anchorY="middle"
+            >
+              {i.toFixed(1)}
+            </Text>
+          );
+        }
+      }
+
+      return (
+        <group
+          ref={objectRef}
+          position={[this.position.x, this.position.y, 0]}
+          rotation={[this.rotation.x, this.rotation.y, this.rotation.z]}
+          scale={[this.scale.x, this.scale.y, this.scale.z]}
+          onPointerDown={this.isClickable ? onClickSelect : undefined}
+        >
           <Line
-            key={`xtick-${i}`}
-            points={points}
+            points={xAxisPoints}
             color={material ? material.color : this.color}
             lineWidth={this.lineWidth}
           />
-        ))}
-        {ticksY.map((points, i) => (
           <Line
-            key={`ytick-${i}`}
-            points={points}
+            points={yAxisPoints}
             color={material ? material.color : this.color}
             lineWidth={this.lineWidth}
           />
-        ))}
-        <Line
-          points={xAxisPoints}
-          color={material ? material.color : this.color}
-          lineWidth={this.lineWidth}
-        />
-        <Line
-          points={yAxisPoints}
-          color={material ? material.color : this.color}
-          lineWidth={this.lineWidth}
-        />
-        {labelsX}
-        {labelsY}
-        {xAxisLabel}
-        {yAxisLabel}
-        {children}
-      </group>
-    );
+          {ticksX.map((points, i) => (
+            <Line
+              key={`xtick-${i}`}
+              points={points}
+              color={material ? material.color : this.color}
+              lineWidth={this.lineWidth}
+            />
+          ))}
+          {ticksY.map((points, i) => (
+            <Line
+              key={`ytick-${i}`}
+              points={points}
+              color={material ? material.color : this.color}
+              lineWidth={this.lineWidth}
+            />
+          ))}
+          {labelsX}
+          {labelsY}
+          {/* X-axis label */}
+          <Text
+            position={[
+              this.axisLength / 4 + 2 * this.fontSize,
+              -this.tickSize - 2 * this.fontSize,
+              0,
+            ]}
+            fontSize={this.fontSize * 2}
+            color={material ? material.color : this.color}
+            anchorX="left"
+            anchorY="top"
+          >
+            {this.xLabel}
+          </Text>
+          {/* Y-axis label */}
+          <Text
+            position={[
+              -this.tickSize - 3 * this.fontSize,
+              this.axisLength / 4 + 2 * this.fontSize,
+              0,
+            ]}
+            fontSize={this.fontSize * 2}
+            color={material ? material.color : this.color}
+            anchorX="right"
+            anchorY="bottom"
+            rotation={[0, 0, Math.PI / 2]}
+          >
+            {this.yLabel}
+          </Text>
+          {children}
+        </group>
+      );
+    } else {
+      // Number line mode - only render x-axis elements
+      return (
+        <group
+          ref={objectRef}
+          position={[this.position.x, this.position.y, 0]}
+          rotation={[this.rotation.x, this.rotation.y, this.rotation.z]}
+          scale={[this.scale.x, this.scale.y, this.scale.z]}
+          onPointerDown={this.isClickable ? onClickSelect : undefined}
+        >
+          <Line
+            points={xAxisPoints}
+            color={material ? material.color : this.color}
+            lineWidth={this.lineWidth}
+          />
+          {ticksX.map((points, i) => (
+            <Line
+              key={`xtick-${i}`}
+              points={points}
+              color={material ? material.color : this.color}
+              lineWidth={this.lineWidth}
+            />
+          ))}
+          {labelsX}
+          {/* X-axis label */}
+          <Text
+            position={[
+              this.axisLength / 4 + 2 * this.fontSize,
+              -this.tickSize - 2 * this.fontSize,
+              0,
+            ]}
+            fontSize={this.fontSize * 2}
+            color={material ? material.color : this.color}
+            anchorX="left"
+            anchorY="top"
+          >
+            {this.xLabel}
+          </Text>
+          {children}
+        </group>
+      );
+    }
   }
 
   static getPopup({
@@ -333,23 +411,24 @@ export default class CoordinateAxis extends TransformObj {
     onClose: () => void;
     onSave: (obj: CoordinateAxis) => void;
   }) {
-    const [editedObject, setEditedObject] =
-      React.useState<CoordinateAxisConstructor>({
-        id: Date.now() % 10000,
-        name: "CoordinateAxis",
-        isEnabled: true,
-        color: "#000000",
-        touch_controls: new TouchControl(),
-        axisLength: 60,
-        isClickable: false,
-        tickSpacing: 2,
-        tickSize: 0.2,
-        showLabels: true,
-        fontSize: 0.6,
-        lineWidth: 4,
-        xLabel: "",
-        yLabel: "",
-      });
+    const [editedObject, setEditedObject] = React.useState<CoordinateAxisConstructor>({
+      id: Date.now() % 10000,
+      name: "CoordinateAxis",
+      isEnabled: true,
+      color: "#000000",
+      touch_controls: new TouchControl(),
+      axisLength: 60,
+      isClickable: false,
+      tickSpacing: 2,
+      tickSize: 0.2,
+      showLabels: true,
+      fontSize: 0.6,
+      lineWidth: 4,
+      xLabel: "",
+      yLabel: "",
+      constructionType: "coordinate",
+      position: new THREE.Vector2(0, 0),
+    });
 
     const popupProps: EditableObjectPopupProps<CoordinateAxisConstructor> = {
       isOpen,
@@ -364,10 +443,29 @@ export default class CoordinateAxis extends TransformObj {
       fields: [
         { key: "name", label: "Name", type: "text" },
         { key: "color", label: "Color", type: "color" },
+        { key: "position", label: "Position", type: "position" },
         { key: "axisLength", label: "Axis Length", type: "number" },
         { key: "showLabels", label: "Show Labels", type: "checkbox" },
-        { key: "xLabel", label: "X Label", type: "text" },
-        { key: "yLabel", label: "Y Label", type: "text" },
+        {
+          key: "constructionType",
+          label: "Type",
+          type: "select",
+          options: [
+            { label: "Coordinate System", value: "coordinate" },
+            { label: "Number Line", value: "numberLine" },
+          ],
+        },
+        {
+          key: "xLabel",
+          label: "X Label",
+          type: "text",
+        },
+        {
+          key: "yLabel",
+          label: "Y Label",
+          type: "text",
+          showIf: (obj) => obj.constructionType === "coordinate",
+        },
       ],
     };
     return <EditableObjectPopup {...popupProps} />;

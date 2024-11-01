@@ -334,7 +334,7 @@ export function MinigameEdit({}: {}) {
         <br />
 
         {/* Add state management */}
-        <Dialog>
+        {/* <Dialog>
           <DialogTrigger asChild>
             <button className="mt-4 p-4 bg-white rounded shadow w-full">
               State Management
@@ -411,7 +411,7 @@ export function MinigameEdit({}: {}) {
               </div>
             </div>
           </DialogContent>
-        </Dialog>
+        </Dialog> */}
       </div>
     </div>
   );
