@@ -261,7 +261,7 @@ export const ExpDBHub = ({ isAuthenticated: parentIsAuthenticated }: { isAuthent
           <DialogHeader>
             <DialogTitle>Delete Experience</DialogTitle>
             <DialogDescription>
-              Are you sure you want to delete this experience? This action cannot be undone.
+              {"Are you sure you want to delete this experience? This action cannot be undone."}
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
@@ -386,7 +386,7 @@ export const ExperienceCardDB = ({
                   <Edit2 size={16} className="text-[#01A9B2]" />
                   <div>
                     <p className="font-medium text-gray-700">Edit Experience</p>
-                    <p className="text-xs text-gray-500">Modify this experience's content</p>
+                    <p className="text-xs text-gray-500">{"Modify this experience's content"}</p>
                   </div>
                 </button>
                 <button
