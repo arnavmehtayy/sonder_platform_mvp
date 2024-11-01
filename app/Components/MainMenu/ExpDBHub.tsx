@@ -4,10 +4,22 @@ import { motion } from "framer-motion";
 import Image from "next/image";
 import Logo from "@/images/Sonder logo with text.png";
 import { ExperienceCard } from "./ExperienceHub";
-import { ChevronRight, Activity, Eye } from "lucide-react";
+import { ChevronRight, Activity, Eye, PlusCircle } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { User } from "lucide-react";
+import { createClient } from '@/app/utils/supabase/client';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 
 interface Experience {
   id: number;
@@ -23,29 +35,84 @@ interface State {
   index: number;
 }
 
-export const ExpDBHub = () => {
+export const ExpDBHub = ({ isAuthenticated: parentIsAuthenticated }: { isAuthenticated: boolean }) => {
   const [experiences, setExperiences] = useState<Experience[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [userId, setUserId] = useState<number | null>(null);
+  const [newExperience, setNewExperience] = useState({ title: '', desc: '' });
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+
+  const supabase = createClient();
+  const router = useRouter();
 
   useEffect(() => {
-    const fetchExperiences = async () => {
-      try {
-        const response = await fetch('/api/supabase/experiences');
-        if (!response.ok) {
-          throw new Error('Failed to fetch experiences');
-        }
-        const data = await response.json();
-        setExperiences(data);
-      } catch (err) {
-        setError(err instanceof Error ? err.message : 'Failed to fetch experiences');
-      } finally {
-        setLoading(false);
-      }
-    };
+    setIsAuthenticated(parentIsAuthenticated);
+    if (!parentIsAuthenticated) {
+      setUserId(null);
+    }
+  }, [parentIsAuthenticated]);
 
+  useEffect(() => {
+    checkAuth();
     fetchExperiences();
   }, []);
+
+  const checkAuth = async () => {
+    const { data: { session }, error } = await supabase.auth.getSession();
+    if (session?.user) {
+      setIsAuthenticated(true);
+      // Fetch user profile to get userId
+      const response = await fetch(`/api/supabase/profile?userId=${session.user.id}`);
+      const profile = await response.json();
+      setUserId(profile.id);
+    }
+  };
+
+  const handleCreateExperience = async () => {
+    if (!userId) return;
+
+    try {
+      const response = await fetch('/api/supabase/experiences', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          title: newExperience.title,
+          desc: newExperience.desc,
+          profileId: userId,
+        }),
+      });
+
+      const experience = await response.json();
+      
+      if (response.ok) {
+        // Redirect to the new experience
+        router.push(`/experience/edit/${experience.id}/0`);
+      } else {
+        throw new Error(experience.error);
+      }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to create experience');
+    }
+  };
+
+  const fetchExperiences = async () => {
+    try {
+      const response = await fetch('/api/supabase/experiences');
+      if (!response.ok) {
+        throw new Error('Failed to fetch experiences');
+      }
+      const data = await response.json();
+      setExperiences(data);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to fetch experiences');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-neutral-800 to-neutral-800 overflow-auto">
@@ -86,6 +153,10 @@ export const ExpDBHub = () => {
             <div className="text-center text-red-500">Error: {error}</div>
           )}
 
+          {/* <div className="flex justify-between items-center mb-8">
+            <h2 className="text-2xl font-bold text-white">Experiences</h2>
+          </div> */}
+
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -102,6 +173,55 @@ export const ExpDBHub = () => {
                 lastName={experience.lastName}
               />
             ))}
+            {isAuthenticated && (
+              <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+                <DialogTrigger asChild>
+                  <motion.div
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    className="h-full"
+                  >
+                    <div className="border-2 border-dashed border-[#01A9B2] bg-white/5 rounded-lg overflow-hidden h-full transition-all duration-300 hover:bg-white/10 cursor-pointer flex flex-col items-center justify-center min-h-[300px] group">
+                      <PlusCircle size={40} className="text-[#01A9B2]/70 group-hover:text-[#01A9B2] transition-colors duration-300 mb-3" />
+                      <p className="text-[#01A9B2]/70 group-hover:text-[#01A9B2] text-lg font-medium transition-colors duration-300">Add New Experience</p>
+                    </div>
+                  </motion.div>
+                </DialogTrigger>
+                <DialogContent className="sm:max-w-[425px]">
+                  <DialogHeader>
+                    <DialogTitle className="text-lg font-semibold text-gray-900">Create New Experience</DialogTitle>
+                  </DialogHeader>
+                  <div className="space-y-4 mt-4">
+                    <div>
+                      <Label htmlFor="title" className="text-sm font-medium text-gray-700">Title</Label>
+                      <Input
+                        id="title"
+                        placeholder="Enter experience title"
+                        className="mt-1"
+                        value={newExperience.title}
+                        onChange={(e) => setNewExperience(prev => ({...prev, title: e.target.value}))}
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="description" className="text-sm font-medium text-gray-700">Description</Label>
+                      <Textarea
+                        id="description"
+                        placeholder="What is this experience about?"
+                        className="mt-1"
+                        value={newExperience.desc}
+                        onChange={(e) => setNewExperience(prev => ({...prev, desc: e.target.value}))}
+                      />
+                    </div>
+                    <Button 
+                      onClick={handleCreateExperience}
+                      className="w-full bg-[#01A9B2] hover:bg-[#018A91] transition-colors duration-300"
+                    >
+                      Create Experience
+                    </Button>
+                  </div>
+                </DialogContent>
+              </Dialog>
+            )}
           </motion.div>
         </div>
       </div>

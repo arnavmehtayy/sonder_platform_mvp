@@ -15,49 +15,42 @@ export default function LoginPage() {
     height: 100%;
     width: 100%; }`}</style>
 
-      <div className="flex min-h-screen items-center justify-center bg-white">
-        <Card className="w-[350px] bg-white bg-opacity-50 backdrop-blur-xl shadow-2xl">
+      <div className="flex min-h-screen items-center justify-center bg-[#121212]">
+        <Card className="w-[350px] bg-[#1E1E1E] border-[#01A9B2] border-2 shadow-[0_0_15px_rgba(1,169,178,0.3)]">
           <CardHeader>
-            <CardTitle className="text-2xl text-center text-blue-800">Welcome</CardTitle>
-            <CardDescription className="text-center text-gray-700">Login to your account or create a new one</CardDescription>
+            <CardTitle className="text-2xl text-center text-[#01A9B2] font-bold">Welcome Back!</CardTitle>
+            <CardDescription className="text-center text-gray-300">Sign in to continue your journey</CardDescription>
           </CardHeader>
           <CardContent>
             <form className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="email" className="text-gray-700">Email</Label>
+                <Label htmlFor="email" className="text-gray-200">Email</Label>
                 <Input 
                   id="email" 
                   name="email" 
                   type="email" 
                   placeholder="Enter your email"
-                  className="bg-white bg-opacity-90 backdrop-blur-sm border-blue-800 focus:border-[#00A9C1]"
+                  className="bg-[#2D2D2D] border-[#01A9B2] focus:border-[#00D1DC] text-white placeholder:text-gray-400"
                   required 
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="password" className="text-gray-700">Password</Label>
+                <Label htmlFor="password" className="text-gray-200">Password</Label>
                 <Input 
                   id="password" 
                   name="password" 
                   type="password" 
                   placeholder="Enter your password"
-                  className="bg-white bg-opacity-90 backdrop-blur-sm border-blue-800 focus:border-[#00A9C1]"
+                  className="bg-[#2D2D2D] border-[#01A9B2] focus:border-[#00D1DC] text-white placeholder:text-gray-400"
                   required 
                 />
               </div>
-              <div className="flex gap-4 pt-4">
+              <div className="flex pt-4">
                 <Button 
                   formAction={login}
-                  className="flex-1 bg-gradient-to-r from-blue-800 to-[#00A9C1] text-white hover:opacity-90"
+                  className="flex-1 bg-[#01A9B2] hover:bg-[#00D1DC] text-white transition-all duration-300 transform hover:scale-[1.02]"
                 >
                   Log in
-                </Button>
-                <Button 
-                  formAction={signup}
-                  variant="outline"
-                  className="flex-1 border-blue-800 text-blue-800 hover:bg-white hover:bg-opacity-20"
-                >
-                  Sign up
                 </Button>
               </div>
             </form>

@@ -13,8 +13,10 @@ import {
   getScore,
   getControlSelector2,
   State,
-  OrderItem
+  OrderItem,
+  setTitleSelector
 } from "@/app/store";
+import { useDebounce } from "use-debounce";
 
 /*
  * This component is responsible for rendering the order of components in the sidebar
@@ -28,6 +30,18 @@ export const OrderHandlerDB = () => {
   const title = useStore(getTitleSelector);
   const get_placement = useStore(getPlacementSelector2);
   const get_control = useStore(getControlSelector2);
+  const setTitle = useStore(setTitleSelector);
+
+  const [localTitle, setLocalTitle] = useState(title);
+  const [debouncedTitle] = useDebounce(localTitle, 500);
+
+  React.useEffect(() => {
+    setTitle(debouncedTitle);
+  }, [debouncedTitle, setTitle]);
+
+  React.useEffect(() => {
+    setLocalTitle(title);
+  }, [title]);
 
   const renderComponent = (item: OrderItem, index: number) => {
     switch (item.type) {
@@ -41,17 +55,11 @@ export const OrderHandlerDB = () => {
         const question = get_questions(item.id as number);
         return (
           <div key={`question-${index}`} className="p-4">
-            {item.id == 0 ? (
-              <>
-                <h2 className="text-lg md:text-xl font-semibold text-blue-800 mb-2">
-                  {title}
-                </h2>{" "}
-              </>
-            ) : null}
-
-            <p id={`question-text-${index}`} className="text-gray-700">
-              {question ? <Latex>{question}</Latex> : null}
-            </p>
+            {item.id == 0 ? null : (
+              <p id={`question-text-${index}`} className="text-gray-700">
+                {question ? <Latex>{question}</Latex> : null}
+              </p>
+            )}
           </div>
         );
       default:
@@ -61,6 +69,15 @@ export const OrderHandlerDB = () => {
 
   return (
     <div className="space-y-4 md:space-y-6">
+      <div className="p-4">
+        <input
+          type="text"
+          value={localTitle}
+          onChange={(e) => setLocalTitle(e.target.value)}
+          className="w-full text-lg md:text-xl font-semibold text-blue-800 bg-transparent border-none focus:outline-none"
+          placeholder="Enter title..."
+        />
+      </div>
       {state.order.map((item, index) => (
         <React.Fragment key={`${item.type}-${item.id}-${index}`}>
           {renderComponent(item, index)}

@@ -16,6 +16,7 @@ import { ExpDBHub } from "@/app/Components/MainMenu/ExpDBHub";
 
 export default function Home() {
   const [user, setUser] = useState<User | null>(null);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
   const supabase = createClient();
 
   useEffect(() => {
@@ -25,14 +26,24 @@ export default function Home() {
     const getUser = async () => {
       const { data: { user } } = await supabase.auth.getUser();
       setUser(user);
+      setIsAuthenticated(!!user);
     };
     getUser();
+
+    // Subscribe to auth changes
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      setUser(session?.user || null);
+      setIsAuthenticated(!!session?.user);
+    });
+
+    return () => subscription.unsubscribe();
   }, []);
 
   const handleSignOut = async () => {
     const { error } = await supabase.auth.signOut();
     if (!error) {
       setUser(null);
+      setIsAuthenticated(false);
     }
   };
 
@@ -61,7 +72,7 @@ export default function Home() {
           </Link>
         )}
       </div>
-      <ExpDBHub />
+      <ExpDBHub isAuthenticated={isAuthenticated} />
       <Analytics />
     </main>
   );

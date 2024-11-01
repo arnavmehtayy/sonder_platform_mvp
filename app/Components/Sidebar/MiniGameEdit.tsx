@@ -30,6 +30,7 @@ import {
 } from "@/components/ui/dialog";
 import { createClient } from "@/app/utils/supabase/client";
 import { toast } from "sonner";
+import { useRouter } from 'next/navigation';
 
 const SortableItem: React.FC<{ id: string; children: React.ReactNode }> = ({ id, children }) => {
   const {
@@ -56,6 +57,7 @@ const SortableItem: React.FC<{ id: string; children: React.ReactNode }> = ({ id,
 };
 
 export function MinigameEdit({}: {}) {
+  const router = useRouter();
   const reset = useStore((state) => state.reset);
   const state_name = useStore(getStateName);
   const [stateData, setStateData] = useState({
@@ -117,6 +119,20 @@ export function MinigameEdit({}: {}) {
 
     fetchUserAndProfile();
   }, []);
+
+  useEffect(() => {
+    const checkAuth = async () => {
+      const supabase = await createClient();
+      const { data: { user }, error } = await supabase.auth.getUser();
+      
+      if (error || !user) {
+        router.push('/login');
+        return;
+      }
+    };
+
+    checkAuth();
+  }, [router]);
 
   const handleValidationUpdate = () => {
     updateValidation();

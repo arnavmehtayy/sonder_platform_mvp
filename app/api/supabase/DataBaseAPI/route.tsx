@@ -49,11 +49,14 @@ export async function GET(request: Request) {
     );
   }
 
+  
+
   try {
     const loadedState: SerializeStateSelect  = await loadStateFromDatabase(
       parseInt(experienceId),
       parseInt(index)
     );
+    // console.log(experienceId, index, loadedState)
     return NextResponse.json(loadedState);
   } catch (error) {
     console.error("Error loading state:", error);

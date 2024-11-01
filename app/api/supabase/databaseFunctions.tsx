@@ -325,14 +325,17 @@ export async function loadStateFromDatabase(
       .select()
       .from(states)
       .where(
-        eq(states.experienceId, experienceId) &&
-        eq(states.index, index)
+        and(eq(states.experienceId, experienceId),
+        eq(states.index, index))
       )
       .limit(1);
+
     if (stateRecord.length === 0) {
       throw new Error(`State not found for experience ${experienceId} and index ${index}`);
     }
     const stateId = stateRecord[0].id;
+
+    console.log(stateId)
 
     // Fetch all vizobject data
     const geomObjData = await tx

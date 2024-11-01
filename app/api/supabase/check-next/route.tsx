@@ -16,7 +16,7 @@ export async function GET(request: Request) {
       .where(
         and(
           eq(states.experienceId, experienceId),
-          eq(states.index, currentIndex + 1)
+          eq(states.index, currentIndex)
         )
       )
       .limit(1);

@@ -27,6 +27,7 @@ import { TableControl } from "@/classes/Controls/TableControl";
 import { SliderControlAdvanced } from "@/classes/Controls/SliderControlAdv";
 import { Validation_tableControl } from "@/classes/Validation/Validation_tableControl";
 import Validation_sliderAdv from "@/classes/Validation/Validation_sliderAdv";
+import { useDebounce } from "use-debounce";
 
 /*
 
@@ -114,6 +115,7 @@ export type State = {
   deleteOrderItem: (id: number, type: string) => void;
   setTableControl: (newTable: TableControl<any>) => void;
   deleteValidationByIndex: (index: number) => void;
+  setTitle: (title: string) => void;
   
 
 };
@@ -672,6 +674,10 @@ export const useStore = create<State>((set, get) => ({
       return { validations: newValidations };
     });
   },
+
+  setTitle: (title: string) => {
+    set({ title });
+  },
 }));
 
 // get the score corresponding to some score_id
@@ -934,4 +940,6 @@ export const getValidationDescription = (state: State) => (validation: Validatio
 };
 
 export const deleteValidationByIndexSelect = (state: State) => state.deleteValidationByIndex
+
+export const setTitleSelector = (state: State) => state.setTitle;
 

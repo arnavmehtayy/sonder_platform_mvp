@@ -3,6 +3,39 @@ import { experience, profiles } from "@/app/db/schema";
 import { NextResponse } from 'next/server';
 import { eq } from 'drizzle-orm';
 
+export async function POST(request: Request) {
+  try {
+    const { title, desc, profileId }: {
+      title: string;
+      desc: string; 
+      profileId: number;
+    } = await request.json();
+
+    // Insert new experience and return the ID
+    const [insertedExperience] = await db
+      .insert(experience)
+      .values({
+        desc: desc,
+        title: title,
+        user_id: profileId
+      })
+      .returning({ id: experience.id });
+
+    return NextResponse.json({ 
+      id: insertedExperience.id,
+      message: "Experience created successfully" 
+    });
+
+  } catch (error) {
+    console.error("Error creating experience:", error);
+    return NextResponse.json(
+      { error: "Failed to create experience" },
+      { status: 500 }
+    );
+  }
+}
+
+
 export async function GET() {
   try {
     const experiences = await db

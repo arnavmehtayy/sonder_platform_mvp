@@ -42,7 +42,7 @@ export function MinigameDB({experienceID, index}: {experienceID: number, index: 
   useEffect(() => {
     const checkNextExperience = async () => {
       try {
-        const response = await fetch(`/api/supabase/check-next?experienceId=${experienceID}&index=${index}`);
+        const response = await fetch(`/api/supabase/check-next?experienceId=${experienceID}&index=${index+1}`);
         const data = await response.json();
         setHasNextExperience(data.hasNext);
       } catch (error) {
