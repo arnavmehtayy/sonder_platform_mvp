@@ -43,6 +43,7 @@ export async function GET() {
         id: experience.id,
         desc: experience.desc,
         title: experience.title,
+        userId: profiles.id, // this is the profile ID not the supabase userID
         firstName: profiles.firstName,
         lastName: profiles.lastName,
       })
@@ -53,5 +54,47 @@ export async function GET() {
   } catch (error) {
     console.error('Error fetching experiences:', error);
     return NextResponse.json({ error: 'Failed to fetch experiences' }, { status: 500 });
+  }
+}
+
+export async function DELETE(request: Request) {
+  try {
+    // Get the ID from the URL
+    const url = new URL(request.url);
+    const id = url.searchParams.get('id');
+    
+    if (!id || isNaN(parseInt(id))) {
+      return NextResponse.json(
+        { error: "Invalid experience ID" },
+        { status: 400 }
+      );
+    }
+
+    const experienceId = parseInt(id);
+
+    // Delete the experience
+    const [deletedExperience] = await db
+      .delete(experience)
+      .where(eq(experience.id, experienceId))
+      .returning();
+
+    if (!deletedExperience) {
+      return NextResponse.json(
+        { error: "Experience not found" },
+        { status: 404 }
+      );
+    }
+
+    return NextResponse.json({ 
+      message: "Experience deleted successfully",
+      id: deletedExperience.id 
+    });
+
+  } catch (error) {
+    console.error("Error deleting experience:", error);
+    return NextResponse.json(
+      { error: "Failed to delete experience" },
+      { status: 500 }
+    );
   }
 }

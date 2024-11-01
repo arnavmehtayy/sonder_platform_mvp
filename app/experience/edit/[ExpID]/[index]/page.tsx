@@ -255,7 +255,6 @@ export default function ExperienceEditPage() {
   };
 
   const handleEndExperience = () => {
-    handleSave();
     router.push("/");
   };
 

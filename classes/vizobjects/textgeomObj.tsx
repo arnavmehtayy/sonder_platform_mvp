@@ -19,9 +19,11 @@ import { TextGeomInsert, TextGeomSelect } from "@/app/db/schema";
 
 export interface TextGeomConstructor extends geomobjconstructor {
   text: string;
+  textcolor?: string
 }
 export default class TextGeom extends geomobj {
   text: string;
+  textcolor: string;
 
   constructor({
     id,
@@ -29,6 +31,7 @@ export default class TextGeom extends geomobj {
     rotation = new THREE.Vector3(0, 0, 0),
     scale = new THREE.Vector3(1, 1, 1),
     color = "blue",
+    textcolor = "white",
     geom_json, // geom remains a required parameter
     touch_controls = new TouchControl(),
     param_t = 0, // the parametric parameter if the object is following a parametric object
@@ -53,6 +56,7 @@ export default class TextGeom extends geomobj {
       geom_json: geom_json
     });
     this.text = text;
+    this.textcolor = textcolor
     this.name = text;
     this.type = "TextGeomObj";
   }
@@ -153,24 +157,42 @@ export default class TextGeom extends geomobj {
     )}
   </mesh>
   <Text
-    color="white"
+    color={this.textcolor}
     anchorX="center"
     anchorY="middle"
     renderOrder={1}
-    maxWidth={this.scale.x * 0.9} // Reduced to 90% of the geometry width
-    fontSize={Math.min(this.scale.x, this.scale.y) * 0.4} // Reduced font size
-    position={[0, 0, 0.01]} // Slightly in front of the geometry
+    maxWidth={this.scale.x * 0.9}
+    fontSize={(() => {
+        // Start with initial font size
+        let baseFontSize = Math.min(this.scale.x, this.scale.y) * 0.4;
+        
+        // Calculate number of lines (rough estimation)
+        const textWidth = this.text.length * (baseFontSize * 0.5);
+        const lines = Math.ceil(textWidth / (this.scale.x * 0.9));
+        
+        // If more than 3 lines or text height would exceed bounds, reduce font size
+        const totalHeight = lines * baseFontSize * 1.2; // 1.2 is lineHeight
+        const maxHeight = this.scale.y * 0.9; // 90% of shape height
+        
+        if (lines > 3 || totalHeight > maxHeight) {
+            const scaleFactor = Math.min(
+                3 / lines,
+                maxHeight / totalHeight
+            );
+            baseFontSize *= scaleFactor;
+        }
+        
+        return baseFontSize;
+    })()}
+    position={[0, 0, 0.01]}
     textAlign="center"
-    overflowWrap="break-word"
-    clipRect={[-this.scale.x / 2, -this.scale.y / 2, this.scale.x, this.scale.y]}
-    lineHeight={1.2} // Increased line height
-    letterSpacing={0} // Removed negative letter spacing
-    whiteSpace="normal"
+    lineHeight={1.2}
+    letterSpacing={0}
     scale={[1 / this.scale.x, 1 / this.scale.y, 1]}
-    material-depthTest={false} // Ensure text renders on top
-  >
+    material-depthTest={false}
+>
     {this.text}
-  </Text>
+</Text>
 </group>
       
       {this.touch_controls.scale && (
@@ -271,6 +293,7 @@ export default class TextGeom extends geomobj {
         },
         { key: "text", label: "Text", type: "text" },
         { key: "color", label: "Color", type: "color" },
+        {key: "textcolor", label: "Text Color", type: "color"},
         { key: "position", label: "Position", type: "position" },
         { key: "rotation", label: "Rotation", type: "rotation" },
         { key: "scale", label: "Scale", type: "vector3" },

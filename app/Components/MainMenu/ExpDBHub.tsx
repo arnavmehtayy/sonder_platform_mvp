@@ -1,10 +1,10 @@
 "use client";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { motion } from "framer-motion";
 import Image from "next/image";
 import Logo from "@/images/Sonder logo with text.png";
 import { ExperienceCard } from "./ExperienceHub";
-import { ChevronRight, Activity, Eye, PlusCircle } from "lucide-react";
+import { ChevronRight, Activity, Eye, PlusCircle, X, MoreVertical, Edit2, Trash2 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { User } from "lucide-react";
@@ -15,16 +15,20 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
+  DialogDescription,
+  DialogFooter,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { toast } from "sonner";
 
 interface Experience {
   id: number;
   desc: string;
   title: string;
+  userId: number;
   firstName: string;
   lastName: string;
 }
@@ -43,6 +47,8 @@ export const ExpDBHub = ({ isAuthenticated: parentIsAuthenticated }: { isAuthent
   const [userId, setUserId] = useState<number | null>(null);
   const [newExperience, setNewExperience] = useState({ title: '', desc: '' });
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [experienceToDelete, setExperienceToDelete] = useState<number | null>(null);
 
   const supabase = createClient();
   const router = useRouter();
@@ -96,6 +102,31 @@ export const ExpDBHub = ({ isAuthenticated: parentIsAuthenticated }: { isAuthent
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to create experience');
+    }
+  };
+
+  const handleDeleteExperience = async (id: number) => {
+    setExperienceToDelete(id);
+    setDeleteDialogOpen(true);
+  };
+
+  const confirmDelete = async () => {
+    if (!experienceToDelete) return;
+
+    try {
+      const response = await fetch(`/api/supabase/experiences?id=${experienceToDelete}`, {
+        method: 'DELETE',
+      });
+
+      if (response.ok) {
+        setExperiences(experiences.filter(exp => exp.id !== experienceToDelete));
+        setDeleteDialogOpen(false);
+        setExperienceToDelete(null);
+      } else {
+        throw new Error('Failed to delete experience');
+      }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to delete experience');
     }
   };
 
@@ -153,10 +184,6 @@ export const ExpDBHub = ({ isAuthenticated: parentIsAuthenticated }: { isAuthent
             <div className="text-center text-red-500">Error: {error}</div>
           )}
 
-          {/* <div className="flex justify-between items-center mb-8">
-            <h2 className="text-2xl font-bold text-white">Experiences</h2>
-          </div> */}
-
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -171,6 +198,9 @@ export const ExpDBHub = ({ isAuthenticated: parentIsAuthenticated }: { isAuthent
                 experienceId={experience.id}
                 firstName={experience.firstName}
                 lastName={experience.lastName}
+                userId={experience.userId}
+                currentUserId={userId}
+                onDelete={handleDeleteExperience}
               />
             ))}
             {isAuthenticated && (
@@ -225,6 +255,25 @@ export const ExpDBHub = ({ isAuthenticated: parentIsAuthenticated }: { isAuthent
           </motion.div>
         </div>
       </div>
+
+      <Dialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Delete Experience</DialogTitle>
+            <DialogDescription>
+              Are you sure you want to delete this experience? This action cannot be undone.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setDeleteDialogOpen(false)}>
+              Cancel
+            </Button>
+            <Button variant="destructive" onClick={confirmDelete}>
+              Delete
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
@@ -235,36 +284,126 @@ export const ExperienceCardDB = ({
   description,
   experienceId,
   firstName,
-  lastName
+  lastName,
+  userId,
+  currentUserId,
+  onDelete
 }: {
   name: string;
   description: string;
   experienceId: number;
   firstName: string;
   lastName: string;
+  userId: number;
+  currentUserId: number | null;
+  onDelete: (id: number) => void;
 }) => {
   const [isHovered, setIsHovered] = useState(false);
+  const [showActions, setShowActions] = useState(false);
+  const actionRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
 
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (actionRef.current && !actionRef.current.contains(event.target as Node)) {
+        setShowActions(false);
+      }
+    };
 
-  const handleClick = (e: React.MouseEvent) => {
-    e.preventDefault();
-    router.push(`/experience/data/${experienceId}/${0}`);
-    
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  const handleClick = async (e: React.MouseEvent) => {
+    // Only navigate if we're not clicking the menu
+    if (!actionRef.current?.contains(e.target as Node)) {
+      try {
+        // Check if next experience exists
+        const response = await fetch(`/api/supabase/check-next?experienceId=${experienceId}&index=${0}`);
+        const data = await response.json();
+
+        if (data.hasNext) {
+          router.push(`/experience/data/${experienceId}/${0}`);
+        } else {
+          // Show popup for empty experience
+          toast.warning("This experience is empty");
+          return;
+        }
+      } catch (error) {
+        console.error('Error checking experience:', error);
+        alert("Error checking experience. Please try again.");
+      }
+    }
+  };
+
+  const handleEdit = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    router.push(`/experience/edit/${experienceId}/0`);
+  };
+
+  const handleDelete = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    onDelete(experienceId);
   };
 
   return (
     <motion.div
       whileHover={{ scale: 1.05 }}
-      whileTap={{ scale: 0.95 }}
-      className="h-full"
+      whileTap={actionRef.current?.contains(document.activeElement as Node) ? {} : { scale: 0.95 }}
+      className="h-full relative"
     >
       <div
         onClick={handleClick}
-        className="bg-white rounded-lg shadow-lg overflow-hidden h-full transition-all duration-300 hover:shadow-xl cursor-pointer"
+        className="bg-white rounded-lg shadow-lg overflow-hidden h-full transition-all duration-300 hover:shadow-xl cursor-pointer relative group"
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
       >
+        {userId === currentUserId && (
+          <div 
+            ref={actionRef}
+            className="absolute top-2 right-2 z-50"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                setShowActions(!showActions);
+              }}
+              className={`p-2.5 bg-white/90 hover:bg-white shadow-md rounded-full transition-all duration-300 ${
+                showActions ? 'bg-white ring-2 ring-[#01A9B2]' : ''
+              }`}
+            >
+              <MoreVertical size={18} className="text-gray-700" />
+            </button>
+            
+            {showActions && (
+              <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg overflow-hidden z-50 border border-gray-100">
+                <button
+                  onClick={handleEdit}
+                  className="w-full px-4 py-3 text-left text-sm hover:bg-[#01A9B2]/5 flex items-center gap-2 transition-colors duration-200"
+                >
+                  <Edit2 size={16} className="text-[#01A9B2]" />
+                  <div>
+                    <p className="font-medium text-gray-700">Edit Experience</p>
+                    <p className="text-xs text-gray-500">Modify this experience's content</p>
+                  </div>
+                </button>
+                <button
+                  onClick={handleDelete}
+                  className="w-full px-4 py-3 text-left text-sm hover:bg-red-50 flex items-center gap-2 border-t border-gray-100 transition-colors duration-200"
+                >
+                  <Trash2 size={16} className="text-red-500" />
+                  <div>
+                    <p className="font-medium text-red-600">Delete Experience</p>
+                    <p className="text-xs text-red-500/75">Remove this experience permanently</p>
+                  </div>
+                </button>
+              </div>
+            )}
+          </div>
+        )}
+
         <div
           className="bg-gradient-to-r from-[#01A9B2] to-[#7AE5EC] text-white p-6"
         >
@@ -285,7 +424,6 @@ export const ExperienceCardDB = ({
                   isHovered ? "translate-x-1" : ""
                 }`}
               />
-              {/* traslate arrow forward when hovering as user feedback to click to go to experience */}
             </span>
             <Activity size={24} className="text-[#18D9E4]" />
           </div>
