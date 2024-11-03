@@ -1,5 +1,3 @@
-
-
 import { InputNumber } from "../Controls/InputNumber";
 import Validation from "./Validation";
 import * as val_func from "./Validation_funcs";
@@ -9,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { DialogTitle, DialogHeader } from "@/components/ui/dialog";
+import { ValidationInputNumberInsert, ValidationInputNumberSelect } from "@/app/db/schema";
 
 /*
  * Validation class for the InputNumber control
@@ -62,6 +61,24 @@ export class Validation_inputNumber extends Validation {
       control_id: this.control_id,
       error: this.error,
       type: "V_numberIn"
+    };
+  }
+
+  static deserialize(data: ValidationInputNumberSelect): Validation_inputNumber {
+    return new Validation_inputNumber({
+      answer: Number(data.answer),
+      control_id: data.control_id,
+      error: Number(data.error),
+      desc: data.desc
+    });
+  }
+
+  serialize(): Omit<ValidationInputNumberInsert, "stateId"> {
+    return {
+      desc: this.desc,
+      answer: this.answer,
+      control_id: this.control_id,
+      error: this.error,
     };
   }
 }

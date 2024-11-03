@@ -20,6 +20,7 @@ import { FunctionScore } from "@/classes/Scores/FunctionScore";
 import { ValidationMultiChoice } from "@/classes/Validation/ValidationMultiChoice";
 import Validation from "@/classes/Validation/Validation";
 import Placement from "@/classes/Placement";
+import { InfluenceAdvanced } from "@/classes/influenceAdv";
 
 export type EditAddType =
   | obj
@@ -37,7 +38,8 @@ export type EditAddType =
   | FunctionPlotString
   | DummyDataStorage<any>
   | FunctionScore
-  | Placement;
+  | Placement
+  | InfluenceAdvanced
   
 export type PopUpType = 
   | typeof LineObj
@@ -54,7 +56,8 @@ export type PopUpType =
   | typeof FunctionPlotString
   | typeof DummyDataStorage<any>
   | typeof FunctionScore
-  | typeof Placement;
+  | typeof Placement
+  | typeof InfluenceAdvanced
   
 
 interface ObjectCreatorProps {

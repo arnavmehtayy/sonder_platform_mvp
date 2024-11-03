@@ -48,7 +48,15 @@ import {
   PlacementInsert,
   PlacementSelect,
   QuestionTextInsert,
-  QuestionTextSelect
+  QuestionTextSelect,
+  Validation_MultiChoiceInsert,
+  Validation_MultiChoiceSelect,
+  ValidationInputNumberInsert,
+  ValidationInputNumberSelect,
+  InfluenceAdvancedInsert,
+  InfluenceAdvancedSelect,
+  InfluenceAttributePairsInsert,
+  InfluenceAttributePairsSelect
 } from "@/app/db/schema";
 
 export interface SerializeStateInsert {
@@ -85,6 +93,10 @@ export interface SerializeStateInsert {
   ValidationSelects: Omit<ValidationSelectInsert, "stateId">[];
   Placements: Omit<PlacementInsert, "stateId">[];
   Questions: Omit<QuestionTextInsert, "stateId">[];
+  ValidationMultiChoices: Omit<Validation_MultiChoiceInsert, "stateId">[];
+  ValidationInputNumbers: Omit<ValidationInputNumberInsert, "stateId">[];
+  InfluenceAdvanced: Omit<InfluenceAdvancedInsert, "stateId">[];
+  InfluenceAttributePairs: Omit<InfluenceAttributePairsInsert, "stateId">[];
 }
 
 export interface SerializeStateSelect {
@@ -121,4 +133,8 @@ export interface SerializeStateSelect {
   ValidationSelects: ValidationSelectSelect[];
   Placements: PlacementSelect[];
   Questions: QuestionTextSelect[];
+  ValidationMultiChoices: Validation_MultiChoiceSelect[];
+  ValidationInputNumbers: ValidationInputNumberSelect[];
+  InfluenceAdvanced: InfluenceAdvancedSelect[];
+  InfluenceAttributePairs: InfluenceAttributePairsSelect[];
 }

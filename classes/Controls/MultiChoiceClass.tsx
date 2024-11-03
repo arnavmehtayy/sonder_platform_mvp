@@ -154,6 +154,7 @@ export class MultiChoiceClass extends Control {
       this.options.map((option) => ({
         multiChoiceControlId: this.id,
         label: option.label,
+        optionId: option.id,
       }));
 
     return [controlData, optionsData];
@@ -169,7 +170,7 @@ export class MultiChoiceClass extends Control {
       text: data.text,
       isMultiSelect: data.isMultiSelect,
       options: options.map((opt) => ({
-        id: opt.id,
+        id: opt.optionId,
         label: opt.label,
       })),
     });

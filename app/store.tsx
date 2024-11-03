@@ -28,6 +28,7 @@ import { SliderControlAdvanced } from "@/classes/Controls/SliderControlAdv";
 import { Validation_tableControl } from "@/classes/Validation/Validation_tableControl";
 import Validation_sliderAdv from "@/classes/Validation/Validation_sliderAdv";
 import { useDebounce } from "use-debounce";
+import { InfluenceAdvanced } from "@/classes/influenceAdv";
 
 /*
 
@@ -88,6 +89,7 @@ export type State = {
   vizobjs: { [id: number]: obj };
   controls: { [id: number]: Control };
   influences: { [id: number]: Influence<any, obj, obj>[] };
+  influenceAdvIndex: { [id: number]: InfluenceAdvanced[] };
   scores: { [id: number]: Score<any> };
   setVizObj: (id: number, new_obj: obj) => void;
   setControl: (control_id: number, new_obj: Control) => void;
@@ -116,6 +118,7 @@ export type State = {
   setTableControl: (newTable: TableControl<any>) => void;
   deleteValidationByIndex: (index: number) => void;
   setTitle: (title: string) => void;
+  deleteInfluenceAdv: (influence_id: number) => void;
   
 
 };
@@ -131,6 +134,7 @@ export const useStore = create<State>((set, get) => ({
   controls: {},
   vizobjs: {},
   influences: {},
+  influenceAdvIndex: {},
   scores: {},
   placement: [],
   isSelectActive: false,
@@ -220,8 +224,28 @@ export const useStore = create<State>((set, get) => ({
     set((state) => {
       let updatedState: Partial<State> = {};
 
+      if (element instanceof InfluenceAdvanced) {
+        const newIndex = { ...state.influenceAdvIndex };
+        
+        // Add influence to index for each dependency
+        element.dependencyIds.forEach(id => {
+          if (!newIndex[id]) newIndex[id] = [];
+          if (!newIndex[id].find(inf => inf.influence_id === element.influence_id)) {
+            newIndex[id] = [...newIndex[id], element];
+          }
+        });
 
-      if (element instanceof obj) {
+        updatedState = { influenceAdvIndex: newIndex };
+      } else if (element instanceof Influence) {
+        // Handle regular influences
+        const influences = state.influences[element.master_id] || [];
+        updatedState = {
+          influences: {
+            ...state.influences,
+            [element.master_id]: [...influences, element],
+          },
+        };
+      } else if (element instanceof obj) {
         updatedState = {
           vizobjs: { ...state.vizobjs, [element.id]: element },
         };
@@ -244,14 +268,6 @@ export const useStore = create<State>((set, get) => ({
         updatedState = {
           placement: { ...state.placement, [element.id]: element },
           order: [...state.order, { type: "placement", id: element.id}], 
-        };
-      } else if (element instanceof Influence) {
-        if (!state.influences[element.master_id]) {
-          state.influences[element.master_id] = [];
-        }
-        state.influences[element.master_id].push(element);
-        updatedState = {
-          influences: state.influences,
         };
       } else if (element instanceof Validation) {
         updatedState = {
@@ -496,10 +512,10 @@ export const useStore = create<State>((set, get) => ({
         vizobjs: { ...state.vizobjs, [id]: new_obj },
       };
 
-      // update the influences for which the added object is a master
+      // Handle regular influences
       const masterInfluences = state.influences[id];
       if (masterInfluences) {
-        masterInfluences.forEach((influence: Influence<any, any, any>) => {
+        masterInfluences.forEach((influence) => {
           updatedState.vizobjs[influence.worker_id] = Influence.UpdateInfluence(
             influence,
             new_obj,
@@ -508,14 +524,14 @@ export const useStore = create<State>((set, get) => ({
         });
       }
 
-      // Check if the updated object is part of any FunctionPlotString's symbols
-      Object.values(updatedState.vizobjs).forEach((obj) => {
-        if (obj instanceof FunctionPlotString) {
-          const isRelevant = obj.functionStr.symbols.some(symbol => symbol.obj_id === id);
-          if (isRelevant) {
-            obj.func = obj.parseFunction(obj.functionStr);
-          }
-        }
+      // Handle advanced influences
+      const advancedInfluences = state.influenceAdvIndex[id] || [];
+      advancedInfluences.forEach(influence => {
+        updatedState.vizobjs[influence.worker_id] = InfluenceAdvanced.UpdateInfluence(
+          influence,
+          new_obj,
+          updatedState.vizobjs[influence.worker_id]
+        );
       });
 
       return updatedState;
@@ -540,13 +556,34 @@ export const useStore = create<State>((set, get) => ({
           return true;
         });
   
-        // Remove corresponding influences
+        // Remove regular influences where the object is either master or worker
         const updatedInfluences = { ...state.influences };
+        // Remove influences where object is master
         delete updatedInfluences[id];
+        // Remove influences where object is worker
         Object.keys(updatedInfluences).forEach(masterId => {
           updatedInfluences[Number(masterId)] = updatedInfluences[Number(masterId)].filter(
             influence => influence.worker_id !== id
           );
+          // Remove empty master entries
+          if (updatedInfluences[Number(masterId)].length === 0) {
+            delete updatedInfluences[Number(masterId)];
+          }
+        });
+
+        // Remove advanced influences where the object is either worker or dependency
+        const updatedAdvancedInfluences = { ...state.influenceAdvIndex };
+        // Remove from index where object is a dependency
+        delete updatedAdvancedInfluences[id];
+        // Remove influences where object is worker
+        Object.keys(updatedAdvancedInfluences).forEach(depId => {
+          updatedAdvancedInfluences[Number(depId)] = updatedAdvancedInfluences[Number(depId)].filter(
+            influence => influence.worker_id !== id
+          );
+          // Remove empty dependency entries
+          if (updatedAdvancedInfluences[Number(depId)].length === 0) {
+            delete updatedAdvancedInfluences[Number(depId)];
+          }
         });
 
         // Remove corresponding Controls and update order
@@ -584,6 +621,7 @@ export const useStore = create<State>((set, get) => ({
           vizobjs: updatedVizobjs, 
           validations: newValidations,
           influences: updatedInfluences,
+          influenceAdvIndex: updatedAdvancedInfluences,
           controls: updatedControls,
           order: newOrder
         };
@@ -677,6 +715,38 @@ export const useStore = create<State>((set, get) => ({
 
   setTitle: (title: string) => {
     set({ title });
+  },
+
+  // New method to add advanced influence
+  addInfluenceAdv: (influence: InfluenceAdvanced) => {
+    set((state) => {
+      const newIndex = { ...state.influenceAdvIndex };
+      
+      influence.dependencyIds.forEach(id => {
+        if (!newIndex[id]) newIndex[id] = [];
+        if (!newIndex[id].find(inf => inf.influence_id === influence.influence_id)) {
+          newIndex[id] = [...newIndex[id], influence];
+        }
+      });
+
+      return { influenceAdvIndex: newIndex };
+    });
+  },
+
+  // New method to delete advanced influence
+  deleteInfluenceAdv: (influence_id: number) => {
+    set((state) => {
+      const newIndex = { ...state.influenceAdvIndex };
+      
+      Object.keys(newIndex).forEach(key => {
+        newIndex[Number(key)] = newIndex[Number(key)].filter(
+          influence => influence.influence_id !== influence_id
+        );
+        if (newIndex[Number(key)].length === 0) delete newIndex[Number(key)];
+      });
+
+      return { influenceAdvIndex: newIndex };
+    });
   },
 }));
 
@@ -943,3 +1013,7 @@ export const deleteValidationByIndexSelect = (state: State) => state.deleteValid
 
 export const setTitleSelector = (state: State) => state.setTitle;
 
+// Add this near your other selectors
+export const getAdvancedInfluencesSelector = (state: State) => state.influenceAdvIndex;
+
+export const getInfluenceAdvDelete = (state: State) => state.deleteInfluenceAdv

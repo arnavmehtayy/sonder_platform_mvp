@@ -1,4 +1,4 @@
-import { OrderItem, State } from "@/app/store";
+import { OrderItem, State, useStore } from "@/app/store";
 import { geomobj } from "@/classes/vizobjects/geomobj";
 import { SerializeStateInsert, SerializeStateSelect } from "./Serializtypes";
 import CoordinateAxis from "@/classes/vizobjects/CoordinateAxis";
@@ -23,6 +23,9 @@ import Validation_sliderAdv  from "../Validation/Validation_sliderAdv";
 import  Validation_select  from "../Validation/Validation_select";
 import Validation from "../Validation/Validation";
 import Placement from "../Placement";
+import { ValidationMultiChoice } from "../Validation/ValidationMultiChoice";
+import { Validation_inputNumber } from "../Validation/Validation_inputNumber";
+import { InfluenceAdvanced } from "../influenceAdv";
 
 export function serializeState(state: State): SerializeStateInsert {
     const multiChoiceControls = Object.values(state.controls)
@@ -66,6 +69,14 @@ export function serializeState(state: State): SerializeStateInsert {
         .filter((obj): obj is Validation_select => obj instanceof Validation_select)
         .map(validation => validation.serialize());
 
+    const validationMultiChoices = state.validations
+        .filter((obj): obj is ValidationMultiChoice => obj instanceof ValidationMultiChoice)
+        .map(validation => validation.serialize());
+
+    const validationInputNumbers = state.validations
+        .filter((obj): obj is Validation_inputNumber => obj instanceof Validation_inputNumber)
+        .map(validation => validation.serialize());
+
     const placements = Object.values(state.placement)
     .filter((obj): obj is Placement => obj instanceof Placement)
     .map(placement => placement.serialize());
@@ -74,6 +85,11 @@ export function serializeState(state: State): SerializeStateInsert {
       questionId: parseInt(id),
       text: text
     }));
+
+    const influenceAdvanced = Object.values(state.influenceAdvIndex)
+      .flat()
+      .filter((obj): obj is InfluenceAdvanced => obj instanceof InfluenceAdvanced)
+      .map(influence => influence.serialize());
 
     console.log(multiChoiceControls)
   return {
@@ -132,8 +148,12 @@ export function serializeState(state: State): SerializeStateInsert {
     ValidationScores: validationScores,
     ValidationSliders: validationSliders,
     ValidationSelects: validationSelects,
+    ValidationMultiChoices: validationMultiChoices,
+    ValidationInputNumbers: validationInputNumbers,
     Placements: placements,
     Questions: questions,
+    InfluenceAdvanced: influenceAdvanced.map(([influence]) => influence),
+    InfluenceAttributePairs: influenceAdvanced.flatMap(([_, pairs]) => pairs),
   };
 }
 
@@ -223,7 +243,9 @@ export function deserializeState(serializedState: SerializeStateSelect): State {
     ...serializedState.ValidationTableControls.map(v => Validation_tableControl.deserialize(v)),
     ...serializedState.ValidationScores.map(v => Validation_score.deserialize(v)),
     ...serializedState.ValidationSliders.map(v => Validation_sliderAdv.deserialize(v)),
-    ...serializedState.ValidationSelects.map(v => Validation_select.deserialize(v))
+    ...serializedState.ValidationSelects.map(v => Validation_select.deserialize(v)),
+    ...serializedState.ValidationMultiChoices.map(v => ValidationMultiChoice.deserialize(v)),
+    ...serializedState.ValidationInputNumbers.map(v => Validation_inputNumber.deserialize(v))
   ];
 
   const placements: { [key: number]: Placement } = {};
@@ -236,6 +258,19 @@ export function deserializeState(serializedState: SerializeStateSelect): State {
     questions[question.questionId] = question.text;
   });
 
+  const influenceAdvIndex: { [key: number]: InfluenceAdvanced[] } = {};
+  serializedState.InfluenceAdvanced.forEach((influence) => {
+    const attributePairs = serializedState.InfluenceAttributePairs.filter(
+      pair => pair.InfluenceId === influence.influence_id
+    );
+    const influenceObj = InfluenceAdvanced.deserialize(influence, attributePairs);
+    
+    // Group by worker_id as that's how it's stored in the state
+    const workerId = influence.worker_id;
+    influenceAdvIndex[workerId] = influenceAdvIndex[workerId] || [];
+    influenceAdvIndex[workerId].push(influenceObj);
+  });
+
   return {
     title: serializedState.title,
     camera_zoom: serializedState.camera_zoom,
@@ -246,6 +281,7 @@ export function deserializeState(serializedState: SerializeStateSelect): State {
     validations: validations,
     placement: placements,
     questions: questions,
+    influenceAdvIndex,
     // questions: [],
     // order: [],
     // validations: [],

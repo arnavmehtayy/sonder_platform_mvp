@@ -11,6 +11,8 @@ import {
   getSideBarName,
   getValidationDescription,
   deleteValidationByIndexSelect,
+  getAdvancedInfluencesSelector,
+  getInfluenceAdvDelete,
 } from "@/app/store";
 import Experience from "@/app/Components/visualexp";
 import { EditBar } from "@/app/Components/EditMode/EditBar";
@@ -45,9 +47,10 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { ChevronLeft, ChevronRight, Save, X } from "lucide-react";
+import { ChevronLeft, ChevronRight, Save, X, RefreshCw } from "lucide-react";
 import { FeedbackComponent } from "@/app/Components/MainMenu/FeedbackComponent";
 import CurvedBackButton from "@/app/Components/three/BackButton";
+import { SceneManager } from "@/app/Components/Sidebar/SceneManager";
 
 const SortableItem: React.FC<{ id: string; children: React.ReactNode }> = ({
   id,
@@ -97,6 +100,9 @@ export default function ExperienceEditPage() {
   const validationDescriptions = useStore(getValidationDescription);
   const validationDeletor = useStore(deleteValidationByIndexSelect);
 
+  const advancedInfluences = useStore(getAdvancedInfluencesSelector);
+  const deleteInfluenceAdv = useStore(getInfluenceAdvDelete);
+
   const sensors = useSensors(
     useSensor(PointerSensor),
     useSensor(KeyboardSensor, {
@@ -131,6 +137,20 @@ export default function ExperienceEditPage() {
     if (type === "control" || type === "placement" || type === "question") {
       deleteVizObj(id);
     }
+  };
+
+  const handleResetState = () => {
+    useStore.setState({
+      order: [],
+      vizobjs: {},
+      title: "",
+      questions: {},
+      controls: {},
+      placement: {},
+      scores: {},
+      validations: [],
+    });
+    toast.success("State has been reset");
   };
 
   useEffect(() => {
@@ -171,17 +191,6 @@ export default function ExperienceEditPage() {
               useStore.setState(loadedState);
             }
           }
-        } else {
-          useStore.setState({
-            order: [],
-            vizobjs: {},
-            title: "",
-            questions: {},
-            controls: {},
-            placement: {},
-            scores: {},
-            validations: [],
-          });
         }
       } catch (error) {
         console.error("Error loading state:", error);
@@ -335,6 +344,13 @@ export default function ExperienceEditPage() {
               <Save size={16} />
               Save Progress
             </Button>
+            <Button
+              onClick={handleResetState}
+              className="flex items-center gap-2 bg-red-100 hover:bg-red-200 text-red-700"
+            >
+              <RefreshCw size={16} />
+              Reset State
+            </Button>
           </div>
 
           <div className="flex items-center gap-4">
@@ -366,82 +382,11 @@ export default function ExperienceEditPage() {
                 <span className="text-sm font-medium">Scene Manager</span>
               </button>
             </DialogTrigger>
-            <DialogContent className="sm:max-w-[425px]">
-              <DialogHeader>
-                <DialogTitle>Scene Manager</DialogTitle>
-              </DialogHeader>
-              <div className="mt-4">
-                <DndContext
-                  sensors={sensors}
-                  collisionDetection={closestCenter}
-                  onDragEnd={handleDragEnd}
-                >
-                  <SortableContext
-                    items={order.map((item) => `${item.type}-${item.id}`)}
-                    strategy={verticalListSortingStrategy}
-                  >
-                    <ul className="space-y-2">
-                      {order.map((item) => (
-                        <SortableItem
-                          key={`${item.type}-${item.id}`}
-                          id={`${item.type}-${item.id}`}
-                        >
-                          <div className="flex-grow">{getName(item)}</div>
-                          <button
-                            onClick={() => handleDeleteItem(item.id, item.type)}
-                            className="text-red-500 hover:text-red-700 ml-2"
-                          >
-                            <Trash2 size={16} />
-                          </button>
-                        </SortableItem>
-                      ))}
-                    </ul>
-                  </SortableContext>
-                </DndContext>
-              </div>
-              <div className="mt-4">
-                <h3 className="text-lg font-semibold mb-2">
-                  Visual Objects Manager
-                </h3>
-                <ul className="space-y-2">
-                  {Object.entries(vizobjs).map(([id, obj]) => (
-                    <li
-                      key={id}
-                      className="flex items-center justify-between bg-gray-100 p-2 rounded"
-                    >
-                      <span>{`${obj.name}`}</span>
-                      <button
-                        onClick={() => deleteVizObj(Number(id))}
-                        className="text-red-500 hover:text-red-700"
-                      >
-                        <Trash2 size={16} />
-                      </button>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-              <div className="mt-4">
-                <h3 className="text-lg font-semibold mb-2">
-                  Validation Manager
-                </h3>
-                <ul className="space-y-2">
-                  {validationInstance.map((validation, index) => (
-                    <li
-                      key={index}
-                      className="flex items-center justify-between bg-gray-100 p-2 rounded"
-                    >
-                      <span>{validationDescriptions(validation)}</span>
-                      <button
-                        onClick={() => validationDeletor(index)}
-                        className="text-red-500 hover:text-red-700"
-                      >
-                        <Trash2 size={16} />
-                      </button>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            </DialogContent>
+            <SceneManager
+              sensors={sensors}
+              handleDragEnd={handleDragEnd}
+              handleDeleteItem={handleDeleteItem}
+            />
           </Dialog>
 
           {/* Keep existing OrderHandlerDb */}

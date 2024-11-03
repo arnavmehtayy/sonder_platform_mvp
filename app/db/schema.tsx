@@ -6,7 +6,7 @@ import { ScoreConstructor } from '@/classes/Scores/Score';
 import { ValidationConstructor } from '@/classes/Validation/Validation';
 import { geom_param_type, geom_type, PredefinedGeometry } from '@/classes/vizobjects/geomobj';
 import { objconstructor, object_types } from '@/classes/vizobjects/obj';
-import { integer, boolean, real, pgTable, serial, text, timestamp, jsonb, uuid } from 'drizzle-orm/pg-core';
+import { integer, boolean, real, pgTable, serial, text, timestamp, jsonb, uuid, numeric } from 'drizzle-orm/pg-core';
 import { InferSelectModel, InferInsertModel } from 'drizzle-orm';
 import { pgSchema } from 'drizzle-orm/pg-core';
 
@@ -329,6 +329,7 @@ export const MultiChoiceOption = pgTable('multi_choice_option', {
   multiChoiceControlId: integer('multi_choice_control_id').references(() => MultiChoiceControl.id, { onDelete: 'cascade' }).notNull(),
   stateId: integer('state_id').references(() => states.id, { onDelete: 'cascade' }).notNull(),
   label: text('label').notNull(),
+  optionId: integer('option_id').notNull(),
 });
 
 export type MultiChoiceControlSelect = InferSelectModel<typeof MultiChoiceControl>;
@@ -563,7 +564,50 @@ export type PlacementInsert = InferInsertModel<typeof Placement>;
 export type QuestionTextSelect = InferSelectModel<typeof Questions_text>;
 export type QuestionTextInsert = InferInsertModel<typeof Questions_text>;
 
+// Add new table for influence attribute pairs
+export const InfluenceAttributePairs = pgTable('influence_attribute_pairs', {
+  id: serial('id').primaryKey(),
+  stateId: integer('state_id').references(() => states.id, { onDelete: 'cascade' }).notNull(),
+  InfluenceId: integer('influence_id').notNull(),
+  trans_functionStr: text('trans_functionStr').notNull(),
+  trans_symbols: jsonb('trans_symbols').$type<AttributePairGet[]>().notNull(),
+  get_func: text('func').notNull(),
+  obj_type: text('obj_type').$type<object_types>().notNull(),
+});
 
+export type InfluenceAttributePairsSelect = InferSelectModel<typeof InfluenceAttributePairs>;
+export type InfluenceAttributePairsInsert = InferInsertModel<typeof InfluenceAttributePairs>;
+
+export const InfluenceAdvanced = pgTable('influence_advanced', {
+  id: serial('id').primaryKey(),
+  stateId: integer('state_id').references(() => states.id, { onDelete: 'cascade' }).notNull(),
+  influence_id: integer('influence_id').notNull(),
+  worker_id: integer('worker_id').notNull(),
+});
+
+export type InfluenceAdvancedSelect = InferSelectModel<typeof InfluenceAdvanced>;
+export type InfluenceAdvancedInsert = InferInsertModel<typeof InfluenceAdvanced>;
+
+export const Validation_MultiChoice = pgTable('validation_multi_choice', {
+  stateId: integer('state_id').notNull().references(() => states.id, { onDelete: 'cascade' }),
+  answer: integer('answer').array().notNull(),
+  control_id: integer('control_id').notNull(),
+  desc: text('desc').notNull(),
+});
+
+export type Validation_MultiChoiceInsert = typeof Validation_MultiChoice.$inferInsert;
+export type Validation_MultiChoiceSelect = typeof Validation_MultiChoice.$inferSelect;
+
+export const ValidationInputNumber = pgTable('validation_input_number', {
+  stateId: integer('state_id').notNull().references(() => states.id, { onDelete: 'cascade' }),
+  answer: real('answer').notNull(),
+  control_id: integer('control_id').notNull(),
+  error: real('error').notNull(),
+  desc: text('desc').notNull(),
+});
+
+export type ValidationInputNumberInsert = typeof ValidationInputNumber.$inferInsert;
+export type ValidationInputNumberSelect = typeof ValidationInputNumber.$inferSelect;
 
 
 

@@ -1,6 +1,6 @@
 "use client";
 import React, { useState } from "react";
-import { HelpCircle, List, ChevronDown, Plus, Trash2 } from "lucide-react";
+import { HelpCircle, List, ChevronDown, Plus, Trash2, ArrowRightLeft } from "lucide-react";
 import { 
   LineChart, 
   Circle, 
@@ -54,6 +54,7 @@ import { DialogTrigger } from "@radix-ui/react-dialog";
 import { GripVertical } from 'lucide-react';
 import { ToggleLeft, Type, Variable, Table, Calculator, Hash, MousePointerClick} from 'lucide-react';
 import Placement from "@/classes/Placement";
+import { InfluenceAdvanced } from "@/classes/influenceAdv";
 
 export interface Option {
   id: number;
@@ -81,6 +82,7 @@ export const EditBar: React.FC = () => {
     {name: "Hide/Show Object", type: EnablerControl, icon: ToggleLeft},
     {name: "Object Placer", type: Placement, icon: MousePointerClick},
     {name: "Score", type: FunctionScore, icon: Calculator},
+    {name: "Influence", type: InfluenceAdvanced, icon: ArrowRightLeft}
   ];
     
   const objectTypes: ObjectType[] = [

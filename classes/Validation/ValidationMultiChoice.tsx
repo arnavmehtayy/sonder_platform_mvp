@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { DialogTitle, DialogHeader} from "@/components/ui/dialog"
+import { Validation_MultiChoice, Validation_MultiChoiceInsert, Validation_MultiChoiceSelect } from "@/app/db/schema";
 
 
 /*
@@ -25,7 +26,7 @@ export class ValidationMultiChoice extends Validation {
     constructor({
         answer,
         control_id,
-        desc = "validation_select"
+        desc = "validation_multichoice"
     }: ValidationMultiChoiceConstructor) {
         super({ is_valid: false , desc: desc})
         this.answer = answer
@@ -54,6 +55,22 @@ export class ValidationMultiChoice extends Validation {
             control_id: this.control_id,
             type: "V_MCQ"
         }
+    }
+
+    static deserialize(data: Validation_MultiChoiceSelect): ValidationMultiChoice {
+        return new ValidationMultiChoice({
+            answer: data.answer,
+            control_id: data.control_id,
+            desc: data.desc
+        });
+    }
+
+    serialize(): Omit<Validation_MultiChoiceInsert, "stateId"> {
+        return {
+            desc: this.desc,
+            answer: this.answer,
+            control_id: this.control_id,
+        };
     }
 }
 

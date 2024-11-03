@@ -10,6 +10,7 @@ import {
   getSideBarName,
   getValidationDescription,
   deleteValidationByIndexSelect,
+  getAdvancedInfluencesSelector,
 } from "@/app/store";
 import "katex/dist/katex.min.css";
 import "../style.css";
@@ -31,6 +32,7 @@ import {
 import { createClient } from "@/app/utils/supabase/client";
 import { toast } from "sonner";
 import { useRouter } from 'next/navigation';
+import { SceneManager } from "./SceneManager";
 
 const SortableItem: React.FC<{ id: string; children: React.ReactNode }> = ({ id, children }) => {
   const {
@@ -82,6 +84,8 @@ export function MinigameEdit({}: {}) {
   const getName = useStore(getSideBarName);
   const validationDescriptions = useStore(getValidationDescription);
   const validationDeletor = useStore(deleteValidationByIndexSelect)
+  const advancedInfluences = useStore(getAdvancedInfluencesSelector);
+  const deleteAdvancedInfluence = useStore((state) => state.deleteInfluenceAdv);
 
   useEffect(() => reset("default"), []);
 
@@ -269,62 +273,11 @@ export function MinigameEdit({}: {}) {
               <span className="text-sm font-medium">Scene Manager</span>
             </button>
           </DialogTrigger>
-          <DialogContent className="sm:max-w-[425px]">
-            <DialogHeader>
-              <DialogTitle>Sidebar Manager</DialogTitle>
-            </DialogHeader>
-            <div className="mt-4">
-              <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
-                <SortableContext items={order.map(item => `${item.type}-${item.id}`)} strategy={verticalListSortingStrategy}>
-                  <ul className="space-y-2">
-                    {order.map((item) => (
-                      <SortableItem key={`${item.type}-${item.id}`} id={`${item.type}-${item.id}`}>
-                        <div className="flex-grow">{getName(item)}</div>
-                        <button
-                          onClick={() => handleDeleteItem(item.id, item.type)}
-                          className="text-red-500 hover:text-red-700 ml-2"
-                        >
-                          <Trash2 size={16} />
-                        </button>
-                      </SortableItem>
-                    ))}
-                  </ul>
-                </SortableContext>
-              </DndContext>
-            </div>
-            <div className="mt-4">
-              <h3 className="text-lg font-semibold mb-2">Visual Objects Manager</h3>
-              <ul className="space-y-2">
-                {Object.entries(vizobjs).map(([id, obj]) => (
-                  <li key={id} className="flex items-center justify-between bg-gray-100 p-2 rounded">
-                    <span>{`${obj.name}`}</span>
-                    <button
-                      onClick={() => deleteVizObj(Number(id))}
-                      className="text-red-500 hover:text-red-700"
-                    >
-                      <Trash2 size={16} />
-                    </button>
-                  </li>
-                ))}
-              </ul>
-            </div>
-            <div className="mt-4">
-              <h3 className="text-lg font-semibold mb-2">Validation Manager</h3>
-              <ul className="space-y-2">
-                {validationInstance.map((validation, index) => (
-                  <li key={index} className="flex items-center justify-between bg-gray-100 p-2 rounded">
-                    <span>{validationDescriptions(validation)}</span>
-                    <button
-                      onClick={() => validationDeletor(index)}
-                      className="text-red-500 hover:text-red-700"
-                    >
-                      <Trash2 size={16} />
-                    </button>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          </DialogContent>
+          <SceneManager
+            sensors={sensors}
+            handleDragEnd={handleDragEnd}
+            handleDeleteItem={handleDeleteItem}
+          />
         </Dialog>
 
         <OrderHandler state_name={state_name} />

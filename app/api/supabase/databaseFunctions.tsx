@@ -26,6 +26,10 @@ import {
   Placement,
   Questions_text,
   experience,
+  Validation_MultiChoice,
+  ValidationInputNumber,
+  InfluenceAdvanced,
+  InfluenceAttributePairs,
 } from "@/app/db/schema";
 import { eq } from "drizzle-orm";
 import {
@@ -140,6 +144,12 @@ export async function saveStateToDatabase(
 
     // Delete existing question records
     await tx.delete(Questions_text).where(eq(Questions_text.stateId, stateId));
+
+    // Delete existing ValidationMultiChoice records
+    await tx.delete(Validation_MultiChoice).where(eq(Validation_MultiChoice.stateId, stateId));
+    await tx.delete(ValidationInputNumber).where(eq(ValidationInputNumber.stateId, stateId));
+    await tx.delete(InfluenceAdvanced).where(eq(InfluenceAdvanced.stateId, stateId));
+    await tx.delete(InfluenceAttributePairs).where(eq(InfluenceAttributePairs.stateId, stateId));
     } else {
       // Create new state
       const [insertedState] = await tx
@@ -312,6 +322,43 @@ export async function saveStateToDatabase(
       await tx.insert(Questions_text)
         .values(state.Questions.map(q => ({ ...q, stateId })));
     }
+
+    // Insert ValidationMultiChoice records
+    if (state.ValidationMultiChoices.length > 0) {
+      await tx.insert(Validation_MultiChoice).values(
+        state.ValidationMultiChoices.map((validation) => ({
+          ...validation,
+          stateId: stateId,
+        }))
+      );
+    }
+
+    if (state.ValidationInputNumbers.length > 0) {
+      await tx.insert(ValidationInputNumber).values(
+        state.ValidationInputNumbers.map((validation) => ({
+          ...validation,
+          stateId: stateId,
+        }))
+      );
+    }
+
+    if (state.InfluenceAdvanced.length > 0) {
+      await tx.insert(InfluenceAdvanced).values(
+        state.InfluenceAdvanced.map((influence) => ({
+          ...influence,
+          stateId: stateId,
+        }))
+      );
+    }
+
+    if (state.InfluenceAttributePairs.length > 0) {
+      await tx.insert(InfluenceAttributePairs).values(
+        state.InfluenceAttributePairs.map((pair) => ({
+          ...pair,
+          stateId: stateId,
+        }))
+      );
+    }
   });
 }
 
@@ -448,6 +495,23 @@ export async function loadStateFromDatabase(
       .from(Questions_text)
       .where(eq(Questions_text.stateId, stateId));
 
+    // Fetch ValidationMultiChoice data
+    const validationMultiChoiceData = await tx.select()
+      .from(Validation_MultiChoice)
+      .where(eq(Validation_MultiChoice.stateId, stateId));
+
+    const validationInputNumberData = await tx.select()
+      .from(ValidationInputNumber)
+      .where(eq(ValidationInputNumber.stateId, stateId));
+
+    const influenceAdvancedData = await tx.select()
+      .from(InfluenceAdvanced)
+      .where(eq(InfluenceAdvanced.stateId, stateId));
+
+    const influenceAttributePairsData = await tx.select()
+      .from(InfluenceAttributePairs)
+      .where(eq(InfluenceAttributePairs.stateId, stateId));
+
     // Construct the state object
     const loadedState: SerializeStateSelect = {
       title: stateRecord[0].title,
@@ -477,6 +541,10 @@ export async function loadStateFromDatabase(
       ValidationSelects: validationSelectData,
       Placements: placementData,
       Questions: questionData,
+      ValidationMultiChoices: validationMultiChoiceData,
+      ValidationInputNumbers: validationInputNumberData,
+      InfluenceAdvanced: influenceAdvancedData,
+      InfluenceAttributePairs: influenceAttributePairsData,
     };
     return loadedState;
   });
