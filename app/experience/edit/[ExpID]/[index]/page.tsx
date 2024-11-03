@@ -149,6 +149,7 @@ export default function ExperienceEditPage() {
       placement: {},
       scores: {},
       validations: [],
+      influenceAdvIndex: {},
     });
     toast.success("State has been reset");
   };
@@ -259,7 +260,7 @@ export default function ExperienceEditPage() {
   };
 
   const handleNextSlide = () => {
-    handleSave();
+    // handleSave();
     router.push(`/experience/edit/${expId}/${currentIndex + 1}`);
   };
 
@@ -273,7 +274,7 @@ export default function ExperienceEditPage() {
 
   const handlePreviousSlide = () => {
     if (currentIndex > 0) {
-      handleSave();
+    //   handleSave();
       router.push(`/experience/edit/${expId}/${currentIndex - 1}`);
     }
   };
@@ -390,7 +391,7 @@ export default function ExperienceEditPage() {
           </Dialog>
 
           {/* Keep existing OrderHandlerDb */}
-          <OrderHandlerDB />
+          <OrderHandlerDB isEditMode={true} />
         </div>
       </div>
     </>

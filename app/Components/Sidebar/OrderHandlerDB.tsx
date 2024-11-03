@@ -24,7 +24,7 @@ import { useDebounce } from "use-debounce";
  * It is used to render the order of components in the sidebar
  */
 
-export const OrderHandlerDB = () => {
+export const OrderHandlerDB = ({ isEditMode = false }: { isEditMode?: boolean }) => {
   const state = useStore();
   const get_questions = useStore(getQuestionsSelector);
   const title = useStore(getTitleSelector);
@@ -70,13 +70,19 @@ export const OrderHandlerDB = () => {
   return (
     <div className="space-y-4 md:space-y-6">
       <div className="p-4">
-        <input
-          type="text"
-          value={localTitle}
-          onChange={(e) => setLocalTitle(e.target.value)}
-          className="w-full text-lg md:text-xl font-semibold text-blue-800 bg-transparent border-none focus:outline-none"
-          placeholder="Enter title..."
-        />
+        {isEditMode ? (
+          <input
+            type="text"
+            value={localTitle}
+            onChange={(e) => setLocalTitle(e.target.value)}
+            className="w-full text-lg md:text-xl font-semibold text-blue-800 bg-transparent border-none focus:outline-none"
+            placeholder="Enter title..."
+          />
+        ) : (
+          <h2 className="text-lg md:text-xl font-semibold text-blue-800">
+            <Latex>{localTitle}</Latex>
+          </h2>
+        )}
       </div>
       {state.order.map((item, index) => (
         <React.Fragment key={`${item.type}-${item.id}-${index}`}>
