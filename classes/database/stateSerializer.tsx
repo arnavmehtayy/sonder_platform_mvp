@@ -265,10 +265,13 @@ export function deserializeState(serializedState: SerializeStateSelect): State {
     );
     const influenceObj = InfluenceAdvanced.deserialize(influence, attributePairs);
     
-    // Group by worker_id as that's how it's stored in the state
-    const workerId = influence.worker_id;
-    influenceAdvIndex[workerId] = influenceAdvIndex[workerId] || [];
-    influenceAdvIndex[workerId].push(influenceObj);
+    // Index by dependency IDs instead of worker_id
+    influenceObj.dependencyIds.forEach(masterId => {
+      if (!influenceAdvIndex[masterId]) {
+        influenceAdvIndex[masterId] = [];
+      }
+      influenceAdvIndex[masterId].push(influenceObj);
+    });
   });
 
   return {

@@ -67,19 +67,18 @@ export class InfluenceAdvanced extends Influence<number, obj, obj> {
   registerWithStore(store: typeof useStore): void {
     const state = store.getState();
     
-    // Register this influence with all master objects
-    this.masterIds.forEach(masterId => {
-      const influences = state.influences[masterId] || [];
+    // Register this influence with all master/dependency objects
+    this.dependencyIds.forEach(masterId => {
+      const influences = state.influenceAdvIndex[masterId] || [];
       if (!influences.includes(this)) {
         store.setState(state => ({
-          influences: {
-            ...state.influences,
+          influenceAdvIndex: {
+            ...state.influenceAdvIndex,
             [masterId]: [...influences, this]
           }
         }));
       }
     });
-    console.log("STATE THINGS", useStore.getState().influenceAdvIndex)
   }
 
   // Make UpdateInfluence compatible with base class
@@ -88,10 +87,23 @@ export class InfluenceAdvanced extends Influence<number, obj, obj> {
     master: master_T,
     worker: worker_T
   ): worker_T {
-    
     if (influence instanceof InfluenceAdvanced) {
+      // Get the current state with the latest updates
+      const currentState = useStore.getState();
+      const updatedVizobjs = { ...currentState.vizobjs };
+      
+      // Update the vizobjs with the new master value
+      influence.masterIds.forEach(masterId => {
+        if (masterId === (master as any).id) {
+          updatedVizobjs[masterId] = master;
+        }
+      });
+
+      // Apply all attribute pair transformations using the latest state
       return influence.attribute_pairs.reduce((updatedObj, pair) => {
-        const value = pair.transform_function.get_function()(0, useStore.getState);
+        const value = pair.transform_function.get_function()(0, () => ({
+          vizobjs: updatedVizobjs
+        }));
         return pair.set_attribute(updatedObj, value);
       }, worker) as worker_T;
     }
@@ -124,11 +136,16 @@ export class InfluenceAdvanced extends Influence<number, obj, obj> {
       obj_type: pair.obj_type
     }));
 
-    return new InfluenceAdvanced({
+    const influence = new InfluenceAdvanced({
       influence_id: data.influence_id,
       worker_id: data.worker_id,
       attribute_pairs: attribute_pairs
     });
+
+    // Register with store immediately after deserialization
+    influence.registerWithStore(useStore);
+    
+    return influence;
   }
 
   static getPopup({

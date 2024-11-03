@@ -89,7 +89,7 @@ export type State = {
   vizobjs: { [id: number]: obj };
   controls: { [id: number]: Control };
   influences: { [id: number]: Influence<any, obj, obj>[] };
-  influenceAdvIndex: { [id: number]: InfluenceAdvanced[] };
+  influenceAdvIndex: { [masterId: number]: InfluenceAdvanced[] };
   scores: { [id: number]: Score<any> };
   setVizObj: (id: number, new_obj: obj) => void;
   setControl: (control_id: number, new_obj: Control) => void;
@@ -227,11 +227,11 @@ export const useStore = create<State>((set, get) => ({
       if (element instanceof InfluenceAdvanced) {
         const newIndex = { ...state.influenceAdvIndex };
         
-        // Add influence to index for each dependency
-        element.dependencyIds.forEach(id => {
-          if (!newIndex[id]) newIndex[id] = [];
-          if (!newIndex[id].find(inf => inf.influence_id === element.influence_id)) {
-            newIndex[id] = [...newIndex[id], element];
+        // Add influence to index for each master/dependency ID
+        element.dependencyIds.forEach(masterId => {
+          if (!newIndex[masterId]) newIndex[masterId] = [];
+          if (!newIndex[masterId].find(inf => inf.influence_id === element.influence_id)) {
+            newIndex[masterId] = [...newIndex[masterId], element];
           }
         });
 
@@ -508,33 +508,38 @@ export const useStore = create<State>((set, get) => ({
   // used to set a particular viz object. Note that after a viz object is set we also update the influences for which the particular viz object was the worker.
   setVizObj: (id: number, new_obj: obj) => {
     set((state) => {
-      const updatedState = {
-        vizobjs: { ...state.vizobjs, [id]: new_obj },
-      };
-
-      // Handle regular influences
+      const updatedVizobjs = { ...state.vizobjs, [id]: new_obj };
+      
+      // Process regular influences
       const masterInfluences = state.influences[id];
       if (masterInfluences) {
         masterInfluences.forEach((influence) => {
-          updatedState.vizobjs[influence.worker_id] = Influence.UpdateInfluence(
+          updatedVizobjs[influence.worker_id] = Influence.UpdateInfluence(
             influence,
             new_obj,
-            state.vizobjs[influence.worker_id]
+            updatedVizobjs[influence.worker_id]
           );
         });
       }
 
-      // Handle advanced influences
+      // Process advanced influences
       const advancedInfluences = state.influenceAdvIndex[id] || [];
       advancedInfluences.forEach(influence => {
-        updatedState.vizobjs[influence.worker_id] = InfluenceAdvanced.UpdateInfluence(
-          influence,
-          new_obj,
-          updatedState.vizobjs[influence.worker_id]
+        // Get all current values for dependencies
+        const dependencyValues = influence.dependencyIds.map(depId => 
+          depId === id ? new_obj : updatedVizobjs[depId]
         );
+        
+        // Update the worker using the latest state
+        updatedVizobjs[influence.worker_id] = influence.attribute_pairs.reduce((updatedObj, pair) => {
+          const value = pair.transform_function.get_function()(0, () => ({
+            vizobjs: updatedVizobjs
+          }));
+          return pair.set_attribute(updatedObj, value);
+        }, updatedVizobjs[influence.worker_id]);
       });
 
-      return updatedState;
+      return { vizobjs: updatedVizobjs };
     });
   },
 
@@ -738,11 +743,14 @@ export const useStore = create<State>((set, get) => ({
     set((state) => {
       const newIndex = { ...state.influenceAdvIndex };
       
-      Object.keys(newIndex).forEach(key => {
-        newIndex[Number(key)] = newIndex[Number(key)].filter(
+      // Remove the influence from all master ID arrays
+      Object.keys(newIndex).forEach(masterId => {
+        newIndex[Number(masterId)] = newIndex[Number(masterId)].filter(
           influence => influence.influence_id !== influence_id
         );
-        if (newIndex[Number(key)].length === 0) delete newIndex[Number(key)];
+        if (newIndex[Number(masterId)].length === 0) {
+          delete newIndex[Number(masterId)];
+        }
       });
 
       return { influenceAdvIndex: newIndex };
