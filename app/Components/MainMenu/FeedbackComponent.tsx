@@ -84,16 +84,17 @@ export const FeedbackComponent = () => {
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle> We want to improve for you!</DialogTitle>
+          <DialogTitle>Help Us Improve Your Learning Experience</DialogTitle>
           <DialogDescription>
-            Share your feedback by answering the following. <br /> <br />
-            1) How effective/ineffective was this in teaching Ridge Regression?{" "}
+            We value your feedback! Please share your thoughts on:
+            <br /><br />
+            • The features you found most helpful or challenging
             <br />
-            2) What features did you like/dislike? and are there any that you
-            thought were missing? <br />
-            3) What Topics would like to see taught in this format? <br />
-            4) Would you prefer this medium over traditional teaching methods
-            such as textbooks or video lectures? Why? <br />
+            • Additional topics you'd like to explore through interactive learning
+            <br /> 
+            • How this compares to traditional learning methods for you
+            <br />
+            • Any other suggestions to enhance your experience
           </DialogDescription>
         </DialogHeader>
         <Textarea
