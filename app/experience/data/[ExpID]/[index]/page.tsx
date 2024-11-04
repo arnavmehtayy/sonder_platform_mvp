@@ -26,7 +26,6 @@ const resetState = () => {
 };
 
 const handleLoadState = async (experienceId: number, index: number) => {
-  resetState(); // Reset before loading new state
   
   try {
     const response = await fetch(`/api/supabase/DataBaseAPI?experienceId=${experienceId}&index=${index}`);
@@ -56,9 +55,8 @@ export default function ExperiencePage() {
 
     loadData();
 
-    return () => {
-      resetState();
-    };
+    
+
   }, [params]);
 
   if (isLoading) {
