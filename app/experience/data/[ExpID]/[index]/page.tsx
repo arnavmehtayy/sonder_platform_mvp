@@ -1,4 +1,5 @@
 'use client'
+import { useState, useEffect } from 'react';
 import { Minigame } from '@/app/Components/Sidebar/Minigame';
 import { experiences } from "@/classes/Data/CompleteData";
 import CurvedBackButton from '@/app/Components/three/BackButton';
@@ -8,7 +9,7 @@ import '@/app/TutorialOverlay.css';
 import { deserializeState } from '@/classes/database/stateSerializer';
 import { useStore } from '@/app/store';
 import { MinigameDB } from '@/app/Components/Sidebar/MinigameDB';
-import { useEffect } from 'react';
+import { LoadingScreen } from '@/app/Components/MainMenu/LoadingScreen';
 
 const resetState = () => {
   useStore.setState({
@@ -42,17 +43,27 @@ const handleLoadState = async (experienceId: number, index: number) => {
 
 export default function ExperiencePage() {
   const params = useParams();
-  
-  useEffect(() => {
-    const index = Number(params.index);
-    const experienceId = Number(params.ExpID);
-    handleLoadState(experienceId, index);
+  const [isLoading, setIsLoading] = useState(true);
 
-    // Cleanup function to reset state when leaving the page
+  useEffect(() => {
+    const loadData = async () => {
+      setIsLoading(true);
+      const index = Number(params.index);
+      const experienceId = Number(params.ExpID);
+      await handleLoadState(experienceId, index);
+      setIsLoading(false);
+    };
+
+    loadData();
+
     return () => {
       resetState();
     };
   }, [params]);
+
+  if (isLoading) {
+    return <LoadingScreen />;
+  }
 
   return (
     <div className="flex flex-col h-screen">

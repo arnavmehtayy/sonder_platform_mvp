@@ -51,7 +51,7 @@ export default class CoordinateAxis extends TransformObj {
     position = new THREE.Vector2(0, 0),
     rotation = new THREE.Vector3(0, 0, 0),
     scale = new THREE.Vector3(1, 1, 1),
-    color = "#000000",
+    color = "#FFFFFF",
     touch_controls = new TouchControl(),
     constructionType = "coordinate",
     axisLength = 60,

@@ -51,6 +51,7 @@ import { ChevronLeft, ChevronRight, Save, X, RefreshCw } from "lucide-react";
 import { FeedbackComponent } from "@/app/Components/MainMenu/FeedbackComponent";
 import CurvedBackButton from "@/app/Components/three/BackButton";
 import { SceneManager } from "@/app/Components/Sidebar/SceneManager";
+import { LoadingScreen } from "@/app/Components/MainMenu/LoadingScreen";
 
 const SortableItem: React.FC<{ id: string; children: React.ReactNode }> = ({
   id,
@@ -83,6 +84,7 @@ export default function ExperienceEditPage() {
   const params = useParams();
   const expId = parseInt(params.ExpID as string);
   const currentIndex = parseInt(params.index as string);
+  const [isLoading, setIsLoading] = useState(true);
 
   const reset = useStore((state) => state.reset);
 
@@ -155,30 +157,25 @@ export default function ExperienceEditPage() {
   };
 
   useEffect(() => {
-    const checkAuth = async () => {
-      const supabase = await createClient();
-      const {
-        data: { user },
-        error,
-      } = await supabase.auth.getUser();
-
-      if (error || !user) {
-        router.push("/login");
-      }
-    };
-
-    checkAuth();
-
-    const loadExistingState = async () => {
+    const initializeState = async () => {
+      setIsLoading(true);
       try {
-        // First check if the state exists
+        // Auth check
+        const supabase = await createClient();
+        const { data: { user }, error } = await supabase.auth.getUser();
+
+        if (error || !user) {
+          router.push("/login");
+          return;
+        }
+
+        // Load state
         const checkResponse = await fetch(
           `/api/supabase/check-next?experienceId=${expId}&index=${currentIndex}`
         );
         const checkData = await checkResponse.json();
 
         if (checkData.hasNext) {
-          // If state exists, load it
           const response = await fetch(
             `/api/supabase/DataBaseAPI?experienceId=${expId}&index=${currentIndex}`
           );
@@ -186,8 +183,6 @@ export default function ExperienceEditPage() {
           if (response.ok) {
             const serializedState = await response.json();
             const loadedState = deserializeState(serializedState);
-
-            console.log(loadedState);
             if (loadedState) {
               useStore.setState(loadedState);
             }
@@ -195,10 +190,14 @@ export default function ExperienceEditPage() {
         }
       } catch (error) {
         console.error("Error loading state:", error);
+        toast.error("Failed to load experience state");
+      } finally {
+        setIsLoading(false);
       }
     };
-    loadExistingState();
-  }, [expId, currentIndex, reset]);
+
+    initializeState();
+  }, [expId, currentIndex, reset, router]);
 
   useEffect(() => {
     const checkAllValidations = () => {
@@ -278,6 +277,13 @@ export default function ExperienceEditPage() {
       router.push(`/experience/edit/${expId}/${currentIndex - 1}`);
     }
   };
+
+  if (isLoading) {
+    return <LoadingScreen 
+      message="Loading Experience Editor" 
+      description="Please wait while we prepare your experience editor..."
+    />;
+  }
 
   return (
     <>
