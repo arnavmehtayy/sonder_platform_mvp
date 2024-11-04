@@ -261,6 +261,17 @@ export function AttributePairsEditor({
     : {};
   const [showAdvanced, setShowAdvanced] = React.useState(false);
 
+  React.useEffect(() => {
+    if (object && pairs.length === 0 && Object.keys(setAttributeOptions).length > 0) {
+      const firstKey = Object.keys(setAttributeOptions)[0];
+      onChange([{
+        transform_function: new FunctionStr("x", []),
+        func: firstKey,
+        obj_type: type
+      }]);
+    }
+  }, [object, pairs.length]);
+
   const addPair = () => {
     if (Object.keys(setAttributeOptions).length > 0) {
       const firstKey = Object.keys(setAttributeOptions)[0];

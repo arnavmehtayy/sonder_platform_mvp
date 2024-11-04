@@ -5,8 +5,10 @@ import { getObjectSelector, getObjectsSelector, useStore } from '@/app/store';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { X } from "lucide-react";
+import { X, ChevronDown, ChevronRight, Variable, Plus } from "lucide-react";
 import { atts } from '../vizobjects/get_set_obj_attributes';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
+import { Badge } from "@/components/ui/badge";
 
 export interface AttributePairGet {
     obj_id: number;
@@ -77,6 +79,7 @@ export interface FunctionStrEditorProps {
 }
 
 export const FunctionStrEditor: React.FC<FunctionStrEditorProps> = ({ value, onChange }) => {
+    const [isOpen, setIsOpen] = useState(false);
     const [functionString, setFunctionString] = useState(value.functionString);
     const [symbols, setSymbols] = useState(value.symbols);
 
@@ -108,81 +111,170 @@ export const FunctionStrEditor: React.FC<FunctionStrEditorProps> = ({ value, onC
     };
 
     return (
-        <div className="space-y-4">
-            <Input
-                type="text"
-                value={functionString}
-                onChange={(e) => setFunctionString(e.target.value)}
-                placeholder="Function string (e.g., 2*x + sin(y))"
-                className="w-full"
-            />
-            {symbols.map((symbol, index) => (
-                <div key={index} className="flex items-center space-x-2">
-                    <div className="flex-grow space-y-2">
-                        <Input
-                            type="text"
-                            value={symbol.symbol}
-                            onChange={(e) => updateSymbol(index, { symbol: e.target.value })}
-                            placeholder="Symbol (e.g., y)"
-                            className="w-full"
-                        />
-                        <Select
-                            value={symbol.obj_id.toString()}
-                            onValueChange={(value) => {
-                                const selectedObj = objects.find(obj => obj.id === parseInt(value));
-                                if (selectedObj) {
-                                    updateSymbol(index, { obj_id: selectedObj.id, obj_type: selectedObj.type as object_types, attribute: '' });
-                                }
-                            }}
-                        >
-                            <SelectTrigger className="w-full">
-                                <SelectValue placeholder="Select an object" />
-                            </SelectTrigger>
-                            <SelectContent>
-                                {objects.map((obj) => (
-                                    <SelectItem key={obj.id} value={obj.id.toString()}>
-                                        {obj.name}
-                                    </SelectItem>
-                                ))}
-                            </SelectContent>
-                        </Select>
-                        {symbol.obj_id !== -1 && atts[symbol.obj_type] && (
-                            <Select
-                                value={symbol.attribute}
-                                onValueChange={(value) => {
-                                    updateSymbol(index, { attribute: value });
-                                }}
-                            >
-                                <SelectTrigger className="w-full">
-                                    <SelectValue placeholder="Select attribute" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    {Object.keys(atts[symbol.obj_type]?.number || {}).map((attr) => (
-                                        <SelectItem key={attr} value={attr}>
-                                            {attr}
-                                        </SelectItem>
-                                    ))}
-                                </SelectContent>
-                            </Select>
-                        )}
+        <div className="space-y-3">
+            {/* Transform Function Section */}
+            <div className="mt-4">
+                <label className="text-sm font-medium flex items-baseline justify-between mb-3">
+                    <div>
+                        Transform Function
+                        <span className="text-muted-foreground ml-2 text-xs">
+                            Define how the value should be transformed
+                        </span>
                     </div>
-                    <Button
-                        onClick={() => removeSymbol(index)}
-                        variant="ghost"
-                        size="icon"
-                        className="self-center"
-                    >
-                        <X className="h-4 w-4" />
-                    </Button>
+                </label>
+                <div className="mt-3">
+                    <Input
+                        type="text"
+                        value={functionString}
+                        onChange={(e) => setFunctionString(e.target.value)}
+                        placeholder="Enter function (e.g., 2*x + y)"
+                        className="w-full"
+                    />
                 </div>
-            ))}
-            <Button
-                onClick={addSymbol}
-                variant="outline"
-                className="w-full mt-3"
-            >
-                Add Symbol
-            </Button>
+            </div>
+            {symbols.length > 0 && (
+                <div className="flex flex-wrap items-center gap-1.5 px-1">
+                    <span className="text-xs text-muted-foreground">Using:</span>
+                    {symbols.map((symbol) => (
+                        <Badge 
+                            key={symbol.symbol} 
+                            variant="secondary"
+                            className="text-xs"
+                        >
+                            {symbol.symbol}
+                        </Badge>
+                    ))}
+                </div>
+            )}
+
+            {/* Variables Section */}
+            <div className="rounded-lg border bg-muted/30">
+                {/* Variables Header */}
+                <div className="p-3 border-b flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                        <Variable className="h-4 w-4" />
+                        <span className="text-sm font-medium">Variables</span>
+                        
+                    </div>
+                    <div className="flex items-center gap-2">
+                        {symbols.length > 1 && (
+                            <Button
+                                onClick={() => setSymbols([])}
+                                variant="ghost"
+                                size="sm"
+                                className="h-7 text-muted-foreground hover:text-destructive"
+                            >
+                                Clear All
+                            </Button>
+                        )}
+                        <Button
+                            onClick={addSymbol}
+                            variant="outline"
+                            size="sm"
+                            className="h-7 px-3"
+                        >
+                            <Plus className="h-3.5 w-3.5 mr-1" />
+                            Add Variable
+                        </Button>
+                    </div>
+                </div>
+
+                {/* Variables List */}
+                <div className="p-3">
+                    {symbols.length === 0 ? (
+                        <div className="text-sm text-muted-foreground text-center py-6">
+                           Add a variable to reference external object properties.
+                        </div>
+                    ) : (
+                        <div className="grid gap-2">
+                            {symbols.map((symbol, index) => (
+                                <div 
+                                    key={index} 
+                                    className="grid grid-cols-[1fr,1fr,auto] gap-3 items-start bg-background rounded-md border p-3"
+                                >
+                                    <div className="space-y-1.5">
+                                        <label className="text-xs font-medium text-muted-foreground">
+                                            Variable Name
+                                        </label>
+                                        <Input
+                                            type="text"
+                                            value={symbol.symbol}
+                                            onChange={(e) => updateSymbol(index, { symbol: e.target.value })}
+                                            placeholder="e.g. radius"
+                                            className="h-8 text-sm"
+                                        />
+                                    </div>
+
+                                    <div className="space-y-1.5">
+                                        <label className="text-xs font-medium text-muted-foreground">
+                                            Object
+                                        </label>
+                                        <Select
+                                            value={symbol.obj_id.toString()}
+                                            onValueChange={(value) => {
+                                                const selectedObj = objects.find(obj => obj.id === parseInt(value));
+                                                if (selectedObj) {
+                                                    updateSymbol(index, { 
+                                                        obj_id: selectedObj.id, 
+                                                        obj_type: selectedObj.type as object_types,
+                                                        attribute: '' 
+                                                    });
+                                                }
+                                            }}
+                                        >
+                                            <SelectTrigger className="h-8 text-sm">
+                                                <SelectValue placeholder="Select object" />
+                                            </SelectTrigger>
+                                            <SelectContent>
+                                                {objects.map((obj) => (
+                                                    <SelectItem key={obj.id} value={obj.id.toString()}>
+                                                        {obj.name}
+                                                    </SelectItem>
+                                                ))}
+                                            </SelectContent>
+                                        </Select>
+
+                                        {symbol.obj_id !== -1 && atts[symbol.obj_type] && (
+                                            <div className="mt-1.5">
+                                                <label className="text-xs font-medium text-muted-foreground">
+                                                    Property
+                                                </label>
+                                                <Select
+                                                    value={symbol.attribute}
+                                                    onValueChange={(value) => updateSymbol(index, { attribute: value })}
+                                                >
+                                                    <SelectTrigger className="h-8 text-sm mt-1">
+                                                        <SelectValue placeholder="Select property" />
+                                                    </SelectTrigger>
+                                                    <SelectContent>
+                                                        {Object.keys(atts[symbol.obj_type]?.number || {}).map((attr) => (
+                                                            <SelectItem key={attr} value={attr}>
+                                                                {attr}
+                                                            </SelectItem>
+                                                        ))}
+                                                    </SelectContent>
+                                                </Select>
+                                            </div>
+                                        )}
+                                    </div>
+
+                                    <Button
+                                        onClick={() => removeSymbol(index)}
+                                        variant="ghost"
+                                        size="sm"
+                                        className="h-8 w-8 text-muted-foreground hover:text-destructive mt-6"
+                                    >
+                                        <X className="h-4 w-4" />
+                                    </Button>
+                                </div>
+                            ))}
+                        </div>
+                    )}
+                </div>
+            </div>
+
+            {/* Variable Preview */}
+            
         </div>
     );
 };
