@@ -90,7 +90,7 @@ export const FeedbackComponent = () => {
             <br /><br />
             • The features you found most helpful or challenging
             <br />
-            • Additional topics you'd like to explore through interactive learning
+            • Additional topics you&apos;d like to explore through interactive learning
             <br /> 
             • How this compares to traditional learning methods for you
             <br />
