@@ -119,6 +119,8 @@ export type State = {
   deleteValidationByIndex: (index: number) => void;
   setTitle: (title: string) => void;
   deleteInfluenceAdv: (influence_id: number) => void;
+  isEditMode: boolean;
+  setIsEditMode: (value: boolean) => void;
   
 
 };
@@ -138,6 +140,7 @@ export const useStore = create<State>((set, get) => ({
   scores: {},
   placement: [],
   isSelectActive: false,
+  isEditMode: false,
 
   setTableControl: (newTable: TableControl<any>) => {
     set((state) => {
@@ -756,6 +759,8 @@ export const useStore = create<State>((set, get) => ({
       return { influenceAdvIndex: newIndex };
     });
   },
+
+  setIsEditMode: (value: boolean) => set({ isEditMode: value }),
 }));
 
 // get the score corresponding to some score_id
@@ -1025,3 +1030,5 @@ export const setTitleSelector = (state: State) => state.setTitle;
 export const getAdvancedInfluencesSelector = (state: State) => state.influenceAdvIndex;
 
 export const getInfluenceAdvDelete = (state: State) => state.deleteInfluenceAdv
+
+export const setIsEditModeSelector = (state: State) => state.setIsEditMode

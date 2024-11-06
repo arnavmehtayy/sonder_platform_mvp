@@ -6,6 +6,7 @@ import {
   useStore,
   getStateName,
   getPlacementListSelector,
+  setIsEditModeSelector,
   State,
   UpdateValidationSelector,
   getSideBarName,
@@ -87,6 +88,7 @@ export default function ExperienceEditPage() {
   const [isLoading, setIsLoading] = useState(true);
 
   const reset = useStore((state) => state.reset);
+  const setIsEditMode = useStore(setIsEditModeSelector);
 
   const [showValidation, setShowValidation] = useState(true);
   const [allValidationsValid, setAllValidationsValid] = useState(false);
@@ -194,6 +196,7 @@ export default function ExperienceEditPage() {
       } finally {
         setIsLoading(false);
       }
+
     };
 
     initializeState();
@@ -278,6 +281,11 @@ export default function ExperienceEditPage() {
       router.push(`/experience/edit/${expId}/${currentIndex - 1}`);
     }
   };
+
+  useEffect(() => {
+    setIsEditMode(true);
+    return () => setIsEditMode(false); // Clean up when leaving the page
+  }, [setIsEditMode]);
 
   if (isLoading) {
     return <LoadingScreen 

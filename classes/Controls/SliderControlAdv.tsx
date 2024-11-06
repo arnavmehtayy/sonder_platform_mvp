@@ -27,6 +27,7 @@ import { atts, dict_get_attributes} from "../vizobjects/get_set_obj_attributes";
 import { FunctionStr, FunctionStrEditor } from './FunctionStr';
 import Validation_sliderAdv, { Validation_sliderAdv_constructor, ValidationSliderAdvEditor } from "../Validation/Validation_sliderAdv";
 import { AttributePairsInsert, AttributePairsSelect, SliderControlAdvancedInsert, SliderControlAdvancedSelect } from "@/app/db/schema";
+import { InlineSliderEdit } from "./InlineEdit/InLineSliderEdit";
 
 export interface AttributePairSet {
   transform_function: FunctionStr;
@@ -152,7 +153,14 @@ export class SliderControlAdvanced<T extends obj> extends SliderControl<T> {
   }
 
   render(): React.ReactNode {
-    return <ShowSliderControl control={this} />;
+    // return <ShowSliderControl control={this} />;
+    const isEditMode = useStore(state => state.isEditMode);
+  return (
+    <>
+      {isEditMode ? <InlineSliderEdit control={this} /> : <ShowSliderControl control={this} />}
+    </>
+  );
+  // return <InlineSliderEdit control={this} />;
   }
 
   static getPopup({
