@@ -1,5 +1,3 @@
-
-
 import { Control } from "./Control";
 import { useStore, setInputNumberValueSelector } from "@/app/store";
 import Latex from "react-latex-next";
@@ -18,6 +16,9 @@ import { AttributePairsEditor } from "./SliderControlAdv";
 import { obj } from "../vizobjects/obj";
 import { InputNumberControlInsert, InputNumberControlSelect, AttributePairsInsert, AttributePairsSelect } from "@/app/db/schema";
 import FunctionStr from "./FunctionStr";
+import { InlineInputEdit } from "./InlineEdit/InLineInputEdit";
+import { Pencil } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 
 /*
@@ -38,7 +39,7 @@ interface InputNumberConstructor extends ControlConstructor {
   obj_id? : number
 }
 
-function ShowInputNumber({ control }: { control: InputNumber }) {
+function ShowInputNumber({ control, onEdit }: { control: InputNumber, onEdit?: () => void }) {
   const setValue = useStore(setInputNumberValueSelector(control.id));
   const value = control.value;
   const isClickable = control.isClickable;
@@ -55,6 +56,16 @@ function ShowInputNumber({ control }: { control: InputNumber }) {
         !isClickable ? "opacity-50" : ""
       } relative`}
     >
+      {onEdit && (
+        <Button 
+          variant="ghost" 
+          size="icon"
+          className="absolute right-2 top-2 z-10" 
+          onClick={onEdit}
+        >
+          <Pencil className="h-4 w-4" />
+        </Button>
+      )}
       <h3 className="text-lg font-semibold text-blue-800 mb-2">
         <Latex>{control.desc}</Latex>
       </h3>
@@ -218,7 +229,7 @@ export class InputNumber extends Control {
   }
 
   render(): React.ReactNode {
-    return <ShowInputNumber control={this} />;
+    return <InputNumberRenderer control={this} />;
   }
 
   static getPopup({
@@ -311,4 +322,21 @@ export class InputNumber extends Control {
     )};
     return <EditableObjectPopup {...popupProps} />;
   }
+}
+
+function InputNumberRenderer({ control }: { control: InputNumber }) {
+  const [isEditing, setIsEditing] = React.useState(false);
+  const isEditMode = useStore(state => state.isEditMode);
+  
+  if (isEditing && isEditMode) {
+    return <InlineInputEdit 
+      control={control} 
+      onClose={() => setIsEditing(false)} 
+    />;
+  }
+
+  return <ShowInputNumber 
+    control={control} 
+    onEdit={isEditMode ? () => setIsEditing(true) : undefined}
+  />;
 }

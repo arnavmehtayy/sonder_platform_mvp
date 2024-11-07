@@ -79,7 +79,7 @@ export const EditBar: React.FC = () => {
   const controlTypes: ObjectType[] = [
     { name: "SliderControl", type: SliderControlAdvanced, icon: Sliders },
     {name: "Object Picker", type: SelectControl, icon: List},
-    {name: "Hide/Show Object", type: EnablerControl, icon: ToggleLeft},
+    // {name: "Hide/Show Object", type: EnablerControl, icon: ToggleLeft},
     {name: "Object Placer", type: Placement, icon: MousePointerClick},
     {name: "Score", type: FunctionScore, icon: Calculator},
     {name: "Influence", type: InfluenceAdvanced, icon: ArrowRightLeft}
