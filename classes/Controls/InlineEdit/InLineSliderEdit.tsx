@@ -109,7 +109,7 @@ export const InlineSliderEdit: React.FC<InlineSliderEditProps> = ({ control, onC
             <Label className="text-xs text-gray-500">Step Size</Label>
             <Input
               type="number"
-              value={editedValues.step_size}
+              // value={editedValues.step_size}
               onChange={(e) => setEditedValues(prev => ({ 
                 ...prev, 
                 step_size: Number(e.target.value) 
@@ -122,7 +122,7 @@ export const InlineSliderEdit: React.FC<InlineSliderEditProps> = ({ control, onC
             <div className="flex items-center space-x-2">
               <Input
                 type="number"
-                value={editedValues.range[0]}
+                // value={editedValues.range[0]}
                 onChange={(e) => setEditedValues(prev => ({ 
                   ...prev, 
                   range: [Number(e.target.value), prev.range[1]] 
@@ -132,7 +132,7 @@ export const InlineSliderEdit: React.FC<InlineSliderEditProps> = ({ control, onC
               <span className="text-sm">to</span>
               <Input
                 type="number"
-                value={editedValues.range[1]}
+                // value={editedValues.range[1]}
                 onChange={(e) => setEditedValues(prev => ({ 
                   ...prev, 
                   range: [prev.range[0], Number(e.target.value)] 

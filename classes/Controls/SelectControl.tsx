@@ -1,4 +1,3 @@
-
 import { Control, ControlConstructor } from "./Control";
 import { obj } from "../vizobjects/obj";
 import {
@@ -16,6 +15,9 @@ import {
 
 import Validation_select, { Validation_selectConstructor, ValidationSelectEditor } from "../Validation/Validation_select";
 import { SelectControlInsert, SelectControlSelect } from "@/app/db/schema";
+import { InlineSelectEdit } from "./InlineEdit/InLineSelectEdit";
+import { Button } from "@/components/ui/button";
+import { Pencil } from "lucide-react";
 
 /*
  * This is the class that holds information about the select control
@@ -27,7 +29,13 @@ import { SelectControlInsert, SelectControlSelect } from "@/app/db/schema";
  * capacity (the total number of objects that can be selected at a time)
 
 */
-function ShowSelectControl({ control }: { control: SelectControl }) {
+function ShowSelectControl({ 
+  control, 
+  onEdit 
+}: { 
+  control: SelectControl;
+  onEdit?: () => void;
+}) {
   const handleRemove = useStore(DeSelectObjectControl);
   const setIsActive = useStore(SetIsActiveSelectControl(control.id));
   const getName = useStore(getNameSelector);
@@ -60,7 +68,18 @@ function ShowSelectControl({ control }: { control: SelectControl }) {
         !control.isClickable ? "opacity-70" : ""
       } relative`}
     >
-      <div className="flex justify-between items-center mb-4">
+      {onEdit && (
+        <Button 
+          variant="ghost" 
+          size="icon"
+          className="absolute right-2 top-2 z-10" 
+          onClick={onEdit}
+        >
+          <Pencil className="h-4 w-4" />
+        </Button>
+      )}
+
+      <div className={`flex justify-between items-center mb-4 ${onEdit ? 'mt-6' : ''}`}>
         <h3 className="text-lg font-semibold text-blue-800">
           <Latex>{control.desc}</Latex>
         </h3>
@@ -72,15 +91,11 @@ function ShowSelectControl({ control }: { control: SelectControl }) {
             onClick={handleClick}
             disabled={!control.isClickable}
             className={`
-          ${
-            isComponentActive
-              ? "bg-blue-600 hover:bg-blue-700"
-              : "bg-gray-400 hover:bg-gray-500"
-          }
-          ${!control.isClickable && "opacity-50 cursor-not-allowed"}
-          text-white py-1 px-3 rounded-md text-sm font-medium transition duration-300 ease-in-out
-          flex items-center
-        `}
+              ${isComponentActive ? "bg-blue-600 hover:bg-blue-700" : "bg-gray-400 hover:bg-gray-500"}
+              ${!control.isClickable && "opacity-50 cursor-not-allowed"}
+              text-white py-1 px-3 rounded-md text-sm font-medium transition duration-300 ease-in-out
+              flex items-center
+            `}
           >
             {isComponentActive ? "Active" : "Inactive"}
           </button>
@@ -260,7 +275,7 @@ export class SelectControl extends Control {
   }
 
   render(): React.ReactNode {
-    return <ShowSelectControl control={this} />;
+    return <SelectControlRenderer control={this} />;
   }
 
   static getPopup({
@@ -318,4 +333,21 @@ export class SelectControl extends Control {
 
     return <EditableObjectPopup {...popupProps} />;
   }
+}
+
+function SelectControlRenderer({ control }: { control: SelectControl }) {
+  const [isEditing, setIsEditing] = React.useState(false);
+  const isEditMode = useStore(state => state.isEditMode);
+  
+  if (isEditing && isEditMode) {
+    return <InlineSelectEdit 
+      control={control} 
+      onClose={() => setIsEditing(false)} 
+    />;
+  }
+
+  return <ShowSelectControl 
+    control={control} 
+    onEdit={isEditMode ? () => setIsEditing(true) : undefined}
+  />;
 }

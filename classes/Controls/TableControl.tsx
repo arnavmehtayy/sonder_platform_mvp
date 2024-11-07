@@ -16,12 +16,13 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { X } from "lucide-react";
+import { X, Pencil } from "lucide-react";
 import Latex from "react-latex-next";
 import { atts } from "../vizobjects/get_set_obj_attributes";
 import { FunctionStr, FunctionStrEditor } from './FunctionStr';
 import { Validation_tableControl, Validation_tableControlConstructor, ValidationTableControlEditor } from "../Validation/Validation_tableControl";
 import { TableControlInsert, TableControlSelect, TableCellInsert, TableCellSelect } from "@/app/db/schema";
+import { InlineTableEdit } from './InlineEdit/InLineTableEdit';
 
 export interface TableCell<T extends obj> {
   value: number;
@@ -101,7 +102,7 @@ export class TableControl<T extends obj> extends Control {
   }
 
   render(): React.ReactNode {
-    return <ShowTableControl control={this} />;
+    return <TableControlRenderer control={this} />;
   }
 
   static getPopup<T extends obj>({
@@ -267,8 +268,10 @@ export class TableControl<T extends obj> extends Control {
 
 function ShowTableControl<T extends obj>({
   control,
+  onEdit
 }: {
   control: TableControl<T>;
+  onEdit?: () => void;
 }) {
   const setVizObj = useStore(setVizObjSelector);
   const setTableControl = useStore(SetTableControl);
@@ -310,7 +313,18 @@ function ShowTableControl<T extends obj>({
   };
 
   return (
-    <div className="bg-white rounded-lg shadow-lg p-6">
+    <div className="bg-white rounded-lg shadow-lg p-6 relative">
+      {onEdit && (
+        <Button 
+          variant="ghost" 
+          size="icon"
+          className="absolute right-2 top-2 z-10" 
+          onClick={onEdit}
+        >
+          <Pencil className="h-4 w-4" />
+        </Button>
+      )}
+
       <h3 className="text-lg font-semibold text-blue-800 mb-2">
         <Latex>{control.desc}</Latex>
       </h3>
@@ -592,4 +606,21 @@ function TableEditor<T extends obj>({
       </Button>
     </div>
   );
+}
+
+function TableControlRenderer<T extends obj>({ control }: { control: TableControl<T> }) {
+  const [isEditing, setIsEditing] = React.useState(false);
+  const isEditMode = useStore(state => state.isEditMode);
+  
+  if (isEditing && isEditMode) {
+    return <InlineTableEdit 
+      control={control} 
+      onClose={() => setIsEditing(false)} 
+    />;
+  }
+
+  return <ShowTableControl 
+    control={control} 
+    onEdit={isEditMode ? () => setIsEditing(true) : undefined}
+  />;
 }
