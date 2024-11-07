@@ -1,5 +1,3 @@
-
-
 import { obj } from "../vizobjects/obj";
 import { Control, ControlConstructor } from "./Control";
 import {
@@ -13,6 +11,8 @@ import {
   EditableObjectPopup,
   EditableObjectPopupProps,
 } from "@/app/Components/EditMode/EditPopups/EditableObjectPopup";
+import { Button } from "@/components/ui/button";
+import { Pencil } from "lucide-react";
 
 /*
  *  This is the class that holds information about the slider control
@@ -36,11 +36,14 @@ export interface SliderControlConstructor<T extends obj>
 
 export function ShowSliderControl({
   control,
+  onEdit
 }: {
   control: SliderControl<any>;
+  onEdit?: () => void;
 }) {
   const setValue = useStore(setSliderControlValueSelector(control.id));
   const getValue = useStore(getSliderControlValueSelector(control.id));
+  const isEditMode = useStore(state => state.isEditMode);
 
   return (
     <div
@@ -48,6 +51,17 @@ export function ShowSliderControl({
         !control.isClickable ? "opacity-50" : ""
       } relative`}
     >
+      {isEditMode && onEdit && (
+        <Button 
+          variant="ghost" 
+          size="icon"
+          className="absolute right-2 top-2 hover:opacity-100 transition-opacity z-10" 
+          onClick={onEdit}
+        >
+          <Pencil className="h-4 w-4" />
+        </Button>
+      )}
+
       <h3 className="text-lg font-semibold text-blue-800 mb-2">
         <Latex>{control.desc}</Latex>
       </h3>
@@ -216,38 +230,6 @@ export class SliderControl<T extends obj> extends Control {
 
   render(): React.ReactNode {
     return <ShowSliderControl control={this} />;
-    // const setValue = useStore(setSliderControlValueSelector(this.id));
-    // const getValue = useStore(getSliderControlValueSelector(this.id));
-
-    // return (
-    //   <div className={`bg-white rounded-lg shadow-md p-4 ${!this.isClickable ? "opacity-50" : ""} relative`}>
-    //     <h3 className="text-lg font-semibold text-blue-800 mb-2">
-    //       <Latex>{this.desc}</Latex>
-    //     </h3>
-    //     <p className="text-gray-600 mb-2">
-    //       <Latex>{this.text}</Latex>
-    //     </p>
-    //     <div className="relative pt-1">
-    //       <input
-    //         type="range"
-    //         min={this.range[0]}
-    //         max={this.range[1]}
-    //         step={this.step_size}
-    //         value={getValue}
-    //         onChange={(e) => setValue(Number(e.target.value))}
-    //         className="w-full h-2 bg-blue-200 rounded-lg appearance-none cursor-pointer"
-    //         disabled={!this.isClickable}
-    //       />
-    //       <div className="flex justify-between items-center mt-2">
-    //         <span className="text-sm text-gray-600">{this.range[0]}</span>
-    //         <span className="text-sm font-medium text-blue-600">
-    //           {getValue.toFixed(2)}
-    //         </span>
-    //         <span className="text-sm text-gray-600">{this.range[1]}</span>
-    //       </div>
-    //     </div>
-    //   </div>
-    // );
   }
   static getPopup({
     isOpen,

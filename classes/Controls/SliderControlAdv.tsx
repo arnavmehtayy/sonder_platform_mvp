@@ -45,6 +45,23 @@ export interface SliderControlAdvancedConstructor<T extends obj>
   attribute_pairs: AttributePairSet_json[];
 }
 
+function SliderControlRenderer({ control }: { control: SliderControlAdvanced<any> }) {
+  const [isEditing, setIsEditing] = React.useState(false);
+  const isEditMode = useStore(state => state.isEditMode);
+  
+  if (isEditing && isEditMode) {
+    return <InlineSliderEdit 
+      control={control} 
+      onClose={() => setIsEditing(false)} 
+    />;
+  }
+
+  return <ShowSliderControl 
+    control={control} 
+    onEdit={isEditMode ? () => setIsEditing(true) : undefined}
+  />;
+}
+
 export class SliderControlAdvanced<T extends obj> extends SliderControl<T> {
   attribute_pairs: AttributePairSet[];
   attribute_JSON: AttributePairSet_json[];
@@ -153,14 +170,7 @@ export class SliderControlAdvanced<T extends obj> extends SliderControl<T> {
   }
 
   render(): React.ReactNode {
-    // return <ShowSliderControl control={this} />;
-    const isEditMode = useStore(state => state.isEditMode);
-  return (
-    <>
-      {isEditMode ? <InlineSliderEdit control={this} /> : <ShowSliderControl control={this} />}
-    </>
-  );
-  // return <InlineSliderEdit control={this} />;
+    return <SliderControlRenderer control={this} />;
   }
 
   static getPopup({
