@@ -1,7 +1,7 @@
 "use client";
 import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Pencil, Check, X } from "lucide-react";
+import { Pencil, Check, X, GripVertical } from "lucide-react";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
@@ -18,12 +18,77 @@ import {
   setQuestionSelector
 } from "@/app/store";
 import { useDebounce } from "use-debounce";
+import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+} from "@dnd-kit/core";
+import {
+  SortableContext,
+  sortableKeyboardCoordinates,
+  verticalListSortingStrategy,
+  useSortable,
+} from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
 
 /*
  * This component is responsible for rendering the order of components in the sidebar
  * It is used in the MiniGame component
  * It is used to render the order of components in the sidebar
  */
+
+// Add SortableItem component
+function SortableItem({ 
+  id, 
+  children, 
+  isEditMode 
+}: { 
+  id: string; 
+  children: React.ReactNode;
+  isEditMode: boolean;
+}) {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+  } = useSortable({ id });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+  };
+
+  if (!isEditMode) {
+    // When not in edit mode, render without drag functionality
+    return (
+      <div className="bg-white rounded-lg shadow-sm mb-2">
+        <div className="flex-1">
+          {children}
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div 
+      ref={setNodeRef} 
+      style={style} 
+      className="flex items-center bg-white rounded-lg shadow-sm mb-2"
+    >
+      <div {...attributes} {...listeners} className="cursor-move p-2 text-gray-400 hover:text-gray-600">
+        <GripVertical size={16} />
+      </div>
+      <div className="flex-1">
+        {children}
+      </div>
+    </div>
+  );
+}
 
 export const OrderHandlerDB = ({ isEditMode = false }: { isEditMode?: boolean }) => {
   const state = useStore();
@@ -44,6 +109,31 @@ export const OrderHandlerDB = ({ isEditMode = false }: { isEditMode?: boolean })
 
   // Add new state for title editing
   const [isTitleEditing, setIsTitleEditing] = useState(false);
+
+  // Add DnD sensors
+  const sensors = useSensors(
+    useSensor(PointerSensor),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    })
+  );
+
+  // Add drag end handler
+  const handleDragEnd = (event: any) => {
+    const { active, over } = event;
+    if (active.id !== over.id) {
+      const oldIndex = state.order.findIndex(
+        (item) => `${item.type}-${item.id}` === active.id
+      );
+      const newIndex = state.order.findIndex(
+        (item) => `${item.type}-${item.id}` === over.id
+      );
+      const newOrder = [...state.order];
+      const [reorderedItem] = newOrder.splice(oldIndex, 1);
+      newOrder.splice(newIndex, 0, reorderedItem);
+      state.setOrder(newOrder);
+    }
+  };
 
   React.useEffect(() => {
     setTitle(debouncedTitle);
@@ -205,11 +295,43 @@ export const OrderHandlerDB = ({ isEditMode = false }: { isEditMode?: boolean })
           </div>
         )}
       </div>
-      {state.order.map((item, index) => (
-        <React.Fragment key={`${item.type}-${item.id}-${index}`}>
-          {renderComponent(item, index)}
-        </React.Fragment>
-      ))}
+
+      {isEditMode ? (
+        // Render with drag and drop functionality when in edit mode
+        <DndContext
+          sensors={sensors}
+          collisionDetection={closestCenter}
+          onDragEnd={handleDragEnd}
+        >
+          <SortableContext
+            items={state.order.map(item => `${item.type}-${item.id}`)}
+            strategy={verticalListSortingStrategy}
+          >
+            {state.order.map((item, index) => (
+              <SortableItem
+                key={`${item.type}-${item.id}-${index}`}
+                id={`${item.type}-${item.id}`}
+                isEditMode={isEditMode}
+              >
+                {renderComponent(item, index)}
+              </SortableItem>
+            ))}
+          </SortableContext>
+        </DndContext>
+      ) : (
+        // Render without drag and drop functionality when not in edit mode
+        <div>
+          {state.order.map((item, index) => (
+            <SortableItem
+              key={`${item.type}-${item.id}-${index}`}
+              id={`${item.type}-${item.id}`}
+              isEditMode={false}
+            >
+              {renderComponent(item, index)}
+            </SortableItem>
+          ))}
+        </div>
+      )}
     </div>
   );
 };
