@@ -390,20 +390,24 @@ export default function ExperienceEditPage() {
 
         {/* Sidebar */}
         <div className="w-full md:w-1/3 md:min-w-[300px] md:max-w-md bg-blue-50 p-4 pb-24 overflow-y-auto h-1/2 md:h-full relative">
-          {/* Add Scene Manager Dialog */}
-          <Dialog>
-            <DialogTrigger asChild>
-              <button className="absolute top-3 right-3 flex items-center gap-2 px-3 py-2 rounded-md bg-blue-500 text-white hover:bg-blue-600 transition-all shadow-md z-10">
-                <GripVertical size={18} />
-                <span className="text-sm font-medium">Scene Manager</span>
-              </button>
-            </DialogTrigger>
-            <SceneManager
-              sensors={sensors}
-              handleDragEnd={handleDragEnd}
-              handleDeleteItem={handleDeleteItem}
-            />
-          </Dialog>
+          {/* Scene Manager Button - Moved to top with proper spacing */}
+          <div className="mb-6">
+            <Dialog>
+              <DialogTrigger asChild>
+                <Button 
+                  className="w-full flex items-center justify-center gap-2 bg-blue-500 text-white hover:bg-blue-600 transition-all shadow-md"
+                >
+                  <GripVertical size={18} />
+                  <span className="font-medium">Scene Manager</span>
+                </Button>
+              </DialogTrigger>
+              <SceneManager
+                sensors={sensors}
+                handleDragEnd={handleDragEnd}
+                handleDeleteItem={handleDeleteItem}
+              />
+            </Dialog>
+          </div>
 
           {/* Keep existing OrderHandlerDb */}
           <OrderHandlerDB isEditMode={true} />
