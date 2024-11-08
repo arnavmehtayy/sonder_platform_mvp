@@ -121,6 +121,7 @@ export type State = {
   deleteInfluenceAdv: (influence_id: number) => void;
   isEditMode: boolean;
   setIsEditMode: (value: boolean) => void;
+  setQuestion: (id: number, text: string) => void;
   
 
 };
@@ -761,6 +762,15 @@ export const useStore = create<State>((set, get) => ({
   },
 
   setIsEditMode: (value: boolean) => set({ isEditMode: value }),
+
+  setQuestion: (id: number, text: string) => {
+    set((state) => ({
+      questions: {
+        ...state.questions,
+        [id]: text
+      }
+    }));
+  },
 }));
 
 // get the score corresponding to some score_id
@@ -1032,3 +1042,5 @@ export const getAdvancedInfluencesSelector = (state: State) => state.influenceAd
 export const getInfluenceAdvDelete = (state: State) => state.deleteInfluenceAdv
 
 export const setIsEditModeSelector = (state: State) => state.setIsEditMode
+
+export const setQuestionSelector = (state: State) => state.setQuestion
