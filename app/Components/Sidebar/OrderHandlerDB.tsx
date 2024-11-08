@@ -63,10 +63,14 @@ function SortableItem({
     transition,
   };
 
+  const isTextItem = id.startsWith('question-');
+  const containerClass = isTextItem 
+    ? "mb-2" // Text items don't need background
+    : "bg-white rounded-lg shadow-sm mb-2"; // Other items keep the white background
+
   if (!isEditMode) {
-    // When not in edit mode, render without drag functionality
     return (
-      <div className="bg-white rounded-lg shadow-sm mb-2">
+      <div className={containerClass}>
         <div className="flex-1">
           {children}
         </div>
@@ -78,7 +82,7 @@ function SortableItem({
     <div 
       ref={setNodeRef} 
       style={style} 
-      className="flex items-center bg-white rounded-lg shadow-sm mb-2"
+      className={`flex items-center ${containerClass}`}
     >
       <div {...attributes} {...listeners} className="cursor-move p-2 text-gray-400 hover:text-gray-600">
         <GripVertical size={16} />
@@ -218,7 +222,7 @@ export const OrderHandlerDB = ({ isEditMode = false }: { isEditMode?: boolean })
                     </div>
                   </div>
                 ) : (
-                  <div className="flex justify-between items-start">
+                  <div className="flex justify-between items-start px-0">
                     <div className="text-gray-700">
                       {question ? <Latex>{question}</Latex> : null}
                     </div>
