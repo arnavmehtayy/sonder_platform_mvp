@@ -9,6 +9,8 @@ import { Input } from "@/components/ui/input";
 import { Vector2 } from 'three';
 import { X } from "lucide-react";
 import { PlacementInsert, PlacementSelect } from "@/app/db/schema";
+import { Pencil } from "lucide-react";
+import { InlinePlacementEdit } from "./Controls/InlineEdit/InLinePlacementEdit";
 
 /*
  * This class stores information about a control that allows users to place of objects on the three.js experience
@@ -25,25 +27,62 @@ import { PlacementInsert, PlacementSelect } from "@/app/db/schema";
  * NOTE: if we set the grid to [0,0] then the options to place in come solely from the gridVectors
  */
 
-function ShowPlacement({id}: {id: number}) {
-  const placement = useStore(getPlacementSelector(id));
-
+function ShowPlacementControl({ 
+  placement, 
+  onEdit 
+}: { 
+  placement: Placement;
+  onEdit?: () => void;
+}) {
   const isActive = placement?.isClickable || false;
   
-  if (placement) {
-    return (
-      <div className={`bg-white rounded-lg shadow-md p-4 ${!isActive&& 'opacity-50'}`}>
-        <div className="flex justify-between items-start mb-3">
-          <div>
-            <h3 className="text-lg font-semibold text-blue-800 mb-2">{placement.desc}</h3>
-            <p className="text-gray-600 mb-2">{placement.text}</p>
-          </div>
-          <PlacementActivationButton isActive={isActive} placement_id={id}/>
+  return (
+    <div className={`bg-white rounded-lg shadow-lg p-6 ${!isActive && 'opacity-70'} relative`}>
+      {onEdit && (
+        <Button 
+          variant="ghost" 
+          size="icon"
+          className="absolute right-2 top-2 z-10" 
+          onClick={onEdit}
+        >
+          <Pencil className="h-4 w-4" />
+        </Button>
+      )}
+
+      <div className={`flex justify-between items-start mb-3 ${onEdit ? 'mt-6' : ''}`}>
+        <div>
+          <h3 className="text-lg font-semibold text-blue-800">{placement.desc}</h3>
+          <p className="text-gray-600 mb-2">{placement.text}</p>
         </div>
+        <PlacementActivationButton isActive={isActive} placement_id={placement.id}/>
       </div>
-    );
+    </div>
+  );
+}
+
+function PlacementRenderer({id}: {id: number}) {
+  const [isEditing, setIsEditing] = React.useState(false);
+  const placement = useStore(getPlacementSelector(id));
+  const isEditMode = useStore(state => state.isEditMode);
+  
+  if (!placement) return null;
+
+  if (isEditing && isEditMode) {
+    return <InlinePlacementEdit 
+      placement={placement} 
+      onClose={() => setIsEditing(false)} 
+    />;
   }
-  return null;
+  
+  return <ShowPlacementControl 
+    placement={placement} 
+    onEdit={isEditMode ? () => setIsEditing(true) : undefined}
+  />;
+}
+
+// Replace the existing ShowPlacement function with this
+function ShowPlacement({id}: {id: number}) {
+  return <PlacementRenderer id={id} />;
 }
 
 export interface PlacementConstructor {
@@ -217,6 +256,7 @@ export default class Placement {
           ...updatedObject,
           object_ids: Array.from({ length: updatedObject.max_placements || 0 }, () => Math.floor(Math.random() * 10000))
         });
+        newObj.updateGeometry(updatedObject.geometry_json || {type: 'circle', params: {radius: 0.5}});
         onSave(newObj);
       },
       title: `Create New Placement`,
@@ -282,6 +322,13 @@ export default class Placement {
       max_placements: this.max_placements
     };
   }
+
+  public updateGeometry(geom_json: PredefinedGeometry) {
+    this.geom_json = geom_json;
+    this.geometry = this.createPredefinedGeometry(geom_json)
+  }
+
+
 }
 
     // Start of Selection

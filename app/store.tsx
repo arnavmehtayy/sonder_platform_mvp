@@ -122,7 +122,8 @@ export type State = {
   isEditMode: boolean;
   setIsEditMode: (value: boolean) => void;
   setQuestion: (id: number, text: string) => void;
-  
+  setPlacement: (id: number, placement: Placement) => void;
+  deletePlacement: (id: number) => void;
 
 };
 
@@ -771,6 +772,26 @@ export const useStore = create<State>((set, get) => ({
       }
     }));
   },
+
+  setPlacement: (id: number, placement: Placement) => {
+    set((state) => ({
+      placement: {
+        ...state.placement,
+        [id]: placement
+      }
+    }));
+  },
+
+  deletePlacement: (id: number) => {
+    set((state) => {
+      const { [id]: _, ...remainingPlacements } = state.placement;
+      const newOrder = state.order.filter(item => !(item.id === id && item.type === 'placement'));
+      return {
+        placement: remainingPlacements,
+        order: newOrder
+      };
+    });
+  },
 }));
 
 // get the score corresponding to some score_id
@@ -1044,3 +1065,13 @@ export const getInfluenceAdvDelete = (state: State) => state.deleteInfluenceAdv
 export const setIsEditModeSelector = (state: State) => state.setIsEditMode
 
 export const setQuestionSelector = (state: State) => state.setQuestion
+
+export const setPlacementSelector = (state: State) => 
+  (id: number, placement: Placement) => {
+    state.setPlacement(id, placement);
+  };
+
+export const deletePlacementSelector = (state: State) => 
+  (id: number) => {
+    state.deletePlacement(id);
+  };
