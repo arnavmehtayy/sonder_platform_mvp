@@ -53,6 +53,7 @@ import { FeedbackComponent } from "@/app/Components/MainMenu/FeedbackComponent";
 import CurvedBackButton from "@/app/Components/three/BackButton";
 import { SceneManager } from "@/app/Components/Sidebar/SceneManager";
 import { LoadingScreen } from "@/app/Components/MainMenu/LoadingScreen";
+import { DummyDataManager } from "@/app/Components/DummyData/DummyDataManager";
 
 const SortableItem: React.FC<{ id: string; children: React.ReactNode }> = ({
   id,
@@ -313,14 +314,12 @@ export default function ExperienceEditPage() {
       <div className="fixed top-4 left-4 z-50">
         <CurvedBackButton />
       </div>
-      {/* <div className="fixed bottom-20 right-4 z-50">
-                <FeedbackComponent />
-            </div> */}
 
       <div className="relative flex flex-col md:flex-row h-screen bg-gray-100">
         {/* Main Three.js Experience */}
-        <div className="flex-grow bg-black h-1/2 md:h-full md:flex-1">
+        <div className="flex-grow bg-black h-1/2 md:h-full md:flex-1 relative">
           <Experience />
+          <DummyDataManager />
         </div>
 
         {/* Autograder Button - Repositioned */}
