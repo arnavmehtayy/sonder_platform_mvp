@@ -16,7 +16,7 @@ import {
   getInfluenceAdvDelete,
 } from "@/app/store";
 import Experience from "@/app/Components/visualexp";
-import { EditBar } from "@/app/Components/EditMode/EditBar";
+import { EditBar, ObjectType } from "@/app/Components/EditMode/EditBar";
 import { OrderHandler } from "@/app/Components/Sidebar/OrderHandler";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
@@ -24,7 +24,7 @@ import { deserializeState, serializeState } from "@/classes/database/stateSerial
 import { createClient } from "@/app/utils/supabase/client";
 import { OrderHandlerDB } from "@/app/Components/Sidebar/OrderHandlerDB";
 import ValidationComponent from "@/app/Components/ShowValid";
-import { CheckCircle } from "lucide-react";
+import { ArrowRightLeft, CheckCircle } from "lucide-react";
 import {
   DndContext,
   closestCenter,
@@ -55,6 +55,18 @@ import { SceneManager } from "@/app/Components/Sidebar/SceneManager";
 import { LoadingScreen } from "@/app/Components/MainMenu/LoadingScreen";
 import { DummyDataManager } from "@/app/Components/DummyData/DummyDataManager";
 import { ObjectTreeManager } from "@/app/Components/SceneManager/ObjectTreeManager";
+import { DropdownMenu } from "@/components/ui/dropdown-menu";
+import { Plus, List, MousePointerClick, Calculator, PencilLine, Circle, LineChart, Axis3D, Type, Variable, Sliders, ListChecks, Table, Hash } from "lucide-react";
+import { SliderControlAdvanced } from "@/classes/Controls/SliderControlAdv";
+import { SelectControl } from "@/classes/Controls/SelectControl";
+import Placement from "@/classes/Placement";
+import { FunctionScore } from "@/classes/Scores/FunctionScore";
+import { InfluenceAdvanced } from "@/classes/influenceAdv";
+import { Question } from "@/classes/Question";
+import { MultiChoiceClass } from "@/classes/Controls/MultiChoiceClass";
+import { TableControl } from "@/classes/Controls/TableControl";
+import { InputNumber } from "@/classes/Controls/InputNumber";
+import { DropDownMenu } from "@/app/Components/EditMode/DropDownMenu";
 
 const SortableItem: React.FC<{ id: string; children: React.ReactNode }> = ({
   id,
@@ -302,6 +314,9 @@ export default function ExperienceEditPage() {
     return () => setIsEditMode(false); // Clean up when leaving the page
   }, [setIsEditMode]);
 
+  
+
+  
   if (isLoading) {
     return <LoadingScreen 
       message="Loading Experience Editor" 
@@ -359,13 +374,11 @@ export default function ExperienceEditPage() {
 
         {/* Right Sidebar */}
         <div className="w-full md:w-1/3 md:min-w-[300px] md:max-w-md bg-blue-50 p-4 pb-24 overflow-y-auto h-full relative">
-          {/* Scene Manager Button - Moved to top with proper spacing */}
+          {/* Scene Manager Button */}
           <div className="mb-6">
             <Dialog>
               <DialogTrigger asChild>
-                <Button 
-                  className="w-full flex items-center justify-center gap-2 bg-blue-500 text-white hover:bg-blue-600 transition-all shadow-md"
-                >
+                <Button className="w-full flex items-center justify-center gap-2 bg-blue-500 text-white hover:bg-blue-600 transition-all shadow-md">
                   <GripVertical size={18} />
                   <span className="font-medium">Scene Manager</span>
                 </Button>
@@ -378,7 +391,7 @@ export default function ExperienceEditPage() {
             </Dialog>
           </div>
 
-          {/* Keep existing OrderHandlerDb */}
+          {/* OrderHandlerDB */}
           <OrderHandlerDB isEditMode={true} />
         </div>
       </div>

@@ -1,7 +1,7 @@
 "use client";
 import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Pencil, Check, X, GripVertical, Trash2 } from "lucide-react";
+import { Pencil, Check, X, GripVertical, Trash2, Plus } from "lucide-react";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
@@ -33,6 +33,24 @@ import {
   useSortable,
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
+import { DropDownMenu } from "@/app/Components/EditMode/DropDownMenu";
+import { 
+  Sliders, List, MousePointerClick, Calculator, ArrowRightLeft,
+  PencilLine, Circle, LineChart, Axis3D, Type, Variable,
+  Table, Hash, ListChecks
+} from "lucide-react";
+import { ObjectCreator } from "@/app/Components/EditMode/ObjectCreator";
+import { ObjectType } from "../EditMode/EditBar";
+import { SliderControlAdvanced } from "@/classes/Controls/SliderControlAdv";
+import { SelectControl } from "@/classes/Controls/SelectControl";
+import Placement from "@/classes/Placement";
+import { InfluenceAdvanced } from "@/classes/influenceAdv";
+import { FunctionScore } from "@/classes/Scores/FunctionScore";
+import { Question } from "@/classes/Question";
+import { MultiChoiceClass } from "@/classes/Controls/MultiChoiceClass";
+import { TableControl } from "@/classes/Controls/TableControl";
+import { InputNumber } from "@/classes/Controls/InputNumber";
+import { DropdownMenu, DropdownMenuTrigger, DropdownMenuItem, DropdownMenuContent } from "@/components/ui/dropdown-menu"
 
 /*
  * This component is responsible for rendering the order of components in the sidebar
@@ -133,6 +151,9 @@ export const OrderHandlerDB = ({ isEditMode = false }: { isEditMode?: boolean })
   // Add new state for title editing
   const [isTitleEditing, setIsTitleEditing] = useState(false);
 
+  // Add new state for object creation
+  const [selectedObjectType, setSelectedObjectType] = useState<ObjectType | null>(null);
+
   // Add DnD sensors
   const sensors = useSensors(
     useSensor(PointerSensor),
@@ -140,6 +161,17 @@ export const OrderHandlerDB = ({ isEditMode = false }: { isEditMode?: boolean })
       coordinateGetter: sortableKeyboardCoordinates,
     })
   );
+
+  const controlTypes: ObjectType[] = [
+    { name: "SliderControl", type: SliderControlAdvanced, icon: Sliders },
+    { name: "Object Picker", type: SelectControl, icon: List },
+    { name: "Object Placer", type: Placement, icon: MousePointerClick },
+    { name: "Score", type: FunctionScore, icon: Calculator },
+    { name: "Text", type: Question, icon: Type },
+    { name: "MCQ", type: MultiChoiceClass, icon: ListChecks },
+    { name: "Table Question", type: TableControl, icon: Table },
+    { name: "Number Input", type: InputNumber, icon: Hash },
+  ];
 
   // Add drag end handler
   const handleDragEnd = (event: any) => {
@@ -371,6 +403,41 @@ export const OrderHandlerDB = ({ isEditMode = false }: { isEditMode?: boolean })
             </SortableItem>
           ))}
         </div>
+      )}
+
+      {isEditMode && (
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <div className="mt-8 border-2 border-dashed border-gray-300 rounded-lg p-6 bg-transparent hover:border-blue-300 hover:bg-blue-50 transform transition-all duration-200 hover:scale-[1.02] cursor-pointer group">
+              <div className="flex flex-col items-center justify-center">
+                <Plus className="h-8 w-8 text-gray-400 group-hover:text-blue-500 mb-2" />
+                <h3 className="text-lg font-medium text-gray-600 group-hover:text-gray-700 mb-2">Add Sidebar Component</h3>
+              </div>
+            </div>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent 
+            className="bg-white rounded-lg shadow-xl p-2 mt-2 w-56 border border-gray-100"
+            align="center"
+          >
+            {controlTypes.map((objectType) => (
+              <DropdownMenuItem
+                key={objectType.type.name}
+                onSelect={() => setSelectedObjectType(objectType)}
+                className="flex items-center space-x-3 px-4 py-3 hover:bg-blue-50 rounded-md transition-all duration-200 cursor-pointer group"
+              >
+                <objectType.icon className="h-5 w-5 text-blue-600 group-hover:text-blue-700" />
+                <span className="text-gray-700 font-medium group-hover:text-gray-900">{objectType.name}</span>
+              </DropdownMenuItem>
+            ))}
+          </DropdownMenuContent>
+        </DropdownMenu>
+      )}
+
+      {selectedObjectType && (
+        <ObjectCreator
+          ObjectType={selectedObjectType.type}
+          onClose={() => setSelectedObjectType(null)}
+        />
       )}
     </div>
   );

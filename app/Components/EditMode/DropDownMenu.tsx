@@ -12,21 +12,32 @@ export function DropDownMenu({
   ObjectList,
   setSelectedObjectType,
   label,
+  compact = false,
 }: {
   ObjectList: ObjectType[];
   setSelectedObjectType: (objectType: ObjectType) => void;
   label: string;
+  compact?: boolean;
 }) {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button className="bg-blue-500 hover:bg-blue-600 text-white px-6 py-3 rounded-lg flex items-center space-x-3 shadow-lg transform hover:scale-105 transition-all duration-200 ease-out text-lg font-semibold">
-          <Plus className="h-6 w-6" />
+        <Button 
+          className={`${
+            compact 
+              ? "bg-gray-100 hover:bg-gray-200 text-gray-700 px-3 py-2 text-sm" 
+              : "bg-blue-500 hover:bg-blue-600 text-white px-6 py-3 text-lg"
+          } rounded-lg flex items-center space-x-2 transform transition-all duration-200 ease-out font-semibold`}
+        >
+          <Plus className={compact ? "h-4 w-4" : "h-6 w-6"} />
           <span>{label}</span>
-          <ChevronDown className="h-5 w-5" />
+          <ChevronDown className={compact ? "h-4 w-4" : "h-5 w-5"} />
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent className="bg-white rounded-lg shadow-xl p-2 mt-2">
+      <DropdownMenuContent 
+        className="bg-white rounded-lg shadow-xl p-2 mt-2"
+        align={compact ? "end" : "center"}
+      >
         {ObjectList.map((objectType) => (
           <DropdownMenuItem
             key={objectType.type.name}
