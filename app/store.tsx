@@ -127,7 +127,8 @@ export type State = {
   deleteControl: (id: number) => void;
   deleteInfluences: (id: number) => void;
   deleteScore: (id: number) => void;
-  deleteQuestion: (id: number) => void
+  deleteQuestion: (id: number) => void;
+  setScore: (score_id: number, new_score: Score<any>, validation?: Validation_score<any, obj>) => void;
 };
 
 export const useStore = create<State>((set, get) => ({
@@ -882,6 +883,33 @@ export const useStore = create<State>((set, get) => ({
         questions: updatedQuestions,
         validations: updatedValidations
       };
+    });
+  },
+
+  setScore: (score_id: number, new_score: Score<any>, validation?: Validation_score<any, obj>) => {
+    set((state) => {
+      const newScores = { ...state.scores };
+      newScores[score_id] = new_score;
+      
+      if (validation) {
+        const newValidations = [...state.validations];
+        const existingIndex = newValidations.findIndex(
+          (v) => v instanceof Validation_score && v.score_id === score_id
+        );
+        
+        if (existingIndex !== -1) {
+          newValidations[existingIndex] = validation;
+        } else {
+          newValidations.push(validation);
+        }
+        
+        return {
+          scores: newScores,
+          validations: newValidations,
+        };
+      }
+      
+      return { scores: newScores };
     });
   },
 }));

@@ -6,11 +6,15 @@ import {
   EditableObjectPopup,
   EditableObjectPopupProps,
 } from "@/app/Components/EditMode/EditPopups/EditableObjectPopup";
-import { useStore } from '@/app/store';
+import { getObjectSelector2, useStore } from '@/app/store';
 import { objectScorer } from "./objectScorer";
 import { atts } from '../vizobjects/get_set_obj_attributes';
 import Validation_score, { Validation_score_constructor, ValidationScoreEditor } from "../Validation/Validation_score";
 import { FunctionScoreInsert, FunctionScoreSelect } from "@/app/db/schema";
+import { Button } from "@/components/ui/button";
+import { Pencil } from "lucide-react";
+import Latex from "react-latex-next";
+import { InlineFunctionScoreEdit } from "../Controls/InlineEdit/InLineScoreEdit";
 
 export interface FunctionScoreConstructor extends ScoreConstructor<number>{
   score_id: number
@@ -18,6 +22,23 @@ export interface FunctionScoreConstructor extends ScoreConstructor<number>{
   text: string;
   desc: string;
   to_string?: (score: number) => string
+}
+
+function FunctionScoreRenderer({ score }: { score: FunctionScore }) {
+  const [isEditing, setIsEditing] = React.useState(false);
+  const isEditMode = useStore(state => state.isEditMode);
+  
+  if (isEditing && isEditMode) {
+    return <InlineFunctionScoreEdit 
+      score={score} 
+      onClose={() => setIsEditing(false)} 
+    />;
+  }
+
+  return <ShowFunctionScore 
+    score={score} 
+    onEdit={isEditMode ? () => setIsEditing(true) : undefined}
+  />;
 }
 
 export class FunctionScore extends Score<number> {
@@ -158,4 +179,60 @@ export class FunctionScore extends Score<number> {
 
     return <EditableObjectPopup {...popupProps} />;
   }
+
+  render(): React.ReactNode {
+    return <FunctionScoreRenderer score={this} />;
+  }
+}
+
+function ShowFunctionScore({ score, onEdit }: { score: FunctionScore; onEdit?: () => void }) {
+  const [scoreValue, setScoreValue] = useState<number | null>(null);
+  const get_obj = useStore(getObjectSelector2);
+  const isEditMode = useStore(state => state.isEditMode);
+
+  useEffect(() => {
+    if (score) {
+      const objs = score.obj_list.map((obj) => get_obj(obj.id));
+      setScoreValue(score.computeValue(objs));
+    }
+  }, [get_obj, score]);
+
+  return (
+    <div className="bg-white rounded-lg shadow-md p-4 mb-4 relative">
+      {isEditMode && onEdit && (
+        <Button 
+          variant="ghost" 
+          size="icon"
+          className="absolute right-2 top-2 z-10" 
+          onClick={onEdit}
+        >
+          <Pencil className="h-4 w-4" />
+        </Button>
+      )}
+
+      <h3 className="text-lg font-semibold text-blue-800 mb-2">
+        <Latex>{score.text}</Latex>
+      </h3>
+      <p className="text-gray-600 mb-2">
+        <Latex>{score.desc}</Latex>
+      </p>
+      <div className="flex items-center justify-end">
+        <span className="text-2xl font-bold text-blue-600">
+          {scoreValue !== null ? (
+            score.to_string(scoreValue)
+          ) : (
+            <span className="text-gray-400 text-lg">Calculating...</span>
+          )}
+        </span>
+      </div>
+      {scoreValue !== null && (
+        <div className="mt-2 h-2 bg-blue-200 rounded-full overflow-hidden">
+          <div
+            className="h-full bg-blue-600 rounded-full transition-all duration-500 ease-out"
+            style={{ width: `${Math.min(100, scoreValue)}%` }}
+          ></div>
+        </div>
+      )}
+    </div>
+  );
 }
