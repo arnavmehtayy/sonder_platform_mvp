@@ -57,33 +57,39 @@ export function MinigameDB({experienceID, index}: {experienceID: number, index: 
   return (
     <div className="relative flex flex-col md:flex-row h-screen bg-gray-100">
       {/* Main Three.js Experience */}
-      <div className="flex-grow bg-black h-1/2 md:h-full md:flex-1">
+      <div className="flex-grow bg-black h-1/2 md:h-full md:flex-1 relative">
         <Experience />
-      </div>
 
-      {/* Floating Validation Button */}
-      <button
-        onClick={() => setShowValidation(!showValidation)}
-        className={`absolute bottom-4 left-4 flex items-center space-x-2 px-4 py-2 rounded-full shadow-lg transition-all duration-300 z-10 ${
-          allValidationsValid ? 'bg-green-500 hover:bg-green-600' : 'bg-blue-500 hover:bg-blue-600'
-        }`}
-      >
-        {allValidationsValid && <CheckCircle className="text-white" size={20} />}
-        <span className="text-white font-semibold">
-          {showValidation ? 'Hide' : 'Show'} Grader
-        </span>
-      </button>
+        {/* Validation Panel - Positioned above navigation */}
+        <div
+          className={`absolute bottom-16 left-4 w-[calc(100%-2rem)] md:w-96 bg-white rounded-lg shadow-xl transition-all duration-300 ${
+            showValidation
+              ? "opacity-100 translate-y-0"
+              : "opacity-0 translate-y-full pointer-events-none"
+          } z-30`}
+        >
+          <div className="p-4 max-h-[30vh] md:max-h-[calc(100vh-400px)] overflow-y-auto">
+            <ValidationComponent
+              validations={validationInstance}
+              updater={handleValidationUpdate}
+            />
+          </div>
+        </div>
 
-      {/* Validation Overlay */}
-      <div
-        className={`absolute bottom-16 left-4 w-80 bg-white bg-opacity-90 rounded-lg shadow-xl p-4 transition-all duration-300 ${
-          showValidation ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-full pointer-events-none'
-        } z-20`}
-      >
-        <ValidationComponent
-          validations={validationInstance}
-          updater={handleValidationUpdate}
-        />
+        {/* Toggle button - Positioned above navigation */}
+        <button
+          onClick={() => setShowValidation(!showValidation)}
+          className={`absolute bottom-4 left-4 flex items-center space-x-2 px-4 py-2 rounded-md shadow-lg transition-all duration-300 z-40 ${
+            allValidationsValid 
+              ? 'bg-green-500 hover:bg-green-600' 
+              : 'bg-blue-500 hover:bg-blue-600'
+          }`}
+        >
+          {allValidationsValid && <CheckCircle className="text-white" size={20} />}
+          <span className="text-white font-semibold">
+            {showValidation ? 'Hide Autograder' : 'Show Autograder'}
+          </span>
+        </button>
       </div>
 
       {/* Sidebar */}
