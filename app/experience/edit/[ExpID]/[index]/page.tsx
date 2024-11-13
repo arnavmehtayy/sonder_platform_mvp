@@ -54,6 +54,7 @@ import CurvedBackButton from "@/app/Components/three/BackButton";
 import { SceneManager } from "@/app/Components/Sidebar/SceneManager";
 import { LoadingScreen } from "@/app/Components/MainMenu/LoadingScreen";
 import { DummyDataManager } from "@/app/Components/DummyData/DummyDataManager";
+import { ObjectTreeManager } from "@/app/Components/SceneManager/ObjectTreeManager";
 
 const SortableItem: React.FC<{ id: string; children: React.ReactNode }> = ({
   id,
@@ -311,17 +312,20 @@ export default function ExperienceEditPage() {
   return (
     <>
       <EditBar />
-      <div className="fixed top-4 left-4 z-50">
-        <CurvedBackButton />
-      </div>
+      <div className="relative flex flex-row h-screen bg-gray-100">
+        {/* Left Sidebar - Scene Manager */}
+        <ObjectTreeManager />
 
-      <div className="relative flex flex-col md:flex-row h-screen bg-gray-100">
         {/* Main Three.js Experience */}
-        <div className="flex-grow bg-black h-1/2 md:h-full md:flex-1 relative">
-          <Experience />
-          <DummyDataManager />
+        <div className="flex-grow bg-black h-full relative">
+          <div className="absolute top-4 left-4 z-50">
+            <CurvedBackButton />
+          </div>
           
-          {/* Validation Panel - Positioned above bottom nav bar */}
+          <Experience />
+          {/* <DummyDataManager /> */}
+          
+          {/* Validation Panel */}
           <div
             className={`absolute bottom-32 left-4 w-[calc(100%-2rem)] md:w-96 bg-white rounded-lg shadow-xl transition-all duration-300 ${
               showValidation
@@ -337,7 +341,7 @@ export default function ExperienceEditPage() {
             </div>
           </div>
 
-          {/* Toggle button - Positioned above bottom nav bar */}
+          {/* Toggle button */}
           <button
             onClick={() => setShowValidation(!showValidation)}
             className={`absolute bottom-20 left-4 flex items-center space-x-2 px-4 py-2 rounded-md shadow-lg transition-all duration-300 z-40 ${
@@ -353,55 +357,8 @@ export default function ExperienceEditPage() {
           </button>
         </div>
 
-        {/* Navigation Controls - Updated styling */}
-        <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 px-6 py-4 flex justify-between items-center z-20 shadow-lg">
-          <div className="flex items-center gap-4">
-            {!isPreviousDisabled && (
-              <Button
-                onClick={handlePreviousSlide}
-                className="flex items-center gap-2 bg-gray-100 hover:bg-gray-200 text-gray-700"
-              >
-                <ChevronLeft size={16} />
-                Previous Step
-              </Button>
-            )}
-            <Button
-              onClick={handleSave}
-              className="flex items-center gap-2 bg-blue-100 hover:bg-blue-200 text-blue-700"
-            >
-              <Save size={16} />
-              Save Progress
-            </Button>
-            <Button
-              onClick={handleResetState}
-              className="flex items-center gap-2 bg-red-100 hover:bg-red-200 text-red-700"
-            >
-              <RefreshCw size={16} />
-              Reset State
-            </Button>
-          </div>
-
-          <div className="flex items-center gap-4">
-            <Button
-              onClick={handleEndExperience}
-              variant="outline"
-              className="flex items-center gap-2 border-red-200 text-red-600 hover:bg-red-50"
-            >
-              <X size={16} />
-              Exit Editor
-            </Button>
-            <Button
-              onClick={handleNextSlide}
-              className="flex items-center gap-2 bg-blue-500 hover:bg-blue-600 text-white min-w-[140px]"
-            >
-              Next Step
-              <ChevronRight size={16} />
-            </Button>
-          </div>
-        </div>
-
-        {/* Sidebar */}
-        <div className="w-full md:w-1/3 md:min-w-[300px] md:max-w-md bg-blue-50 p-4 pb-24 overflow-y-auto h-1/2 md:h-full relative">
+        {/* Right Sidebar */}
+        <div className="w-full md:w-1/3 md:min-w-[300px] md:max-w-md bg-blue-50 p-4 pb-24 overflow-y-auto h-full relative">
           {/* Scene Manager Button - Moved to top with proper spacing */}
           <div className="mb-6">
             <Dialog>
@@ -423,6 +380,53 @@ export default function ExperienceEditPage() {
 
           {/* Keep existing OrderHandlerDb */}
           <OrderHandlerDB isEditMode={true} />
+        </div>
+      </div>
+
+      {/* Navigation Controls */}
+      <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 px-6 py-4 flex justify-between items-center z-20 shadow-lg">
+        <div className="flex items-center gap-4">
+          {!isPreviousDisabled && (
+            <Button
+              onClick={handlePreviousSlide}
+              className="flex items-center gap-2 bg-gray-100 hover:bg-gray-200 text-gray-700"
+            >
+              <ChevronLeft size={16} />
+              Previous Step
+            </Button>
+          )}
+          <Button
+            onClick={handleSave}
+            className="flex items-center gap-2 bg-blue-100 hover:bg-blue-200 text-blue-700"
+          >
+            <Save size={16} />
+            Save Progress
+          </Button>
+          <Button
+            onClick={handleResetState}
+            className="flex items-center gap-2 bg-red-100 hover:bg-red-200 text-red-700"
+          >
+            <RefreshCw size={16} />
+            Reset State
+          </Button>
+        </div>
+
+        <div className="flex items-center gap-4">
+          <Button
+            onClick={handleEndExperience}
+            variant="outline"
+            className="flex items-center gap-2 border-red-200 text-red-600 hover:bg-red-50"
+          >
+            <X size={16} />
+            Exit Editor
+          </Button>
+          <Button
+            onClick={handleNextSlide}
+            className="flex items-center gap-2 bg-blue-500 hover:bg-blue-600 text-white min-w-[140px]"
+          >
+            Next Step
+            <ChevronRight size={16} />
+          </Button>
         </div>
       </div>
     </>
