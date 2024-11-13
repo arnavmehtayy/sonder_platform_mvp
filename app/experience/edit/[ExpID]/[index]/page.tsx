@@ -99,6 +99,10 @@ export default function ExperienceEditPage() {
   const setOrder = useStore((state) => state.setOrder);
   const deleteOrderItem = useStore((state) => state.deleteOrderItem);
   const deleteVizObj = useStore((state) => state.deleteVizObj);
+  const deleteQuestion = useStore((state) => state.deleteQuestion);
+  const deletePlacement = useStore((state) => state.deletePlacement);
+  const deleteScore = useStore((state) => state.deleteScore);
+
   const vizobjs = useStore((state) => state.vizobjs);
   const getName = useStore(getSideBarName);
   const validationDescriptions = useStore(getValidationDescription);
@@ -138,8 +142,17 @@ export default function ExperienceEditPage() {
 
   const handleDeleteItem = (id: number, type: string) => {
     deleteOrderItem(id, type);
-    if (type === "control" || type === "placement" || type === "question") {
+    if (type === "control" ) {
       deleteVizObj(id);
+    }
+    if (type === "question") {
+      deleteQuestion(id);
+    }
+    if (type === "placement") {
+      deletePlacement(id);
+    }
+    if (type === "score") {
+      deleteScore(id);
     }
   };
 

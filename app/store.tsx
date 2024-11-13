@@ -124,7 +124,10 @@ export type State = {
   setQuestion: (id: number, text: string) => void;
   setPlacement: (id: number, placement: Placement) => void;
   deletePlacement: (id: number) => void;
-
+  deleteControl: (id: number) => void;
+  deleteInfluences: (id: number) => void;
+  deleteScore: (id: number) => void;
+  deleteQuestion: (id: number) => void
 };
 
 export const useStore = create<State>((set, get) => ({
@@ -789,6 +792,95 @@ export const useStore = create<State>((set, get) => ({
       return {
         placement: remainingPlacements,
         order: newOrder
+      };
+    });
+  },
+
+  deleteControl: (id: number) => {
+    set((state) => {
+      const updatedControls = { ...state.controls };
+      delete updatedControls[id];
+      return { controls: updatedControls };
+    });
+  },
+
+  deleteInfluences: (id: number) => {
+    set((state) => {
+      // Remove regular influences
+      const updatedInfluences = { ...state.influences };
+      // Remove influences where object is master
+      delete updatedInfluences[id];
+      // Remove influences where object is worker
+      Object.keys(updatedInfluences).forEach(masterId => {
+        updatedInfluences[Number(masterId)] = updatedInfluences[Number(masterId)].filter(
+          influence => influence.worker_id !== id
+        );
+        // Remove empty master entries
+        if (updatedInfluences[Number(masterId)].length === 0) {
+          delete updatedInfluences[Number(masterId)];
+        }
+      });
+
+      // Remove advanced influences
+      const updatedAdvancedInfluences = { ...state.influenceAdvIndex };
+      // Remove from index where object is a dependency
+      delete updatedAdvancedInfluences[id];
+      // Remove influences where object is worker
+      Object.keys(updatedAdvancedInfluences).forEach(depId => {
+        updatedAdvancedInfluences[Number(depId)] = updatedAdvancedInfluences[Number(depId)].filter(
+          influence => influence.worker_id !== id
+        );
+        // Remove empty dependency entries
+        if (updatedAdvancedInfluences[Number(depId)].length === 0) {
+          delete updatedAdvancedInfluences[Number(depId)];
+        }
+      });
+
+      return { 
+        influences: updatedInfluences,
+        influenceAdvIndex: updatedAdvancedInfluences
+      };
+    });
+  },
+
+  deleteScore: (id: number) => {
+    set((state) => {
+      // Create copy of scores and delete the specified score
+      const updatedScores = { ...state.scores };
+      delete updatedScores[id];
+
+      // Remove any validations related to this score
+      const updatedValidations = state.validations.filter(validation => {
+        if (validation instanceof Validation_score) {
+          return validation.score_id !== id;
+        }
+        return true;
+      });
+
+      return { 
+        scores: updatedScores,
+        validations: updatedValidations
+      };
+    });
+  },
+
+  deleteQuestion: (id: number) => {
+    set((state) => {
+      // Create copy of questions and delete the specified question
+      const updatedQuestions = { ...state.questions };
+      delete updatedQuestions[id];
+
+      // Remove any validations related to this question
+      const updatedValidations = state.validations.filter(validation => {
+        if (validation instanceof Validation_obj) {
+          return validation.obj_id !== id;
+        }
+        return true;
+      });
+
+      return { 
+        questions: updatedQuestions,
+        validations: updatedValidations
       };
     });
   },

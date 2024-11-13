@@ -1,7 +1,7 @@
 "use client";
 import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Pencil, Check, X, GripVertical } from "lucide-react";
+import { Pencil, Check, X, GripVertical, Trash2 } from "lucide-react";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
@@ -15,7 +15,7 @@ import {
   OrderItem,
   getControlSelector2,
   setTitleSelector,
-  setQuestionSelector
+  setQuestionSelector,
 } from "@/app/store";
 import { useDebounce } from "use-debounce";
 import {
@@ -44,11 +44,13 @@ import { CSS } from "@dnd-kit/utilities";
 function SortableItem({ 
   id, 
   children, 
-  isEditMode 
+  isEditMode,
+  onDelete 
 }: { 
   id: string; 
   children: React.ReactNode;
   isEditMode: boolean;
+  onDelete?: () => void;
 }) {
   const {
     attributes,
@@ -65,8 +67,8 @@ function SortableItem({
 
   const isTextItem = id.startsWith('question-');
   const containerClass = isTextItem 
-    ? "mb-2" // Text items don't need background
-    : "bg-white rounded-lg shadow-sm mb-2"; // Other items keep the white background
+    ? "mb-2" 
+    : "bg-white rounded-lg shadow-sm mb-2";
 
   if (!isEditMode) {
     return (
@@ -90,6 +92,16 @@ function SortableItem({
       <div className="flex-1">
         {children}
       </div>
+      {onDelete && (
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={onDelete}
+          className="text-red-500 hover:text-red-700"
+        >
+          <Trash2 className="h-4 w-4" />
+        </Button>
+      )}
     </div>
   );
 }
@@ -102,6 +114,13 @@ export const OrderHandlerDB = ({ isEditMode = false }: { isEditMode?: boolean })
   const get_control = useStore(getControlSelector2);
   const setTitle = useStore(setTitleSelector);
   const setQuestion = useStore(setQuestionSelector);
+  const deleteVizObj = useStore((state) => state.deleteVizObj);
+  const deleteControl = useStore((state) => state.deleteControl);
+  const deleteQuestion = useStore((state) => state.deleteQuestion);
+  const deletePlacement = useStore((state) => state.deletePlacement);
+  const deleteOrderItem = useStore((state) => state.deleteOrderItem);
+  const deleteInfluences = useStore((state) => state.deleteInfluences);
+  const deleteScore = useStore((state) => state.deleteScore);
 
   // Title editing state
   const [localTitle, setLocalTitle] = useState(title);
@@ -247,6 +266,24 @@ export const OrderHandlerDB = ({ isEditMode = false }: { isEditMode?: boolean })
     }
   };
 
+  // Add delete handler
+  const handleDeleteItem = (id: number, type: string) => {
+    // First delete the order item
+    deleteOrderItem(id, type);
+
+    // Handle specific type deletions
+    if (type === 'control') {
+      deleteControl(id);
+    } else if (type === 'placement') {
+      deletePlacement(id);
+    } else if (type === 'question') {
+      deleteQuestion(id);
+    }
+    else if (type === 'score') {
+      deleteScore(id);
+    }
+  };
+
   return (
     <div className="space-y-4 md:space-y-6">
       <div className="p-4">
@@ -301,7 +338,6 @@ export const OrderHandlerDB = ({ isEditMode = false }: { isEditMode?: boolean })
       </div>
 
       {isEditMode ? (
-        // Render with drag and drop functionality when in edit mode
         <DndContext
           sensors={sensors}
           collisionDetection={closestCenter}
@@ -316,6 +352,7 @@ export const OrderHandlerDB = ({ isEditMode = false }: { isEditMode?: boolean })
                 key={`${item.type}-${item.id}-${index}`}
                 id={`${item.type}-${item.id}`}
                 isEditMode={isEditMode}
+                onDelete={() => handleDeleteItem(item.id, item.type)}
               >
                 {renderComponent(item, index)}
               </SortableItem>
@@ -323,7 +360,6 @@ export const OrderHandlerDB = ({ isEditMode = false }: { isEditMode?: boolean })
           </SortableContext>
         </DndContext>
       ) : (
-        // Render without drag and drop functionality when not in edit mode
         <div>
           {state.order.map((item, index) => (
             <SortableItem
