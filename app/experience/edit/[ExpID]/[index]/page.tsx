@@ -314,9 +314,8 @@ export default function ExperienceEditPage() {
     return () => setIsEditMode(false); // Clean up when leaving the page
   }, [setIsEditMode]);
 
-  
+  const [isLeftSidebarCollapsed, setIsLeftSidebarCollapsed] = useState(false);
 
-  
   if (isLoading) {
     return <LoadingScreen 
       message="Loading Experience Editor" 
@@ -328,11 +327,32 @@ export default function ExperienceEditPage() {
     <>
       <EditBar />
       <div className="relative flex flex-row h-screen bg-gray-100">
-        {/* Left Sidebar - Scene Manager */}
-        <ObjectTreeManager />
+        {/* Left Sidebar with collapse animation */}
+        <div
+          className={`transition-all duration-300 ease-in-out ${
+            isLeftSidebarCollapsed ? 'w-0' : 'w-64'
+          } flex-shrink-0 relative`}
+        >
+          <div className="relative h-full">
+            <ObjectTreeManager />
+            <div className="absolute -right-6 top-1/2 transform -translate-y-1/2 z-50">
+              <Button
+                onClick={() => setIsLeftSidebarCollapsed(!isLeftSidebarCollapsed)}
+                className={`h-12 w-12 rounded-full bg-white hover:bg-gray-50 border border-gray-200 shadow-lg flex items-center justify-center transition-all duration-300 ${
+                  isLeftSidebarCollapsed ? 'translate-x-3' : ''
+                }`}
+              >
+                {isLeftSidebarCollapsed ? 
+                  <ChevronRight className="h-5 w-5 text-gray-600" /> : 
+                  <ChevronLeft className="h-5 w-5 text-gray-600" />
+                }
+              </Button>
+            </div>
+          </div>
+        </div>
 
         {/* Main Three.js Experience */}
-        <div className="flex-grow bg-black h-full relative">
+        <div className="flex-grow bg-black h-full relative min-w-0">
           <div className="absolute top-4 left-4 z-50">
             <CurvedBackButton />
           </div>
@@ -340,9 +360,9 @@ export default function ExperienceEditPage() {
           <Experience />
           {/* <DummyDataManager /> */}
           
-          {/* Validation Panel */}
+          {/* Validation Panel - Update positioning */}
           <div
-            className={`absolute bottom-32 left-4 w-[calc(100%-2rem)] md:w-96 bg-white rounded-lg shadow-xl transition-all duration-300 ${
+            className={`absolute bottom-32 left-1/2 transform -translate-x-1/2 w-[calc(100%-2rem)] md:w-96 bg-white rounded-lg shadow-xl transition-all duration-300 ${
               showValidation
                 ? "opacity-100 translate-y-0"
                 : "opacity-0 translate-y-full pointer-events-none"
@@ -356,10 +376,10 @@ export default function ExperienceEditPage() {
             </div>
           </div>
 
-          {/* Toggle button */}
+          {/* Toggle button - Update positioning */}
           <button
             onClick={() => setShowValidation(!showValidation)}
-            className={`absolute bottom-20 left-4 flex items-center space-x-2 px-4 py-2 rounded-md shadow-lg transition-all duration-300 z-40 ${
+            className={`absolute bottom-20 left-1/2 transform -translate-x-1/2 flex items-center space-x-2 px-4 py-2 rounded-md shadow-lg transition-all duration-300 z-40 ${
               allValidationsValid 
                 ? 'bg-green-500 hover:bg-green-600' 
                 : 'bg-blue-500 hover:bg-blue-600'
@@ -373,26 +393,30 @@ export default function ExperienceEditPage() {
         </div>
 
         {/* Right Sidebar */}
-        <div className="w-full md:w-1/3 md:min-w-[300px] md:max-w-md bg-blue-50 p-4 pb-24 overflow-y-auto h-full relative">
-          {/* Scene Manager Button */}
-          <div className="mb-6">
-            <Dialog>
-              <DialogTrigger asChild>
-                <Button className="w-full flex items-center justify-center gap-2 bg-blue-500 text-white hover:bg-blue-600 transition-all shadow-md">
-                  <GripVertical size={18} />
-                  <span className="font-medium">Scene Manager</span>
-                </Button>
-              </DialogTrigger>
-              <SceneManager
-                sensors={sensors}
-                handleDragEnd={handleDragEnd}
-                handleDeleteItem={handleDeleteItem}
-              />
-            </Dialog>
-          </div>
+        <div className="w-full md:w-1/3 md:min-w-[300px] md:max-w-md bg-blue-50 h-full flex-shrink-0">
+          <div className="h-full overflow-y-auto overflow-x-visible p-4 pb-24">
+            {/* Scene Manager Button */}
+            <div className="mb-6 relative z-10">
+              <Dialog>
+                <DialogTrigger asChild>
+                  <Button className="w-full flex items-center justify-center gap-2 bg-blue-500 text-white hover:bg-blue-600 transition-all shadow-md">
+                    <GripVertical size={18} />
+                    <span className="font-medium">Scene Manager</span>
+                  </Button>
+                </DialogTrigger>
+                <SceneManager
+                  sensors={sensors}
+                  handleDragEnd={handleDragEnd}
+                  handleDeleteItem={handleDeleteItem}
+                />
+              </Dialog>
+            </div>
 
-          {/* OrderHandlerDB */}
-          <OrderHandlerDB isEditMode={true} />
+            {/* OrderHandlerDB */}
+            <div className="relative">
+              <OrderHandlerDB isEditMode={true} />
+            </div>
+          </div>
         </div>
       </div>
 

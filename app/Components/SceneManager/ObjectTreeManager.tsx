@@ -108,8 +108,8 @@ export function ObjectTreeManager() {
   };
 
   return (
-    <div className="w-64 bg-blue-50 h-full border-r border-gray-200 overflow-hidden">
-      <div className="p-4 h-full overflow-y-auto">
+    <div className="h-full bg-blue-50 border-r border-gray-200 overflow-hidden">
+      <div className="p-4 h-full overflow-y-auto overflow-x-hidden">
         <h2 className="text-lg font-semibold mb-4">Scene Hierarchy</h2>
         
         {/* Objects Section */}
