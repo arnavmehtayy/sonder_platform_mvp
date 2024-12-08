@@ -90,7 +90,7 @@ const IdeathonPage = () => {
               <div className="prose prose-lg max-w-none">
                 <p className="text-xl text-gray-700 leading-relaxed mb-6">
                   ModelMinds invites participants to explore how machine intelligence 
-                  can revolutionize creative disciplines such as music, gaming, art, design, storytelling, and beyond. Whether you're a coder, designer, or 
+                  can revolutionize creative disciplines such as music, gaming, art, design, storytelling, and beyond. Whether you&apos;re a coder, designer, or 
                   visionary thinker, this challenge is designed to provide a platform for diverse talents to come 
                   together and create groundbreaking solutions.
                 </p>
@@ -220,7 +220,7 @@ const IdeathonPage = () => {
                 transition-colors">
                 <div className="flex items-center gap-3 mb-4">
                   <span className="text-3xl">📚</span>
-                  <h3 className="text-2xl font-semibold text-[#257276]">What You'll Learn</h3>
+                  <h3 className="text-2xl font-semibold text-[#257276]">What You&apos;ll Learn</h3>
                 </div>
                 <ul className="space-y-3">
                   <li className="flex items-start gap-3">
