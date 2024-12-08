@@ -412,7 +412,7 @@ const IdeathonPage = () => {
                 </a>
               </p>
               <p className="text-sm text-gray-600 mt-6">
-                © 2024 ModelMinds. A Sonder Initiative.
+                © 2024 ModelMinds. A SonderSkills Initiative.
               </p>
             </div>
 
