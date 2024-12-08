@@ -173,14 +173,14 @@ const IdeathonPage = () => {
         <div className="container mx-auto px-4">
           <div className="max-w-6xl mx-auto">
             <h2 className="text-4xl font-bold text-[#257276] mb-8 text-center">
-              Don't Know Machine Learning? No Problem!
+              Don&apos;t Know Machine Learning? No Problem!
             </h2>
             
             {/* Introduction */}
             <div className="text-center mb-8">
               <p className="text-xl text-gray-700">
-                Join our pre-hackathon educational program. Whether you're a complete beginner 
-                or looking to expand your skills, we'll guide you through everything you need to know.
+                Join our pre-hackathon educational program. Whether you&apos;re a complete beginner 
+                or looking to expand your skills, we&apos;ll guide you through everything you need to know.
               </p>
             </div>
 
