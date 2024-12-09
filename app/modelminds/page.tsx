@@ -34,6 +34,7 @@ const IdeathonPage = () => {
           <h1 className="text-6xl font-bold mb-8 animate-fade-in">ModelMinds</h1>
           <p className="text-3xl mb-6">An Artificial Intelligence Challenge</p>
           <p className="text-2xl font-light mb-4">Where Creativity Meets Machine Learning</p>
+          <p className="text-xl text-white/90">Free to participate!</p>
           <div className="text-center">
             <button 
               onClick={() => window.open('https://forms.gle/zGw2dHrpdxFmkhHY7', '_blank', 'noopener,noreferrer')}
@@ -140,27 +141,73 @@ const IdeathonPage = () => {
                   </div>
                 </div>
 
-                {/* Challenge Tracks - Made more prominent */}
+                {/* Challenge Tracks */}
                 <div className="mt-12">
                   <h3 className="text-2xl font-semibold text-cyan-800 mb-6">Challenge Tracks</h3>
                   <div className="grid md:grid-cols-2 gap-8">
+                    {/* ML Coding Track */}
                     <div className="bg-gradient-to-br from-[#F5FDFD] to-white p-8 rounded-xl border border-[#7AE5EC]/30 
                       shadow-lg hover:shadow-xl transition-all">
-                      <div className="text-4xl mb-4">💻</div>
+                      <div className="text-4xl mb-4">🎨</div>
                       <h4 className="text-xl font-semibold text-[#257276] mb-4">Track 1: Machine Learning Coding</h4>
-                      <p className="text-gray-700">
-                        Develop functional ML models or tools that address creative challenges.
-                      </p>
+                      <div className="space-y-4">
+                        <p className="text-gray-700">
+                          Choose this track if you enjoy coding and want to build something cool with AI! 
+                          Don&apos;t worry if you&apos;re new to machine learning - we&apos;ll teach you everything.
+                        </p>
+                        <div className="space-y-2">
+                          <p className="font-medium text-[#257276]">Perfect for you if:</p>
+                          <ul className="text-gray-700 space-y-1">
+                            <li className="flex items-center gap-2">
+                              <span className="text-[#01A9B2]">•</span>
+                              <span>You know some Python or want to learn</span>
+                            </li>
+                            <li className="flex items-center gap-2">
+                              <span className="text-[#01A9B2]">•</span>
+                              <span>You like solving problems with code</span>
+                            </li>
+                            <li className="flex items-center gap-2">
+                              <span className="text-[#01A9B2]">•</span>
+                              <span>You&apos;re curious about how AI works</span>
+                            </li>
+                          </ul>
+                        </div>
+                        
+                      </div>
                     </div>
+
+                    {/* Design Track */}
                     <div className="bg-gradient-to-br from-[#F5FDFD] to-white p-8 rounded-xl border border-[#7AE5EC]/30 
                       shadow-lg hover:shadow-xl transition-all">
                       <div className="text-4xl mb-4">🎨</div>
                       <h4 className="text-xl font-semibold text-[#257276] mb-4">Track 2: Design and Ideation</h4>
-                      <p className="text-gray-700">
-                        Conceptualize and design user-centric solutions leveraging ML.
-                      </p>
+                      <div className="space-y-4">
+                        <p className="text-gray-700">
+                          Choose this track if you love being creative and coming up with ideas! No coding 
+                          required - focus on designing amazing experiences with AI.
+                        </p>
+                        <div className="space-y-2">
+                          <p className="font-medium text-[#257276]">Perfect for you if:</p>
+                          <ul className="text-gray-700 space-y-1">
+                            <li className="flex items-center gap-2">
+                              <span className="text-[#01A9B2]">•</span>
+                              <span>You enjoy art, design, or creative projects</span>
+                            </li>
+                            <li className="flex items-center gap-2">
+                              <span className="text-[#01A9B2]">•</span>
+                              <span>You want to design real-world products</span>
+                            </li>
+                            <li className="flex items-center gap-2">
+                              <span className="text-[#01A9B2]">•</span>
+                              <span>You want to explore AI without coding</span>
+                            </li>
+                          </ul>
+                        </div>
+                        
+                      </div>
                     </div>
                   </div>
+
                 </div>
               </div>
             </div>
@@ -179,7 +226,7 @@ const IdeathonPage = () => {
             {/* Introduction */}
             <div className="text-center mb-8">
               <p className="text-xl text-gray-700">
-                Join our pre-hackathon educational program. Whether you&apos;re a complete beginner 
+                Join our free pre-hackathon educational program. Whether you&apos;re a complete beginner 
                 or looking to expand your skills, we&apos;ll guide you through everything you need to know.
               </p>
             </div>
@@ -355,7 +402,7 @@ const IdeathonPage = () => {
             />
             <DateCard 
               title="Submission Deadline" 
-              date="January 7th"
+              date="January 10th"
               icon="🎯"
             />
           </div>
@@ -385,7 +432,7 @@ const IdeathonPage = () => {
             />
             <FaqItem 
               question="Is there a cost to participate?" 
-              answer="No, ModelMinds is completely free! We believe in making AI education and opportunities accessible to everyone. There are no registration fees or hidden costs associated with participating in either track of the program."
+              answer="No, ModelMinds is completely free! This includes the hackathon, educational workshops, and mentoring sessions. We believe in making AI education and opportunities accessible to everyone."
             />
             <FaqItem 
               question="Where will this event be held?" 
