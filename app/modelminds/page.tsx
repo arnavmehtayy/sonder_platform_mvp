@@ -351,7 +351,7 @@ const IdeathonPage = () => {
                   </li>
                   <li className="flex items-start gap-2">
                     <span>•</span>
-                    <span>Guidance on research methodology</span>
+                    <span>Guidance on research methodology and paper writing</span>
                   </li>
                 </ul>
               </div>
