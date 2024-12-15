@@ -1,5 +1,5 @@
 'use client'
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
 import Logo from "@/images/Sonder logo with text.png";
 import WhoWeAreImage from "@/images/image.png"
@@ -9,7 +9,7 @@ const IdeathonPage = () => {
   return (
     <div className="min-h-screen bg-[#F5FDFD]">
       {/* Hero Section */}
-      <section className="relative h-[600px] bg-cyan-700 text-white">
+      <section className="relative h-[700px] bg-cyan-700 text-white">
         <div className="absolute inset-0 bg-black/20" />
         
         {/* Overlaid Logo with Link */}
@@ -30,22 +30,29 @@ const IdeathonPage = () => {
           </Link>
         </div>
 
-        <div className="relative container mx-auto px-4 py-32 flex flex-col items-center text-center">
-          <h1 className="text-6xl font-bold mb-8 animate-fade-in">ModelMinds</h1>
-          <p className="text-3xl mb-6">An Artificial Intelligence Challenge</p>
-          <p className="text-2xl font-light mb-4">Where Creativity Meets Machine Learning</p>
-          <p className="text-xl text-white/90">Free to participate!</p>
-          <div className="text-center">
-            <button 
-              onClick={() => window.open('https://forms.gle/zGw2dHrpdxFmkhHY7', '_blank', 'noopener,noreferrer')}
-              className="mt-8 px-8 py-3 bg-white text-cyan-700 rounded-full text-lg font-semibold 
-                hover:bg-cyan-50 transition-all"
-            >
-              Register Now
-            </button>
-            <p className="mt-4 text-sm text-white/80">
-              Register individually or with a team of up to 3 members
-            </p>
+        <div className="relative container mx-auto px-4 py-24 flex flex-col items-center text-center h-full justify-center">
+          <div className="space-y-6">
+            <h1 className="text-6xl font-bold animate-fade-in">ModelMinds</h1>
+            <p className="text-3xl">An AI Innovation Challenge</p>
+            <p className="text-2xl font-light">Where Creativity Meets Machine Learning</p>
+            <p className="text-xl text-white/90">Free to participate!</p>
+            
+            <div className="mt-12">
+              <CountdownTimer />
+            </div>
+            
+            <div className="mt-12">
+              <button 
+                onClick={() => window.open('https://forms.gle/zGw2dHrpdxFmkhHY7', '_blank', 'noopener,noreferrer')}
+                className="px-8 py-3 bg-white text-cyan-700 rounded-full text-lg font-semibold 
+                  hover:bg-cyan-50 transition-all"
+              >
+                Register Now
+              </button>
+              <p className="mt-4 text-sm text-white/80">
+                Register individually or with a team of up to 3 members
+              </p>
+            </div>
           </div>
         </div>
       </section>
@@ -523,5 +530,64 @@ const FaqItem = ({ question, answer }: { question: string, answer: string }) => 
     </div>
   );
 };
+
+const CountdownTimer = () => {
+  const [timeLeft, setTimeLeft] = useState({
+    days: 0,
+    hours: 0,
+    minutes: 0,
+    seconds: 0
+  });
+
+  useEffect(() => {
+    const targetDate = new Date('December 20, 2024 23:59:59').getTime();
+
+    const updateTimer = () => {
+      const now = new Date().getTime();
+      const difference = targetDate - now;
+
+      if (difference > 0) {
+        setTimeLeft({
+          days: Math.floor(difference / (1000 * 60 * 60 * 24)),
+          hours: Math.floor((difference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)),
+          minutes: Math.floor((difference % (1000 * 60 * 60)) / (1000 * 60)),
+          seconds: Math.floor((difference % (1000 * 60)) / 1000)
+        });
+      }
+    };
+
+    // Update immediately
+    updateTimer();
+    
+    // Update every second
+    const timer = setInterval(updateTimer, 1000);
+
+    // Cleanup
+    return () => clearInterval(timer);
+  }, []);
+
+  return (
+    <div className="flex flex-col items-center space-y-2">
+      <div className="flex space-x-4">
+        <TimeUnit value={timeLeft.days} label="Days" />
+        <TimeUnit value={timeLeft.hours} label="Hours" />
+        <TimeUnit value={timeLeft.minutes} label="Minutes" />
+        <TimeUnit value={timeLeft.seconds} label="Seconds" />
+      </div>
+      <p className="text-white/80 text-sm">until registration closes</p>
+    </div>
+  );
+};
+
+const TimeUnit = ({ value, label }: { value: number; label: string }) => (
+  <div className="flex flex-col items-center">
+    <div className="bg-white/10 backdrop-blur-sm rounded-lg px-4 py-2 min-w-[80px]">
+      <span className="text-2xl font-bold text-white">
+        {value.toString().padStart(2, '0')}
+      </span>
+    </div>
+    <span className="text-xs text-white/80 mt-1">{label}</span>
+  </div>
+);
 
 export default IdeathonPage;
