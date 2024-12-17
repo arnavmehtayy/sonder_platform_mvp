@@ -67,6 +67,7 @@ import { MultiChoiceClass } from "@/classes/Controls/MultiChoiceClass";
 import { TableControl } from "@/classes/Controls/TableControl";
 import { InputNumber } from "@/classes/Controls/InputNumber";
 import { DropDownMenu } from "@/app/Components/EditMode/DropDownMenu";
+import { VideoUpload } from "@/app/Components/MainMenu/VideoUpload";
 
 const SortableItem: React.FC<{ id: string; children: React.ReactNode }> = ({
   id,
@@ -326,7 +327,12 @@ export default function ExperienceEditPage() {
   return (
     <>
       <EditBar />
+      
       <div className="relative flex flex-row h-screen bg-gray-100">
+      <div className="absolute top-4 right-4 z-50">
+      <VideoUpload experienceId={expId} index={currentIndex} />
+    </div>
+    
         {/* Left Sidebar with collapse animation */}
         <div
           className={`transition-all duration-300 ease-in-out ${

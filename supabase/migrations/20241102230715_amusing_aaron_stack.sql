@@ -1,1 +1,0 @@
-ALTER TABLE "multi_choice_option" ADD COLUMN "option_id" integer NOT NULL;

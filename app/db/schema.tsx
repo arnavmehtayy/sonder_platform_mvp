@@ -39,6 +39,17 @@ export const experience = pgTable('experience_table', {
 export type ExperienceSelect = InferSelectModel<typeof experience>;
 export type ExperienceInsert = InferInsertModel<typeof experience>;
 
+export const ExperienceVideo = pgTable('experience_videos', {
+  id: serial('id').primaryKey(),
+  experienceId: integer('experience_id').references(() => experience.id, { onDelete: 'cascade' }).notNull(),
+  index: integer('index').notNull(),
+  videoPath: text('video_path').notNull(),
+  createdAt: timestamp('created_at').notNull().defaultNow(),
+  updatedAt: timestamp('updated_at').notNull().defaultNow().$onUpdate(() => new Date()),
+});
+
+export type ExperienceVideoSelect = InferSelectModel<typeof ExperienceVideo>;
+export type ExperienceVideoInsert = InferInsertModel<typeof ExperienceVideo>;
 
 export const states = pgTable('users_table', {
   id: serial('id').primaryKey(),

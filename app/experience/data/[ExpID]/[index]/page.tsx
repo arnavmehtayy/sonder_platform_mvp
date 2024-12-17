@@ -10,6 +10,7 @@ import { deserializeState } from '@/classes/database/stateSerializer';
 import { useStore } from '@/app/store';
 import { MinigameDB } from '@/app/Components/Sidebar/MinigameDB';
 import { LoadingScreen } from '@/app/Components/MainMenu/LoadingScreen';
+import { VideoPlayer } from '@/app/Components/MainMenu/VideoPlayer';
 
 const resetState = () => {
   useStore.setState({
@@ -65,11 +66,12 @@ export default function ExperiencePage() {
 
   return (
     <div className="flex flex-col h-screen">
-      <div className="flex-grow">
-        <CurvedBackButton />
-        <MinigameDB experienceID={Number(params.ExpID)} index={Number(params.index)}/>
-        <FeedbackComponent />
-      </div>
+    <div className="flex-grow">
+      <CurvedBackButton />
+      <VideoPlayer experienceId={Number(params.ExpID)} index={Number(params.index)} />
+      <MinigameDB experienceID={Number(params.ExpID)} index={Number(params.index)}/>
+      <FeedbackComponent />
     </div>
+  </div>
   );
 }

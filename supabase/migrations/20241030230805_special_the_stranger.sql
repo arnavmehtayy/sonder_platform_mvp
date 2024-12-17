@@ -1,1 +1,0 @@
-ALTER TABLE "users_table" ADD COLUMN "index" integer DEFAULT 0;
