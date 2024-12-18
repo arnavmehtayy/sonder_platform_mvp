@@ -9,14 +9,15 @@ interface VideoPlayerProps {
 
 export function VideoPlayer({ experienceId, index }: VideoPlayerProps) {
   const [videoUrl, setVideoUrl] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
   const videoRef = useRef<HTMLVideoElement>(null);
   const isPlaying = useStore(getIsVideoPlayingSelector);
   const setIsPlaying = useStore(setIsVideoPlayingSelector);
 
   useEffect(() => {
     const loadVideo = async () => {
+      setIsLoading(true);
       try {
-        // Get video reference
         const response = await fetch(
           `/api/supabase/video?experienceId=${experienceId}&index=${index}`
         );
@@ -32,6 +33,8 @@ export function VideoPlayer({ experienceId, index }: VideoPlayerProps) {
         }
       } catch (error) {
         console.error('Error loading video:', error);
+      } finally {
+        setIsLoading(false);
       }
     };
 
@@ -39,26 +42,36 @@ export function VideoPlayer({ experienceId, index }: VideoPlayerProps) {
   }, [experienceId, index]);
 
   useEffect(() => {
-    if (videoRef.current && videoUrl) {
+    if (videoRef.current && videoUrl && !isLoading) {
       videoRef.current.play()
+        .then(() => {
+          setIsPlaying(true);
+        })
         .catch(error => {
           console.log("Autoplay failed:", error);
           setIsPlaying(false);
         });
     }
-  }, [videoUrl, setIsPlaying]);
+  }, [videoUrl, setIsPlaying, isLoading]);
 
   const togglePlay = () => {
     if (videoRef.current) {
       if (isPlaying) {
         videoRef.current.pause();
+        setIsPlaying(false);
       } else {
         if (videoRef.current.ended) {
           videoRef.current.currentTime = 0;
         }
-        videoRef.current.play();
+        videoRef.current.play()
+          .then(() => {
+            setIsPlaying(true);
+          })
+          .catch(error => {
+            console.log("Play failed:", error);
+            setIsPlaying(false);
+          });
       }
-      setIsPlaying(!isPlaying);
     }
   };
 
@@ -78,17 +91,23 @@ export function VideoPlayer({ experienceId, index }: VideoPlayerProps) {
           playsInline
           controls={false}
           onEnded={handleVideoEnd}
+          onPlay={() => setIsPlaying(true)}
+          onPause={() => setIsPlaying(false)}
         />
-        {!isPlaying && (
+        {(!isPlaying || isLoading) && (
           <div className="absolute inset-0 flex items-center justify-center">
             <div className="w-20 h-20 bg-black bg-opacity-50 rounded-full flex items-center justify-center">
-              <svg 
-                className="w-12 h-12 text-white" 
-                fill="currentColor" 
-                viewBox="0 0 24 24"
-              >
-                <path d="M8 5v14l11-7z"/>
-              </svg>
+              {isLoading ? (
+                <div className="w-12 h-12 border-4 border-white/30 border-t-white rounded-full animate-spin" />
+              ) : (
+                <svg 
+                  className="w-12 h-12 text-white" 
+                  fill="currentColor" 
+                  viewBox="0 0 24 24"
+                >
+                  <path d="M8 5v14l11-7z"/>
+                </svg>
+              )}
             </div>
           </div>
         )}
