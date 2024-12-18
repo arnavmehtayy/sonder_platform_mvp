@@ -68,7 +68,6 @@ export default function ExperiencePage() {
     <div className="flex flex-col h-screen">
     <div className="flex-grow">
       <CurvedBackButton />
-      <VideoPlayer experienceId={Number(params.ExpID)} index={Number(params.index)} />
       <MinigameDB experienceID={Number(params.ExpID)} index={Number(params.index)}/>
       <FeedbackComponent />
     </div>

@@ -129,6 +129,8 @@ export type State = {
   deleteScore: (id: number) => void;
   deleteQuestion: (id: number) => void;
   setScore: (score_id: number, new_score: Score<any>, validation?: Validation_score<any, obj>) => void;
+  isVideoPlaying: boolean;
+  setIsVideoPlaying: (isPlaying: boolean) => void;
 };
 
 export const useStore = create<State>((set, get) => ({
@@ -147,6 +149,11 @@ export const useStore = create<State>((set, get) => ({
   placement: [],
   isSelectActive: false,
   isEditMode: false,
+  isVideoPlaying: true,
+  
+  setIsVideoPlaying: (isPlaying: boolean) => {
+    set({ isVideoPlaying: isPlaying });
+  },
 
   setTableControl: (newTable: TableControl<any>) => {
     set((state) => {
@@ -1195,3 +1202,6 @@ export const deletePlacementSelector = (state: State) =>
   (id: number) => {
     state.deletePlacement(id);
   };
+
+export const getIsVideoPlayingSelector = (state: State) => state.isVideoPlaying;
+export const setIsVideoPlayingSelector = (state: State) => state.setIsVideoPlaying;

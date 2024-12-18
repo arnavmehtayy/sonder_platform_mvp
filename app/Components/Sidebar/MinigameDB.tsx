@@ -16,6 +16,7 @@ import ValidationComponent from "../ShowValid";
 import { OrderHandler } from "./OrderHandler";
 import { CheckCircle } from 'lucide-react';
 import { OrderHandlerDB } from "./OrderHandlerDB";
+import { VideoPlayer } from "../MainMenu/VideoPlayer";
 
 export function MinigameDB({experienceID, index}: {experienceID: number, index: number}) {
   const state_name = useStore(getStateName);
@@ -58,7 +59,8 @@ export function MinigameDB({experienceID, index}: {experienceID: number, index: 
     <div className="relative flex flex-col md:flex-row h-screen bg-gray-100">
       {/* Main Three.js Experience */}
       <div className="flex-grow bg-black h-1/2 md:h-full md:flex-1 relative">
-        <Experience />
+      <VideoPlayer experienceId={experienceID} index={index} />
+        {/* <Experience /> */}
 
         {/* Validation Panel - Positioned above navigation */}
         <div
@@ -94,7 +96,7 @@ export function MinigameDB({experienceID, index}: {experienceID: number, index: 
 
       {/* Sidebar */}
       <div
-        className="w-full md:w-1/3 md:min-w-[300px] md:max-w-md bg-blue-50 p-4 overflow-y-auto h-1/2 md:h-full"
+        className="w-full md:w-1/3 md:min-w-[300px] md:max-w-md bg-white p-4 overflow-y-auto h-1/2 md:h-full"
         style={{ height: "100lvh" }}
       >
         <div className="space-y-4 md:space-y-6">
