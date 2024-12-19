@@ -316,6 +316,65 @@ export default function ExperienceEditPage() {
   }, [setIsEditMode]);
 
   const [isLeftSidebarCollapsed, setIsLeftSidebarCollapsed] = useState(false);
+  const [videoUrl, setVideoUrl] = useState<string | null>(null);
+
+  const handleVideoUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+      formData.append('experienceId', expId.toString());
+      formData.append('index', currentIndex.toString());
+
+      const response = await fetch('/api/supabase/video', {
+        method: 'POST',
+        body: formData,
+      });
+
+      if (!response.ok) {
+        throw new Error('Upload failed');
+      }
+
+      const data = await response.json();
+      if (data.success) {
+        // Reload the video URL after successful upload
+        loadVideo();
+        toast.success('Video uploaded successfully');
+      }
+    } catch (error) {
+      console.error('Error uploading video:', error);
+      toast.error('Failed to upload video');
+    }
+  };
+
+  const loadVideo = async () => {
+    try {
+      const response = await fetch(
+        `/api/supabase/video?experienceId=${expId}&index=${currentIndex}`
+      );
+
+      if (!response.ok) {
+        throw new Error('Failed to fetch video');
+      }
+
+      const data = await response.json();
+      if (data?.video_path) {
+        const supabase = await createClient();
+        const { data: { publicUrl } } = supabase.storage
+          .from('experience-videos')
+          .getPublicUrl(data.video_path);
+        setVideoUrl(publicUrl);
+      }
+    } catch (error) {
+      console.error('Error loading video:', error);
+    }
+  };
+
+  useEffect(() => {
+    loadVideo();
+  }, [expId, currentIndex]);
 
   if (isLoading) {
     return <LoadingScreen 
@@ -363,9 +422,48 @@ export default function ExperienceEditPage() {
             <CurvedBackButton />
           </div>
           
-          <Experience />
-          {/* <DummyDataManager /> */}
-          
+          {!videoUrl ? (
+            <div className="absolute inset-0 flex items-center justify-center">
+              <label className="cursor-pointer group">
+                <div className="flex flex-col items-center gap-4 p-8 rounded-lg border-2 border-dashed border-gray-400 bg-gray-900 bg-opacity-50 hover:bg-opacity-70 transition-all">
+                  <Plus size={40} className="text-gray-300 group-hover:text-white transition-colors" />
+                  <span className="text-gray-300 group-hover:text-white text-lg font-medium transition-colors">
+                    Click to Upload Video
+                  </span>
+                  <span className="text-gray-400 text-sm">
+                    Supported formats: MP4, WebM
+                  </span>
+                  <input
+                    type="file"
+                    accept="video/*"
+                    className="hidden"
+                    onChange={handleVideoUpload}
+                  />
+                </div>
+              </label>
+            </div>
+          ) : (
+            <div className="relative h-full w-full">
+              <video 
+                className="w-full h-full object-contain"
+                controls
+                src={videoUrl}
+              />
+              <label className="absolute top-4 right-4 cursor-pointer">
+                <div className="bg-black bg-opacity-50 hover:bg-opacity-70 text-white px-4 py-2 rounded-lg flex items-center gap-2 transition-all">
+                  <RefreshCw size={16} />
+                  <span>Replace Video</span>
+                  <input
+                    type="file"
+                    accept="video/*"
+                    className="hidden"
+                    onChange={handleVideoUpload}
+                  />
+                </div>
+              </label>
+            </div>
+          )}
+
           {/* Validation Panel - Update positioning */}
           <div
             className={`absolute bottom-32 left-1/2 transform -translate-x-1/2 w-[calc(100%-2rem)] md:w-96 bg-white rounded-lg shadow-xl transition-all duration-300 ${
