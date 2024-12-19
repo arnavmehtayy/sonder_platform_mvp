@@ -1,7 +1,6 @@
 import { useState } from 'react';
-import { createClient } from '@/app/utils/supabase/client';
 import { Button } from '@/components/ui/button';
-import { Upload, Video } from 'lucide-react';
+import { Upload } from 'lucide-react';
 import { toast } from 'sonner';
 
 interface VideoUploadProps {
@@ -25,45 +24,25 @@ export function VideoUpload({ experienceId, index }: VideoUploadProps) {
         return;
       }
 
-      // Check file size (e.g., 100MB limit)
+      // Check file size (50MB limit)
       if (file.size > 50 * 1024 * 1024) {
         toast.error('Video must be less than 50MB');
         return;
       }
 
-      const supabase = createClient();
-      
-      // Check if user is authenticated
-      const { data: { session } } = await supabase.auth.getSession();
-      if (!session) {
-        toast.error('Please sign in to upload videos');
-        return;
-      }
+      const formData = new FormData();
+      formData.append('file', file);
+      formData.append('experienceId', experienceId.toString());
+      formData.append('index', index.toString());
 
-      // Upload to Supabase storage
-      const { data, error } = await supabase.storage
-        .from('experience-videos')
-        .upload(`${experienceId}/${index}/video.mp4`, file, {
-          cacheControl: '3600',
-          upsert: true
-        });
-
-      if (error) throw error;
-
-      // Save video reference in the database
       const response = await fetch('/api/supabase/video', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          experienceId,
-          index,
-          videoPath: data.path
-        }),
+        body: formData,
       });
 
-      if (!response.ok) throw new Error('Failed to save video reference');
+      if (!response.ok) {
+        throw new Error('Upload failed');
+      }
 
       toast.success('Video uploaded successfully');
     } catch (error) {
