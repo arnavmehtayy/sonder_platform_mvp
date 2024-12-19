@@ -22,7 +22,7 @@ export function MinigameDB({experienceID, index}: {experienceID: number, index: 
   const state_name = useStore(getStateName);
   const updateValidation = useStore(UpdateValidationSelector);
   const validationInstance = useStore((state) => state.validations);
-  const [showValidation, setShowValidation] = useState(true);
+  const [showValidation, setShowValidation] = useState(false);
   const [allValidationsValid, setAllValidationsValid] = useState(false);
   const [hasNextExperience, setHasNextExperience] = useState(false);
   const [showValidationResults, setShowValidationResults] = useState(false);
