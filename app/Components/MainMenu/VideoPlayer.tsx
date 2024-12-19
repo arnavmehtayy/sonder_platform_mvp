@@ -189,7 +189,7 @@ export function VideoPlayer({ experienceId, index }: VideoPlayerProps) {
                   className="flex items-center gap-3 bg-white/10 backdrop-blur-sm px-6 py-4 rounded-lg"
                 >
                   <span className="text-white text-lg font-medium">
-                    show what you've learned!
+                    Show what you&apos;ve learned!
                   </span>
                   <svg 
                     className="w-6 h-6 text-white" 
