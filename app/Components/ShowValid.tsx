@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { CheckCircle, XCircle } from "react-feather";
 import Validation from "@/classes/Validation/Validation";
 import { useStore, isValidatorClickableSelector } from "@/app/store";
@@ -9,21 +9,32 @@ import { Button } from "@/components/ui/button";
 
 const ValidationComponent = ({
   validations,
-  updater, // function to update the state of each of the validations in the store 
+  updater,
+  isChecked = false,
 }: {
   validations: Validation[];
-  updater: () => void; 
+  updater: () => void;
+  isChecked?: boolean;
 }) => {
-  const [isChecked, setIsChecked] = useState(false); // to decide whether the user has clicked the check button and show the results accordingly
+  const [internalIsChecked, setInternalIsChecked] = useState(false);
   const [overallValidity, setOverallValidity] = useState(false);
   const isActive = useStore(isValidatorClickableSelector);
 
+  const effectiveIsChecked = isChecked || internalIsChecked;
+
   const handleCheck = () => {
-    setIsChecked(true);
-    updater(); 
+    setInternalIsChecked(true);
+    updater();
     const allValid = validations.every((validation) => validation.is_valid);
     setOverallValidity(allValid);
   };
+
+  useEffect(() => {
+    if (effectiveIsChecked) {
+      const allValid = validations.every((validation) => validation.is_valid);
+      setOverallValidity(allValid);
+    }
+  }, [validations, effectiveIsChecked]);
 
   return (
     <div className="space-y-4">
@@ -45,7 +56,7 @@ const ValidationComponent = ({
         </Button>
       </div>
 
-      {isChecked && (
+      {effectiveIsChecked && (
         <div className="flex items-center justify-end mb-4">
           {overallValidity ? (
             <CheckCircle className="text-green-500 w-6 h-6 mr-2" />
@@ -57,7 +68,7 @@ const ValidationComponent = ({
           </span>
         </div>
       )}
-      {isChecked && (
+      {effectiveIsChecked && (
         <div className="mt-4">
           <h4 className="font-semibold mb-2">Individual Results:</h4>
           <ul>
