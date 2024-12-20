@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useRouter, useParams } from "next/navigation";
 import {
   useStore,
@@ -68,6 +68,7 @@ import { TableControl } from "@/classes/Controls/TableControl";
 import { InputNumber } from "@/classes/Controls/InputNumber";
 import { DropDownMenu } from "@/app/Components/EditMode/DropDownMenu";
 import { VideoUpload } from "@/app/Components/MainMenu/VideoUpload";
+import { AnimatePresence } from "framer-motion";
 
 const SortableItem: React.FC<{ id: string; children: React.ReactNode }> = ({
   id,
@@ -376,6 +377,50 @@ export default function ExperienceEditPage() {
     loadVideo();
   }, [expId, currentIndex]);
 
+  const [progress, setProgress] = useState(0);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [showPlayButton, setShowPlayButton] = useState(true);
+  const videoRef = useRef<HTMLVideoElement>(null);
+
+  const handleTimeUpdate = () => {
+    if (videoRef.current) {
+      const progress = (videoRef.current.currentTime / videoRef.current.duration) * 100;
+      setProgress(progress);
+    }
+  };
+
+  const handleSeek = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (videoRef.current) {
+      const bar = e.currentTarget;
+      const rect = bar.getBoundingClientRect();
+      const percentage = (e.clientX - rect.left) / rect.width;
+      const newTime = videoRef.current.duration * percentage;
+      videoRef.current.currentTime = newTime;
+      setProgress(percentage * 100);
+    }
+  };
+
+  const togglePlay = () => {
+    if (videoRef.current) {
+      if (isPlaying) {
+        videoRef.current.pause();
+        setIsPlaying(false);
+        setShowPlayButton(true);
+      } else {
+        videoRef.current.play()
+          .then(() => {
+            setIsPlaying(true);
+            setShowPlayButton(false);
+          })
+          .catch(error => {
+            console.log("Play failed:", error);
+            setIsPlaying(false);
+            setShowPlayButton(true);
+          });
+      }
+    }
+  };
+
   if (isLoading) {
     return <LoadingScreen 
       message="Loading Experience Editor" 
@@ -389,7 +434,7 @@ export default function ExperienceEditPage() {
       
       <div className="relative flex flex-row h-screen bg-gray-100">
       <div className="absolute top-4 right-4 z-50">
-      <VideoUpload experienceId={expId} index={currentIndex} />
+      {/* <VideoUpload experienceId={expId} index={currentIndex} /> */}
     </div>
     
         {/* Left Sidebar with collapse animation */}
@@ -443,24 +488,72 @@ export default function ExperienceEditPage() {
               </label>
             </div>
           ) : (
-            <div className="relative h-full w-full">
-              <video 
-                className="w-full h-full object-contain"
-                controls
-                src={videoUrl}
-              />
-              <label className="absolute top-4 right-4 cursor-pointer">
-                <div className="bg-black bg-opacity-50 hover:bg-opacity-70 text-white px-4 py-2 rounded-lg flex items-center gap-2 transition-all">
-                  <RefreshCw size={16} />
-                  <span>Replace Video</span>
-                  <input
-                    type="file"
-                    accept="video/*"
-                    className="hidden"
-                    onChange={handleVideoUpload}
+            <div className="absolute inset-0 w-full h-full bg-black flex items-center justify-center" onClick={togglePlay}>
+              <div className="relative flex flex-col">
+                <video
+                  ref={videoRef}
+                  src={videoUrl}
+                  className="max-w-full max-h-full w-auto h-auto object-contain"
+                  playsInline
+                  controls={false}
+                  onTimeUpdate={handleTimeUpdate}
+                  onPlay={() => {
+                    setIsPlaying(true);
+                    setShowPlayButton(false);
+                  }}
+                  onPause={() => {
+                    setIsPlaying(false);
+                    setShowPlayButton(true);
+                  }}
+                />
+                
+                <div 
+                  className="relative h-1 bg-gray-700 cursor-pointer group mt-2 z-50"
+                  onClick={(e) => e.stopPropagation()}
+                  onMouseDown={handleSeek}
+                >
+                  <div 
+                    className="h-full bg-white transition-all duration-100"
+                    style={{ width: `${progress}%` }}
                   />
+                  <div className="absolute bottom-0 left-0 right-0 h-4 -top-3 opacity-0 group-hover:opacity-100">
+                    <div 
+                      className="absolute bottom-0 h-1 bg-white/30 w-full"
+                      onMouseDown={handleSeek}
+                    />
+                  </div>
                 </div>
-              </label>
+
+                <AnimatePresence>
+                  {showPlayButton && (
+                    <div className="absolute inset-0 flex items-center justify-center">
+                      <div className="w-20 h-20 bg-black bg-opacity-50 rounded-full flex items-center justify-center">
+                        <svg 
+                          className="w-12 h-12 text-white" 
+                          fill="currentColor" 
+                          viewBox="0 0 24 24"
+                        >
+                          <path d="M8 5v14l11-7z"/>
+                        </svg>
+                      </div>
+                    </div>
+                  )}
+                </AnimatePresence>
+
+                {/* Replace Video Button */}
+                <label className="absolute top-4 right-4 cursor-pointer">
+                  <div className="bg-black bg-opacity-50 hover:bg-opacity-70 text-white px-4 py-2 rounded-lg flex items-center gap-2 transition-all">
+                    <RefreshCw size={16} />
+                    <span>Replace Video</span>
+                    <input
+                      type="file"
+                      accept="video/*"
+                      className="hidden"
+                      onChange={handleVideoUpload}
+                    />
+                  </div>
+                </label>
+              </div>
             </div>
           )}
 
