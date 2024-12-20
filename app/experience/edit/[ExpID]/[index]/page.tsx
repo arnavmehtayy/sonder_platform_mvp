@@ -14,6 +14,8 @@ import {
   deleteValidationByIndexSelect,
   getAdvancedInfluencesSelector,
   getInfluenceAdvDelete,
+  getIsVideoPlayingSelector,
+  getIsVideoEndedSelector,
 } from "@/app/store";
 import Experience from "@/app/Components/visualexp";
 import { EditBar, ObjectType } from "@/app/Components/EditMode/EditBar";
@@ -69,6 +71,8 @@ import { InputNumber } from "@/classes/Controls/InputNumber";
 import { DropDownMenu } from "@/app/Components/EditMode/DropDownMenu";
 import { VideoUpload } from "@/app/Components/MainMenu/VideoUpload";
 import { AnimatePresence } from "framer-motion";
+import { VideoPlayer } from '@/app/Components/MainMenu/VideoPlayer';
+import { motion } from "framer-motion";
 
 const SortableItem: React.FC<{ id: string; children: React.ReactNode }> = ({
   id,
@@ -421,6 +425,9 @@ export default function ExperienceEditPage() {
     }
   };
 
+  const isVideoPlaying = useStore(getIsVideoPlayingSelector);
+  const isVideoEnded = useStore(getIsVideoEndedSelector);
+
   if (isLoading) {
     return <LoadingScreen 
       message="Loading Experience Editor" 
@@ -433,10 +440,6 @@ export default function ExperienceEditPage() {
       <EditBar />
       
       <div className="relative flex flex-row h-screen bg-gray-100">
-      <div className="absolute top-4 right-4 z-50">
-      {/* <VideoUpload experienceId={expId} index={currentIndex} /> */}
-    </div>
-    
         {/* Left Sidebar with collapse animation */}
         <div
           className={`transition-all duration-300 ease-in-out ${
@@ -461,109 +464,47 @@ export default function ExperienceEditPage() {
           </div>
         </div>
 
-        {/* Main Three.js Experience */}
+        {/* Main Experience Area */}
         <div className="flex-grow bg-black h-full relative min-w-0">
           <div className="absolute top-4 left-4 z-50">
             <CurvedBackButton />
           </div>
+
+          {/* Video Upload Button - Always visible */}
+          <div className="absolute top-4 right-4 z-50">
+            <VideoUpload 
+              experienceId={expId} 
+              index={currentIndex}
+            />
+          </div>
           
-          {!videoUrl ? (
-            <div className="absolute inset-0 flex items-center justify-center">
-              <label className="cursor-pointer group">
-                <div className="flex flex-col items-center gap-4 p-8 rounded-lg border-2 border-dashed border-gray-400 bg-gray-900 bg-opacity-50 hover:bg-opacity-70 transition-all">
-                  <Plus size={40} className="text-gray-300 group-hover:text-white transition-colors" />
-                  <span className="text-gray-300 group-hover:text-white text-lg font-medium transition-colors">
-                    Click to Upload Video
-                  </span>
-                  <span className="text-gray-400 text-sm">
-                    Supported formats: MP4, WebM
-                  </span>
-                  <input
-                    type="file"
-                    accept="video/*"
-                    className="hidden"
-                    onChange={handleVideoUpload}
-                  />
-                </div>
-              </label>
-            </div>
-          ) : (
-            <div className="absolute inset-0 w-full h-full bg-black flex items-center justify-center" onClick={togglePlay}>
-              <div className="relative flex flex-col">
-                <video
-                  ref={videoRef}
-                  src={videoUrl}
-                  className="max-w-full max-h-full w-auto h-auto object-contain"
-                  playsInline
-                  controls={false}
-                  onTimeUpdate={handleTimeUpdate}
-                  onPlay={() => {
-                    setIsPlaying(true);
-                    setShowPlayButton(false);
-                  }}
-                  onPause={() => {
-                    setIsPlaying(false);
-                    setShowPlayButton(true);
-                  }}
-                />
-                
-                <div 
-                  className="relative h-1 bg-gray-700 cursor-pointer group mt-2 z-50"
-                  onClick={(e) => e.stopPropagation()}
-                  onMouseDown={handleSeek}
-                >
-                  <div 
-                    className="h-full bg-white transition-all duration-100"
-                    style={{ width: `${progress}%` }}
-                  />
-                  <div className="absolute bottom-0 left-0 right-0 h-4 -top-3 opacity-0 group-hover:opacity-100">
-                    <div 
-                      className="absolute bottom-0 h-1 bg-white/30 w-full"
-                      onMouseDown={handleSeek}
-                    />
-                  </div>
-                </div>
+          {/* Video Player */}
+          <VideoPlayer 
+            experienceId={expId} 
+            index={currentIndex} 
+          />
 
-                <AnimatePresence>
-                  {showPlayButton && (
-                    <div className="absolute inset-0 flex items-center justify-center">
-                      <div className="w-20 h-20 bg-black bg-opacity-50 rounded-full flex items-center justify-center">
-                        <svg 
-                          className="w-12 h-12 text-white" 
-                          fill="currentColor" 
-                          viewBox="0 0 24 24"
-                        >
-                          <path d="M8 5v14l11-7z"/>
-                        </svg>
-                      </div>
-                    </div>
-                  )}
-                </AnimatePresence>
+          {/* Experience will only show after video ends */}
+          <AnimatePresence>
+            {isVideoEnded && !isVideoPlaying && (
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                className="absolute inset-0 z-10"
+              >
+                <Experience />
+              </motion.div>
+            )}
+          </AnimatePresence>
 
-                {/* Replace Video Button */}
-                <label className="absolute top-4 right-4 cursor-pointer">
-                  <div className="bg-black bg-opacity-50 hover:bg-opacity-70 text-white px-4 py-2 rounded-lg flex items-center gap-2 transition-all">
-                    <RefreshCw size={16} />
-                    <span>Replace Video</span>
-                    <input
-                      type="file"
-                      accept="video/*"
-                      className="hidden"
-                      onChange={handleVideoUpload}
-                    />
-                  </div>
-                </label>
-              </div>
-            </div>
-          )}
-
-          {/* Validation Panel - Update positioning */}
+          {/* Validation Panel - Only increased z-index */}
           <div
             className={`absolute bottom-32 left-1/2 transform -translate-x-1/2 w-[calc(100%-2rem)] md:w-96 bg-white rounded-lg shadow-xl transition-all duration-300 ${
               showValidation
                 ? "opacity-100 translate-y-0"
                 : "opacity-0 translate-y-full pointer-events-none"
-            } z-30`}
+            } z-[60]`}
           >
             <div className="p-4 max-h-[30vh] md:max-h-[calc(100vh-400px)] overflow-y-auto">
               <ValidationComponent
@@ -573,10 +514,10 @@ export default function ExperienceEditPage() {
             </div>
           </div>
 
-          {/* Toggle button - Update positioning */}
+          {/* Toggle button - Only increased z-index */}
           <button
             onClick={() => setShowValidation(!showValidation)}
-            className={`absolute bottom-20 left-1/2 transform -translate-x-1/2 flex items-center space-x-2 px-4 py-2 rounded-md shadow-lg transition-all duration-300 z-40 ${
+            className={`absolute bottom-20 left-1/2 transform -translate-x-1/2 flex items-center space-x-2 px-4 py-2 rounded-md shadow-lg transition-all duration-300 z-[60] ${
               allValidationsValid 
                 ? 'bg-green-500 hover:bg-green-600' 
                 : 'bg-blue-500 hover:bg-blue-600'
