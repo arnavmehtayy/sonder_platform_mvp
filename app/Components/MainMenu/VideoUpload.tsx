@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { Upload } from 'lucide-react';
+import { RefreshCw } from 'lucide-react';
 import { toast } from 'sonner';
+import { useStore, setIsVideoEndedSelector } from '@/app/store';
 
 interface VideoUploadProps {
   experienceId: number;
@@ -10,6 +11,7 @@ interface VideoUploadProps {
 
 export function VideoUpload({ experienceId, index }: VideoUploadProps) {
   const [uploading, setUploading] = useState(false);
+  const setIsVideoEnded = useStore(setIsVideoEndedSelector);
 
   const handleUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     try {
@@ -44,10 +46,17 @@ export function VideoUpload({ experienceId, index }: VideoUploadProps) {
         throw new Error('Upload failed');
       }
 
-      toast.success('Video uploaded successfully');
+      // Reset video ended state to trigger reload
+      setIsVideoEnded(false);
+      
+      toast.success('Video replaced successfully');
+      
+      // Force reload the page to update the video
+      window.location.reload();
+      
     } catch (error) {
       console.error('Error uploading video:', error);
-      toast.error('Failed to upload video');
+      toast.error('Failed to replace video');
     } finally {
       setUploading(false);
     }
@@ -66,13 +75,13 @@ export function VideoUpload({ experienceId, index }: VideoUploadProps) {
       <label htmlFor="video-upload">
         <Button
           variant="outline"
-          className="cursor-pointer"
+          className="cursor-pointer bg-black/50 hover:bg-black/70 text-white border-none"
           disabled={uploading}
           asChild
         >
           <div className="flex items-center gap-2">
-            <Upload size={16} />
-            {uploading ? 'Uploading...' : 'Upload Video'}
+            <RefreshCw size={16} className={uploading ? 'animate-spin' : ''} />
+            {uploading ? 'Replacing...' : 'Replace Video'}
           </div>
         </Button>
       </label>

@@ -322,6 +322,33 @@ export default function ExperienceEditPage() {
 
   const [isLeftSidebarCollapsed, setIsLeftSidebarCollapsed] = useState(false);
   const [videoUrl, setVideoUrl] = useState<string | null>(null);
+  const [videoKey, setVideoKey] = useState(0);
+  const isVideoPlaying = useStore(getIsVideoPlayingSelector);
+  const isVideoEnded = useStore(getIsVideoEndedSelector);
+
+  const loadVideo = async () => {
+    try {
+      const response = await fetch(
+        `/api/supabase/video?experienceId=${expId}&index=${currentIndex}`
+      );
+
+      if (!response.ok) {
+        throw new Error('Failed to fetch video');
+      }
+
+      const data = await response.json();
+      if (data?.video_path) {
+        const supabase = createClient();
+        const { data: { publicUrl } } = supabase.storage
+          .from('experience-videos')
+          .getPublicUrl(data.video_path);
+        setVideoUrl(publicUrl);
+        setVideoKey(prev => prev + 1);
+      }
+    } catch (error) {
+      console.error('Error loading video:', error);
+    }
+  };
 
   const handleVideoUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -342,38 +369,11 @@ export default function ExperienceEditPage() {
         throw new Error('Upload failed');
       }
 
-      const data = await response.json();
-      if (data.success) {
-        // Reload the video URL after successful upload
-        loadVideo();
-        toast.success('Video uploaded successfully');
-      }
+      await loadVideo();
+      toast.success('Video replaced successfully');
     } catch (error) {
       console.error('Error uploading video:', error);
-      toast.error('Failed to upload video');
-    }
-  };
-
-  const loadVideo = async () => {
-    try {
-      const response = await fetch(
-        `/api/supabase/video?experienceId=${expId}&index=${currentIndex}`
-      );
-
-      if (!response.ok) {
-        throw new Error('Failed to fetch video');
-      }
-
-      const data = await response.json();
-      if (data?.video_path) {
-        const supabase = await createClient();
-        const { data: { publicUrl } } = supabase.storage
-          .from('experience-videos')
-          .getPublicUrl(data.video_path);
-        setVideoUrl(publicUrl);
-      }
-    } catch (error) {
-      console.error('Error loading video:', error);
+      toast.error('Failed to replace video');
     }
   };
 
@@ -425,9 +425,6 @@ export default function ExperienceEditPage() {
     }
   };
 
-  const isVideoPlaying = useStore(getIsVideoPlayingSelector);
-  const isVideoEnded = useStore(getIsVideoEndedSelector);
-
   if (isLoading) {
     return <LoadingScreen 
       message="Loading Experience Editor" 
@@ -470,18 +467,34 @@ export default function ExperienceEditPage() {
             <CurvedBackButton />
           </div>
 
-          {/* Video Upload Button - Always visible */}
+          {/* Video Upload Button - Positioned in top-right corner */}
           <div className="absolute top-4 right-4 z-50">
-            <VideoUpload 
-              experienceId={expId} 
-              index={currentIndex}
+            <input
+              type="file"
+              accept="video/*"
+              onChange={handleVideoUpload}
+              className="hidden"
+              id="video-upload"
             />
+            <label htmlFor="video-upload">
+              <Button
+                variant="outline"
+                className="cursor-pointer bg-black/50 hover:bg-black/70 text-white border-none"
+                asChild
+              >
+                <div className="flex items-center gap-2">
+                  <RefreshCw size={16} />
+                  Replace Video
+                </div>
+              </Button>
+            </label>
           </div>
           
-          {/* Video Player */}
+          {/* Video Player with key prop */}
           <VideoPlayer 
             experienceId={expId} 
-            index={currentIndex} 
+            index={currentIndex}
+            key={videoKey}
           />
 
           {/* Experience will only show after video ends */}
