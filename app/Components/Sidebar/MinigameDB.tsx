@@ -108,6 +108,7 @@ export function MinigameDB({experienceID, index}: {experienceID: number, index: 
       {/* Main Three.js Experience */}
       <div className="flex-grow bg-black h-1/2 md:h-full md:flex-1 relative">
         <VideoPlayer experienceId={experienceID} index={index} />
+        <Experience />
         {/* <Experience /> */}
 
         {/* Validation Panel - Positioned above navigation */}

@@ -131,6 +131,8 @@ export type State = {
   setScore: (score_id: number, new_score: Score<any>, validation?: Validation_score<any, obj>) => void;
   isVideoPlaying: boolean;
   setIsVideoPlaying: (isPlaying: boolean) => void;
+  isVideoEnded: boolean;
+  setIsVideoEnded: (isEnded: boolean) => void;
 };
 
 export const useStore = create<State>((set, get) => ({
@@ -150,9 +152,13 @@ export const useStore = create<State>((set, get) => ({
   isSelectActive: false,
   isEditMode: false,
   isVideoPlaying: true,
-  
-  setIsVideoPlaying: (isPlaying: boolean) => {
+  isVideoEnded: false, 
+
+  setIsVideoPlaying: (isPlaying: boolean) => {  
     set({ isVideoPlaying: isPlaying });
+  },
+  setIsVideoEnded: (isEnded: boolean) => {
+    set({ isVideoEnded: isEnded });
   },
 
   setTableControl: (newTable: TableControl<any>) => {
@@ -1205,3 +1211,5 @@ export const deletePlacementSelector = (state: State) =>
 
 export const getIsVideoPlayingSelector = (state: State) => state.isVideoPlaying;
 export const setIsVideoPlayingSelector = (state: State) => state.setIsVideoPlaying;
+export const getIsVideoEndedSelector = (state: State) => state.isVideoEnded;
+export const setIsVideoEndedSelector = (state: State) => state.setIsVideoEnded;

@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { createClient } from '@/app/utils/supabase/client';
-import { useStore, getIsVideoPlayingSelector, setIsVideoPlayingSelector } from '@/app/store';
+import { useStore, getIsVideoPlayingSelector, setIsVideoPlayingSelector, setIsVideoEndedSelector, getIsVideoEndedSelector } from '@/app/store';
 import { motion, AnimatePresence } from 'framer-motion';
 
 interface VideoPlayerProps {
@@ -11,10 +11,12 @@ interface VideoPlayerProps {
 export function VideoPlayer({ experienceId, index }: VideoPlayerProps) {
   const [videoUrl, setVideoUrl] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [showPlayButton, setShowPlayButton] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
   const isPlaying = useStore(getIsVideoPlayingSelector);
   const setIsPlaying = useStore(setIsVideoPlayingSelector);
-  const [videoEnded, setVideoEnded] = useState(false);
+  const isVideoEnded = useStore(getIsVideoEndedSelector);
+  const setIsVideoEnded = useStore(setIsVideoEndedSelector);
   const [progress, setProgress] = useState(0);
 
   useEffect(() => {
@@ -49,10 +51,12 @@ export function VideoPlayer({ experienceId, index }: VideoPlayerProps) {
       videoRef.current.play()
         .then(() => {
           setIsPlaying(true);
+          setShowPlayButton(false);
         })
         .catch(error => {
           console.log("Autoplay failed:", error);
           setIsPlaying(false);
+          setShowPlayButton(true);
         });
     }
   }, [videoUrl, setIsPlaying, isLoading]);
@@ -62,6 +66,7 @@ export function VideoPlayer({ experienceId, index }: VideoPlayerProps) {
       if (isPlaying) {
         videoRef.current.pause();
         setIsPlaying(false);
+        setShowPlayButton(true);
       } else {
         if (videoRef.current.ended) {
           videoRef.current.currentTime = 0;
@@ -69,10 +74,12 @@ export function VideoPlayer({ experienceId, index }: VideoPlayerProps) {
         videoRef.current.play()
           .then(() => {
             setIsPlaying(true);
+            setShowPlayButton(false);
           })
           .catch(error => {
             console.log("Play failed:", error);
             setIsPlaying(false);
+            setShowPlayButton(true);
           });
       }
     }
@@ -80,7 +87,18 @@ export function VideoPlayer({ experienceId, index }: VideoPlayerProps) {
 
   const handleVideoEnd = () => {
     setIsPlaying(false);
-    setVideoEnded(true);
+    setIsVideoEnded(true);
+    setShowPlayButton(false);
+  };
+
+  const handleReplay = () => {
+    setIsVideoEnded(false);
+    setIsPlaying(true);
+    setShowPlayButton(false);
+    if (videoRef.current) {
+      videoRef.current.currentTime = 0;
+      videoRef.current.play();
+    }
   };
 
   const handleTimeUpdate = () => {
@@ -121,18 +139,23 @@ export function VideoPlayer({ experienceId, index }: VideoPlayerProps) {
           src={videoUrl}
           className="max-w-full max-h-full w-auto h-auto object-contain"
           playsInline
+          autoPlay
           controls={false}
           onEnded={handleVideoEnd}
           onTimeUpdate={handleTimeUpdate}
           onPlay={() => {
             setIsPlaying(true);
-            setVideoEnded(false);
+            setIsVideoEnded(false);
+            setShowPlayButton(false);
           }}
-          onPause={() => setIsPlaying(false)}
+          onPause={() => {
+            setIsPlaying(false);
+            setShowPlayButton(true);
+          }}
         />
         
         <div 
-          className="relative h-1 bg-gray-700 cursor-pointer group mt-2"
+          className="relative h-1 bg-gray-700 cursor-pointer group mt-2 z-50"
           onClick={(e) => e.stopPropagation()}
           onMouseDown={handleSeek}
         >
@@ -149,7 +172,7 @@ export function VideoPlayer({ experienceId, index }: VideoPlayerProps) {
         </div>
 
         <AnimatePresence>
-          {(!isPlaying || isLoading) && !videoEnded && (
+          {showPlayButton && !isVideoEnded && (
             <div className="absolute inset-0 flex items-center justify-center">
               <div className="w-20 h-20 bg-black bg-opacity-50 rounded-full flex items-center justify-center">
                 {isLoading ? (
@@ -167,12 +190,12 @@ export function VideoPlayer({ experienceId, index }: VideoPlayerProps) {
             </div>
           )}
 
-          {videoEnded && (
+          {isVideoEnded && (
             <motion.div 
               initial={{ opacity: 0, x: 0 }}
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0 }}
-              className="absolute inset-0 bg-black/70 flex items-center justify-center"
+              className="absolute inset-0 bg-black/70 flex items-end justify-end p-8"
             >
               <motion.div 
                 className="flex flex-col items-center gap-4"
@@ -182,14 +205,14 @@ export function VideoPlayer({ experienceId, index }: VideoPlayerProps) {
                 <motion.div
                   animate={{ x: [0, 20, 0] }}
                   transition={{ 
-                    repeat: Infinity, 
+                    repeat: 1, 
                     duration: 1.5,
                     ease: "easeInOut" 
                   }}
                   className="flex items-center gap-3 bg-white/10 backdrop-blur-sm px-6 py-4 rounded-lg"
                 >
                   <span className="text-white text-lg font-medium">
-                    Show what you&apos;ve learned!
+                    Apply your knowledge!
                   </span>
                   <svg 
                     className="w-6 h-6 text-white" 
@@ -206,8 +229,8 @@ export function VideoPlayer({ experienceId, index }: VideoPlayerProps) {
                   </svg>
                 </motion.div>
                 <button
-                  onClick={() => setVideoEnded(false)}
-                  className="text-gray-400 hover:text-white transition-colors text-sm"
+                  onClick={handleReplay}
+                  className="text-gray-400 hover:text-white transition-colors text-sm z-50"
                 >
                   Replay video
                 </button>

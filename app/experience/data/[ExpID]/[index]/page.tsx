@@ -66,11 +66,14 @@ export default function ExperiencePage() {
 
   return (
     <div className="flex flex-col h-screen">
-    <div className="flex-grow">
-      <CurvedBackButton />
-      <MinigameDB experienceID={Number(params.ExpID)} index={Number(params.index)}/>
-      <FeedbackComponent />
+      <div className="flex-grow relative">
+        <div className="absolute top-4 left-4 z-[100]">
+          <CurvedBackButton />
+        </div>
+        
+        <MinigameDB experienceID={Number(params.ExpID)} index={Number(params.index)}/>
+        <FeedbackComponent />
+      </div>
     </div>
-  </div>
   );
 }
