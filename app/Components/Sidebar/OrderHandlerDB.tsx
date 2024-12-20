@@ -16,6 +16,8 @@ import {
   getControlSelector2,
   setTitleSelector,
   setQuestionSelector,
+  getIsVideoPlayingSelector,
+  getIsVideoEndedSelector,
 } from "@/app/store";
 import { useDebounce } from "use-debounce";
 import {
@@ -316,6 +318,10 @@ export const OrderHandlerDB = ({ isEditMode = false }: { isEditMode?: boolean })
     }
   };
 
+  // Add video state selectors
+  const isVideoPlaying = useStore(getIsVideoPlayingSelector);
+  const isVideoEnded = useStore(getIsVideoEndedSelector);
+
   return (
     <div className="space-y-4 md:space-y-6">
       <div className="p-4">
@@ -369,79 +375,83 @@ export const OrderHandlerDB = ({ isEditMode = false }: { isEditMode?: boolean })
         )}
       </div>
 
-      {isEditMode ? (
-        <DndContext
-          sensors={sensors}
-          collisionDetection={closestCenter}
-          onDragEnd={handleDragEnd}
-        >
-          <SortableContext
-            items={state.order.map(item => `${item.type}-${item.id}`)}
-            strategy={verticalListSortingStrategy}
-          >
-            {state.order.map((item, index) => (
-              <SortableItem
-                key={`${item.type}-${item.id}-${index}`}
-                id={`${item.type}-${item.id}`}
-                isEditMode={isEditMode}
-                onDelete={() => handleDeleteItem(item.id, item.type)}
-              >
-                {renderComponent(item, index)}
-              </SortableItem>
-            ))}
-          </SortableContext>
-        </DndContext>
-      ) : (
-        <div>
-          {state.order.map((item, index) => (
-            <SortableItem
-              key={`${item.type}-${item.id}-${index}`}
-              id={`${item.type}-${item.id}`}
-              isEditMode={false}
+      {isVideoEnded && !isVideoPlaying && (
+        <>
+          {isEditMode ? (
+            <DndContext
+              sensors={sensors}
+              collisionDetection={closestCenter}
+              onDragEnd={handleDragEnd}
             >
-              {renderComponent(item, index)}
-            </SortableItem>
-          ))}
-        </div>
-      )}
-
-      {isEditMode && (
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <div className="mt-8 relative">
-              <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 bg-transparent hover:border-blue-300 hover:bg-blue-50 transform transition-all duration-200 hover:scale-[1.02] cursor-pointer group overflow-visible">
-                <div className="flex flex-col items-center justify-center">
-                  <Plus className="h-8 w-8 text-gray-400 group-hover:text-blue-500 mb-2" />
-                  <h3 className="text-lg font-medium text-gray-600 group-hover:text-gray-700 mb-2">Add Sidebar Component</h3>
-                </div>
-              </div>
-            </div>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent 
-            className="bg-white rounded-lg shadow-xl p-2 mt-2 w-56 border border-gray-100 z-[100]"
-            align="center"
-            sideOffset={5}
-            alignOffset={0}
-          >
-            {controlTypes.map((objectType) => (
-              <DropdownMenuItem
-                key={objectType.type.name}
-                onSelect={() => setSelectedObjectType(objectType)}
-                className="flex items-center space-x-3 px-4 py-3 hover:bg-blue-50 rounded-md transition-all duration-200 cursor-pointer group"
+              <SortableContext
+                items={state.order.map(item => `${item.type}-${item.id}`)}
+                strategy={verticalListSortingStrategy}
               >
-                <objectType.icon className="h-5 w-5 text-blue-600 group-hover:text-blue-700" />
-                <span className="text-gray-700 font-medium group-hover:text-gray-900">{objectType.name}</span>
-              </DropdownMenuItem>
-            ))}
-          </DropdownMenuContent>
-        </DropdownMenu>
-      )}
+                {state.order.map((item, index) => (
+                  <SortableItem
+                    key={`${item.type}-${item.id}-${index}`}
+                    id={`${item.type}-${item.id}`}
+                    isEditMode={isEditMode}
+                    onDelete={() => handleDeleteItem(item.id, item.type)}
+                  >
+                    {renderComponent(item, index)}
+                  </SortableItem>
+                ))}
+              </SortableContext>
+            </DndContext>
+          ) : (
+            <div>
+              {state.order.map((item, index) => (
+                <SortableItem
+                  key={`${item.type}-${item.id}-${index}`}
+                  id={`${item.type}-${item.id}`}
+                  isEditMode={false}
+                >
+                  {renderComponent(item, index)}
+                </SortableItem>
+              ))}
+            </div>
+          )}
 
-      {selectedObjectType && (
-        <ObjectCreator
-          ObjectType={selectedObjectType.type}
-          onClose={() => setSelectedObjectType(null)}
-        />
+          {isEditMode && (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <div className="mt-8 relative">
+                  <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 bg-transparent hover:border-blue-300 hover:bg-blue-50 transform transition-all duration-200 hover:scale-[1.02] cursor-pointer group overflow-visible">
+                    <div className="flex flex-col items-center justify-center">
+                      <Plus className="h-8 w-8 text-gray-400 group-hover:text-blue-500 mb-2" />
+                      <h3 className="text-lg font-medium text-gray-600 group-hover:text-gray-700 mb-2">Add Sidebar Component</h3>
+                    </div>
+                  </div>
+                </div>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent 
+                className="bg-white rounded-lg shadow-xl p-2 mt-2 w-56 border border-gray-100 z-[100]"
+                align="center"
+                sideOffset={5}
+                alignOffset={0}
+              >
+                {controlTypes.map((objectType) => (
+                  <DropdownMenuItem
+                    key={objectType.type.name}
+                    onSelect={() => setSelectedObjectType(objectType)}
+                    className="flex items-center space-x-3 px-4 py-3 hover:bg-blue-50 rounded-md transition-all duration-200 cursor-pointer group"
+                  >
+                    <objectType.icon className="h-5 w-5 text-blue-600 group-hover:text-blue-700" />
+                    <span className="text-gray-700 font-medium group-hover:text-gray-900">{objectType.name}</span>
+                  </DropdownMenuItem>
+                ))}
+              </DropdownMenuContent>
+            </DropdownMenu>
+          )}
+
+          {selectedObjectType && (
+            <ObjectCreator
+              ObjectType={selectedObjectType.type}
+              onClose={() => setSelectedObjectType(null)}
+            />
+          )}
+        </>
       )}
     </div>
   );
