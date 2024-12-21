@@ -11,6 +11,8 @@ import { useStore } from '@/app/store';
 import { MinigameDB } from '@/app/Components/Sidebar/MinigameDB';
 import { LoadingScreen } from '@/app/Components/MainMenu/LoadingScreen';
 import { VideoPlayer } from '@/app/Components/MainMenu/VideoPlayer';
+import { Analytics } from '@vercel/analytics/react';
+import { track } from '@vercel/analytics';
 
 const resetState = () => {
   useStore.setState({
@@ -50,6 +52,14 @@ export default function ExperiencePage() {
       setIsLoading(true);
       const index = Number(params.index);
       const experienceId = Number(params.ExpID);
+      
+      // Track page visit
+      track('visit_experience', {
+        experienceId,
+        index,
+        path: window.location.pathname
+      });
+
       await handleLoadState(experienceId, index);
       setIsLoading(false);
     };
@@ -75,5 +85,6 @@ export default function ExperiencePage() {
         <FeedbackComponent />
       </div>
     </div>
+    
   );
 }

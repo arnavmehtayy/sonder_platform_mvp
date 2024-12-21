@@ -41,7 +41,7 @@ const ValidationComponent = ({
       {/* Header Section */}
       <div className="flex items-center justify-between">
       <h3 className="text-lg font-semibold text-blue-800">Autograder</h3>
-        <Button
+        {/* <Button
           onClick={handleCheck}
           disabled={!isActive}
           className={`flex items-center gap-2 ${
@@ -53,7 +53,7 @@ const ValidationComponent = ({
         >
           <CheckCircle size={16} />
           Check Validity
-        </Button>
+        </Button> */}
       </div>
 
       {effectiveIsChecked && (
