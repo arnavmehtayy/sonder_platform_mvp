@@ -3,21 +3,34 @@ import { NextResponse } from 'next/server';
 
 export async function POST(request: Request) {
   try {
-    const formData = await request.formData();
-    const file = formData.get('file') as File;
-    const experienceId = formData.get('experienceId') as string;
-    const index = formData.get('index') as string;
+    const body = await request.json();
+    console.log('Received body:', body); // Debug log
 
-    if (!file || !experienceId || !index) {
+    const { experienceId, index, filePath } = body;
+
+    // More detailed validation
+    if (!experienceId) {
       return NextResponse.json(
-        { error: 'Missing required fields' },
+        { error: 'experienceId is required' },
+        { status: 400 }
+      );
+    }
+    if (index === undefined || index === null) {
+      return NextResponse.json(
+        { error: 'index is required' },
+        { status: 400 }
+      );
+    }
+    if (!filePath) {
+      return NextResponse.json(
+        { error: 'filePath is required' },
         { status: 400 }
       );
     }
 
     const supabase = await createClient();
 
-    // 1. First check if a record exists
+    // Check for existing video
     const { data: existingVideo } = await supabase
       .from('experience_videos')
       .select('video_path')
@@ -25,14 +38,12 @@ export async function POST(request: Request) {
       .eq('index', index)
       .single();
 
-    // 2. If exists, delete the old video file and database record
+    // If exists, delete old file and record
     if (existingVideo?.video_path) {
-      // Delete old file from storage
       await supabase.storage
         .from('experience-videos')
         .remove([existingVideo.video_path]);
       
-      // Delete old database record
       await supabase
         .from('experience_videos')
         .delete()
@@ -40,23 +51,7 @@ export async function POST(request: Request) {
         .eq('index', index);
     }
 
-    // 3. Upload new video
-    const timestamp = Date.now();
-    const fileExtension = file.name.split('.').pop();
-    const fileName = `video_${timestamp}.${fileExtension}`;
-    const filePath = `${experienceId}/${index}/${fileName}`;
-
-    const { data: uploadData, error: uploadError } = await supabase.storage
-      .from('experience-videos')
-      .upload(filePath, file, {
-        cacheControl: '3600',
-        upsert: false,
-        contentType: file.type
-      });
-
-    if (uploadError) throw uploadError;
-
-    // 4. Insert new database record
+    // Insert new database record
     const { error: dbError } = await supabase
       .from('experience_videos')
       .insert({

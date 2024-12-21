@@ -355,18 +355,40 @@ export default function ExperienceEditPage() {
     if (!file) return;
 
     try {
-      const formData = new FormData();
-      formData.append('file', file);
-      formData.append('experienceId', expId.toString());
-      formData.append('index', currentIndex.toString());
+      const supabase = createClient();
+      const timestamp = Date.now();
+      const fileExtension = file.name.split('.').pop();
+      const fileName = `video_${timestamp}.${fileExtension}`;
+      const filePath = `${expId}/${currentIndex}/${fileName}`;
+
+      const { error: uploadError } = await supabase.storage
+        .from('experience-videos')
+        .upload(filePath, file);
+
+      if (uploadError) throw uploadError;
+
+      console.log('Sending to API:', {
+        experienceId: expId.toString(),
+        index: parseInt(currentIndex.toString()),
+        filePath: filePath,
+      });
 
       const response = await fetch('/api/supabase/video', {
         method: 'POST',
-        body: formData,
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          experienceId: expId.toString(),
+          index: parseInt(currentIndex.toString()),
+          filePath: filePath,
+        }),
       });
 
       if (!response.ok) {
-        throw new Error('Upload failed');
+        const errorData = await response.json();
+        console.error('API Error:', errorData);
+        throw new Error(`Failed to update database: ${errorData.error}`);
       }
 
       await loadVideo();
