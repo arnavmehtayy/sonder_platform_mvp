@@ -540,7 +540,7 @@ const CountdownTimer = () => {
   });
 
   useEffect(() => {
-    const targetDate = new Date('December 21, 2024 23:59:59').getTime();
+    const targetDate = new Date('December 25, 2024 23:59:59').getTime();
 
     const updateTimer = () => {
       const now = new Date().getTime();
