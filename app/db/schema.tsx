@@ -34,6 +34,7 @@ export const experience = pgTable('experience_table', {
   desc: text('desc').notNull(),
   title: text('title').notNull(),
   user_id: integer('user_id').references(() => profiles.id).notNull(), // foreign key to the profile
+  is_hidden: boolean('is_hidden').notNull().default(false)
 })
 
 export type ExperienceSelect = InferSelectModel<typeof experience>;

@@ -4,7 +4,7 @@ import { motion } from "framer-motion";
 import Image from "next/image";
 import Logo from "@/images/Sonder logo with text.png";
 import { ExperienceCard } from "./ExperienceHub";
-import { ChevronRight, Activity, Eye, PlusCircle, X, MoreVertical, Edit2, Trash2 } from "lucide-react";
+import { ChevronRight, Activity, Eye, PlusCircle, X, MoreVertical, Edit2, Trash2, EyeOff } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { User } from "lucide-react";
@@ -31,6 +31,7 @@ interface Experience {
   userId: number;
   firstName: string;
   lastName: string;
+  is_hidden: boolean;
 }
 
 interface State {
@@ -63,7 +64,7 @@ export const ExpDBHub = ({ isAuthenticated: parentIsAuthenticated }: { isAuthent
   useEffect(() => {
     checkAuth();
     fetchExperiences();
-  }, []);
+  }, [userId]);
 
   const checkAuth = async () => {
     const { data: { session }, error } = await supabase.auth.getSession();
@@ -132,7 +133,7 @@ export const ExpDBHub = ({ isAuthenticated: parentIsAuthenticated }: { isAuthent
 
   const fetchExperiences = async () => {
     try {
-      const response = await fetch('/api/supabase/experiences');
+      const response = await fetch(`/api/supabase/experiences${userId ? `?userId=${userId}` : ''}`);
       if (!response.ok) {
         throw new Error('Failed to fetch experiences');
       }
@@ -142,6 +143,33 @@ export const ExpDBHub = ({ isAuthenticated: parentIsAuthenticated }: { isAuthent
       setError(err instanceof Error ? err.message : 'Failed to fetch experiences');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleToggleHidden = async (id: number, isHidden: boolean) => {
+    try {
+      const response = await fetch('/api/supabase/experiences', {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          id,
+          is_hidden: isHidden,
+        }),
+      });
+
+      if (response.ok) {
+        setExperiences(experiences.map(exp => 
+          exp.id === id ? { ...exp, is_hidden: isHidden } : exp
+        ));
+        toast.success(isHidden ? 'Experience hidden' : 'Experience unhidden');
+      } else {
+        throw new Error('Failed to update experience');
+      }
+    } catch (error) {
+      console.error('Error updating experience:', error);
+      toast.error('Failed to update experience');
     }
   };
 
@@ -201,6 +229,8 @@ export const ExpDBHub = ({ isAuthenticated: parentIsAuthenticated }: { isAuthent
                 userId={experience.userId}
                 currentUserId={userId}
                 onDelete={handleDeleteExperience}
+                is_hidden={experience.is_hidden}
+                onToggleHidden={handleToggleHidden}
               />
             ))}
             {isAuthenticated && (
@@ -287,7 +317,9 @@ export const ExperienceCardDB = ({
   lastName,
   userId,
   currentUserId,
-  onDelete
+  onDelete,
+  is_hidden,
+  onToggleHidden
 }: {
   name: string;
   description: string;
@@ -297,6 +329,8 @@ export const ExperienceCardDB = ({
   userId: number;
   currentUserId: number | null;
   onDelete: (id: number) => void;
+  is_hidden: boolean;
+  onToggleHidden: (id: number, isHidden: boolean) => Promise<void>;
 }) => {
   const [isHovered, setIsHovered] = useState(false);
   const [showActions, setShowActions] = useState(false);
@@ -355,7 +389,9 @@ export const ExperienceCardDB = ({
     >
       <div
         onClick={handleClick}
-        className="bg-white rounded-lg shadow-lg overflow-hidden h-full transition-all duration-300 hover:shadow-xl cursor-pointer relative group"
+        className={`bg-white rounded-lg shadow-lg overflow-hidden h-full transition-all duration-300 hover:shadow-xl cursor-pointer relative group ${
+          is_hidden ? 'opacity-60' : ''
+        }`}
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
       >
@@ -378,27 +414,46 @@ export const ExperienceCardDB = ({
             </button>
             
             {showActions && (
-              <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg overflow-hidden z-50 border border-gray-100">
-                <button
-                  onClick={handleEdit}
-                  className="w-full px-4 py-3 text-left text-sm hover:bg-[#01A9B2]/5 flex items-center gap-2 transition-colors duration-200"
-                >
-                  <Edit2 size={16} className="text-[#01A9B2]" />
-                  <div>
-                    <p className="font-medium text-gray-700">Edit Experience</p>
-                    <p className="text-xs text-gray-500">{"Modify this experience's content"}</p>
-                  </div>
-                </button>
-                <button
-                  onClick={handleDelete}
-                  className="w-full px-4 py-3 text-left text-sm hover:bg-red-50 flex items-center gap-2 border-t border-gray-100 transition-colors duration-200"
-                >
-                  <Trash2 size={16} className="text-red-500" />
-                  <div>
-                    <p className="font-medium text-red-600">Delete Experience</p>
-                    <p className="text-xs text-red-500/75">Remove this experience permanently</p>
-                  </div>
-                </button>
+              <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg overflow-hidden z-50 border border-gray-100"
+                   style={{ maxHeight: '100vh' }}
+              >
+                <div className="relative">
+                  <button
+                    onClick={handleEdit}
+                    className="w-full px-4 py-3 text-left text-sm hover:bg-[#01A9B2]/5 flex items-center gap-2 transition-colors duration-200"
+                  >
+                    <Edit2 size={16} className="text-[#01A9B2]" />
+                    <div>
+                      <p className="font-medium text-gray-700">Edit Experience</p>
+                    </div>
+                  </button>
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onToggleHidden(experienceId, !is_hidden);
+                      setShowActions(false);
+                    }}
+                    className="w-full px-4 py-3 text-left text-sm hover:bg-[#01A9B2]/5 flex items-center gap-2 border-t border-gray-100 transition-colors duration-200"
+                  >
+                    {is_hidden ? (
+                      <Eye size={16} className="text-[#01A9B2]" />
+                    ) : (
+                      <EyeOff size={16} className="text-[#01A9B2]" />
+                    )}
+                    <div>
+                      <p className="font-medium text-gray-700">{is_hidden ? 'Show Experience' : 'Hide Experience'}</p>
+                    </div>
+                  </button>
+                  <button
+                    onClick={handleDelete}
+                    className="w-full px-4 py-3 text-left text-sm hover:bg-red-50 flex items-center gap-2 border-t border-gray-100 transition-colors duration-200"
+                  >
+                    <Trash2 size={16} className="text-red-500" />
+                    <div>
+                      <p className="font-medium text-red-600">Delete Experience</p>
+                    </div>
+                  </button>
+                </div>
               </div>
             )}
           </div>

@@ -1,7 +1,7 @@
 import { db } from "@/app/db/index";
 import { experience, profiles } from "@/app/db/schema";
 import { NextResponse } from 'next/server';
-import { eq } from 'drizzle-orm';
+import { eq, or, and } from 'drizzle-orm';
 
 export async function POST(request: Request) {
   try {
@@ -36,19 +36,34 @@ export async function POST(request: Request) {
 }
 
 
-export async function GET() {
+export async function GET(request: Request) {
   try {
+    // Get the current user's ID from the query params
+    const url = new URL(request.url);
+    const currentUserId = url.searchParams.get('userId');
+
     const experiences = await db
       .select({
         id: experience.id,
         desc: experience.desc,
         title: experience.title,
-        userId: profiles.id, // this is the profile ID not the supabase userID
+        userId: profiles.id,
         firstName: profiles.firstName,
         lastName: profiles.lastName,
+        is_hidden: experience.is_hidden,
       })
       .from(experience)
-      .leftJoin(profiles, eq(experience.user_id, profiles.id));
+      .leftJoin(profiles, eq(experience.user_id, profiles.id))
+      // Only show hidden experiences to their authors
+      .where(
+        or(
+          eq(experience.is_hidden, false),
+          and(
+            eq(experience.is_hidden, true),
+            eq(experience.user_id, Number(currentUserId) || 0)
+          )
+        )
+      );
     
     return NextResponse.json(experiences);
   } catch (error) {
@@ -94,6 +109,26 @@ export async function DELETE(request: Request) {
     console.error("Error deleting experience:", error);
     return NextResponse.json(
       { error: "Failed to delete experience" },
+      { status: 500 }
+    );
+  }
+}
+
+export async function PATCH(request: Request) {
+  try {
+    const { id, is_hidden }: { id: number; is_hidden: boolean } = await request.json();
+
+    const [updatedExperience] = await db
+      .update(experience)
+      .set({ is_hidden })
+      .where(eq(experience.id, id))
+      .returning();
+
+    return NextResponse.json(updatedExperience);
+  } catch (error) {
+    console.error("Error updating experience:", error);
+    return NextResponse.json(
+      { error: "Failed to update experience" },
       { status: 500 }
     );
   }
