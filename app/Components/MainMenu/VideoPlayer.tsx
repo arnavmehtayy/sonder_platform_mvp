@@ -230,7 +230,7 @@ export function VideoPlayer({ experienceId, index }: VideoPlayerProps) {
                 </motion.div>
                 <button
                   onClick={handleReplay}
-                  className="text-gray-400 hover:text-white transition-colors text-sm z-50"
+                  className="text-white bg-black/50 hover:bg-black/70 px-4 py-2 rounded-md transition-colors text-sm z-50 backdrop-blur-sm"
                 >
                   Replay video
                 </button>
