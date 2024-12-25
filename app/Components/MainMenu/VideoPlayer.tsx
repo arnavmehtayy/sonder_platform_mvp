@@ -195,7 +195,7 @@ export function VideoPlayer({ experienceId, index }: VideoPlayerProps) {
               initial={{ opacity: 0, x: 0 }}
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0 }}
-              className="absolute inset-0 bg-black/70 flex items-end justify-end p-8"
+              className="absolute inset-0 bg-black/35 flex items-end justify-end p-8"
             >
               <motion.div 
                 className="flex flex-col items-center gap-4"
