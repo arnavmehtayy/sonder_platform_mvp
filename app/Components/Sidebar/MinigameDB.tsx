@@ -144,7 +144,9 @@ export function MinigameDB({experienceID, index}: {experienceID: number, index: 
       });
 
       videoElement.currentTime = videoElement.duration;
+      videoElement.play();
     }
+
   };
 
   return (
