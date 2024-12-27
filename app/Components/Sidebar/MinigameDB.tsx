@@ -223,9 +223,9 @@ export function MinigameDB({experienceID, index}: {experienceID: number, index: 
           )}
         </AnimatePresence>
 
-        {/* Verify button - Only show when video has ended */}
+        {/* Verify button - Only show when video has ended AND there are validations */}
         <AnimatePresence>
-          {isVideoEnded && !isVideoPlaying && (
+          {isVideoEnded && !isVideoPlaying && validationInstance.length > 0 && (
             <motion.button 
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
