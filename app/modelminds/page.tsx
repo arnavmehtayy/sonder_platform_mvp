@@ -157,7 +157,7 @@ const IdeathonPage = () => {
                           Design Document (30%)
                         </p>
                         <p className="text-gray-700">
-                          A one-page document outlining your project's concept,
+                          A one-page document outlining your project&apos;s concept,
                           approach, and impact.
                         </p>
                       </div>
