@@ -74,9 +74,20 @@ export class OrderItem {
   // hint?: string; removed hints for now will move it somewhere else
 }
 
-export type SideBarComponentType = "score" | "control" | "placement" | "question"; // possible types of objects that can be in the sidebar
+export type SideBarComponentType =
+  | "score"
+  | "control"
+  | "placement"
+  | "question"; // possible types of objects that can be in the sidebar
 
-export type EditAddType = Question | obj | Control  | Score<any> | Placement | Influence<any, obj, obj> | Validation;
+export type EditAddType =
+  | Question
+  | obj
+  | Control
+  | Score<any>
+  | Placement
+  | Influence<any, obj, obj>
+  | Validation;
 
 export type State = {
   camera_zoom: number;
@@ -109,10 +120,15 @@ export type State = {
   setInputNumberValue: (control_id: number) => (value: number | "") => void;
   setEnablerControl: (control_id: number) => (isEnabled: boolean) => void;
   addQuestion: (id: number, text: string) => void;
-  addMCQuestion: (id: number, title: string, desc: string, options: Option[]) => void;
+  addMCQuestion: (
+    id: number,
+    title: string,
+    desc: string,
+    options: Option[]
+  ) => void;
   addElement: (element: EditAddType) => void;
-  setIsPlacementModeIndividual:  (id: number, val: boolean) => void
-  setNumObjectsPlaced: (id: number, num: number) => void
+  setIsPlacementModeIndividual: (id: number, val: boolean) => void;
+  setNumObjectsPlaced: (id: number, num: number) => void;
   setOrder: (newOrder: OrderItem[]) => void;
   deleteOrderItem: (id: number, type: string) => void;
   setTableControl: (newTable: TableControl<any>) => void;
@@ -128,11 +144,17 @@ export type State = {
   deleteInfluences: (id: number) => void;
   deleteScore: (id: number) => void;
   deleteQuestion: (id: number) => void;
-  setScore: (score_id: number, new_score: Score<any>, validation?: Validation_score<any, obj>) => void;
+  setScore: (
+    score_id: number,
+    new_score: Score<any>,
+    validation?: Validation_score<any, obj>
+  ) => void;
   isVideoPlaying: boolean;
   setIsVideoPlaying: (isPlaying: boolean) => void;
   isVideoEnded: boolean;
   setIsVideoEnded: (isEnded: boolean) => void;
+  editingObjects: { [key: number]: boolean };
+  setEditingObject: (id: number, isEditing: boolean) => void;
 };
 
 export const useStore = create<State>((set, get) => ({
@@ -152,9 +174,9 @@ export const useStore = create<State>((set, get) => ({
   isSelectActive: false,
   isEditMode: false,
   isVideoPlaying: true,
-  isVideoEnded: false, 
+  isVideoEnded: false,
 
-  setIsVideoPlaying: (isPlaying: boolean) => {  
+  setIsVideoPlaying: (isPlaying: boolean) => {
     set({ isVideoPlaying: isPlaying });
   },
   setIsVideoEnded: (isEnded: boolean) => {
@@ -163,9 +185,9 @@ export const useStore = create<State>((set, get) => ({
 
   setTableControl: (newTable: TableControl<any>) => {
     set((state) => {
-      const controls_new = {...state.controls, [newTable.id]: newTable}
-      return {controls: controls_new}
-    })
+      const controls_new = { ...state.controls, [newTable.id]: newTable };
+      return { controls: controls_new };
+    });
   },
 
   setOrder: (newOrder: OrderItem[]) => {
@@ -174,28 +196,34 @@ export const useStore = create<State>((set, get) => ({
 
   deleteOrderItem: (id: number, type: string) => {
     set((state) => {
-      const newOrder = state.order.filter(item => !(item.id === id && item.type === type));
-      
+      const newOrder = state.order.filter(
+        (item) => !(item.id === id && item.type === type)
+      );
+
       // Delete the corresponding object based on the type
       switch (type) {
-        case 'control':
+        case "control":
           delete state.controls[id];
           break;
-        case 'score':
+        case "score":
           delete state.scores[id];
           break;
-        case 'placement':
+        case "placement":
           delete state.placement[id];
           break;
-        case 'question':
+        case "question":
           delete state.questions[id];
           break;
       }
 
-      const newValidations = state.validations.filter(validation => {
+      const newValidations = state.validations.filter((validation) => {
         if (validation instanceof Validation_obj) {
           return validation.obj_id !== id;
-        } else if (validation instanceof Validation_select || validation instanceof Validation_inputNumber || validation instanceof ValidationMultiChoice) {
+        } else if (
+          validation instanceof Validation_select ||
+          validation instanceof Validation_inputNumber ||
+          validation instanceof ValidationMultiChoice
+        ) {
           return validation.control_id !== id;
         } else if (validation instanceof Validation_score) {
           return validation.score_id !== id;
@@ -204,39 +232,36 @@ export const useStore = create<State>((set, get) => ({
       });
 
       return { order: newOrder, validations: newValidations };
-
     });
   },
-  
 
   setNumObjectsPlaced: (id: number, num: number) => {
     set((state) => {
-      let updatedState: Partial<State> = {}
+      let updatedState: Partial<State> = {};
       const placement = state.placement[id];
-    const updatedPlacement = Placement.setNumObjectsPlaced(placement, num);
-    updatedState = {
-      placement: { ...state.placement, [id]: updatedPlacement },
-    };
-    return updatedState
-    })
+      const updatedPlacement = Placement.setNumObjectsPlaced(placement, num);
+      updatedState = {
+        placement: { ...state.placement, [id]: updatedPlacement },
+      };
+      return updatedState;
+    });
   },
 
   setIsPlacementModeIndividual: (id: number, val: boolean) => {
     set((state) => {
-      let updatedState:  Partial<State> = {};
-    if(val) {
-      state.setIsPlacementMode(true);
-    }
-    else {
-      state.setIsPlacementMode(false);
-    }
-    const placement = state.placement[id];
-    const updatedPlacement = Placement.setPlacementActive(placement, val);
-    updatedState = {
-      placement: { ...state.placement, [id]: updatedPlacement },
-    };
-    return updatedState
-  })
+      let updatedState: Partial<State> = {};
+      if (val) {
+        state.setIsPlacementMode(true);
+      } else {
+        state.setIsPlacementMode(false);
+      }
+      const placement = state.placement[id];
+      const updatedPlacement = Placement.setPlacementActive(placement, val);
+      updatedState = {
+        placement: { ...state.placement, [id]: updatedPlacement },
+      };
+      return updatedState;
+    });
   },
 
   // add any element to the state (vizobj, control, score, placement, influence, validation, order)
@@ -248,11 +273,15 @@ export const useStore = create<State>((set, get) => ({
 
       if (element instanceof InfluenceAdvanced) {
         const newIndex = { ...state.influenceAdvIndex };
-        
+
         // Add influence to index for each master/dependency ID
-        element.dependencyIds.forEach(masterId => {
+        element.dependencyIds.forEach((masterId) => {
           if (!newIndex[masterId]) newIndex[masterId] = [];
-          if (!newIndex[masterId].find(inf => inf.influence_id === element.influence_id)) {
+          if (
+            !newIndex[masterId].find(
+              (inf) => inf.influence_id === element.influence_id
+            )
+          ) {
             newIndex[masterId] = [...newIndex[masterId], element];
           }
         });
@@ -289,7 +318,7 @@ export const useStore = create<State>((set, get) => ({
       } else if (element instanceof Placement) {
         updatedState = {
           placement: { ...state.placement, [element.id]: element },
-          order: [...state.order, { type: "placement", id: element.id}], 
+          order: [...state.order, { type: "placement", id: element.id }],
         };
       } else if (element instanceof Validation) {
         updatedState = {
@@ -301,15 +330,21 @@ export const useStore = create<State>((set, get) => ({
     });
   },
 
-  addMCQuestion: (id: number, title: string, desc: string, options: Option[]) => {
+  addMCQuestion: (
+    id: number,
+    title: string,
+    desc: string,
+    options: Option[]
+  ) => {
     set((state) => {
-      const updatedControl= { ...state.controls, [id]:  new MultiChoiceClass(
-        {
+      const updatedControl = {
+        ...state.controls,
+        [id]: new MultiChoiceClass({
           id: id,
           desc: title,
           text: desc,
           options: options,
-        })
+        }),
       };
       const updatedOrder: OrderItem[] = [
         ...state.order,
@@ -357,14 +392,16 @@ export const useStore = create<State>((set, get) => ({
     set((state) => {
       const control = state.controls[control_id] as InputNumber;
       if (control instanceof InputNumber) {
-        const obj_id = control.obj_id
-        const viz = state.vizobjs[obj_id]
-        const updated_viz = control.setControlledObjectValue(value, viz)
+        const obj_id = control.obj_id;
+        const viz = state.vizobjs[obj_id];
+        const updated_viz = control.setControlledObjectValue(value, viz);
         const updatedControl = control.setValue(value);
 
         return {
           controls: { ...state.controls, [control_id]: updatedControl },
-          vizobjs: updated_viz ? {...state.vizobjs, [obj_id]: updated_viz } : state.vizobjs
+          vizobjs: updated_viz
+            ? { ...state.vizobjs, [obj_id]: updated_viz }
+            : state.vizobjs,
         };
       }
       return {};
@@ -420,11 +457,16 @@ export const useStore = create<State>((set, get) => ({
           {} as { [id: number]: Control }
         );
 
-        const updatedPlacement = Object.entries(state.placement).reduce((acc, [id, placement]) => {
-              acc[placement.id] = Placement.setPlacementisClickable(placement, !val);
-              return acc;
-            }, {} as { [id: number]: Placement })
-          
+        const updatedPlacement = Object.entries(state.placement).reduce(
+          (acc, [id, placement]) => {
+            acc[placement.id] = Placement.setPlacementisClickable(
+              placement,
+              !val
+            );
+            return acc;
+          },
+          {} as { [id: number]: Placement }
+        );
 
         // Update selectable objects and make sure they are clickable
         if (control) {
@@ -507,18 +549,15 @@ export const useStore = create<State>((set, get) => ({
           return validation.computeValidity(
             state.controls[validation.control_id] as InputNumber
           );
-        } 
-        else if (validation instanceof Validation_tableControl) {
-            return validation.computeValidity(
-              state.controls[validation.control_id] as TableControl<any>
-            )
-        }
-        else if(validation instanceof Validation_sliderAdv) {
+        } else if (validation instanceof Validation_tableControl) {
+          return validation.computeValidity(
+            state.controls[validation.control_id] as TableControl<any>
+          );
+        } else if (validation instanceof Validation_sliderAdv) {
           return validation.computeValidity(
             state.controls[validation.control_id] as SliderControlAdvanced<any>
-          )
-        }
-        else {
+          );
+        } else {
           return validation.computeValidity(null);
         }
       });
@@ -531,7 +570,7 @@ export const useStore = create<State>((set, get) => ({
   setVizObj: (id: number, new_obj: obj) => {
     set((state) => {
       const updatedVizobjs = { ...state.vizobjs, [id]: new_obj };
-      
+
       // Process regular influences
       const masterInfluences = state.influences[id];
       if (masterInfluences) {
@@ -546,19 +585,22 @@ export const useStore = create<State>((set, get) => ({
 
       // Process advanced influences
       const advancedInfluences = state.influenceAdvIndex[id] || [];
-      advancedInfluences.forEach(influence => {
+      advancedInfluences.forEach((influence) => {
         // Get all current values for dependencies
-        const dependencyValues = influence.dependencyIds.map(depId => 
+        const dependencyValues = influence.dependencyIds.map((depId) =>
           depId === id ? new_obj : updatedVizobjs[depId]
         );
-        
+
         // Update the worker using the latest state
-        updatedVizobjs[influence.worker_id] = influence.attribute_pairs.reduce((updatedObj, pair) => {
-          const value = pair.transform_function.get_function()(0, () => ({
-            vizobjs: updatedVizobjs
-          }));
-          return pair.set_attribute(updatedObj, value);
-        }, updatedVizobjs[influence.worker_id]);
+        updatedVizobjs[influence.worker_id] = influence.attribute_pairs.reduce(
+          (updatedObj, pair) => {
+            const value = pair.transform_function.get_function()(0, () => ({
+              vizobjs: updatedVizobjs,
+            }));
+            return pair.set_attribute(updatedObj, value);
+          },
+          updatedVizobjs[influence.worker_id]
+        );
       });
 
       return { vizobjs: updatedVizobjs };
@@ -574,24 +616,24 @@ export const useStore = create<State>((set, get) => ({
         const updatedVizobjs = { ...state.vizobjs };
         delete updatedVizobjs[id];
         wasDeleted = true;
-  
+
         // Remove corresponding validations
-        const newValidations = state.validations.filter(validation => {
+        const newValidations = state.validations.filter((validation) => {
           if (validation instanceof Validation_obj) {
             return validation.obj_id !== id;
           }
           return true;
         });
-  
+
         // Remove regular influences where the object is either master or worker
         const updatedInfluences = { ...state.influences };
         // Remove influences where object is master
         delete updatedInfluences[id];
         // Remove influences where object is worker
-        Object.keys(updatedInfluences).forEach(masterId => {
-          updatedInfluences[Number(masterId)] = updatedInfluences[Number(masterId)].filter(
-            influence => influence.worker_id !== id
-          );
+        Object.keys(updatedInfluences).forEach((masterId) => {
+          updatedInfluences[Number(masterId)] = updatedInfluences[
+            Number(masterId)
+          ].filter((influence) => influence.worker_id !== id);
           // Remove empty master entries
           if (updatedInfluences[Number(masterId)].length === 0) {
             delete updatedInfluences[Number(masterId)];
@@ -603,10 +645,10 @@ export const useStore = create<State>((set, get) => ({
         // Remove from index where object is a dependency
         delete updatedAdvancedInfluences[id];
         // Remove influences where object is worker
-        Object.keys(updatedAdvancedInfluences).forEach(depId => {
-          updatedAdvancedInfluences[Number(depId)] = updatedAdvancedInfluences[Number(depId)].filter(
-            influence => influence.worker_id !== id
-          );
+        Object.keys(updatedAdvancedInfluences).forEach((depId) => {
+          updatedAdvancedInfluences[Number(depId)] = updatedAdvancedInfluences[
+            Number(depId)
+          ].filter((influence) => influence.worker_id !== id);
           // Remove empty dependency entries
           if (updatedAdvancedInfluences[Number(depId)].length === 0) {
             delete updatedAdvancedInfluences[Number(depId)];
@@ -616,41 +658,54 @@ export const useStore = create<State>((set, get) => ({
         // Remove corresponding Controls and update order
         const updatedControls = { ...state.controls };
         let newOrder = [...state.order];
-        Object.keys(updatedControls).forEach(controlId => {
+        Object.keys(updatedControls).forEach((controlId) => {
           const control = updatedControls[Number(controlId)];
           if (control instanceof SelectControl) {
-            control.selectable = control.selectable.filter(objId => objId !== id);
-            control.selected = control.selected.filter(objId => objId !== id);
+            control.selectable = control.selectable.filter(
+              (objId) => objId !== id
+            );
+            control.selected = control.selected.filter((objId) => objId !== id);
           } else if (control instanceof EnablerControl) {
-            control.obj_ids = control.obj_ids.filter(objId => objId !== id);
+            control.obj_ids = control.obj_ids.filter((objId) => objId !== id);
             if (control.obj_ids.length === 0) {
               delete updatedControls[Number(controlId)];
-              newOrder = newOrder.filter(item => !(item.type === 'control' && item.id === Number(controlId)));
+              newOrder = newOrder.filter(
+                (item) =>
+                  !(item.type === "control" && item.id === Number(controlId))
+              );
             }
           } else if (control instanceof TableControl) {
-            control.rows = control.rows.map(row => ({
-              cells: row.cells.map(cell => {
+            control.rows = control.rows.map((row) => ({
+              cells: row.cells.map((cell) => {
                 if (cell.obj_id === id) {
-                  return { ...cell, obj_id: -1, obj_type: 'Obj', attribute: '' };
+                  return {
+                    ...cell,
+                    obj_id: -1,
+                    obj_type: "Obj",
+                    attribute: "",
+                  };
                 }
                 return cell;
-              })
+              }),
             }));
           } else if (control instanceof SliderControlAdvanced) {
             if (control.obj_id === id) {
               delete updatedControls[Number(controlId)];
-              newOrder = newOrder.filter(item => !(item.type === 'control' && item.id === Number(controlId)));
+              newOrder = newOrder.filter(
+                (item) =>
+                  !(item.type === "control" && item.id === Number(controlId))
+              );
             }
           }
         });
-  
-        return { 
-          vizobjs: updatedVizobjs, 
+
+        return {
+          vizobjs: updatedVizobjs,
           validations: newValidations,
           influences: updatedInfluences,
           influenceAdvIndex: updatedAdvancedInfluences,
           controls: updatedControls,
-          order: newOrder
+          order: newOrder,
         };
       }
       return {}; // Return an empty object if no changes were made
@@ -669,7 +724,7 @@ export const useStore = create<State>((set, get) => ({
   reset: (dataSetKey: keyof typeof initDataSets) => {
     const dataSet = initDataSets[dataSetKey];
     set({
-      camera_zoom: dataSet.camera_zoom || 25, 
+      camera_zoom: dataSet.camera_zoom || 25,
       title: dataSet.title,
       state_name: dataSetKey,
       order: dataSet.order,
@@ -679,8 +734,7 @@ export const useStore = create<State>((set, get) => ({
       placement: dataSet.placement.reduce((acc, placement) => {
         acc[placement.id] = placement;
         return acc;
-      }
-      , {} as { [id: number]: Placement }),
+      }, {} as { [id: number]: Placement }),
 
       questions: dataSet.questions.reduce((acc, question) => {
         acc[question.id] = question.text;
@@ -748,10 +802,14 @@ export const useStore = create<State>((set, get) => ({
   addInfluenceAdv: (influence: InfluenceAdvanced) => {
     set((state) => {
       const newIndex = { ...state.influenceAdvIndex };
-      
-      influence.dependencyIds.forEach(id => {
+
+      influence.dependencyIds.forEach((id) => {
         if (!newIndex[id]) newIndex[id] = [];
-        if (!newIndex[id].find(inf => inf.influence_id === influence.influence_id)) {
+        if (
+          !newIndex[id].find(
+            (inf) => inf.influence_id === influence.influence_id
+          )
+        ) {
           newIndex[id] = [...newIndex[id], influence];
         }
       });
@@ -764,11 +822,11 @@ export const useStore = create<State>((set, get) => ({
   deleteInfluenceAdv: (influence_id: number) => {
     set((state) => {
       const newIndex = { ...state.influenceAdvIndex };
-      
+
       // Remove the influence from all master ID arrays
-      Object.keys(newIndex).forEach(masterId => {
+      Object.keys(newIndex).forEach((masterId) => {
         newIndex[Number(masterId)] = newIndex[Number(masterId)].filter(
-          influence => influence.influence_id !== influence_id
+          (influence) => influence.influence_id !== influence_id
         );
         if (newIndex[Number(masterId)].length === 0) {
           delete newIndex[Number(masterId)];
@@ -785,8 +843,8 @@ export const useStore = create<State>((set, get) => ({
     set((state) => ({
       questions: {
         ...state.questions,
-        [id]: text
-      }
+        [id]: text,
+      },
     }));
   },
 
@@ -794,18 +852,20 @@ export const useStore = create<State>((set, get) => ({
     set((state) => ({
       placement: {
         ...state.placement,
-        [id]: placement
-      }
+        [id]: placement,
+      },
     }));
   },
 
   deletePlacement: (id: number) => {
     set((state) => {
       const { [id]: _, ...remainingPlacements } = state.placement;
-      const newOrder = state.order.filter(item => !(item.id === id && item.type === 'placement'));
+      const newOrder = state.order.filter(
+        (item) => !(item.id === id && item.type === "placement")
+      );
       return {
         placement: remainingPlacements,
-        order: newOrder
+        order: newOrder,
       };
     });
   },
@@ -825,10 +885,10 @@ export const useStore = create<State>((set, get) => ({
       // Remove influences where object is master
       delete updatedInfluences[id];
       // Remove influences where object is worker
-      Object.keys(updatedInfluences).forEach(masterId => {
-        updatedInfluences[Number(masterId)] = updatedInfluences[Number(masterId)].filter(
-          influence => influence.worker_id !== id
-        );
+      Object.keys(updatedInfluences).forEach((masterId) => {
+        updatedInfluences[Number(masterId)] = updatedInfluences[
+          Number(masterId)
+        ].filter((influence) => influence.worker_id !== id);
         // Remove empty master entries
         if (updatedInfluences[Number(masterId)].length === 0) {
           delete updatedInfluences[Number(masterId)];
@@ -840,19 +900,19 @@ export const useStore = create<State>((set, get) => ({
       // Remove from index where object is a dependency
       delete updatedAdvancedInfluences[id];
       // Remove influences where object is worker
-      Object.keys(updatedAdvancedInfluences).forEach(depId => {
-        updatedAdvancedInfluences[Number(depId)] = updatedAdvancedInfluences[Number(depId)].filter(
-          influence => influence.worker_id !== id
-        );
+      Object.keys(updatedAdvancedInfluences).forEach((depId) => {
+        updatedAdvancedInfluences[Number(depId)] = updatedAdvancedInfluences[
+          Number(depId)
+        ].filter((influence) => influence.worker_id !== id);
         // Remove empty dependency entries
         if (updatedAdvancedInfluences[Number(depId)].length === 0) {
           delete updatedAdvancedInfluences[Number(depId)];
         }
       });
 
-      return { 
+      return {
         influences: updatedInfluences,
-        influenceAdvIndex: updatedAdvancedInfluences
+        influenceAdvIndex: updatedAdvancedInfluences,
       };
     });
   },
@@ -864,16 +924,16 @@ export const useStore = create<State>((set, get) => ({
       delete updatedScores[id];
 
       // Remove any validations related to this score
-      const updatedValidations = state.validations.filter(validation => {
+      const updatedValidations = state.validations.filter((validation) => {
         if (validation instanceof Validation_score) {
           return validation.score_id !== id;
         }
         return true;
       });
 
-      return { 
+      return {
         scores: updatedScores,
-        validations: updatedValidations
+        validations: updatedValidations,
       };
     });
   },
@@ -885,45 +945,59 @@ export const useStore = create<State>((set, get) => ({
       delete updatedQuestions[id];
 
       // Remove any validations related to this question
-      const updatedValidations = state.validations.filter(validation => {
+      const updatedValidations = state.validations.filter((validation) => {
         if (validation instanceof Validation_obj) {
           return validation.obj_id !== id;
         }
         return true;
       });
 
-      return { 
+      return {
         questions: updatedQuestions,
-        validations: updatedValidations
+        validations: updatedValidations,
       };
     });
   },
 
-  setScore: (score_id: number, new_score: Score<any>, validation?: Validation_score<any, obj>) => {
+  setScore: (
+    score_id: number,
+    new_score: Score<any>,
+    validation?: Validation_score<any, obj>
+  ) => {
     set((state) => {
       const newScores = { ...state.scores };
       newScores[score_id] = new_score;
-      
+
       if (validation) {
         const newValidations = [...state.validations];
         const existingIndex = newValidations.findIndex(
           (v) => v instanceof Validation_score && v.score_id === score_id
         );
-        
+
         if (existingIndex !== -1) {
           newValidations[existingIndex] = validation;
         } else {
           newValidations.push(validation);
         }
-        
+
         return {
           scores: newScores,
           validations: newValidations,
         };
       }
-      
+
       return { scores: newScores };
     });
+  },
+
+  editingObjects: {},
+  setEditingObject: (id: number, isEditing: boolean) => {
+    set((state) => ({
+      editingObjects: {
+        ...state.editingObjects,
+        [id]: isEditing,
+      },
+    }));
   },
 }));
 
@@ -953,25 +1027,25 @@ export const setVizObjSelector2 =
 export const setSliderControlValueSelector =
   (control_id: number) => (state: State) => (value: number) => {
     const control = state.controls[control_id] as SliderControl<any>;
-    const vizobj = state.vizobjs[control.obj_id]
-    
+    const vizobj = state.vizobjs[control.obj_id];
+
     if (control) {
       // use the set_attribute to update the viz
-      if(control instanceof SliderControlAdvanced) {
-        const new_control = control.clone() as SliderControlAdvanced<obj>
-        new_control.localValue = value
-        state.setControl(control_id, new_control)
+      if (control instanceof SliderControlAdvanced) {
+        const new_control = control.clone() as SliderControlAdvanced<obj>;
+        new_control.localValue = value;
+        state.setControl(control_id, new_control);
       }
       const updatedViz = control.setSliderValue(vizobj, value);
-      if(updatedViz) {
-      state.setVizObj(control.obj_id, updatedViz);
+      if (updatedViz) {
+        state.setVizObj(control.obj_id, updatedViz);
       }
     }
   };
 
 // get the vizobj corresponding to a particular id
 // this is a curried function that takes the id of the vizobj to be set first
-export const getObjectSelector = (id: number) => (state: State) => 
+export const getObjectSelector = (id: number) => (state: State) =>
   state.vizobjs[id];
 
 // get the vizobj corresponding to an arbitrary id
@@ -981,7 +1055,7 @@ export const getObjectSelector2 = (state: State) => (id: number) =>
 export const getControlSelector = (control_id: number) => (state: State) =>
   state.controls[control_id];
 
-export const getControlSelector2 = (state: State) => (control_id: number) => 
+export const getControlSelector2 = (state: State) => (control_id: number) =>
   state.controls[control_id];
 
 // get the value of a particular slider control given its id
@@ -989,7 +1063,7 @@ export const getSliderControlValueSelector =
   (control_id: number) => (state: State) => {
     const control = state.controls[control_id] as SliderControl<any>;
     const viz = state.vizobjs[control?.obj_id]; // get the vizobject corresponding to the slider control
-    
+
     return control.getSliderValue(viz);
 
     // NOTE: 0 is the default value if the vizobject or control is not found
@@ -1066,11 +1140,14 @@ export const getStateName = (state: State) => state.state_name;
 export const getNameSelector = (state: State) => (id: number) =>
   state.vizobjs[id].name;
 
-export const getPlacementSelector = (id: number) => (state: State) => state.placement[id];
+export const getPlacementSelector = (id: number) => (state: State) =>
+  state.placement[id];
 
-export const getPlacementSelector2 = (state: State) => (id: number) => state.placement[id];
+export const getPlacementSelector2 = (state: State) => (id: number) =>
+  state.placement[id];
 
-export const getPlacementListSelector = (state: State) => Object.values(state.placement);
+export const getPlacementListSelector = (state: State) =>
+  Object.values(state.placement);
 
 export const DeleteVizObjSelector = (state: State) => (id: number) => {
   return state.deleteVizObj(id);
@@ -1085,24 +1162,25 @@ export const getValidationsSelector = (state: State) => state.validations;
 export const UpdateAllInfluencesSelector = (state: State) =>
   state.updateAllInfluences;
 
-
 /* new */
 
 export const isPlacementModeActive2 = (state: State) => (id: number) => {
-  return state.placement[id].isPlacementActive
+  return state.placement[id].isPlacementActive;
 };
 
-export const setIsPlacementModeActive2 = (state: State) => (id: number, val: boolean) => {
-  state.setIsPlacementModeIndividual(id, val);
-}
+export const setIsPlacementModeActive2 =
+  (state: State) => (id: number, val: boolean) => {
+    state.setIsPlacementModeIndividual(id, val);
+  };
 
 export const getNumObjectsPlaced = (state: State) => (id: number) => {
-  return state.placement[id].numObjectsPlaced
-}
+  return state.placement[id].numObjectsPlaced;
+};
 
-export const setNumObjectsPlaced = (state: State) => (id: number, num: number) => {
-  state.setNumObjectsPlaced(id, num)
-}
+export const setNumObjectsPlaced =
+  (state: State) => (id: number, num: number) => {
+    state.setNumObjectsPlaced(id, num);
+  };
 /* new */
 
 export const setMultiChoiceOptionsSelector =
@@ -1110,9 +1188,10 @@ export const setMultiChoiceOptionsSelector =
     state.setMultiChoiceOptions(control_id, Selectedoptions);
   };
 
-export const setControlSelector = (state: State) => (control_id: number, new_obj: Control) => {
-  state.setControl(control_id, new_obj);
-}
+export const setControlSelector =
+  (state: State) => (control_id: number, new_obj: Control) => {
+    state.setControl(control_id, new_obj);
+  };
 
 export const setInputNumberValueSelector =
   (control_id: number) => (state: State) => (value: number | "") => {
@@ -1139,77 +1218,84 @@ export const addQuestionEditor =
     state.addQuestion(question_id, question);
   };
 
-export const addMCQuestionEditor = 
-  (state: State) => (id: number, title: string, desc: string, options: Option[]) => {
+export const addMCQuestionEditor =
+  (state: State) =>
+  (id: number, title: string, desc: string, options: Option[]) => {
     state.addMCQuestion(id, title, desc, options);
   };
 
 export const addElementSelector = (state: State) => (element: EditAddType) => {
   state.addElement(element);
-}
+};
 
 export const getZoomSelector = (state: State) => state.camera_zoom;
 
-export const SetTableControl = (state: State) => state.setTableControl
+export const SetTableControl = (state: State) => state.setTableControl;
 
 export const getSideBarName = (state: State) => (item: OrderItem) => {
   switch (item.type) {
-    case 'control':
+    case "control":
       return state.controls[item.id]?.desc || `Control ${item.id}`;
-    case 'placement':
+    case "placement":
       return state.placement[item.id]?.desc || `Placement ${item.id}`;
-    case 'question':
+    case "question":
       return state.questions[item.id] || `Question ${item.id}`;
-    case 'score':
+    case "score":
       return state.scores[item.id]?.desc || `Score ${item.id}`;
     default:
       return `Unknown ${item.type} ${item.id}`;
   }
-}
-
-export const getValidationDescription = (state: State) => (validation: Validation) => {
-  if (validation instanceof Validation_obj) {
-    return validation.desc;
-  } else if (validation instanceof Validation_select) {
-    return validation.desc;
-  } else if (validation instanceof Validation_inputNumber) {
-    return validation.desc;
-  } else if (validation instanceof ValidationMultiChoice) {
-    return validation.desc;
-  } else if (validation instanceof Validation_score) {
-    return validation.desc;
-  } else if (validation instanceof Validation_tableControl) {
-    return validation.desc;
-  } else if (validation instanceof Validation_sliderAdv) {
-    return validation.desc;
-  }
-  return 'Unknown Validation';
 };
 
-export const deleteValidationByIndexSelect = (state: State) => state.deleteValidationByIndex
+export const getValidationDescription =
+  (state: State) => (validation: Validation) => {
+    if (validation instanceof Validation_obj) {
+      return validation.desc;
+    } else if (validation instanceof Validation_select) {
+      return validation.desc;
+    } else if (validation instanceof Validation_inputNumber) {
+      return validation.desc;
+    } else if (validation instanceof ValidationMultiChoice) {
+      return validation.desc;
+    } else if (validation instanceof Validation_score) {
+      return validation.desc;
+    } else if (validation instanceof Validation_tableControl) {
+      return validation.desc;
+    } else if (validation instanceof Validation_sliderAdv) {
+      return validation.desc;
+    }
+    return "Unknown Validation";
+  };
+
+export const deleteValidationByIndexSelect = (state: State) =>
+  state.deleteValidationByIndex;
 
 export const setTitleSelector = (state: State) => state.setTitle;
 
 // Add this near your other selectors
-export const getAdvancedInfluencesSelector = (state: State) => state.influenceAdvIndex;
+export const getAdvancedInfluencesSelector = (state: State) =>
+  state.influenceAdvIndex;
 
-export const getInfluenceAdvDelete = (state: State) => state.deleteInfluenceAdv
+export const getInfluenceAdvDelete = (state: State) => state.deleteInfluenceAdv;
 
-export const setIsEditModeSelector = (state: State) => state.setIsEditMode
+export const setIsEditModeSelector = (state: State) => state.setIsEditMode;
 
-export const setQuestionSelector = (state: State) => state.setQuestion
+export const setQuestionSelector = (state: State) => state.setQuestion;
 
-export const setPlacementSelector = (state: State) => 
-  (id: number, placement: Placement) => {
+export const setPlacementSelector =
+  (state: State) => (id: number, placement: Placement) => {
     state.setPlacement(id, placement);
   };
 
-export const deletePlacementSelector = (state: State) => 
-  (id: number) => {
-    state.deletePlacement(id);
-  };
+export const deletePlacementSelector = (state: State) => (id: number) => {
+  state.deletePlacement(id);
+};
 
 export const getIsVideoPlayingSelector = (state: State) => state.isVideoPlaying;
-export const setIsVideoPlayingSelector = (state: State) => state.setIsVideoPlaying;
+export const setIsVideoPlayingSelector = (state: State) =>
+  state.setIsVideoPlaying;
 export const getIsVideoEndedSelector = (state: State) => state.isVideoEnded;
 export const setIsVideoEndedSelector = (state: State) => state.setIsVideoEnded;
+
+export const getEditingObjectSelector = (id: number) => (state: State) =>
+  state.editingObjects[id] || false;

@@ -109,7 +109,7 @@ export const EditBar: React.FC = () => {
 
   return (
     <>
-      <div className="fixed top-4 left-[38%] ml-[8.33%] transform -translate-x-1/2 z-10 flex space-x-2">
+      <div className="fixed top-4 left-[33%] ml-[8.33%] transform -translate-x-1/2 z-10 flex space-x-2 z-[100]">
         <DropDownMenu
           ObjectList={controlTypes}
           setSelectedObjectType={setSelectedObjectType}

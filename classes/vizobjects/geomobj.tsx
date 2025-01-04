@@ -18,7 +18,11 @@ import { Input } from "@/components/ui/input";
 import { Slider } from "@/components/ui/slider";
 import { Switch } from "@/components/ui/switch";
 import { Separator } from "@/components/ui/separator";
-import { dict_keys, get_attributes, transform_atts } from "./get_set_obj_attributes";
+import {
+  dict_keys,
+  get_attributes,
+  transform_atts,
+} from "./get_set_obj_attributes";
 import { TouchControlEditor } from "@/app/Components/EditMode/EditPopups/TouchControlAttributeEditor";
 import {
   Validation_obj_constructor,
@@ -27,6 +31,7 @@ import {
 import Validation_obj from "../Validation/Validation_obj";
 import Validation from "../Validation/Validation";
 import { GeomObjInsert, GeomObjSelect } from "@/app/db/schema";
+import { useStore } from "@/app/store";
 // import { db } from "@/app/db";
 // import { GeomObj } from "@/app/db/schema";
 // import { eq, and } from 'drizzle-orm';
@@ -255,11 +260,12 @@ export class geomobj extends TransformObj {
     children: React.ReactElement | null;
     objectRef: React.RefObject<THREE.Mesh>;
   }): React.ReactElement {
-    // console.log(`Rendering geomobj with position: ${this.position.x}, ${this.position.y}`);
-    // console.log(`Rendering geomobj with color: ${this.color}`);
-    // console.log(`Rendering geomobj with geometry type: ${this.geom_json.type}`);
-    
-    // const objectRef_l = useRef<THREE.Mesh>(null)
+    const isEditing = useStore(
+      (state) => state.editingObjects && state.editingObjects[this.id]
+    );
+
+    console.log("isEditing", isEditing);
+
     return (
       <>
         <mesh
@@ -278,6 +284,29 @@ export class geomobj extends TransformObj {
         </mesh>
 
         {children}
+
+        {isEditing && (
+          <>
+            <GeneralTransformControl
+              mode="translate"
+              vizObjId={this.id}
+              touchControl={{ direction: [true, true, false], step_size: 0.1 }}
+              obj_ref={objectRef}
+            />
+            <GeneralTransformControl
+              mode="rotate"
+              vizObjId={this.id}
+              touchControl={{ direction: [false, false, true], step_size: 0.1 }}
+              obj_ref={objectRef}
+            />
+            <GeneralTransformControl
+              mode="scale"
+              vizObjId={this.id}
+              touchControl={{ direction: [true, true, false], step_size: 0.1 }}
+              obj_ref={objectRef}
+            />
+          </>
+        )}
 
         {this.touch_controls.scale && (
           <GeneralTransformControl
