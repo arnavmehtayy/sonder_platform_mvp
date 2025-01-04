@@ -22,7 +22,10 @@ import { EditBar, ObjectType } from "@/app/Components/EditMode/EditBar";
 import { OrderHandler } from "@/app/Components/Sidebar/OrderHandler";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
-import { deserializeState, serializeState } from "@/classes/database/stateSerializer";
+import {
+  deserializeState,
+  serializeState,
+} from "@/classes/database/stateSerializer";
 import { createClient } from "@/app/utils/supabase/client";
 import { OrderHandlerDB } from "@/app/Components/Sidebar/OrderHandlerDB";
 import ValidationComponent from "@/app/Components/ShowValid";
@@ -58,7 +61,22 @@ import { LoadingScreen } from "@/app/Components/MainMenu/LoadingScreen";
 import { DummyDataManager } from "@/app/Components/DummyData/DummyDataManager";
 import { ObjectTreeManager } from "@/app/Components/SceneManager/ObjectTreeManager";
 import { DropdownMenu } from "@/components/ui/dropdown-menu";
-import { Plus, List, MousePointerClick, Calculator, PencilLine, Circle, LineChart, Axis3D, Type, Variable, Sliders, ListChecks, Table, Hash } from "lucide-react";
+import {
+  Plus,
+  List,
+  MousePointerClick,
+  Calculator,
+  PencilLine,
+  Circle,
+  LineChart,
+  Axis3D,
+  Type,
+  Variable,
+  Sliders,
+  ListChecks,
+  Table,
+  Hash,
+} from "lucide-react";
 import { SliderControlAdvanced } from "@/classes/Controls/SliderControlAdv";
 import { SelectControl } from "@/classes/Controls/SelectControl";
 import Placement from "@/classes/Placement";
@@ -71,8 +89,9 @@ import { InputNumber } from "@/classes/Controls/InputNumber";
 import { DropDownMenu } from "@/app/Components/EditMode/DropDownMenu";
 import { VideoUpload } from "@/app/Components/MainMenu/VideoUpload";
 import { AnimatePresence } from "framer-motion";
-import { VideoPlayer } from '@/app/Components/MainMenu/VideoPlayer';
+import { VideoPlayer } from "@/app/Components/MainMenu/VideoPlayer";
 import { motion } from "framer-motion";
+import { FastForward } from "lucide-react";
 
 const SortableItem: React.FC<{ id: string; children: React.ReactNode }> = ({
   id,
@@ -162,7 +181,7 @@ export default function ExperienceEditPage() {
 
   const handleDeleteItem = (id: number, type: string) => {
     deleteOrderItem(id, type);
-    if (type === "control" ) {
+    if (type === "control") {
       deleteVizObj(id);
     }
     if (type === "question") {
@@ -197,7 +216,10 @@ export default function ExperienceEditPage() {
       try {
         // Auth check
         const supabase = await createClient();
-        const { data: { user }, error } = await supabase.auth.getUser();
+        const {
+          data: { user },
+          error,
+        } = await supabase.auth.getUser();
 
         if (error || !user) {
           router.push("/login");
@@ -229,7 +251,6 @@ export default function ExperienceEditPage() {
       } finally {
         setIsLoading(false);
       }
-
     };
 
     initializeState();
@@ -300,17 +321,19 @@ export default function ExperienceEditPage() {
   };
 
   const handleEndExperience = () => {
-    handleSave()
+    handleSave();
     router.push("/");
   };
 
   const handleValidationUpdate = () => {
     updateValidation();
+    setShowValidation(true);
+    setShowValidationResults(true);
   };
 
   const handlePreviousSlide = () => {
     if (currentIndex > 0) {
-    //   handleSave();
+      //   handleSave();
       router.push(`/experience/edit/${expId}/${currentIndex - 1}`);
     }
   };
@@ -333,50 +356,54 @@ export default function ExperienceEditPage() {
       );
 
       if (!response.ok) {
-        throw new Error('Failed to fetch video');
+        throw new Error("Failed to fetch video");
       }
 
       const data = await response.json();
       if (data?.video_path) {
         const supabase = createClient();
-        const { data: { publicUrl } } = supabase.storage
-          .from('experience-videos')
+        const {
+          data: { publicUrl },
+        } = supabase.storage
+          .from("experience-videos")
           .getPublicUrl(data.video_path);
         setVideoUrl(publicUrl);
-        setVideoKey(prev => prev + 1);
+        setVideoKey((prev) => prev + 1);
       }
     } catch (error) {
-      console.error('Error loading video:', error);
+      console.error("Error loading video:", error);
     }
   };
 
-  const handleVideoUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleVideoUpload = async (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
     const file = event.target.files?.[0];
     if (!file) return;
 
     try {
       const supabase = createClient();
       const timestamp = Date.now();
-      const fileExtension = file.name.split('.').pop();
+      const fileExtension = file.name.split(".").pop();
       const fileName = `video_${timestamp}.${fileExtension}`;
       const filePath = `${expId}/${currentIndex}/${fileName}`;
 
       const { error: uploadError } = await supabase.storage
-        .from('experience-videos')
+        .from("experience-videos")
         .upload(filePath, file);
 
       if (uploadError) throw uploadError;
 
-      console.log('Sending to API:', {
+      console.log("Sending to API:", {
         experienceId: expId.toString(),
         index: parseInt(currentIndex.toString()),
         filePath: filePath,
       });
 
-      const response = await fetch('/api/supabase/video', {
-        method: 'POST',
+      const response = await fetch("/api/supabase/video", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({
           experienceId: expId.toString(),
@@ -387,15 +414,15 @@ export default function ExperienceEditPage() {
 
       if (!response.ok) {
         const errorData = await response.json();
-        console.error('API Error:', errorData);
+        console.error("API Error:", errorData);
         throw new Error(`Failed to update database: ${errorData.error}`);
       }
 
       await loadVideo();
-      toast.success('Video replaced successfully');
+      toast.success("Video replaced successfully");
     } catch (error) {
-      console.error('Error uploading video:', error);
-      toast.error('Failed to replace video');
+      console.error("Error uploading video:", error);
+      toast.error("Failed to replace video");
     }
   };
 
@@ -410,7 +437,8 @@ export default function ExperienceEditPage() {
 
   const handleTimeUpdate = () => {
     if (videoRef.current) {
-      const progress = (videoRef.current.currentTime / videoRef.current.duration) * 100;
+      const progress =
+        (videoRef.current.currentTime / videoRef.current.duration) * 100;
       setProgress(progress);
     }
   };
@@ -433,12 +461,13 @@ export default function ExperienceEditPage() {
         setIsPlaying(false);
         setShowPlayButton(true);
       } else {
-        videoRef.current.play()
+        videoRef.current
+          .play()
           .then(() => {
             setIsPlaying(true);
             setShowPlayButton(false);
           })
-          .catch(error => {
+          .catch((error) => {
             console.log("Play failed:", error);
             setIsPlaying(false);
             setShowPlayButton(true);
@@ -447,37 +476,52 @@ export default function ExperienceEditPage() {
     }
   };
 
+  const handleSkipVideo = () => {
+    const videoElement = document.querySelector("video");
+    if (videoElement) {
+      videoElement.currentTime = videoElement.duration;
+      videoElement.play();
+    }
+  };
+
+  const [showValidationResults, setShowValidationResults] = useState(false);
+
   if (isLoading) {
-    return <LoadingScreen 
-      message="Loading Experience Editor" 
-      description="Please wait while we prepare your experience editor..."
-    />;
+    return (
+      <LoadingScreen
+        message="Loading Experience Editor"
+        description="Please wait while we prepare your experience editor..."
+      />
+    );
   }
 
   return (
     <>
       <EditBar />
-      
+
       <div className="relative flex flex-row h-screen bg-gray-100">
         {/* Left Sidebar with collapse animation */}
         <div
           className={`transition-all duration-300 ease-in-out ${
-            isLeftSidebarCollapsed ? 'w-0' : 'w-64'
+            isLeftSidebarCollapsed ? "w-0" : "w-64"
           } flex-shrink-0 relative`}
         >
           <div className="relative h-full">
             <ObjectTreeManager />
             <div className="absolute -right-6 top-1/2 transform -translate-y-1/2 z-50">
               <Button
-                onClick={() => setIsLeftSidebarCollapsed(!isLeftSidebarCollapsed)}
+                onClick={() =>
+                  setIsLeftSidebarCollapsed(!isLeftSidebarCollapsed)
+                }
                 className={`h-12 w-12 rounded-full bg-white hover:bg-gray-50 border border-gray-200 shadow-lg flex items-center justify-center transition-all duration-300 ${
-                  isLeftSidebarCollapsed ? 'translate-x-3' : ''
+                  isLeftSidebarCollapsed ? "translate-x-3" : ""
                 }`}
               >
-                {isLeftSidebarCollapsed ? 
-                  <ChevronRight className="h-5 w-5 text-gray-600" /> : 
+                {isLeftSidebarCollapsed ? (
+                  <ChevronRight className="h-5 w-5 text-gray-600" />
+                ) : (
                   <ChevronLeft className="h-5 w-5 text-gray-600" />
-                }
+                )}
               </Button>
             </div>
           </div>
@@ -511,13 +555,16 @@ export default function ExperienceEditPage() {
               </Button>
             </label>
           </div>
-          
+
           {/* Video Player with key prop */}
-          <VideoPlayer 
-            experienceId={expId} 
+          <VideoPlayer
+            experienceId={expId}
             index={currentIndex}
             key={videoKey}
           />
+
+          {/* Skip Video Button */}
+          
 
           {/* Experience will only show after video ends */}
           <AnimatePresence>
@@ -545,6 +592,7 @@ export default function ExperienceEditPage() {
               <ValidationComponent
                 validations={validationInstance}
                 updater={handleValidationUpdate}
+                isChecked={showValidationResults}
               />
             </div>
           </div>
@@ -553,14 +601,16 @@ export default function ExperienceEditPage() {
           <button
             onClick={() => setShowValidation(!showValidation)}
             className={`absolute bottom-20 left-1/2 transform -translate-x-1/2 flex items-center space-x-2 px-4 py-2 rounded-md shadow-lg transition-all duration-300 z-[60] ${
-              allValidationsValid 
-                ? 'bg-green-500 hover:bg-green-600' 
-                : 'bg-blue-500 hover:bg-blue-600'
+              allValidationsValid
+                ? "bg-green-500 hover:bg-green-600"
+                : "bg-blue-500 hover:bg-blue-600"
             }`}
           >
-            {allValidationsValid && <CheckCircle className="text-white" size={20} />}
+            {allValidationsValid && (
+              <CheckCircle className="text-white" size={20} />
+            )}
             <span className="text-white font-semibold">
-              {showValidation ? 'Hide Autograder' : 'Show Autograder'}
+              {showValidation ? "Hide Autograder" : "Show Autograder"}
             </span>
           </button>
         </div>
@@ -589,6 +639,52 @@ export default function ExperienceEditPage() {
             <div className="relative">
               <OrderHandlerDB isEditMode={true} />
             </div>
+
+            {/* Skip Video Button */}
+            <AnimatePresence>
+              {!isVideoEnded && (
+                <motion.button
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: 20 }}
+                  onClick={handleSkipVideo}
+                  className="w-full mt-6 mb-6 px-4 py-3 bg-blue-50 hover:bg-blue-100 
+                    border border-blue-200 rounded-xl shadow-sm transition-all duration-300 
+                    flex flex-col items-center gap-2"
+                >
+                  <div className="flex flex-col items-center text-center space-y-1">
+                    <span className="text-blue-700 text-lg font-medium">
+                      Skip to the end of the video
+                    </span>
+                    <span className="text-blue-600/80 text-sm">
+                      to apply your learning
+                    </span>
+                  </div>
+                  <FastForward className="w-6 h-6 text-blue-500" />
+                </motion.button>
+              )}
+            </AnimatePresence>
+
+            {/* Verify button */}
+            <AnimatePresence>
+              {isVideoEnded &&
+                !isVideoPlaying &&
+                validationInstance.length > 0 && (
+                  <motion.button
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: 20 }}
+                    onClick={handleValidationUpdate}
+                    className="w-full mt-6 mb-12 px-4 py-3 bg-green-600 text-white rounded-lg 
+                    shadow-md transition-all duration-300 hover:bg-green-700 hover:shadow-lg 
+                    active:bg-green-800"
+                  >
+                    <span className="text-lg font-semibold">
+                      Verify Answers
+                    </span>
+                  </motion.button>
+                )}
+            </AnimatePresence>
           </div>
         </div>
       </div>
