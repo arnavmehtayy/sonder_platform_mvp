@@ -1,7 +1,13 @@
-import { useEffect, useRef, useState } from 'react';
-import { createClient } from '@/app/utils/supabase/client';
-import { useStore, getIsVideoPlayingSelector, setIsVideoPlayingSelector, setIsVideoEndedSelector, getIsVideoEndedSelector } from '@/app/store';
-import { motion, AnimatePresence } from 'framer-motion';
+import { useEffect, useRef, useState } from "react";
+import { createClient } from "@/app/utils/supabase/client";
+import {
+  useStore,
+  getIsVideoPlayingSelector,
+  setIsVideoPlayingSelector,
+  setIsVideoEndedSelector,
+  getIsVideoEndedSelector,
+} from "@/app/store";
+import { motion, AnimatePresence } from "framer-motion";
 
 interface VideoPlayerProps {
   experienceId: number;
@@ -18,6 +24,8 @@ export function VideoPlayer({ experienceId, index }: VideoPlayerProps) {
   const isVideoEnded = useStore(getIsVideoEndedSelector);
   const setIsVideoEnded = useStore(setIsVideoEndedSelector);
   const [progress, setProgress] = useState(0);
+  const [showControls, setShowControls] = useState(true);
+  const controlsTimeoutRef = useRef<NodeJS.Timeout>();
 
   useEffect(() => {
     const loadVideo = async () => {
@@ -30,14 +38,16 @@ export function VideoPlayer({ experienceId, index }: VideoPlayerProps) {
 
         if (data?.video_path) {
           const supabase = createClient();
-          const { data: { publicUrl } } = supabase.storage
-            .from('experience-videos')
+          const {
+            data: { publicUrl },
+          } = supabase.storage
+            .from("experience-videos")
             .getPublicUrl(data.video_path);
 
           setVideoUrl(publicUrl);
         }
       } catch (error) {
-        console.error('Error loading video:', error);
+        console.error("Error loading video:", error);
       } finally {
         setIsLoading(false);
       }
@@ -48,12 +58,13 @@ export function VideoPlayer({ experienceId, index }: VideoPlayerProps) {
 
   useEffect(() => {
     if (videoRef.current && videoUrl && !isLoading) {
-      videoRef.current.play()
+      videoRef.current
+        .play()
         .then(() => {
           setIsPlaying(true);
           setShowPlayButton(false);
         })
-        .catch(error => {
+        .catch((error) => {
           console.log("Autoplay failed:", error);
           setIsPlaying(false);
           setShowPlayButton(true);
@@ -71,17 +82,31 @@ export function VideoPlayer({ experienceId, index }: VideoPlayerProps) {
         if (videoRef.current.ended) {
           videoRef.current.currentTime = 0;
         }
-        videoRef.current.play()
+        videoRef.current
+          .play()
           .then(() => {
             setIsPlaying(true);
             setShowPlayButton(false);
           })
-          .catch(error => {
+          .catch((error) => {
             console.log("Play failed:", error);
             setIsPlaying(false);
             setShowPlayButton(true);
           });
       }
+    }
+  };
+
+  const handleSkip = (seconds: number) => {
+    if (videoRef.current) {
+      const newTime = videoRef.current.currentTime + seconds;
+      videoRef.current.currentTime = Math.min(
+        Math.max(0, newTime),
+        videoRef.current.duration
+      );
+      setProgress(
+        (videoRef.current.currentTime / videoRef.current.duration) * 100
+      );
     }
   };
 
@@ -103,7 +128,8 @@ export function VideoPlayer({ experienceId, index }: VideoPlayerProps) {
 
   const handleTimeUpdate = () => {
     if (videoRef.current) {
-      const progress = (videoRef.current.currentTime / videoRef.current.duration) * 100;
+      const progress =
+        (videoRef.current.currentTime / videoRef.current.duration) * 100;
       setProgress(progress);
     }
   };
@@ -119,6 +145,77 @@ export function VideoPlayer({ experienceId, index }: VideoPlayerProps) {
     }
   };
 
+  const resetControlsTimeout = () => {
+    if (controlsTimeoutRef.current) {
+      clearTimeout(controlsTimeoutRef.current);
+    }
+    setShowControls(true);
+    controlsTimeoutRef.current = setTimeout(() => {
+      if (isPlaying) {
+        setShowControls(false);
+      }
+    }, 3000); // Hide after 3 seconds of inactivity
+  };
+
+  useEffect(() => {
+    // Reset the timeout when play state changes
+    resetControlsTimeout();
+  }, [isPlaying]);
+
+  useEffect(() => {
+    // Cleanup timeout on unmount
+    return () => {
+      if (controlsTimeoutRef.current) {
+        clearTimeout(controlsTimeoutRef.current);
+      }
+    };
+  }, []);
+
+  const handleMouseMove = () => {
+    resetControlsTimeout();
+  };
+
+  useEffect(() => {
+    const handleKeyPress = (e: KeyboardEvent) => {
+      if (
+        e.target instanceof HTMLInputElement ||
+        e.target instanceof HTMLTextAreaElement
+      ) {
+        return;
+      }
+
+      // Show controls when any key is pressed
+      resetControlsTimeout();
+
+      switch (e.code) {
+        case "Space":
+          e.preventDefault();
+          if (videoRef.current) {
+            if (videoRef.current.paused) {
+              videoRef.current.play().then(() => {
+                setIsPlaying(true);
+                setShowPlayButton(false);
+              });
+            } else {
+              videoRef.current.pause();
+              setIsPlaying(false);
+              setShowPlayButton(true);
+            }
+          }
+          break;
+        case "ArrowRight":
+          handleSkip(5);
+          break;
+        case "ArrowLeft":
+          handleSkip(-5);
+          break;
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyPress);
+    return () => window.removeEventListener("keydown", handleKeyPress);
+  }, []);
+
   if (isLoading) {
     return (
       <div className="absolute inset-0 w-full h-full bg-black flex items-center justify-center">
@@ -132,99 +229,193 @@ export function VideoPlayer({ experienceId, index }: VideoPlayerProps) {
   if (!videoUrl) return null;
 
   return (
-    <div className="absolute inset-0 w-full h-full bg-black flex items-center justify-center" onClick={togglePlay}>
-      <div className="relative flex flex-col">
-        <video
-          ref={videoRef}
-          src={videoUrl}
-          className="max-w-full max-h-full w-auto h-auto object-contain"
-          playsInline
-          autoPlay
-          controls={false}
-          onEnded={handleVideoEnd}
-          onTimeUpdate={handleTimeUpdate}
-          onPlay={() => {
-            setIsPlaying(true);
-            setIsVideoEnded(false);
-            setShowPlayButton(false);
-          }}
-          onPause={() => {
-            setIsPlaying(false);
-            setShowPlayButton(true);
-          }}
-        />
-        
-        <div 
-          className="relative h-1 bg-gray-700 cursor-pointer group mt-2 z-50"
-          onClick={(e) => e.stopPropagation()}
-          onMouseDown={handleSeek}
-        >
-          <div 
-            className="h-full bg-white transition-all duration-100"
-            style={{ width: `${progress}%` }}
+    <div
+      className="absolute inset-0 w-full h-full bg-black flex items-center justify-center"
+      onClick={togglePlay}
+      onMouseMove={handleMouseMove}
+      onMouseEnter={() => setShowControls(true)}
+    >
+      <div className="relative flex flex-col w-full">
+        <div className="relative">
+          <video
+            ref={videoRef}
+            src={videoUrl}
+            className="max-w-full max-h-full w-auto h-auto object-contain"
+            playsInline
+            autoPlay
+            controls={false}
+            onEnded={handleVideoEnd}
+            onTimeUpdate={handleTimeUpdate}
+            onPlay={() => {
+              setIsPlaying(true);
+              setIsVideoEnded(false);
+              setShowPlayButton(false);
+            }}
+            onPause={() => {
+              setIsPlaying(false);
+              setShowPlayButton(true);
+            }}
           />
-          <div className="absolute bottom-0 left-0 right-0 h-4 -top-3 opacity-0 group-hover:opacity-100">
-            <div 
-              className="absolute bottom-0 h-1 bg-white/30 w-full"
-              onMouseDown={handleSeek}
-            />
-          </div>
         </div>
 
         <AnimatePresence>
           {showPlayButton && !isVideoEnded && (
-            <div className="absolute inset-0 flex items-center justify-center">
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="absolute inset-0 flex items-center justify-center"
+            >
               <div className="w-20 h-20 bg-black bg-opacity-50 rounded-full flex items-center justify-center">
                 {isLoading ? (
                   <div className="w-12 h-12 border-4 border-white/30 border-t-white rounded-full animate-spin" />
                 ) : (
-                  <svg 
-                    className="w-12 h-12 text-white" 
-                    fill="currentColor" 
+                  <svg
+                    className="w-12 h-12 text-white"
+                    fill="currentColor"
                     viewBox="0 0 24 24"
                   >
-                    <path d="M8 5v14l11-7z"/>
+                    <path d="M8 5v14l11-7z" />
                   </svg>
                 )}
               </div>
-            </div>
+            </motion.div>
           )}
+        </AnimatePresence>
 
+        {!isVideoEnded && (
+          <div
+            className={`absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/60 to-transparent p-4 transition-opacity duration-300 ${
+              showControls ? "opacity-100" : "opacity-0"
+            }`}
+          >
+            <div className="flex items-center gap-4 mb-1">
+              <div
+                className="w-full relative h-1 bg-white/30 cursor-pointer rounded-full overflow-hidden"
+                onClick={(e) => e.stopPropagation()}
+                onMouseDown={handleSeek}
+              >
+                <div
+                  className="h-full bg-white transition-all duration-100 rounded-full"
+                  style={{ width: `${progress}%` }}
+                />
+                <div className="absolute bottom-0 left-0 right-0 h-4 -top-2 opacity-0 group-hover:opacity-100">
+                  <div
+                    className="absolute bottom-0 h-1 bg-white/30 w-full"
+                    onMouseDown={handleSeek}
+                  />
+                </div>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-3">
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  togglePlay();
+                }}
+                className="text-white hover:text-white/80 transition-colors"
+              >
+                {isPlaying ? (
+                  <svg
+                    className="w-5 h-5"
+                    fill="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      fillRule="evenodd"
+                      d="M6.75 5.25a.75.75 0 01.75-.75H9a.75.75 0 01.75.75v13.5a.75.75 0 01-.75.75H7.5a.75.75 0 01-.75-.75V5.25zm7.5 0A.75.75 0 0115 4.5h1.5a.75.75 0 01.75.75v13.5a.75.75 0 01-.75.75H15a.75.75 0 01-.75-.75V5.25z"
+                      clipRule="evenodd"
+                    />
+                  </svg>
+                ) : (
+                  <svg
+                    className="w-5 h-5"
+                    fill="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      fillRule="evenodd"
+                      d="M4.5 5.653c0-1.426 1.529-2.33 2.779-1.643l11.54 6.348c1.295.712 1.295 2.573 0 3.285L7.28 19.991c-1.25.687-2.779-.217-2.779-1.643V5.653z"
+                      clipRule="evenodd"
+                    />
+                  </svg>
+                )}
+              </button>
+
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleSkip(-5);
+                }}
+                className="text-white hover:text-white/80 transition-colors flex items-center gap-1"
+              >
+                <svg
+                  className="w-5 h-5"
+                  fill="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path d="M12.066 11.2a1 1 0 000 1.6l5.334 4A1 1 0 0019 16V7a1 1 0 00-1.6-.8l-5.333 4zM4.066 11.2a1 1 0 000 1.6l5.334 4A1 1 0 0011 16V7a1 1 0 00-1.6-.8l-5.334 4z" />
+                </svg>
+                <span className="text-xs font-medium">5</span>
+              </button>
+
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleSkip(5);
+                }}
+                className="text-white hover:text-white/80 transition-colors flex items-center gap-1"
+              >
+                <svg
+                  className="w-5 h-5"
+                  fill="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path d="M5 16V7a1 1 0 011.6-.8l5.334 4a1 1 0 010 1.6l-5.334 4A1 1 0 015 16zm12 0V7a1 1 0 011.6-.8l5.334 4a1 1 0 010 1.6l-5.334 4A1 1 0 0117 16z" />
+                </svg>
+                <span className="text-xs font-medium">5</span>
+              </button>
+            </div>
+          </div>
+        )}
+
+        <AnimatePresence>
           {isVideoEnded && (
-            <motion.div 
+            <motion.div
               initial={{ opacity: 0, x: 0 }}
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0 }}
               className="absolute inset-0 bg-black/35 flex items-end justify-end p-8"
             >
-              <motion.div 
+              <motion.div
                 className="flex flex-col items-center gap-4"
                 initial={{ scale: 0.9 }}
                 animate={{ scale: 1 }}
               >
                 <motion.div
                   animate={{ x: [0, 20, 0] }}
-                  transition={{ 
-                    repeat: 1, 
+                  transition={{
+                    repeat: 1,
                     duration: 1.5,
-                    ease: "easeInOut" 
+                    ease: "easeInOut",
                   }}
                   className="flex items-center gap-3 bg-white/10 backdrop-blur-sm px-6 py-4 rounded-lg"
                 >
                   <span className="text-white text-lg font-medium">
                     Apply your knowledge!
                   </span>
-                  <svg 
-                    className="w-6 h-6 text-white" 
-                    fill="none" 
-                    stroke="currentColor" 
+                  <svg
+                    className="w-6 h-6 text-white"
+                    fill="none"
+                    stroke="currentColor"
                     viewBox="0 0 24 24"
                   >
-                    <path 
-                      strokeLinecap="round" 
-                      strokeLinejoin="round" 
-                      strokeWidth={2} 
-                      d="M13 7l5 5m0 0l-5 5m5-5H6" 
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M13 7l5 5m0 0l-5 5m5-5H6"
                     />
                   </svg>
                 </motion.div>
