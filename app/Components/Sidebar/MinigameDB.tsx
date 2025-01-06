@@ -16,13 +16,24 @@ import "katex/dist/katex.min.css";
 import "../style.css";
 import ValidationComponent from "../ShowValid";
 import { OrderHandler } from "./OrderHandler";
-import { CheckCircle, ChevronDown, ArrowRight, FastForward } from 'lucide-react';
+import {
+  CheckCircle,
+  ChevronDown,
+  ArrowRight,
+  FastForward,
+} from "lucide-react";
 import { OrderHandlerDB } from "./OrderHandlerDB";
 import { VideoPlayer } from "../MainMenu/VideoPlayer";
-import { motion, AnimatePresence } from 'framer-motion';
-import { track } from '@vercel/analytics';
+import { motion, AnimatePresence } from "framer-motion";
+import { track } from "@vercel/analytics";
 
-export function MinigameDB({experienceID, index}: {experienceID: number, index: number}) {
+export function MinigameDB({
+  experienceID,
+  index,
+}: {
+  experienceID: number;
+  index: number;
+}) {
   const state_name = useStore(getStateName);
   const updateValidation = useStore(UpdateValidationSelector);
   const validationInstance = useStore((state) => state.validations);
@@ -54,11 +65,15 @@ export function MinigameDB({experienceID, index}: {experienceID: number, index: 
   useEffect(() => {
     const checkNextExperience = async () => {
       try {
-        const response = await fetch(`/api/supabase/check-next?experienceId=${experienceID}&index=${index+1}`);
+        const response = await fetch(
+          `/api/supabase/check-next?experienceId=${experienceID}&index=${
+            index + 1
+          }`
+        );
         const data = await response.json();
         setHasNextExperience(data.hasNext);
       } catch (error) {
-        console.error('Error checking next experience:', error);
+        console.error("Error checking next experience:", error);
         setHasNextExperience(false);
       }
     };
@@ -70,11 +85,16 @@ export function MinigameDB({experienceID, index}: {experienceID: number, index: 
     if (hasNextExperience) {
       const preloadVideo = async () => {
         try {
-          await fetch(`/api/supabase/video?experienceId=${experienceID}&index=${index + 1}`, {
-            priority: 'low'
-          });
+          await fetch(
+            `/api/supabase/video?experienceId=${experienceID}&index=${
+              index + 1
+            }`,
+            {
+              priority: "low",
+            }
+          );
         } catch (error) {
-          console.error('Error preloading next video:', error);
+          console.error("Error preloading next video:", error);
         }
       };
 
@@ -84,7 +104,7 @@ export function MinigameDB({experienceID, index}: {experienceID: number, index: 
 
   useEffect(() => {
     const sidebar = sidebarRef.current;
-    
+
     const checkInitialScroll = () => {
       if (sidebar) {
         const isScrollable = sidebar.scrollHeight > sidebar.clientHeight;
@@ -101,21 +121,21 @@ export function MinigameDB({experienceID, index}: {experienceID: number, index: 
     setTimeout(checkInitialScroll, 100); // Check again after content might have loaded
 
     // Add scroll listener
-    sidebar?.addEventListener('scroll', handleScroll, { once: true });
+    sidebar?.addEventListener("scroll", handleScroll, { once: true });
 
     // Cleanup
     return () => {
-      sidebar?.removeEventListener('scroll', handleScroll);
+      sidebar?.removeEventListener("scroll", handleScroll);
     };
   }, []);
 
   // Track when all validations become valid
   useEffect(() => {
     if (allValidationsValid) {
-      track('all_validations_complete', {
+      track("all_validations_complete", {
         experienceId: experienceID,
         index: index,
-        attempts: validationInstance.length // Number of validation attempts
+        attempts: validationInstance.length, // Number of validation attempts
       });
     }
   }, [allValidationsValid, experienceID, index, validationInstance.length]);
@@ -123,30 +143,55 @@ export function MinigameDB({experienceID, index}: {experienceID: number, index: 
   // Track when video ends
   useEffect(() => {
     if (isVideoEnded && !isVideoPlaying) {
-      track('video_completed', {
+      track("video_completed", {
         experienceId: experienceID,
         index: index,
-        skipped: false
+        skipped: false,
       });
     }
   }, [isVideoEnded, isVideoPlaying, experienceID, index]);
 
   // Update skip video handler with analytics
   const handleSkipVideo = () => {
-    const videoElement = document.querySelector('video');
+    const videoElement = document.querySelector("video");
     if (videoElement) {
-      track('video_completed', {
+      track("video_completed", {
         experienceId: experienceID,
         index: index,
         timeWatched: videoElement.currentTime,
         totalDuration: videoElement.duration,
-        percentageWatched: (videoElement.currentTime / videoElement.duration) * 100
+        percentageWatched:
+          (videoElement.currentTime / videoElement.duration) * 100,
       });
 
-      videoElement.currentTime = videoElement.duration;
-      videoElement.play();
-    }
+      // Check if the video is actually loaded and has a duration
+      if (videoElement.readyState >= 2 && videoElement.duration) {
+        // Set time to slightly before the end (e.g., 0.1 seconds before)
+        videoElement.currentTime = Math.max(0, videoElement.duration - 0.1);
 
+        // Use a promise to handle the seek operation
+        const playPromise = videoElement.play();
+        if (playPromise !== undefined) {
+          playPromise
+            .then(() => {
+              // Playback started successfully
+            })
+            .catch((error) => {
+              console.log("Error playing video:", error);
+            });
+        }
+      } else {
+        // If video isn't loaded, wait for it
+        videoElement.addEventListener(
+          "loadedmetadata",
+          () => {
+            videoElement.currentTime = Math.max(0, videoElement.duration - 0.1);
+            videoElement.play();
+          },
+          { once: true }
+        );
+      }
+    }
   };
 
   return (
@@ -178,30 +223,32 @@ export function MinigameDB({experienceID, index}: {experienceID: number, index: 
         <button
           onClick={() => setShowValidation(!showValidation)}
           className={`absolute bottom-4 left-4 flex items-center space-x-2 px-4 py-2 rounded-md shadow-lg transition-all duration-300 z-40 ${
-            allValidationsValid 
-              ? 'bg-green-500 hover:bg-green-600' 
-              : 'bg-blue-500 hover:bg-blue-600'
+            allValidationsValid
+              ? "bg-green-500 hover:bg-green-600"
+              : "bg-blue-500 hover:bg-blue-600"
           }`}
         >
-          {allValidationsValid && <CheckCircle className="text-white" size={20} />}
+          {allValidationsValid && (
+            <CheckCircle className="text-white" size={20} />
+          )}
           <span className="text-white font-semibold">
-            {showValidation ? 'Hide Autograder' : 'Show Autograder'}
+            {showValidation ? "Hide Autograder" : "Show Autograder"}
           </span>
         </button>
       </div>
 
       {/* Sidebar */}
-      <div 
+      <div
         ref={sidebarRef}
         className="w-full md:w-1/3 md:min-w-[300px] md:max-w-md bg-white p-4 overflow-y-auto h-1/2 md:h-full relative"
         style={{ height: "100lvh" }}
       >
         <OrderHandlerDB />
-        
+
         {/* Skip Video Button - Positioned with consistent spacing */}
         <AnimatePresence>
           {!isVideoEnded && (
-            <motion.button 
+            <motion.button
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: 20 }}
@@ -226,11 +273,11 @@ export function MinigameDB({experienceID, index}: {experienceID: number, index: 
         {/* Verify button - Only show when video has ended AND there are validations */}
         <AnimatePresence>
           {isVideoEnded && !isVideoPlaying && validationInstance.length > 0 && (
-            <motion.button 
+            <motion.button
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: 20 }}
-              onClick={handleValidationUpdate} 
+              onClick={handleValidationUpdate}
               className="w-full mt-6 mb-12 px-4 py-3 bg-green-600 text-white rounded-lg shadow-md transition-all duration-300 hover:bg-green-700 hover:shadow-lg active:bg-green-800"
             >
               <span className="text-lg font-semibold">Verify Answers</span>
@@ -241,30 +288,32 @@ export function MinigameDB({experienceID, index}: {experienceID: number, index: 
         {/* Navigation Container with enhanced UI */}
         <div className="relative">
           {/* Success Message and Navigation */}
-          {isVideoEnded && <AnimatePresence>
-            {allValidationsValid && (
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: 20 }}
-                className="mb-6 p-4 bg-green-50 border border-green-100 rounded-xl"
-              >
-                <div className="flex items-center gap-3 mb-2">
-                  <div className="bg-green-100 rounded-full p-1">
-                    <CheckCircle className="h-5 w-5 text-green-600" />
+          {isVideoEnded && (
+            <AnimatePresence>
+              {allValidationsValid && (
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: 20 }}
+                  className="mb-6 p-4 bg-green-50 border border-green-100 rounded-xl"
+                >
+                  <div className="flex items-center gap-3 mb-2">
+                    <div className="bg-green-100 rounded-full p-1">
+                      <CheckCircle className="h-5 w-5 text-green-600" />
+                    </div>
+                    <h3 className="text-green-800 font-semibold">
+                      Great work!
+                    </h3>
                   </div>
-                  <h3 className="text-green-800 font-semibold">
-                    Great work! 
-                  </h3>
-                </div>
-                <p className="text-green-600 text-sm ml-9">
-                  {hasNextExperience 
-                    ? "move on to the next Video"
-                    : "You've completed this module!"}
-                </p>
-              </motion.div>
-            )}
-          </AnimatePresence>}
+                  <p className="text-green-600 text-sm ml-9">
+                    {hasNextExperience
+                      ? "move on to the next Video"
+                      : "You've completed this module!"}
+                  </p>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          )}
 
           <div className="flex justify-between gap-4">
             {/* Previous Button */}
@@ -294,14 +343,16 @@ export function MinigameDB({experienceID, index}: {experienceID: number, index: 
 
             {/* Next/Done Button */}
             <Link
-              href={hasNextExperience 
-                ? `/experience/data/${experienceID}/${index + 1}`
-                : `/`}
+              href={
+                hasNextExperience
+                  ? `/experience/data/${experienceID}/${index + 1}`
+                  : `/`
+              }
               prefetch={hasNextExperience}
               className={`flex-1 group relative overflow-hidden rounded-xl ${
-                allValidationsValid 
-                  ? 'bg-green-600 hover:bg-green-700 active:bg-green-800' 
-                  : 'bg-blue-600 hover:bg-blue-700 active:bg-blue-800'
+                allValidationsValid
+                  ? "bg-green-600 hover:bg-green-700 active:bg-green-800"
+                  : "bg-blue-600 hover:bg-blue-700 active:bg-blue-800"
               } px-4 py-3 text-white shadow-md transition-all duration-300 hover:shadow-lg`}
             >
               <span className="relative z-10 flex items-center justify-center text-lg font-semibold">
@@ -359,15 +410,14 @@ export function MinigameDB({experienceID, index}: {experienceID: number, index: 
           </AnimatePresence> */}
         </div>
 
-
         {/* Floating Scroll Indicator - Overlay */}
         {showScrollIndicator && isVideoEnded && (
-          <div 
+          <div
             className="absolute bottom-6 right-1/2 translate-x-1/2 z-50 cursor-pointer"
             onClick={() => {
               sidebarRef.current?.scrollTo({
                 top: sidebarRef.current.scrollHeight,
-                behavior: 'smooth'
+                behavior: "smooth",
               });
             }}
           >

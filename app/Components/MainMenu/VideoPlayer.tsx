@@ -8,11 +8,23 @@ import {
   getIsVideoEndedSelector,
 } from "@/app/store";
 import { motion, AnimatePresence } from "framer-motion";
+import Image from "next/image";
 
 interface VideoPlayerProps {
   experienceId: number;
   index: number;
 }
+
+const VideoLoadingFallback = () => (
+  <div className="absolute inset-0 w-full h-full bg-gradient-to-br from-gray-900 to-black flex items-center justify-center">
+    <div className="flex flex-col items-center gap-4">
+      <div className="w-20 h-20 bg-black/50 rounded-full flex items-center justify-center backdrop-blur-sm">
+        <div className="w-12 h-12 border-4 border-white/30 border-t-white rounded-full animate-spin" />
+      </div>
+      <p className="text-white/80 text-sm font-medium">Loading video...</p>
+    </div>
+  </div>
+);
 
 export function VideoPlayer({ experienceId, index }: VideoPlayerProps) {
   const [videoUrl, setVideoUrl] = useState<string | null>(null);
@@ -58,17 +70,25 @@ export function VideoPlayer({ experienceId, index }: VideoPlayerProps) {
 
   useEffect(() => {
     if (videoRef.current && videoUrl && !isLoading) {
-      videoRef.current
-        .play()
-        .then(() => {
-          setIsPlaying(true);
-          setShowPlayButton(false);
-        })
-        .catch((error) => {
-          console.log("Autoplay failed:", error);
-          setIsPlaying(false);
-          setShowPlayButton(true);
-        });
+      const playTimeout = setTimeout(() => {
+        if (videoRef.current) {
+          const playPromise = videoRef.current.play();
+          if (playPromise !== undefined) {
+            playPromise
+              .then(() => {
+                setIsPlaying(true);
+                setShowPlayButton(false);
+              })
+              .catch((error) => {
+                console.log("Autoplay failed:", error);
+                setIsPlaying(false);
+                setShowPlayButton(true);
+              });
+          }
+        }
+      }, 100);
+
+      return () => clearTimeout(playTimeout);
     }
   }, [videoUrl, setIsPlaying, isLoading]);
 
@@ -117,20 +137,42 @@ export function VideoPlayer({ experienceId, index }: VideoPlayerProps) {
   };
 
   const handleReplay = () => {
-    setIsVideoEnded(false);
-    setIsPlaying(true);
-    setShowPlayButton(false);
     if (videoRef.current) {
+      // First reset all states
+      setIsVideoEnded(false);
+      setShowPlayButton(false);
+
+      // Reset video time
       videoRef.current.currentTime = 0;
-      videoRef.current.play();
+
+      // Create a small delay to ensure state updates have propagated
+      setTimeout(() => {
+        if (videoRef.current) {
+          const playPromise = videoRef.current.play();
+          if (playPromise !== undefined) {
+            playPromise
+              .then(() => {
+                setIsPlaying(true);
+              })
+              .catch((error) => {
+                console.log("Replay failed:", error);
+                setIsPlaying(false);
+                setShowPlayButton(true);
+              });
+          }
+        }
+      }, 50);
     }
   };
 
   const handleTimeUpdate = () => {
     if (videoRef.current) {
-      const progress =
-        (videoRef.current.currentTime / videoRef.current.duration) * 100;
-      setProgress(progress);
+      // Only update progress if video is actually playing
+      if (!videoRef.current.paused) {
+        const progress =
+          (videoRef.current.currentTime / videoRef.current.duration) * 100;
+        setProgress(progress);
+      }
     }
   };
 
@@ -140,8 +182,47 @@ export function VideoPlayer({ experienceId, index }: VideoPlayerProps) {
       const rect = bar.getBoundingClientRect();
       const percentage = (e.clientX - rect.left) / rect.width;
       const newTime = videoRef.current.duration * percentage;
+
+      // Pause video before seeking
+      videoRef.current.pause();
+
+      // Update time
       videoRef.current.currentTime = newTime;
       setProgress(percentage * 100);
+
+      // Resume playback if it was playing
+      if (isPlaying) {
+        const playPromise = videoRef.current.play();
+        if (playPromise !== undefined) {
+          playPromise.catch((error) => {
+            console.log("Play failed:", error);
+          });
+        }
+      }
+    }
+  };
+
+  const handleSkipVideo = () => {
+    if (videoRef.current) {
+      // First pause the video
+      videoRef.current.pause();
+
+      // Mute the video to prevent audio artifacts
+      const wasMuted = videoRef.current.muted;
+      videoRef.current.muted = true;
+
+      // Set time to end
+      videoRef.current.currentTime = videoRef.current.duration;
+
+      // Reset muted state
+      setTimeout(() => {
+        if (videoRef.current) {
+          videoRef.current.muted = wasMuted;
+        }
+      }, 100);
+
+      // Trigger ended event manually if needed
+      handleVideoEnd();
     }
   };
 
@@ -217,13 +298,7 @@ export function VideoPlayer({ experienceId, index }: VideoPlayerProps) {
   }, []);
 
   if (isLoading) {
-    return (
-      <div className="absolute inset-0 w-full h-full bg-black flex items-center justify-center">
-        <div className="w-20 h-20 bg-black bg-opacity-50 rounded-full flex items-center justify-center">
-          <div className="w-12 h-12 border-4 border-white/30 border-t-white rounded-full animate-spin" />
-        </div>
-      </div>
-    );
+    return <VideoLoadingFallback />;
   }
 
   if (!videoUrl) return null;
@@ -242,8 +317,16 @@ export function VideoPlayer({ experienceId, index }: VideoPlayerProps) {
             src={videoUrl}
             className="max-w-full max-h-full w-auto h-auto object-contain"
             playsInline
-            autoPlay
+            webkit-playsinline="true"
+            x-webkit-airplay="deny"
+            disablePictureInPicture
+            // controlsList="nodownload noplaybackrate noremoteplayback"
             controls={false}
+            preload="auto"
+            style={{
+              WebkitBackfaceVisibility: "hidden",
+              WebkitAppearance: "none",
+            }}
             onEnded={handleVideoEnd}
             onTimeUpdate={handleTimeUpdate}
             onPlay={() => {
