@@ -14,7 +14,6 @@ import {
 import { experiences } from "@/classes/Data/CompleteData";
 import "katex/dist/katex.min.css";
 import "../style.css";
-import ValidationComponent from "../ShowValid";
 import { OrderHandler } from "./OrderHandler";
 import {
   CheckCircle,
@@ -26,6 +25,7 @@ import { OrderHandlerDB } from "./OrderHandlerDB";
 import { VideoPlayer } from "../MainMenu/VideoPlayer";
 import { motion, AnimatePresence } from "framer-motion";
 import { track } from "@vercel/analytics";
+import { MobileValidation } from "../MainMenu/Mobile/MobileValidation";
 
 export function MinigameDB({
   experienceID,
@@ -37,19 +37,17 @@ export function MinigameDB({
   const state_name = useStore(getStateName);
   const updateValidation = useStore(UpdateValidationSelector);
   const validationInstance = useStore((state) => state.validations);
-  const [showValidation, setShowValidation] = useState(false);
-  const [allValidationsValid, setAllValidationsValid] = useState(false);
-  const [hasNextExperience, setHasNextExperience] = useState(false);
   const [showValidationResults, setShowValidationResults] = useState(false);
   const sidebarRef = useRef<HTMLDivElement>(null);
   const [showScrollIndicator, setShowScrollIndicator] = useState(false);
   const isVideoPlaying = useStore(getIsVideoPlayingSelector);
   const isVideoEnded = useStore(getIsVideoEndedSelector);
+  const [allValidationsValid, setAllValidationsValid] = useState(false);
+  const [hasNextExperience, setHasNextExperience] = useState(false);
 
   const handleValidationUpdate = () => {
     updateValidation();
     setShowValidationResults(true);
-    setShowValidation(true);
   };
 
   useEffect(() => {
@@ -201,120 +199,85 @@ export function MinigameDB({
         <VideoPlayer experienceId={experienceID} index={index} />
         <Experience />
         {/* <Experience /> */}
-
-        {/* Validation Panel - Positioned above navigation */}
-        <div
-          className={`absolute bottom-16 left-4 w-[calc(100%-2rem)] md:w-96 bg-white rounded-lg shadow-xl transition-all duration-300 ${
-            showValidation
-              ? "opacity-100 translate-y-0"
-              : "opacity-0 translate-y-full pointer-events-none"
-          } z-[100]`}
-        >
-          <div className="p-4 max-h-[30vh] md:max-h-[calc(100vh-400px)] overflow-y-auto">
-            <ValidationComponent
-              validations={validationInstance}
-              updater={handleValidationUpdate}
-              isChecked={showValidationResults}
-            />
-          </div>
-        </div>
-
-        {/* Toggle button - Positioned above navigation */}
-        <button
-          onClick={() => setShowValidation(!showValidation)}
-          className={`absolute bottom-4 left-4 flex items-center space-x-2 px-4 py-2 rounded-md shadow-lg transition-all duration-300 z-40 ${
-            allValidationsValid
-              ? "bg-green-500 hover:bg-green-600"
-              : "bg-blue-500 hover:bg-blue-600"
-          }`}
-        >
-          {allValidationsValid && (
-            <CheckCircle className="text-white" size={20} />
-          )}
-          <span className="text-white font-semibold">
-            {showValidation ? "Hide Autograder" : "Show Autograder"}
-          </span>
-        </button>
       </div>
 
       {/* Sidebar */}
       <div
         ref={sidebarRef}
-        className="w-full md:w-1/3 md:min-w-[300px] md:max-w-md bg-white p-4 overflow-y-auto h-1/2 md:h-full relative"
+        className="w-full md:w-1/3 md:min-w-[300px] md:max-w-md bg-white p-6 overflow-y-auto h-1/2 md:h-full relative"
         style={{ height: "100lvh" }}
       >
-        <OrderHandlerDB />
+        <div className="space-y-8">
+          <OrderHandlerDB />
 
-        {/* Skip Video Button - Positioned with consistent spacing */}
-        <AnimatePresence>
-          {!isVideoEnded && (
-            <motion.button
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: 20 }}
-              onClick={handleSkipVideo}
-              className="w-full mt-6 mb-6 px-4 py-3 bg-blue-50 hover:bg-blue-100 
-                border border-blue-200 rounded-xl shadow-sm transition-all duration-300 
-                flex flex-col items-center gap-2"
-            >
-              <div className="flex flex-col items-center text-center space-y-1">
-                <span className="text-blue-700 text-lg font-medium">
-                  Skip to the end of the video
-                </span>
-                <span className="text-blue-600/80 text-sm">
-                  to apply your learning
-                </span>
-              </div>
-              <FastForward className="w-6 h-6 text-blue-500" />
-            </motion.button>
-          )}
-        </AnimatePresence>
+          {/* Skip Video Button */}
+          <AnimatePresence>
+            {!isVideoEnded && (
+              <motion.button
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: 20 }}
+                onClick={handleSkipVideo}
+                className="w-full px-4 py-3 bg-blue-50 hover:bg-blue-100 
+                  border border-blue-200 rounded-xl shadow-sm transition-all duration-300 
+                  flex flex-col items-center gap-2"
+              >
+                <div className="flex flex-col items-center text-center space-y-1">
+                  <span className="text-blue-700 text-lg font-medium">
+                    Skip to the end of the video
+                  </span>
+                  <span className="text-blue-600/80 text-sm">
+                    to apply your learning
+                  </span>
+                </div>
+                <FastForward className="w-6 h-6 text-blue-500" />
+              </motion.button>
+            )}
+          </AnimatePresence>
 
-        {/* Verify button - Only show when video has ended AND there are validations */}
-        <AnimatePresence>
-          {isVideoEnded && !isVideoPlaying && validationInstance.length > 0 && (
-            <motion.button
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: 20 }}
-              onClick={handleValidationUpdate}
-              className="w-full mt-6 mb-12 px-4 py-3 bg-green-600 text-white rounded-lg shadow-md transition-all duration-300 hover:bg-green-700 hover:shadow-lg active:bg-green-800"
-            >
-              <span className="text-lg font-semibold">Verify Answers</span>
-            </motion.button>
-          )}
-        </AnimatePresence>
+          {/* Validation Section */}
+          <div className="space-y-6">
+            <MobileValidation
+              validations={validationInstance}
+              showResults={showValidationResults}
+            />
 
-        {/* Navigation Container with enhanced UI */}
-        <div className="relative">
-          {/* Success Message and Navigation */}
-          {isVideoEnded && (
-            <AnimatePresence>
-              {allValidationsValid && (
-                <motion.div
+            {/* Verify button */}
+            {isVideoEnded &&
+              !isVideoPlaying &&
+              validationInstance.length > 0 && (
+                <motion.button
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: 20 }}
-                  className="mb-6 p-4 bg-green-50 border border-green-100 rounded-xl"
+                  onClick={handleValidationUpdate}
+                  className="w-full px-4 py-3 bg-green-600 text-white rounded-xl shadow-md 
+                  transition-all duration-300 hover:bg-green-700 hover:shadow-lg 
+                  active:bg-green-800"
                 >
-                  <div className="flex items-center gap-3 mb-2">
-                    <div className="bg-green-100 rounded-full p-1">
-                      <CheckCircle className="h-5 w-5 text-green-600" />
-                    </div>
-                    <h3 className="text-green-800 font-semibold">
-                      Great work!
-                    </h3>
-                  </div>
-                  <p className="text-green-600 text-sm ml-9">
-                    {hasNextExperience
-                      ? "move on to the next Video"
-                      : "You've completed this module!"}
-                  </p>
-                </motion.div>
+                  <span className="text-lg font-semibold">Verify Answers</span>
+                </motion.button>
               )}
-            </AnimatePresence>
-          )}
 
+            {/* Success Message */}
+            {allValidationsValid && (
+              <div className="p-4 bg-green-50 border border-green-100 rounded-xl">
+                <div className="flex items-center gap-3 mb-2">
+                  <div className="bg-green-100 rounded-full p-1">
+                    <CheckCircle className="h-5 w-5 text-green-600" />
+                  </div>
+                  <h3 className="text-green-800 font-semibold">Great work!</h3>
+                </div>
+                <p className="text-green-600 text-sm ml-9">
+                  {hasNextExperience
+                    ? "Move on to the next video"
+                    : "You've completed this module!"}
+                </p>
+              </div>
+            )}
+          </div>
+
+          {/* Navigation Container */}
           <div className="flex justify-between gap-4">
             {/* Previous Button */}
             {index > 0 && (
@@ -379,38 +342,9 @@ export function MinigameDB({
               </span>
             </Link>
           </div>
-
-          {/* Animated Prompt */}
-          {/* <AnimatePresence>
-            {allValidationsValid && (
-              <motion.div
-                initial={{ opacity: 0, y: -10 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -10 }}
-                className="absolute left-1/2 transform -translate-x-1/2 mt-4"
-              >
-                <motion.div
-                  animate={{ y: [0, 5, 0] }}
-                  transition={{
-                    duration: 1.5,
-                    repeat: Infinity,
-                    ease: "easeInOut"
-                  }}
-                  className="flex flex-col items-center bg-white/80 backdrop-blur-sm px-4 py-2 rounded-full shadow-sm"
-                >
-                  <span className="text-green-600 text-sm font-medium flex items-center gap-4">
-                    <ArrowRight className="h-5 w-5" />
-                    {hasNextExperience 
-                      ? "Click to proceed to the next step" 
-                      : "Click to finish the experience"}
-                  </span>
-                </motion.div>
-              </motion.div>
-            )}
-          </AnimatePresence> */}
         </div>
 
-        {/* Floating Scroll Indicator - Overlay */}
+        {/* Scroll indicator */}
         {showScrollIndicator && isVideoEnded && (
           <div
             className="absolute bottom-6 right-1/2 translate-x-1/2 z-50 cursor-pointer"
