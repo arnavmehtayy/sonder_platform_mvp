@@ -38,6 +38,8 @@ export function VideoPlayer({ experienceId, index }: VideoPlayerProps) {
   const [progress, setProgress] = useState(0);
   const [showControls, setShowControls] = useState(true);
   const controlsTimeoutRef = useRef<NodeJS.Timeout>();
+  const [isDragging, setIsDragging] = useState(false);
+  const progressBarRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const loadVideo = async () => {
@@ -297,6 +299,50 @@ export function VideoPlayer({ experienceId, index }: VideoPlayerProps) {
     return () => window.removeEventListener("keydown", handleKeyPress);
   }, []);
 
+  const handleProgressBarInteraction = (e: React.MouseEvent) => {
+    if (videoRef.current && progressBarRef.current) {
+      const rect = progressBarRef.current.getBoundingClientRect();
+      const position = Math.max(
+        0,
+        Math.min(1, (e.clientX - rect.left) / rect.width)
+      );
+
+      // Update video time
+      videoRef.current.currentTime = position * videoRef.current.duration;
+
+      // Update progress state
+      setProgress(position * 100);
+
+      // Reset video ended state if user drags back
+      if (isVideoEnded && position < 1) {
+        setIsVideoEnded(false);
+      }
+    }
+  };
+
+  useEffect(() => {
+    const handleMouseMove = (e: MouseEvent) => {
+      if (isDragging) {
+        e.preventDefault();
+        handleProgressBarInteraction(e as unknown as React.MouseEvent);
+      }
+    };
+
+    const handleMouseUp = () => {
+      setIsDragging(false);
+    };
+
+    if (isDragging) {
+      window.addEventListener("mousemove", handleMouseMove);
+      window.addEventListener("mouseup", handleMouseUp);
+    }
+
+    return () => {
+      window.removeEventListener("mousemove", handleMouseMove);
+      window.removeEventListener("mouseup", handleMouseUp);
+    };
+  }, [isDragging]);
+
   if (isLoading) {
     return <VideoLoadingFallback />;
   }
@@ -374,18 +420,25 @@ export function VideoPlayer({ experienceId, index }: VideoPlayerProps) {
           >
             <div className="flex items-center gap-4 mb-1">
               <div
-                className="w-full relative h-1 bg-white/30 cursor-pointer rounded-full overflow-hidden"
-                onClick={(e) => e.stopPropagation()}
-                onMouseDown={handleSeek}
+                ref={progressBarRef}
+                className="w-full relative h-8 flex items-center cursor-pointer"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleProgressBarInteraction(e);
+                }}
               >
-                <div
-                  className="h-full bg-white transition-all duration-100 rounded-full"
-                  style={{ width: `${progress}%` }}
-                />
-                <div className="absolute bottom-0 left-0 right-0 h-4 -top-2 opacity-0 group-hover:opacity-100">
+                <div className="w-full h-1 bg-white/30 rounded-full relative">
                   <div
-                    className="absolute bottom-0 h-1 bg-white/30 w-full"
-                    onMouseDown={handleSeek}
+                    className="absolute h-full bg-white rounded-full transition-all duration-100"
+                    style={{ width: `${progress}%` }}
+                  />
+                  <div
+                    className="absolute h-3 w-3 bg-sky-500 rounded-full -mt-1 shadow-sm transform -translate-x-1/2"
+                    style={{ left: `${progress}%` }}
+                    onMouseDown={(e) => {
+                      e.stopPropagation();
+                      setIsDragging(true);
+                    }}
                   />
                 </div>
               </div>
