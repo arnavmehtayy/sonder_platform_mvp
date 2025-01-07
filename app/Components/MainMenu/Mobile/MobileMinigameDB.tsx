@@ -34,13 +34,13 @@ export function MobileMinigameDB({
   // Show questions panel when video ends
   useEffect(() => {
     if (isVideoEnded) {
-      // Show questions when video ends
       setShowQuestions(true);
     } else {
-      // Hide questions when video is playing or restarted
       setShowQuestions(false);
+      // Reset validation results when video starts
+      setShowValidationResults(false);
     }
-  }, [isVideoEnded, isVideoPlaying]);
+  }, [isVideoEnded, isVideoPlaying, experienceID, index]);
 
   // Check for validations
   useEffect(() => {

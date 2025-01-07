@@ -28,8 +28,15 @@ export function MobileVideoPlayer({
   const progressBarRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
+    setIsVideoEnded(false);
+    setShowPlayButton(false);
+    setProgress(0);
+  }, [experienceId, index, setIsVideoEnded]);
+
+  useEffect(() => {
     const loadVideo = async () => {
       setIsLoading(true);
+      setIsVideoEnded(false);
       try {
         const response = await fetch(
           `/api/supabase/video?experienceId=${experienceId}&index=${index}`
@@ -54,7 +61,7 @@ export function MobileVideoPlayer({
     };
 
     loadVideo();
-  }, [experienceId, index]);
+  }, [experienceId, index, setIsVideoEnded]);
 
   useEffect(() => {
     if (videoRef.current && videoUrl && !isLoading) {
