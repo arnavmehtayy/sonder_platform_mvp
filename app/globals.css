@@ -60,6 +60,8 @@
 
   html {
     height: -webkit-fill-available;
+    background-color: black;
+    overscroll-behavior: none;
   }
 
   body {
@@ -69,6 +71,8 @@
     padding-top: max(env(safe-area-inset-top), 1rem);
     padding-left: max(env(safe-area-inset-left), 1rem);
     padding-right: max(env(safe-area-inset-right), 1rem);
+    overscroll-behavior: none;
+    background-color: black;
   }
 }
 
