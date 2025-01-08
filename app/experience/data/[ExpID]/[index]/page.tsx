@@ -78,8 +78,8 @@ export default function ExperiencePage() {
 
   if (isMobile) {
     return (
-      <div className="flex flex-col h-screen bg-black">
-        <div className="absolute top-4 left-4 z-[100]">
+      <div className="flex flex-col h-[100dvh] bg-black">
+        <div className="absolute top-[calc(env(safe-area-inset-top)+1rem)] left-4 z-[100]">
           <CurvedBackButton />
         </div>
         <div className="relative h-full w-full">

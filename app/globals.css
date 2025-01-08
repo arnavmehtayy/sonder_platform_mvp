@@ -2,7 +2,6 @@
 @tailwind components;
 @tailwind utilities;
 
-
 @layer base {
   :root {
     --background: 0 0% 100%;
@@ -58,8 +57,20 @@
     --chart-4: 280 65% 60%;
     --chart-5: 340 75% 55%;
   }
-}
 
+  html {
+    height: -webkit-fill-available;
+  }
+
+  body {
+    min-height: -webkit-fill-available;
+    height: 100dvh;
+    padding-bottom: max(env(safe-area-inset-bottom), 1rem);
+    padding-top: max(env(safe-area-inset-top), 1rem);
+    padding-left: max(env(safe-area-inset-left), 1rem);
+    padding-right: max(env(safe-area-inset-right), 1rem);
+  }
+}
 
 @layer base {
   * {
@@ -73,4 +84,3 @@
     padding-right: env(safe-area-inset-right);
   }
 }
-
