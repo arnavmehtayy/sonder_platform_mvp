@@ -356,17 +356,16 @@ export function VideoPlayer({ experienceId, index }: VideoPlayerProps) {
       onMouseMove={handleMouseMove}
       onMouseEnter={() => setShowControls(true)}
     >
-      <div className="relative flex flex-col w-full">
-        <div className="relative">
+      <div className="relative flex flex-col w-full h-full">
+        <div className="relative w-full h-full">
           <video
             ref={videoRef}
             src={videoUrl}
-            className="max-w-full max-h-full w-auto h-auto object-contain"
+            className="w-full h-full object-contain"
             playsInline
             webkit-playsinline="true"
             x-webkit-airplay="deny"
             disablePictureInPicture
-            // controlsList="nodownload noplaybackrate noremoteplayback"
             controls={false}
             preload="auto"
             style={{

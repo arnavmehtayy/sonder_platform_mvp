@@ -82,12 +82,13 @@ export default function ExperiencePage() {
         <div className="absolute top-4 left-4 z-[100]">
           <CurvedBackButton />
         </div>
-        <MobileMinigameDB
-          experienceID={Number(params.ExpID)}
-          index={Number(params.index)}
-        />
-        {/* Feedback component temporarily removed due to space constraints */}
-        {/* <FeedbackComponent /> */}
+        <div className="relative h-full w-full">
+          <MobileMinigameDB
+            experienceID={Number(params.ExpID)}
+            index={Number(params.index)}
+          />
+        </div>
+        <Analytics />
       </div>
     );
   }

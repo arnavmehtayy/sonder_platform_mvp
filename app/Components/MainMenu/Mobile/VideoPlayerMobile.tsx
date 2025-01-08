@@ -26,6 +26,7 @@ export function MobileVideoPlayer({
   const setIsVideoEnded = useStore(setIsVideoEndedSelector);
   const isVideoEnded = useStore(getIsVideoEndedSelector);
   const progressBarRef = useRef<HTMLDivElement>(null);
+  const [isVerticalVideo, setIsVerticalVideo] = useState(false);
 
   useEffect(() => {
     setIsVideoEnded(false);
@@ -193,6 +194,20 @@ export function MobileVideoPlayer({
     }
   };
 
+  const handleLoadedMetadata = () => {
+    if (videoRef.current) {
+      const { videoWidth, videoHeight } = videoRef.current;
+      const aspectRatio = videoWidth / videoHeight;
+      setIsVerticalVideo(aspectRatio < 1);
+      //   console.log("Video dimensions:", {
+      //     videoWidth,
+      //     videoHeight,
+      //     aspectRatio,
+      //     isVertical: aspectRatio < 1,
+      //   });
+    }
+  };
+
   if (isLoading) {
     return (
       <div className="absolute inset-0 w-full h-full bg-gradient-to-br from-gray-900 to-black flex items-center justify-center">
@@ -211,7 +226,9 @@ export function MobileVideoPlayer({
       <video
         ref={videoRef}
         src={videoUrl || undefined}
-        className="w-full h-full object-contain"
+        className={`absolute inset-0 w-full h-full ${
+          isVerticalVideo && !isVideoEnded ? "object-cover" : "object-contain"
+        }`}
         playsInline
         webkit-playsinline="true"
         x-webkit-airplay="deny"
@@ -222,6 +239,7 @@ export function MobileVideoPlayer({
           WebkitBackfaceVisibility: "hidden",
           WebkitAppearance: "none",
         }}
+        onLoadedMetadata={handleLoadedMetadata}
         onTimeUpdate={handleTimeUpdate}
         onEnded={handleVideoEnd}
         onClick={togglePlay}
@@ -278,7 +296,7 @@ export function MobileVideoPlayer({
           {/* Skip/Replay button */}
           <AnimatePresence mode="wait">
             {isVideoEnded ? (
-              <div className="flex flex-col items-center">
+              <div className="flex flex-col items-center z-[100]">
                 <motion.button
                   key="replay"
                   initial={{ opacity: 0, scale: 0.8 }}
@@ -297,7 +315,7 @@ export function MobileVideoPlayer({
                 />
               </div>
             ) : (
-              <div className="flex flex-col items-center">
+              <div className="flex flex-col items-center z-[100]">
                 <motion.button
                   key="skip"
                   initial={{ opacity: 0, scale: 0.8 }}

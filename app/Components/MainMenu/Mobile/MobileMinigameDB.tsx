@@ -12,6 +12,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { ChevronUp, CheckCircle, FastForward } from "lucide-react";
 import Link from "next/link";
 import { MobileValidation } from "./MobileValidation";
+import Experience from "../../visualexp";
 
 interface MobileMinigameDBProps {
   experienceID: number;
@@ -84,9 +85,16 @@ export function MobileMinigameDB({
       <div
         className={`w-full ${
           showQuestions ? "h-1/2" : "h-full"
-        } transition-all duration-500`}
+        } transition-all duration-500 relative`}
       >
         <MobileVideoPlayer experienceId={experienceID} index={index} />
+
+        {/* Add Three.js experience layer */}
+        {isVideoEnded && (
+          <div className="absolute inset-0 w-full h-full">
+            <Experience />
+          </div>
+        )}
       </div>
 
       {/* Questions Panel */}
