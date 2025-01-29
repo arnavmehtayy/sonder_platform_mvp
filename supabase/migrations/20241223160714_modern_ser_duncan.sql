@@ -1,1 +1,0 @@
-ALTER TABLE "experience_table" ADD COLUMN "is_hidden" boolean DEFAULT false NOT NULL;

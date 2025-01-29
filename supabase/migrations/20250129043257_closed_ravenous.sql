@@ -30,7 +30,8 @@ CREATE TABLE IF NOT EXISTS "axis_object" (
 	"font_size" real NOT NULL,
 	"line_width" real NOT NULL,
 	"x_label" text NOT NULL,
-	"y_label" text NOT NULL
+	"y_label" text NOT NULL,
+	"is_number_line" boolean DEFAULT false NOT NULL
 );
 --> statement-breakpoint
 CREATE TABLE IF NOT EXISTS "dummy_data_storage" (
@@ -49,6 +50,15 @@ CREATE TABLE IF NOT EXISTS "enabler_control" (
 	"text" text NOT NULL,
 	"obj_ids" integer[] NOT NULL,
 	"control_state" boolean NOT NULL
+);
+--> statement-breakpoint
+CREATE TABLE IF NOT EXISTS "experience_videos" (
+	"id" serial PRIMARY KEY NOT NULL,
+	"experience_id" integer NOT NULL,
+	"index" integer NOT NULL,
+	"video_path" text NOT NULL,
+	"created_at" timestamp DEFAULT now() NOT NULL,
+	"updated_at" timestamp DEFAULT now() NOT NULL
 );
 --> statement-breakpoint
 CREATE TABLE IF NOT EXISTS "function_plot_string" (
@@ -71,7 +81,8 @@ CREATE TABLE IF NOT EXISTS "function_plot_string" (
 	"num_points" integer NOT NULL,
 	"line_width" real NOT NULL,
 	"function_str" text NOT NULL,
-	"symbols" jsonb NOT NULL
+	"symbols" jsonb NOT NULL,
+	"axis_id" integer DEFAULT -1
 );
 --> statement-breakpoint
 CREATE TABLE IF NOT EXISTS "function_score" (
@@ -101,6 +112,23 @@ CREATE TABLE IF NOT EXISTS "geom_obj" (
 	"touch_controls" jsonb,
 	"geometry_type" text NOT NULL,
 	"geometry_atts" jsonb NOT NULL
+);
+--> statement-breakpoint
+CREATE TABLE IF NOT EXISTS "influence_advanced" (
+	"id" serial PRIMARY KEY NOT NULL,
+	"state_id" integer NOT NULL,
+	"influence_id" integer NOT NULL,
+	"worker_id" integer NOT NULL
+);
+--> statement-breakpoint
+CREATE TABLE IF NOT EXISTS "influence_attribute_pairs" (
+	"id" serial PRIMARY KEY NOT NULL,
+	"state_id" integer NOT NULL,
+	"influence_id" integer NOT NULL,
+	"trans_functionStr" text NOT NULL,
+	"trans_symbols" jsonb NOT NULL,
+	"func" text NOT NULL,
+	"obj_type" text NOT NULL
 );
 --> statement-breakpoint
 CREATE TABLE IF NOT EXISTS "input_number_attribute_pairs" (
@@ -162,7 +190,8 @@ CREATE TABLE IF NOT EXISTS "multi_choice_option" (
 	"id" serial PRIMARY KEY NOT NULL,
 	"multi_choice_control_id" integer NOT NULL,
 	"state_id" integer NOT NULL,
-	"label" text NOT NULL
+	"label" text NOT NULL,
+	"option_id" integer NOT NULL
 );
 --> statement-breakpoint
 CREATE TABLE IF NOT EXISTS "placement" (
@@ -256,6 +285,14 @@ CREATE TABLE IF NOT EXISTS "text_geom" (
 	"text" text NOT NULL
 );
 --> statement-breakpoint
+CREATE TABLE IF NOT EXISTS "validation_input_number" (
+	"state_id" integer NOT NULL,
+	"answer" real NOT NULL,
+	"control_id" integer NOT NULL,
+	"error" real NOT NULL,
+	"desc" text NOT NULL
+);
+--> statement-breakpoint
 CREATE TABLE IF NOT EXISTS "validation_obj" (
 	"id" serial PRIMARY KEY NOT NULL,
 	"state_id" integer NOT NULL,
@@ -305,10 +342,19 @@ CREATE TABLE IF NOT EXISTS "validation_table_control" (
 	"validate_cells" jsonb NOT NULL
 );
 --> statement-breakpoint
+CREATE TABLE IF NOT EXISTS "validation_multi_choice" (
+	"state_id" integer NOT NULL,
+	"answer" integer[] NOT NULL,
+	"control_id" integer NOT NULL,
+	"desc" text NOT NULL
+);
+--> statement-breakpoint
 CREATE TABLE IF NOT EXISTS "experience_table" (
 	"id" serial PRIMARY KEY NOT NULL,
 	"desc" text NOT NULL,
-	"title" text NOT NULL
+	"title" text NOT NULL,
+	"user_id" integer NOT NULL,
+	"is_hidden" boolean DEFAULT false NOT NULL
 );
 --> statement-breakpoint
 CREATE TABLE IF NOT EXISTS "order" (
@@ -332,6 +378,8 @@ CREATE TABLE IF NOT EXISTS "users_table" (
 	"title" text NOT NULL,
 	"created_at" timestamp DEFAULT now() NOT NULL,
 	"updated_at" timestamp DEFAULT now() NOT NULL,
+	"experience_id" integer NOT NULL,
+	"index" integer DEFAULT 0,
 	CONSTRAINT "users_table_state_name_unique" UNIQUE("state_name")
 );
 --> statement-breakpoint
@@ -366,6 +414,12 @@ EXCEPTION
 END $$;
 --> statement-breakpoint
 DO $$ BEGIN
+ ALTER TABLE "experience_videos" ADD CONSTRAINT "experience_videos_experience_id_experience_table_id_fk" FOREIGN KEY ("experience_id") REFERENCES "public"."experience_table"("id") ON DELETE cascade ON UPDATE no action;
+EXCEPTION
+ WHEN duplicate_object THEN null;
+END $$;
+--> statement-breakpoint
+DO $$ BEGIN
  ALTER TABLE "function_plot_string" ADD CONSTRAINT "function_plot_string_state_id_users_table_id_fk" FOREIGN KEY ("state_id") REFERENCES "public"."users_table"("id") ON DELETE cascade ON UPDATE no action;
 EXCEPTION
  WHEN duplicate_object THEN null;
@@ -379,6 +433,18 @@ END $$;
 --> statement-breakpoint
 DO $$ BEGIN
  ALTER TABLE "geom_obj" ADD CONSTRAINT "geom_obj_state_id_users_table_id_fk" FOREIGN KEY ("state_id") REFERENCES "public"."users_table"("id") ON DELETE cascade ON UPDATE no action;
+EXCEPTION
+ WHEN duplicate_object THEN null;
+END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+ ALTER TABLE "influence_advanced" ADD CONSTRAINT "influence_advanced_state_id_users_table_id_fk" FOREIGN KEY ("state_id") REFERENCES "public"."users_table"("id") ON DELETE cascade ON UPDATE no action;
+EXCEPTION
+ WHEN duplicate_object THEN null;
+END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+ ALTER TABLE "influence_attribute_pairs" ADD CONSTRAINT "influence_attribute_pairs_state_id_users_table_id_fk" FOREIGN KEY ("state_id") REFERENCES "public"."users_table"("id") ON DELETE cascade ON UPDATE no action;
 EXCEPTION
  WHEN duplicate_object THEN null;
 END $$;
@@ -474,6 +540,12 @@ EXCEPTION
 END $$;
 --> statement-breakpoint
 DO $$ BEGIN
+ ALTER TABLE "validation_input_number" ADD CONSTRAINT "validation_input_number_state_id_users_table_id_fk" FOREIGN KEY ("state_id") REFERENCES "public"."users_table"("id") ON DELETE cascade ON UPDATE no action;
+EXCEPTION
+ WHEN duplicate_object THEN null;
+END $$;
+--> statement-breakpoint
+DO $$ BEGIN
  ALTER TABLE "validation_obj" ADD CONSTRAINT "validation_obj_state_id_users_table_id_fk" FOREIGN KEY ("state_id") REFERENCES "public"."users_table"("id") ON DELETE cascade ON UPDATE no action;
 EXCEPTION
  WHEN duplicate_object THEN null;
@@ -504,6 +576,18 @@ EXCEPTION
 END $$;
 --> statement-breakpoint
 DO $$ BEGIN
+ ALTER TABLE "validation_multi_choice" ADD CONSTRAINT "validation_multi_choice_state_id_users_table_id_fk" FOREIGN KEY ("state_id") REFERENCES "public"."users_table"("id") ON DELETE cascade ON UPDATE no action;
+EXCEPTION
+ WHEN duplicate_object THEN null;
+END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+ ALTER TABLE "experience_table" ADD CONSTRAINT "experience_table_user_id_profiles_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."profiles"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION
+ WHEN duplicate_object THEN null;
+END $$;
+--> statement-breakpoint
+DO $$ BEGIN
  ALTER TABLE "order" ADD CONSTRAINT "order_state_id_users_table_id_fk" FOREIGN KEY ("state_id") REFERENCES "public"."users_table"("id") ON DELETE cascade ON UPDATE no action;
 EXCEPTION
  WHEN duplicate_object THEN null;
@@ -511,6 +595,12 @@ END $$;
 --> statement-breakpoint
 DO $$ BEGIN
  ALTER TABLE "profiles" ADD CONSTRAINT "profiles_user_id_users_id_fk" FOREIGN KEY ("user_id") REFERENCES "auth"."users"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION
+ WHEN duplicate_object THEN null;
+END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+ ALTER TABLE "users_table" ADD CONSTRAINT "users_table_experience_id_experience_table_id_fk" FOREIGN KEY ("experience_id") REFERENCES "public"."experience_table"("id") ON DELETE cascade ON UPDATE no action;
 EXCEPTION
  WHEN duplicate_object THEN null;
 END $$;

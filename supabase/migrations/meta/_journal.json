@@ -5,71 +5,8 @@
     {
       "idx": 0,
       "version": "7",
-      "when": 1730143129043,
-      "tag": "20241028191849_aberrant_the_renegades",
-      "breakpoints": true
-    },
-    {
-      "idx": 1,
-      "version": "7",
-      "when": 1730143150583,
-      "tag": "20241028191910_furry_chat",
-      "breakpoints": true
-    },
-    {
-      "idx": 2,
-      "version": "7",
-      "when": 1730143193113,
-      "tag": "20241028191953_wild_odin",
-      "breakpoints": true
-    },
-    {
-      "idx": 3,
-      "version": "7",
-      "when": 1730329685155,
-      "tag": "20241030230805_special_the_stranger",
-      "breakpoints": true
-    },
-    {
-      "idx": 4,
-      "version": "7",
-      "when": 1730490496727,
-      "tag": "20241101194816_reflective_maximus",
-      "breakpoints": true
-    },
-    {
-      "idx": 5,
-      "version": "7",
-      "when": 1730493756181,
-      "tag": "20241101204236_dapper_ozymandias",
-      "breakpoints": true
-    },
-    {
-      "idx": 6,
-      "version": "7",
-      "when": 1730587603806,
-      "tag": "20241102224643_fancy_black_cat",
-      "breakpoints": true
-    },
-    {
-      "idx": 7,
-      "version": "7",
-      "when": 1730588835554,
-      "tag": "20241102230715_amusing_aaron_stack",
-      "breakpoints": true
-    },
-    {
-      "idx": 8,
-      "version": "7",
-      "when": 1734415695551,
-      "tag": "20241217060815_fluffy_gambit",
-      "breakpoints": true
-    },
-    {
-      "idx": 9,
-      "version": "7",
-      "when": 1734970034229,
-      "tag": "20241223160714_modern_ser_duncan",
+      "when": 1738125177715,
+      "tag": "20250129043257_closed_ravenous",
       "breakpoints": true
     }
   ]

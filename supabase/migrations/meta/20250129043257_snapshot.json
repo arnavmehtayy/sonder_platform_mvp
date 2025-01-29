@@ -1,6 +1,6 @@
 {
-  "id": "d2bd5cac-8728-4811-a569-a47c69da31f1",
-  "prevId": "62baa3de-f31f-49f4-b8a6-9c1bd1a49d07",
+  "id": "8001fc78-9076-4516-a15c-3d76324645ea",
+  "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
   "tables": {
@@ -2367,6 +2367,13 @@
           "type": "integer",
           "primaryKey": false,
           "notNull": true
+        },
+        "is_hidden": {
+          "name": "is_hidden",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": false
         }
       },
       "indexes": {},
