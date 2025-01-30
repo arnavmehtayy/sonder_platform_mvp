@@ -1,0 +1,1 @@
+ALTER TABLE "company_table" ADD COLUMN "bucket_name" text DEFAULT 'experience-videos';

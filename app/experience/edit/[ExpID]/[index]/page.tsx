@@ -87,7 +87,6 @@ import { MultiChoiceClass } from "@/classes/Controls/MultiChoiceClass";
 import { TableControl } from "@/classes/Controls/TableControl";
 import { InputNumber } from "@/classes/Controls/InputNumber";
 import { DropDownMenu } from "@/app/Components/EditMode/DropDownMenu";
-import { VideoUpload } from "@/app/Components/MainMenu/VideoUpload";
 import { AnimatePresence } from "framer-motion";
 import { VideoPlayer } from "@/app/Components/MainMenu/VideoPlayer";
 import { motion } from "framer-motion";
@@ -384,7 +383,7 @@ export default function ExperienceEditPage() {
         const {
           data: { publicUrl },
         } = supabase.storage
-          .from("experience-videos")
+          .from(data.bucket_name)
           .getPublicUrl(data.video_path);
         setVideoUrl(publicUrl);
         setVideoKey((prev) => prev + 1);
@@ -401,6 +400,13 @@ export default function ExperienceEditPage() {
     if (!file) return;
 
     try {
+      // First get the bucket name for this experience
+      const bucketResponse = await fetch(
+        `/api/supabase/video?experienceId=${expId}&index=${currentIndex}`
+      );
+      const bucketData = await bucketResponse.json();
+      const bucketName = bucketData.bucket_name || "experience-videos";
+
       const supabase = createClient();
       const timestamp = Date.now();
       const fileExtension = file.name.split(".").pop();
@@ -408,7 +414,7 @@ export default function ExperienceEditPage() {
       const filePath = `${expId}/${currentIndex}/${fileName}`;
 
       const { error: uploadError } = await supabase.storage
-        .from("experience-videos")
+        .from(bucketName)
         .upload(filePath, file);
 
       if (uploadError) throw uploadError;

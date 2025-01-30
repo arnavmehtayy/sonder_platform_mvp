@@ -55,7 +55,7 @@ export function VideoPlayer({ experienceId, index }: VideoPlayerProps) {
           const {
             data: { publicUrl },
           } = supabase.storage
-            .from("experience-videos")
+            .from(data.bucket_name)
             .getPublicUrl(data.video_path);
 
           setVideoUrl(publicUrl);
