@@ -215,7 +215,7 @@ export default function ExperienceEditPage() {
       setIsLoading(true);
       try {
         // Auth check
-        const supabase = await createClient();
+        const supabase = createClient();
         const {
           data: { user },
           error,
@@ -226,7 +226,25 @@ export default function ExperienceEditPage() {
           return;
         }
 
-        // Load state
+        // Check experience permissions
+        const response = await fetch(
+          `/api/supabase/experiences/${expId}/permissions`
+        );
+        const { hasAccess, isEditor } = await response.json();
+
+        if (!hasAccess) {
+          toast.error("You don't have permission to access this experience");
+          router.push("/");
+          return;
+        }
+
+        if (!isEditor) {
+          toast.error("Only editors can access the experience editor");
+          router.push("/");
+          return;
+        }
+
+        // Load state if authorized
         const checkResponse = await fetch(
           `/api/supabase/check-next?experienceId=${expId}&index=${currentIndex}`
         );
@@ -246,8 +264,9 @@ export default function ExperienceEditPage() {
           }
         }
       } catch (error) {
-        console.error("Error loading state:", error);
-        toast.error("Failed to load experience state");
+        console.error("Error:", error);
+        toast.error("Failed to load experience");
+        router.push("/");
       } finally {
         setIsLoading(false);
       }
@@ -268,7 +287,7 @@ export default function ExperienceEditPage() {
 
   const handleSave = async () => {
     try {
-      const supabase = await createClient();
+      const supabase = createClient();
       const {
         data: { user },
         error: userError,
@@ -564,7 +583,6 @@ export default function ExperienceEditPage() {
           />
 
           {/* Skip Video Button */}
-          
 
           {/* Experience will only show after video ends */}
           <AnimatePresence>

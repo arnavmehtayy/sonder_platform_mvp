@@ -3,7 +3,7 @@ import { useState, useEffect } from "react";
 import { Minigame } from "@/app/Components/Sidebar/Minigame";
 import { experiences } from "@/classes/Data/CompleteData";
 import CurvedBackButton from "@/app/Components/three/BackButton";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { FeedbackComponent } from "@/app/Components/MainMenu/FeedbackComponent";
 import "@/app/TutorialOverlay.css";
 import { deserializeState } from "@/classes/database/stateSerializer";
@@ -15,6 +15,8 @@ import { VideoPlayer } from "@/app/Components/MainMenu/VideoPlayer";
 import { Analytics } from "@vercel/analytics/react";
 import { track } from "@vercel/analytics";
 import { useMediaQuery } from "@/app/Components/MainMenu/useMediaQuery";
+import { createClient } from "@/app/utils/supabase/client";
+import { toast } from "sonner";
 
 const resetState = () => {
   useStore.setState({
@@ -48,29 +50,56 @@ const handleLoadState = async (experienceId: number, index: number) => {
 
 export default function ExperiencePage() {
   const params = useParams();
+  const router = useRouter();
   const [isLoading, setIsLoading] = useState(true);
   const isMobile = useMediaQuery("(max-width: 768px)");
 
   useEffect(() => {
     const loadData = async () => {
       setIsLoading(true);
-      const index = Number(params.index);
-      const experienceId = Number(params.ExpID);
+      try {
+        const experienceId = Number(params.ExpID);
+        const index = Number(params.index);
 
-      // Track page visit
-      track("visit_experience", {
-        experienceId,
-        index,
-        path: window.location.pathname,
-        device: isMobile ? "mobile" : "desktop",
-      });
+        // Auth check
+        const supabase = createClient();
+        const {
+          data: { user },
+          error,
+        } = await supabase.auth.getUser();
 
-      await handleLoadState(experienceId, index);
-      setIsLoading(false);
+        // Check experience permissions
+        const response = await fetch(
+          `/api/supabase/experiences/${experienceId}/permissions`
+        );
+        const { hasAccess } = await response.json();
+
+        if (!hasAccess) {
+          toast.error("You don't have permission to access this experience");
+          router.push("/");
+          return;
+        }
+
+        // Track page visit
+        track("visit_experience", {
+          experienceId,
+          index,
+          path: window.location.pathname,
+          device: isMobile ? "mobile" : "desktop",
+        });
+
+        await handleLoadState(experienceId, index);
+      } catch (error) {
+        console.error("Error:", error);
+        toast.error("Failed to load experience");
+        router.push("/");
+      } finally {
+        setIsLoading(false);
+      }
     };
 
     loadData();
-  }, [params]);
+  }, [params, router, isMobile]);
 
   if (isLoading) {
     return <LoadingScreen />;

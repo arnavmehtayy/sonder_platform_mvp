@@ -23,11 +23,24 @@ export const profiles = pgTable('profiles', {
   user_id: uuid('user_id').references(() => users.id).notNull(),
 	firstName: text('first_name').notNull(),
   lastName: text('last_name').notNull(),
+  company_id: integer('company_id').references(() => company_table.id),
+  is_editor: boolean('is_editor').notNull().default(false),
+});
+
+export const company_table = pgTable('company_table', {
+  id: serial('id').primaryKey(),
+  name: text('name').notNull(),
+  date_created: timestamp('date_created').notNull().defaultNow(),
+  date_updated: timestamp('date_updated').notNull().defaultNow().$onUpdate(() => new Date()),
 });
 
 
 export type ProfileSelect = InferSelectModel<typeof profiles>;
 export type ProfileInsert = InferInsertModel<typeof profiles>;
+
+
+export type CompanySelect = InferSelectModel<typeof company_table>;
+export type CompanyInsert = InferInsertModel<typeof company_table>;
 
 export const experience = pgTable('experience_table', {
   id: serial('id').primaryKey(),

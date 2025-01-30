@@ -53,7 +53,7 @@ export default function Home() {
     overflow-y: scroll;
     overflow: auto;
     height: 100%;
-    width: 100%; }`}</style> 
+    width: 100%; }`}</style>
 
 
       <div className="fixed top-4 right-4 z-50">

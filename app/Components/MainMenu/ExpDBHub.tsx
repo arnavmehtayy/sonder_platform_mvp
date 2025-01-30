@@ -4,11 +4,21 @@ import { motion } from "framer-motion";
 import Image from "next/image";
 import Logo from "@/images/Sonder logo with text.png";
 import { ExperienceCard } from "./ExperienceHub";
-import { ChevronRight, Activity, Eye, PlusCircle, X, MoreVertical, Edit2, Trash2, EyeOff } from "lucide-react";
+import {
+  ChevronRight,
+  Activity,
+  Eye,
+  PlusCircle,
+  X,
+  MoreVertical,
+  Edit2,
+  Trash2,
+  EyeOff,
+} from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { User } from "lucide-react";
-import { createClient } from '@/app/utils/supabase/client';
+import { createClient } from "@/app/utils/supabase/client";
 import {
   Dialog,
   DialogContent,
@@ -40,16 +50,23 @@ interface State {
   index: number;
 }
 
-export const ExpDBHub = ({ isAuthenticated: parentIsAuthenticated }: { isAuthenticated: boolean }) => {
+export const ExpDBHub = ({
+  isAuthenticated: parentIsAuthenticated,
+}: {
+  isAuthenticated: boolean;
+}) => {
   const [experiences, setExperiences] = useState<Experience[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [userId, setUserId] = useState<number | null>(null);
-  const [newExperience, setNewExperience] = useState({ title: '', desc: '' });
+  const [newExperience, setNewExperience] = useState({ title: "", desc: "" });
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-  const [experienceToDelete, setExperienceToDelete] = useState<number | null>(null);
+  const [experienceToDelete, setExperienceToDelete] = useState<number | null>(
+    null
+  );
+  const [isEditor, setIsEditor] = useState(false);
 
   const supabase = createClient();
   const router = useRouter();
@@ -67,13 +84,19 @@ export const ExpDBHub = ({ isAuthenticated: parentIsAuthenticated }: { isAuthent
   }, [userId]);
 
   const checkAuth = async () => {
-    const { data: { session }, error } = await supabase.auth.getSession();
+    const {
+      data: { session },
+      error,
+    } = await supabase.auth.getSession();
     if (session?.user) {
       setIsAuthenticated(true);
       // Fetch user profile to get userId
-      const response = await fetch(`/api/supabase/profile?userId=${session.user.id}`);
+      const response = await fetch(
+        `/api/supabase/profile?userId=${session.user.id}`
+      );
       const profile = await response.json();
       setUserId(profile.id);
+      setIsEditor(profile.is_editor);
     }
   };
 
@@ -81,10 +104,10 @@ export const ExpDBHub = ({ isAuthenticated: parentIsAuthenticated }: { isAuthent
     if (!userId) return;
 
     try {
-      const response = await fetch('/api/supabase/experiences', {
-        method: 'POST',
+      const response = await fetch("/api/supabase/experiences", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({
           title: newExperience.title,
@@ -94,7 +117,7 @@ export const ExpDBHub = ({ isAuthenticated: parentIsAuthenticated }: { isAuthent
       });
 
       const experience = await response.json();
-      
+
       if (response.ok) {
         // Redirect to the new experience
         router.push(`/experience/edit/${experience.id}/0`);
@@ -102,7 +125,9 @@ export const ExpDBHub = ({ isAuthenticated: parentIsAuthenticated }: { isAuthent
         throw new Error(experience.error);
       }
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to create experience');
+      setError(
+        err instanceof Error ? err.message : "Failed to create experience"
+      );
     }
   };
 
@@ -115,32 +140,43 @@ export const ExpDBHub = ({ isAuthenticated: parentIsAuthenticated }: { isAuthent
     if (!experienceToDelete) return;
 
     try {
-      const response = await fetch(`/api/supabase/experiences?id=${experienceToDelete}`, {
-        method: 'DELETE',
-      });
+      const response = await fetch(
+        `/api/supabase/experiences?id=${experienceToDelete}`,
+        {
+          method: "DELETE",
+        }
+      );
 
       if (response.ok) {
-        setExperiences(experiences.filter(exp => exp.id !== experienceToDelete));
+        setExperiences(
+          experiences.filter((exp) => exp.id !== experienceToDelete)
+        );
         setDeleteDialogOpen(false);
         setExperienceToDelete(null);
       } else {
-        throw new Error('Failed to delete experience');
+        throw new Error("Failed to delete experience");
       }
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to delete experience');
+      setError(
+        err instanceof Error ? err.message : "Failed to delete experience"
+      );
     }
   };
 
   const fetchExperiences = async () => {
     try {
-      const response = await fetch(`/api/supabase/experiences${userId ? `?userId=${userId}` : ''}`);
+      const response = await fetch(
+        `/api/supabase/experiences${userId ? `?userId=${userId}` : ""}`
+      );
       if (!response.ok) {
-        throw new Error('Failed to fetch experiences');
+        throw new Error("Failed to fetch experiences");
       }
       const data = await response.json();
       setExperiences(data);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to fetch experiences');
+      setError(
+        err instanceof Error ? err.message : "Failed to fetch experiences"
+      );
     } finally {
       setLoading(false);
     }
@@ -148,10 +184,10 @@ export const ExpDBHub = ({ isAuthenticated: parentIsAuthenticated }: { isAuthent
 
   const handleToggleHidden = async (id: number, isHidden: boolean) => {
     try {
-      const response = await fetch('/api/supabase/experiences', {
-        method: 'PATCH',
+      const response = await fetch("/api/supabase/experiences", {
+        method: "PATCH",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({
           id,
@@ -160,16 +196,18 @@ export const ExpDBHub = ({ isAuthenticated: parentIsAuthenticated }: { isAuthent
       });
 
       if (response.ok) {
-        setExperiences(experiences.map(exp => 
-          exp.id === id ? { ...exp, is_hidden: isHidden } : exp
-        ));
-        toast.success(isHidden ? 'Experience hidden' : 'Experience unhidden');
+        setExperiences(
+          experiences.map((exp) =>
+            exp.id === id ? { ...exp, is_hidden: isHidden } : exp
+          )
+        );
+        toast.success(isHidden ? "Experience hidden" : "Experience unhidden");
       } else {
-        throw new Error('Failed to update experience');
+        throw new Error("Failed to update experience");
       }
     } catch (error) {
-      console.error('Error updating experience:', error);
-      toast.error('Failed to update experience');
+      console.error("Error updating experience:", error);
+      toast.error("Failed to update experience");
     }
   };
 
@@ -233,7 +271,7 @@ export const ExpDBHub = ({ isAuthenticated: parentIsAuthenticated }: { isAuthent
                 onToggleHidden={handleToggleHidden}
               />
             ))}
-            {isAuthenticated && (
+            {isAuthenticated && isEditor && (
               <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
                 <DialogTrigger asChild>
                   <motion.div
@@ -242,37 +280,64 @@ export const ExpDBHub = ({ isAuthenticated: parentIsAuthenticated }: { isAuthent
                     className="h-full"
                   >
                     <div className="border-2 border-dashed border-[#01A9B2] bg-white/5 rounded-lg overflow-hidden h-full transition-all duration-300 hover:bg-white/10 cursor-pointer flex flex-col items-center justify-center min-h-[300px] group">
-                      <PlusCircle size={40} className="text-[#01A9B2]/70 group-hover:text-[#01A9B2] transition-colors duration-300 mb-3" />
-                      <p className="text-[#01A9B2]/70 group-hover:text-[#01A9B2] text-lg font-medium transition-colors duration-300">Add New Experience</p>
+                      <PlusCircle
+                        size={40}
+                        className="text-[#01A9B2]/70 group-hover:text-[#01A9B2] transition-colors duration-300 mb-3"
+                      />
+                      <p className="text-[#01A9B2]/70 group-hover:text-[#01A9B2] text-lg font-medium transition-colors duration-300">
+                        Add New Experience
+                      </p>
                     </div>
                   </motion.div>
                 </DialogTrigger>
                 <DialogContent className="sm:max-w-[425px]">
                   <DialogHeader>
-                    <DialogTitle className="text-lg font-semibold text-gray-900">Create New Experience</DialogTitle>
+                    <DialogTitle className="text-lg font-semibold text-gray-900">
+                      Create New Experience
+                    </DialogTitle>
                   </DialogHeader>
                   <div className="space-y-4 mt-4">
                     <div>
-                      <Label htmlFor="title" className="text-sm font-medium text-gray-700">Title</Label>
+                      <Label
+                        htmlFor="title"
+                        className="text-sm font-medium text-gray-700"
+                      >
+                        Title
+                      </Label>
                       <Input
                         id="title"
                         placeholder="Enter experience title"
                         className="mt-1"
                         value={newExperience.title}
-                        onChange={(e) => setNewExperience(prev => ({...prev, title: e.target.value}))}
+                        onChange={(e) =>
+                          setNewExperience((prev) => ({
+                            ...prev,
+                            title: e.target.value,
+                          }))
+                        }
                       />
                     </div>
                     <div>
-                      <Label htmlFor="description" className="text-sm font-medium text-gray-700">Description</Label>
+                      <Label
+                        htmlFor="description"
+                        className="text-sm font-medium text-gray-700"
+                      >
+                        Description
+                      </Label>
                       <Textarea
                         id="description"
                         placeholder="What is this experience about?"
                         className="mt-1"
                         value={newExperience.desc}
-                        onChange={(e) => setNewExperience(prev => ({...prev, desc: e.target.value}))}
+                        onChange={(e) =>
+                          setNewExperience((prev) => ({
+                            ...prev,
+                            desc: e.target.value,
+                          }))
+                        }
                       />
                     </div>
-                    <Button 
+                    <Button
                       onClick={handleCreateExperience}
                       className="w-full bg-[#01A9B2] hover:bg-[#018A91] transition-colors duration-300"
                     >
@@ -291,11 +356,16 @@ export const ExpDBHub = ({ isAuthenticated: parentIsAuthenticated }: { isAuthent
           <DialogHeader>
             <DialogTitle>Delete Experience</DialogTitle>
             <DialogDescription>
-              {"Are you sure you want to delete this experience? This action cannot be undone."}
+              {
+                "Are you sure you want to delete this experience? This action cannot be undone."
+              }
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setDeleteDialogOpen(false)}>
+            <Button
+              variant="outline"
+              onClick={() => setDeleteDialogOpen(false)}
+            >
               Cancel
             </Button>
             <Button variant="destructive" onClick={confirmDelete}>
@@ -308,7 +378,6 @@ export const ExpDBHub = ({ isAuthenticated: parentIsAuthenticated }: { isAuthent
   );
 };
 
-
 export const ExperienceCardDB = ({
   name,
   description,
@@ -319,7 +388,7 @@ export const ExperienceCardDB = ({
   currentUserId,
   onDelete,
   is_hidden,
-  onToggleHidden
+  onToggleHidden,
 }: {
   name: string;
   description: string;
@@ -340,13 +409,16 @@ export const ExperienceCardDB = ({
   // Close dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (actionRef.current && !actionRef.current.contains(event.target as Node)) {
+      if (
+        actionRef.current &&
+        !actionRef.current.contains(event.target as Node)
+      ) {
         setShowActions(false);
       }
     };
 
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
   const handleClick = async (e: React.MouseEvent) => {
@@ -354,7 +426,9 @@ export const ExperienceCardDB = ({
     if (!actionRef.current?.contains(e.target as Node)) {
       try {
         // Check if next experience exists
-        const response = await fetch(`/api/supabase/check-next?experienceId=${experienceId}&index=${0}`);
+        const response = await fetch(
+          `/api/supabase/check-next?experienceId=${experienceId}&index=${0}`
+        );
         const data = await response.json();
 
         if (data.hasNext) {
@@ -365,7 +439,7 @@ export const ExperienceCardDB = ({
           return;
         }
       } catch (error) {
-        console.error('Error checking experience:', error);
+        console.error("Error checking experience:", error);
         alert("Error checking experience. Please try again.");
       }
     }
@@ -384,19 +458,23 @@ export const ExperienceCardDB = ({
   return (
     <motion.div
       whileHover={{ scale: 1.05 }}
-      whileTap={actionRef.current?.contains(document.activeElement as Node) ? {} : { scale: 0.95 }}
+      whileTap={
+        actionRef.current?.contains(document.activeElement as Node)
+          ? {}
+          : { scale: 0.95 }
+      }
       className="h-full relative"
     >
       <div
         onClick={handleClick}
         className={`bg-white rounded-lg shadow-lg overflow-hidden h-full transition-all duration-300 hover:shadow-xl cursor-pointer relative group ${
-          is_hidden ? 'opacity-60' : ''
+          is_hidden ? "opacity-60" : ""
         }`}
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
       >
         {userId === currentUserId && (
-          <div 
+          <div
             ref={actionRef}
             className="absolute top-2 right-2 z-50"
             onClick={(e) => e.stopPropagation()}
@@ -407,15 +485,16 @@ export const ExperienceCardDB = ({
                 setShowActions(!showActions);
               }}
               className={`p-2.5 bg-white/90 hover:bg-white shadow-md rounded-full transition-all duration-300 ${
-                showActions ? 'bg-white ring-2 ring-[#01A9B2]' : ''
+                showActions ? "bg-white ring-2 ring-[#01A9B2]" : ""
               }`}
             >
               <MoreVertical size={18} className="text-gray-700" />
             </button>
-            
+
             {showActions && (
-              <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg overflow-hidden z-50 border border-gray-100"
-                   style={{ maxHeight: '100vh' }}
+              <div
+                className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg overflow-hidden z-50 border border-gray-100"
+                style={{ maxHeight: "100vh" }}
               >
                 <div className="relative">
                   <button
@@ -424,7 +503,9 @@ export const ExperienceCardDB = ({
                   >
                     <Edit2 size={16} className="text-[#01A9B2]" />
                     <div>
-                      <p className="font-medium text-gray-700">Edit Experience</p>
+                      <p className="font-medium text-gray-700">
+                        Edit Experience
+                      </p>
                     </div>
                   </button>
                   <button
@@ -441,7 +522,9 @@ export const ExperienceCardDB = ({
                       <EyeOff size={16} className="text-[#01A9B2]" />
                     )}
                     <div>
-                      <p className="font-medium text-gray-700">{is_hidden ? 'Show Experience' : 'Hide Experience'}</p>
+                      <p className="font-medium text-gray-700">
+                        {is_hidden ? "Show Experience" : "Hide Experience"}
+                      </p>
                     </div>
                   </button>
                   <button
@@ -450,7 +533,9 @@ export const ExperienceCardDB = ({
                   >
                     <Trash2 size={16} className="text-red-500" />
                     <div>
-                      <p className="font-medium text-red-600">Delete Experience</p>
+                      <p className="font-medium text-red-600">
+                        Delete Experience
+                      </p>
                     </div>
                   </button>
                 </div>
@@ -459,13 +544,13 @@ export const ExperienceCardDB = ({
           </div>
         )}
 
-        <div
-          className="bg-gradient-to-r from-[#01A9B2] to-[#7AE5EC] text-white p-6"
-        >
+        <div className="bg-gradient-to-r from-[#01A9B2] to-[#7AE5EC] text-white p-6">
           <h3 className="text-2xl font-bold mb-2">{name}</h3>
           <div className="flex items-center text-sm">
             <User size={16} className="mr-2" />
-            <span>Created by {firstName} {lastName}</span>
+            <span>
+              Created by {firstName} {lastName}
+            </span>
           </div>
         </div>
         <div className="p-6">

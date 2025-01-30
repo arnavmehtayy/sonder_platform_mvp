@@ -1,0 +1,2650 @@
+{
+  "id": "90c6d5a3-5e9a-4b5d-94e0-568552dec4ea",
+  "prevId": "bf52d377-1f98-4792-b87a-a30967cf0f98",
+  "version": "7",
+  "dialect": "postgresql",
+  "tables": {
+    "public.attribute_pairs": {
+      "name": "attribute_pairs",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "control_id": {
+          "name": "control_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "state_id": {
+          "name": "state_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "trans_functionStr": {
+          "name": "trans_functionStr",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "trans_symbols": {
+          "name": "trans_symbols",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "func": {
+          "name": "func",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "obj_type": {
+          "name": "obj_type",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "attribute_pairs_control_id_slider_control_advanced_id_fk": {
+          "name": "attribute_pairs_control_id_slider_control_advanced_id_fk",
+          "tableFrom": "attribute_pairs",
+          "tableTo": "slider_control_advanced",
+          "columnsFrom": [
+            "control_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "attribute_pairs_state_id_users_table_id_fk": {
+          "name": "attribute_pairs_state_id_users_table_id_fk",
+          "tableFrom": "attribute_pairs",
+          "tableTo": "users_table",
+          "columnsFrom": [
+            "state_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {}
+    },
+    "public.axis_object": {
+      "name": "axis_object",
+      "schema": "",
+      "columns": {
+        "state_id": {
+          "name": "state_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "obj_id": {
+          "name": "obj_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "name": {
+          "name": "name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "color": {
+          "name": "color",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "position_x": {
+          "name": "position_x",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "position_y": {
+          "name": "position_y",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "rotation_x": {
+          "name": "rotation_x",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "rotation_y": {
+          "name": "rotation_y",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "rotation_z": {
+          "name": "rotation_z",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "scale_x": {
+          "name": "scale_x",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "scale_y": {
+          "name": "scale_y",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "scale_z": {
+          "name": "scale_z",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "touch_controls": {
+          "name": "touch_controls",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "axis_length": {
+          "name": "axis_length",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "tick_spacing": {
+          "name": "tick_spacing",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "tick_size": {
+          "name": "tick_size",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "show_labels": {
+          "name": "show_labels",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "font_size": {
+          "name": "font_size",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "line_width": {
+          "name": "line_width",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "x_label": {
+          "name": "x_label",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "y_label": {
+          "name": "y_label",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "is_number_line": {
+          "name": "is_number_line",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "axis_object_state_id_users_table_id_fk": {
+          "name": "axis_object_state_id_users_table_id_fk",
+          "tableFrom": "axis_object",
+          "tableTo": "users_table",
+          "columnsFrom": [
+            "state_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {}
+    },
+    "public.dummy_data_storage": {
+      "name": "dummy_data_storage",
+      "schema": "",
+      "columns": {
+        "state_id": {
+          "name": "state_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "obj_id": {
+          "name": "obj_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "name": {
+          "name": "name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "data": {
+          "name": "data",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "dummy_data_storage_state_id_users_table_id_fk": {
+          "name": "dummy_data_storage_state_id_users_table_id_fk",
+          "tableFrom": "dummy_data_storage",
+          "tableTo": "users_table",
+          "columnsFrom": [
+            "state_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {}
+    },
+    "public.enabler_control": {
+      "name": "enabler_control",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "state_id": {
+          "name": "state_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "control_id": {
+          "name": "control_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "desc": {
+          "name": "desc",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "text": {
+          "name": "text",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "obj_ids": {
+          "name": "obj_ids",
+          "type": "integer[]",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "control_state": {
+          "name": "control_state",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "enabler_control_state_id_users_table_id_fk": {
+          "name": "enabler_control_state_id_users_table_id_fk",
+          "tableFrom": "enabler_control",
+          "tableTo": "users_table",
+          "columnsFrom": [
+            "state_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {}
+    },
+    "public.experience_videos": {
+      "name": "experience_videos",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "experience_id": {
+          "name": "experience_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "index": {
+          "name": "index",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "video_path": {
+          "name": "video_path",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "experience_videos_experience_id_experience_table_id_fk": {
+          "name": "experience_videos_experience_id_experience_table_id_fk",
+          "tableFrom": "experience_videos",
+          "tableTo": "experience_table",
+          "columnsFrom": [
+            "experience_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {}
+    },
+    "public.function_plot_string": {
+      "name": "function_plot_string",
+      "schema": "",
+      "columns": {
+        "state_id": {
+          "name": "state_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "obj_id": {
+          "name": "obj_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "name": {
+          "name": "name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "color": {
+          "name": "color",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "position_x": {
+          "name": "position_x",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "position_y": {
+          "name": "position_y",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "rotation_x": {
+          "name": "rotation_x",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "rotation_y": {
+          "name": "rotation_y",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "rotation_z": {
+          "name": "rotation_z",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "scale_x": {
+          "name": "scale_x",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "scale_y": {
+          "name": "scale_y",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "scale_z": {
+          "name": "scale_z",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "touch_controls": {
+          "name": "touch_controls",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "x_range_a": {
+          "name": "x_range_a",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "x_range_b": {
+          "name": "x_range_b",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "num_points": {
+          "name": "num_points",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "line_width": {
+          "name": "line_width",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "function_str": {
+          "name": "function_str",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "symbols": {
+          "name": "symbols",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "axis_id": {
+          "name": "axis_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "default": -1
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "function_plot_string_state_id_users_table_id_fk": {
+          "name": "function_plot_string_state_id_users_table_id_fk",
+          "tableFrom": "function_plot_string",
+          "tableTo": "users_table",
+          "columnsFrom": [
+            "state_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {}
+    },
+    "public.function_score": {
+      "name": "function_score",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "state_id": {
+          "name": "state_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "score_id": {
+          "name": "score_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "text": {
+          "name": "text",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "desc": {
+          "name": "desc",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "function_str": {
+          "name": "function_str",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "function_symbols": {
+          "name": "function_symbols",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "function_score_state_id_users_table_id_fk": {
+          "name": "function_score_state_id_users_table_id_fk",
+          "tableFrom": "function_score",
+          "tableTo": "users_table",
+          "columnsFrom": [
+            "state_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {}
+    },
+    "public.geom_obj": {
+      "name": "geom_obj",
+      "schema": "",
+      "columns": {
+        "state_id": {
+          "name": "state_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "obj_id": {
+          "name": "obj_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "name": {
+          "name": "name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "color": {
+          "name": "color",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "position_x": {
+          "name": "position_x",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "position_y": {
+          "name": "position_y",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "rotation_x": {
+          "name": "rotation_x",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "rotation_y": {
+          "name": "rotation_y",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "rotation_z": {
+          "name": "rotation_z",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "scale_x": {
+          "name": "scale_x",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "scale_y": {
+          "name": "scale_y",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "scale_z": {
+          "name": "scale_z",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "touch_controls": {
+          "name": "touch_controls",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "geometry_type": {
+          "name": "geometry_type",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "geometry_atts": {
+          "name": "geometry_atts",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "geom_obj_state_id_users_table_id_fk": {
+          "name": "geom_obj_state_id_users_table_id_fk",
+          "tableFrom": "geom_obj",
+          "tableTo": "users_table",
+          "columnsFrom": [
+            "state_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {}
+    },
+    "public.influence_advanced": {
+      "name": "influence_advanced",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "state_id": {
+          "name": "state_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "influence_id": {
+          "name": "influence_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "worker_id": {
+          "name": "worker_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "influence_advanced_state_id_users_table_id_fk": {
+          "name": "influence_advanced_state_id_users_table_id_fk",
+          "tableFrom": "influence_advanced",
+          "tableTo": "users_table",
+          "columnsFrom": [
+            "state_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {}
+    },
+    "public.influence_attribute_pairs": {
+      "name": "influence_attribute_pairs",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "state_id": {
+          "name": "state_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "influence_id": {
+          "name": "influence_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "trans_functionStr": {
+          "name": "trans_functionStr",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "trans_symbols": {
+          "name": "trans_symbols",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "func": {
+          "name": "func",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "obj_type": {
+          "name": "obj_type",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "influence_attribute_pairs_state_id_users_table_id_fk": {
+          "name": "influence_attribute_pairs_state_id_users_table_id_fk",
+          "tableFrom": "influence_attribute_pairs",
+          "tableTo": "users_table",
+          "columnsFrom": [
+            "state_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {}
+    },
+    "public.input_number_attribute_pairs": {
+      "name": "input_number_attribute_pairs",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "control_id": {
+          "name": "control_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "state_id": {
+          "name": "state_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "trans_functionStr": {
+          "name": "trans_functionStr",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "trans_symbols": {
+          "name": "trans_symbols",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "func": {
+          "name": "func",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "obj_type": {
+          "name": "obj_type",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "input_number_attribute_pairs_control_id_input_number_control_id_fk": {
+          "name": "input_number_attribute_pairs_control_id_input_number_control_id_fk",
+          "tableFrom": "input_number_attribute_pairs",
+          "tableTo": "input_number_control",
+          "columnsFrom": [
+            "control_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "input_number_attribute_pairs_state_id_users_table_id_fk": {
+          "name": "input_number_attribute_pairs_state_id_users_table_id_fk",
+          "tableFrom": "input_number_attribute_pairs",
+          "tableTo": "users_table",
+          "columnsFrom": [
+            "state_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {}
+    },
+    "public.input_number_control": {
+      "name": "input_number_control",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "state_id": {
+          "name": "state_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "control_id": {
+          "name": "control_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "desc": {
+          "name": "desc",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "text": {
+          "name": "text",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "value": {
+          "name": "value",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "placeholder": {
+          "name": "placeholder",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "initial_value": {
+          "name": "initial_value",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "min": {
+          "name": "min",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "max": {
+          "name": "max",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "step": {
+          "name": "step",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "obj_id": {
+          "name": "obj_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "input_number_control_state_id_users_table_id_fk": {
+          "name": "input_number_control_state_id_users_table_id_fk",
+          "tableFrom": "input_number_control",
+          "tableTo": "users_table",
+          "columnsFrom": [
+            "state_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {}
+    },
+    "public.line_obj": {
+      "name": "line_obj",
+      "schema": "",
+      "columns": {
+        "state_id": {
+          "name": "state_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "obj_id": {
+          "name": "obj_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "name": {
+          "name": "name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "color": {
+          "name": "color",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "construction_type": {
+          "name": "construction_type",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "start_x": {
+          "name": "start_x",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "start_y": {
+          "name": "start_y",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "end_x": {
+          "name": "end_x",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "end_y": {
+          "name": "end_y",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "slope": {
+          "name": "slope",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "intercept": {
+          "name": "intercept",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "line_width": {
+          "name": "line_width",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "length": {
+          "name": "length",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "point1_x": {
+          "name": "point1_x",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "point1_y": {
+          "name": "point1_y",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "point2_x": {
+          "name": "point2_x",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "point2_y": {
+          "name": "point2_y",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "line_obj_state_id_users_table_id_fk": {
+          "name": "line_obj_state_id_users_table_id_fk",
+          "tableFrom": "line_obj",
+          "tableTo": "users_table",
+          "columnsFrom": [
+            "state_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {}
+    },
+    "public.multi_choice_control": {
+      "name": "multi_choice_control",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "state_id": {
+          "name": "state_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "control_id": {
+          "name": "control_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "desc": {
+          "name": "desc",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "text": {
+          "name": "text",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "is_multi_select": {
+          "name": "is_multi_select",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "multi_choice_control_state_id_users_table_id_fk": {
+          "name": "multi_choice_control_state_id_users_table_id_fk",
+          "tableFrom": "multi_choice_control",
+          "tableTo": "users_table",
+          "columnsFrom": [
+            "state_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {}
+    },
+    "public.multi_choice_option": {
+      "name": "multi_choice_option",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "multi_choice_control_id": {
+          "name": "multi_choice_control_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "state_id": {
+          "name": "state_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "label": {
+          "name": "label",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "option_id": {
+          "name": "option_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "multi_choice_option_multi_choice_control_id_multi_choice_control_id_fk": {
+          "name": "multi_choice_option_multi_choice_control_id_multi_choice_control_id_fk",
+          "tableFrom": "multi_choice_option",
+          "tableTo": "multi_choice_control",
+          "columnsFrom": [
+            "multi_choice_control_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "multi_choice_option_state_id_users_table_id_fk": {
+          "name": "multi_choice_option_state_id_users_table_id_fk",
+          "tableFrom": "multi_choice_option",
+          "tableTo": "users_table",
+          "columnsFrom": [
+            "state_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {}
+    },
+    "public.placement": {
+      "name": "placement",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "state_id": {
+          "name": "state_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "placement_id": {
+          "name": "placement_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "object_ids": {
+          "name": "object_ids",
+          "type": "integer[]",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "grid": {
+          "name": "grid",
+          "type": "integer[]",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "cell_size": {
+          "name": "cell_size",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "geometry_json": {
+          "name": "geometry_json",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "grid_vectors": {
+          "name": "grid_vectors",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "text": {
+          "name": "text",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "desc": {
+          "name": "desc",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "color": {
+          "name": "color",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "is_clickable": {
+          "name": "is_clickable",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "max_placements": {
+          "name": "max_placements",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "placement_state_id_users_table_id_fk": {
+          "name": "placement_state_id_users_table_id_fk",
+          "tableFrom": "placement",
+          "tableTo": "users_table",
+          "columnsFrom": [
+            "state_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {}
+    },
+    "public.question_text": {
+      "name": "question_text",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "state_id": {
+          "name": "state_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "placement_id": {
+          "name": "placement_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "text": {
+          "name": "text",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "question_text_state_id_users_table_id_fk": {
+          "name": "question_text_state_id_users_table_id_fk",
+          "tableFrom": "question_text",
+          "tableTo": "users_table",
+          "columnsFrom": [
+            "state_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {}
+    },
+    "public.select_control": {
+      "name": "select_control",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "state_id": {
+          "name": "state_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "control_id": {
+          "name": "control_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "desc": {
+          "name": "desc",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "text": {
+          "name": "text",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "selectable": {
+          "name": "selectable",
+          "type": "integer[]",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "selected": {
+          "name": "selected",
+          "type": "integer[]",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "is_active": {
+          "name": "is_active",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "capacity": {
+          "name": "capacity",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "select_control_state_id_users_table_id_fk": {
+          "name": "select_control_state_id_users_table_id_fk",
+          "tableFrom": "select_control",
+          "tableTo": "users_table",
+          "columnsFrom": [
+            "state_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {}
+    },
+    "public.slider_control_advanced": {
+      "name": "slider_control_advanced",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "state_id": {
+          "name": "state_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "control_id": {
+          "name": "control_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "desc": {
+          "name": "desc",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "text": {
+          "name": "text",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "obj_id": {
+          "name": "obj_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "range": {
+          "name": "range",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "step_size": {
+          "name": "step_size",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "slider_control_advanced_state_id_users_table_id_fk": {
+          "name": "slider_control_advanced_state_id_users_table_id_fk",
+          "tableFrom": "slider_control_advanced",
+          "tableTo": "users_table",
+          "columnsFrom": [
+            "state_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {}
+    },
+    "public.table_cell": {
+      "name": "table_cell",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "state_id": {
+          "name": "state_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "table_control_id": {
+          "name": "table_control_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "row_index": {
+          "name": "row_index",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "column_index": {
+          "name": "column_index",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "value": {
+          "name": "value",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "trans_functionStr": {
+          "name": "trans_functionStr",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "trans_symbols": {
+          "name": "trans_symbols",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "obj_id": {
+          "name": "obj_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "obj_type": {
+          "name": "obj_type",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "attribute": {
+          "name": "attribute",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "is_static": {
+          "name": "is_static",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "table_cell_state_id_users_table_id_fk": {
+          "name": "table_cell_state_id_users_table_id_fk",
+          "tableFrom": "table_cell",
+          "tableTo": "users_table",
+          "columnsFrom": [
+            "state_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "table_cell_table_control_id_table_control_id_fk": {
+          "name": "table_cell_table_control_id_table_control_id_fk",
+          "tableFrom": "table_cell",
+          "tableTo": "table_control",
+          "columnsFrom": [
+            "table_control_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {}
+    },
+    "public.table_control": {
+      "name": "table_control",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "state_id": {
+          "name": "state_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "control_id": {
+          "name": "control_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "desc": {
+          "name": "desc",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "text": {
+          "name": "text",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "column_headers": {
+          "name": "column_headers",
+          "type": "text[]",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "row_headers": {
+          "name": "row_headers",
+          "type": "text[]",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "table_control_state_id_users_table_id_fk": {
+          "name": "table_control_state_id_users_table_id_fk",
+          "tableFrom": "table_control",
+          "tableTo": "users_table",
+          "columnsFrom": [
+            "state_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {}
+    },
+    "public.text_geom": {
+      "name": "text_geom",
+      "schema": "",
+      "columns": {
+        "state_id": {
+          "name": "state_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "obj_id": {
+          "name": "obj_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "name": {
+          "name": "name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "color": {
+          "name": "color",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "position_x": {
+          "name": "position_x",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "position_y": {
+          "name": "position_y",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "rotation_x": {
+          "name": "rotation_x",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "rotation_y": {
+          "name": "rotation_y",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "rotation_z": {
+          "name": "rotation_z",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "scale_x": {
+          "name": "scale_x",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "scale_y": {
+          "name": "scale_y",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "scale_z": {
+          "name": "scale_z",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "touch_controls": {
+          "name": "touch_controls",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "geometry_type": {
+          "name": "geometry_type",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "geometry_atts": {
+          "name": "geometry_atts",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "text": {
+          "name": "text",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "text_geom_state_id_users_table_id_fk": {
+          "name": "text_geom_state_id_users_table_id_fk",
+          "tableFrom": "text_geom",
+          "tableTo": "users_table",
+          "columnsFrom": [
+            "state_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {}
+    },
+    "public.validation_input_number": {
+      "name": "validation_input_number",
+      "schema": "",
+      "columns": {
+        "state_id": {
+          "name": "state_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "answer": {
+          "name": "answer",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "control_id": {
+          "name": "control_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "error": {
+          "name": "error",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "desc": {
+          "name": "desc",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "validation_input_number_state_id_users_table_id_fk": {
+          "name": "validation_input_number_state_id_users_table_id_fk",
+          "tableFrom": "validation_input_number",
+          "tableTo": "users_table",
+          "columnsFrom": [
+            "state_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {}
+    },
+    "public.validation_obj": {
+      "name": "validation_obj",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "state_id": {
+          "name": "state_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "desc": {
+          "name": "desc",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "answer": {
+          "name": "answer",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "obj_id": {
+          "name": "obj_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "get_attribute_json": {
+          "name": "get_attribute_json",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "error": {
+          "name": "error",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "relation": {
+          "name": "relation",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "validation_obj_state_id_users_table_id_fk": {
+          "name": "validation_obj_state_id_users_table_id_fk",
+          "tableFrom": "validation_obj",
+          "tableTo": "users_table",
+          "columnsFrom": [
+            "state_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {}
+    },
+    "public.validation_score": {
+      "name": "validation_score",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "state_id": {
+          "name": "state_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "desc": {
+          "name": "desc",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "score_id": {
+          "name": "score_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "target_score": {
+          "name": "target_score",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "error": {
+          "name": "error",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "relation": {
+          "name": "relation",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "validation_score_state_id_users_table_id_fk": {
+          "name": "validation_score_state_id_users_table_id_fk",
+          "tableFrom": "validation_score",
+          "tableTo": "users_table",
+          "columnsFrom": [
+            "state_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {}
+    },
+    "public.validation_select": {
+      "name": "validation_select",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "state_id": {
+          "name": "state_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "desc": {
+          "name": "desc",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "answer": {
+          "name": "answer",
+          "type": "integer[]",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "control_id": {
+          "name": "control_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "validation_select_state_id_users_table_id_fk": {
+          "name": "validation_select_state_id_users_table_id_fk",
+          "tableFrom": "validation_select",
+          "tableTo": "users_table",
+          "columnsFrom": [
+            "state_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {}
+    },
+    "public.validation_slider": {
+      "name": "validation_slider",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "state_id": {
+          "name": "state_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "desc": {
+          "name": "desc",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "control_id": {
+          "name": "control_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "target_value": {
+          "name": "target_value",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "error": {
+          "name": "error",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "relation": {
+          "name": "relation",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "validation_slider_state_id_users_table_id_fk": {
+          "name": "validation_slider_state_id_users_table_id_fk",
+          "tableFrom": "validation_slider",
+          "tableTo": "users_table",
+          "columnsFrom": [
+            "state_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {}
+    },
+    "public.validation_table_control": {
+      "name": "validation_table_control",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "state_id": {
+          "name": "state_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "desc": {
+          "name": "desc",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "answers": {
+          "name": "answers",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "control_id": {
+          "name": "control_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "error": {
+          "name": "error",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "validate_cells": {
+          "name": "validate_cells",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "validation_table_control_state_id_users_table_id_fk": {
+          "name": "validation_table_control_state_id_users_table_id_fk",
+          "tableFrom": "validation_table_control",
+          "tableTo": "users_table",
+          "columnsFrom": [
+            "state_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {}
+    },
+    "public.validation_multi_choice": {
+      "name": "validation_multi_choice",
+      "schema": "",
+      "columns": {
+        "state_id": {
+          "name": "state_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "answer": {
+          "name": "answer",
+          "type": "integer[]",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "control_id": {
+          "name": "control_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "desc": {
+          "name": "desc",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "validation_multi_choice_state_id_users_table_id_fk": {
+          "name": "validation_multi_choice_state_id_users_table_id_fk",
+          "tableFrom": "validation_multi_choice",
+          "tableTo": "users_table",
+          "columnsFrom": [
+            "state_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {}
+    },
+    "public.company_table": {
+      "name": "company_table",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "name": {
+          "name": "name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "date_created": {
+          "name": "date_created",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "date_updated": {
+          "name": "date_updated",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {}
+    },
+    "public.experience_table": {
+      "name": "experience_table",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "desc": {
+          "name": "desc",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "title": {
+          "name": "title",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "user_id": {
+          "name": "user_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "is_hidden": {
+          "name": "is_hidden",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "experience_table_user_id_profiles_id_fk": {
+          "name": "experience_table_user_id_profiles_id_fk",
+          "tableFrom": "experience_table",
+          "tableTo": "profiles",
+          "columnsFrom": [
+            "user_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {}
+    },
+    "public.order": {
+      "name": "order",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "state_id": {
+          "name": "state_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "type": {
+          "name": "type",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "item_id": {
+          "name": "item_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "order_state_id_users_table_id_fk": {
+          "name": "order_state_id_users_table_id_fk",
+          "tableFrom": "order",
+          "tableTo": "users_table",
+          "columnsFrom": [
+            "state_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {}
+    },
+    "public.profiles": {
+      "name": "profiles",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "user_id": {
+          "name": "user_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "first_name": {
+          "name": "first_name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "last_name": {
+          "name": "last_name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "company_id": {
+          "name": "company_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "is_editor": {
+          "name": "is_editor",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "profiles_user_id_users_id_fk": {
+          "name": "profiles_user_id_users_id_fk",
+          "tableFrom": "profiles",
+          "tableTo": "users",
+          "schemaTo": "auth",
+          "columnsFrom": [
+            "user_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "profiles_company_id_company_table_id_fk": {
+          "name": "profiles_company_id_company_table_id_fk",
+          "tableFrom": "profiles",
+          "tableTo": "company_table",
+          "columnsFrom": [
+            "company_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {}
+    },
+    "public.users_table": {
+      "name": "users_table",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "state_name": {
+          "name": "state_name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "camera_zoom": {
+          "name": "camera_zoom",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": false,
+          "default": 20
+        },
+        "title": {
+          "name": "title",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "experience_id": {
+          "name": "experience_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "index": {
+          "name": "index",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "default": 0
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "users_table_experience_id_experience_table_id_fk": {
+          "name": "users_table_experience_id_experience_table_id_fk",
+          "tableFrom": "users_table",
+          "tableTo": "experience_table",
+          "columnsFrom": [
+            "experience_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "users_table_state_name_unique": {
+          "name": "users_table_state_name_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "state_name"
+          ]
+        }
+      }
+    }
+  },
+  "enums": {},
+  "schemas": {},
+  "sequences": {},
+  "_meta": {
+    "columns": {},
+    "schemas": {},
+    "tables": {}
+  }
+}

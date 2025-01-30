@@ -1,15 +1,39 @@
 import { db } from "@/app/db/index";
 import { experience, profiles } from "@/app/db/schema";
-import { NextResponse } from 'next/server';
-import { eq, or, and } from 'drizzle-orm';
+import { NextResponse } from "next/server";
+import { eq, or, and, isNull } from "drizzle-orm";
 
 export async function POST(request: Request) {
   try {
-    const { title, desc, profileId }: {
+    const {
+      title,
+      desc,
+      profileId,
+    }: {
       title: string;
-      desc: string; 
+      desc: string;
       profileId: number;
     } = await request.json();
+
+    // Check if user is an editor
+    const [userProfile] = await db
+      .select()
+      .from(profiles)
+      .where(eq(profiles.id, profileId));
+
+    if (!userProfile) {
+      return NextResponse.json(
+        { error: "User profile not found" },
+        { status: 404 }
+      );
+    }
+
+    if (!userProfile.is_editor) {
+      return NextResponse.json(
+        { error: "Only editors can create experiences" },
+        { status: 403 }
+      );
+    }
 
     // Insert new experience and return the ID
     const [insertedExperience] = await db
@@ -17,15 +41,14 @@ export async function POST(request: Request) {
       .values({
         desc: desc,
         title: title,
-        user_id: profileId
+        user_id: profileId,
       })
       .returning({ id: experience.id });
 
-    return NextResponse.json({ 
+    return NextResponse.json({
       id: insertedExperience.id,
-      message: "Experience created successfully" 
+      message: "Experience created successfully",
     });
-
   } catch (error) {
     console.error("Error creating experience:", error);
     return NextResponse.json(
@@ -35,14 +58,12 @@ export async function POST(request: Request) {
   }
 }
 
-
 export async function GET(request: Request) {
   try {
-    // Get the current user's ID from the query params
     const url = new URL(request.url);
-    const currentUserId = url.searchParams.get('userId');
+    const currentUserId = url.searchParams.get("userId");
 
-    const experiences = await db
+    let baseQuery = db
       .select({
         id: experience.id,
         desc: experience.desc,
@@ -53,22 +74,61 @@ export async function GET(request: Request) {
         is_hidden: experience.is_hidden,
       })
       .from(experience)
-      .leftJoin(profiles, eq(experience.user_id, profiles.id))
-      // Only show hidden experiences to their authors
-      .where(
-        or(
-          eq(experience.is_hidden, false),
-          and(
-            eq(experience.is_hidden, true),
-            eq(experience.user_id, Number(currentUserId) || 0)
+      .leftJoin(profiles, eq(experience.user_id, profiles.id));
+
+    if (!currentUserId) {
+      // If no user is logged in, only show non-company public experiences
+      const experiences = await baseQuery.where(
+        and(eq(experience.is_hidden, false), isNull(profiles.company_id))
+      );
+
+      return NextResponse.json(experiences);
+    }
+
+    // Get the user's profile including company and editor status
+    const [userProfile] = await db
+      .select()
+      .from(profiles)
+      .where(eq(profiles.id, parseInt(currentUserId)));
+
+    if (!userProfile) {
+      return NextResponse.json(
+        { error: "User profile not found" },
+        { status: 404 }
+      );
+    }
+
+    let experiences;
+    if (userProfile.company_id) {
+      // Company user: Show only their company's content
+      experiences = await baseQuery.where(
+        and(
+          eq(profiles.company_id, userProfile.company_id),
+          or(
+            eq(experience.is_hidden, false),
+            eq(experience.user_id, parseInt(currentUserId))
           )
         )
       );
-    
+    } else {
+      // Non-company user: Show only public content and their own content
+      experiences = await baseQuery.where(
+        or(
+          // Show public content from non-company users
+          and(isNull(profiles.company_id), eq(experience.is_hidden, false)),
+          // Show their own content
+          eq(experience.user_id, parseInt(currentUserId))
+        )
+      );
+    }
+
     return NextResponse.json(experiences);
   } catch (error) {
-    console.error('Error fetching experiences:', error);
-    return NextResponse.json({ error: 'Failed to fetch experiences' }, { status: 500 });
+    console.error("Error fetching experiences:", error);
+    return NextResponse.json(
+      { error: "Failed to fetch experiences" },
+      { status: 500 }
+    );
   }
 }
 
@@ -76,8 +136,8 @@ export async function DELETE(request: Request) {
   try {
     // Get the ID from the URL
     const url = new URL(request.url);
-    const id = url.searchParams.get('id');
-    
+    const id = url.searchParams.get("id");
+
     if (!id || isNaN(parseInt(id))) {
       return NextResponse.json(
         { error: "Invalid experience ID" },
@@ -100,11 +160,10 @@ export async function DELETE(request: Request) {
       );
     }
 
-    return NextResponse.json({ 
+    return NextResponse.json({
       message: "Experience deleted successfully",
-      id: deletedExperience.id 
+      id: deletedExperience.id,
     });
-
   } catch (error) {
     console.error("Error deleting experience:", error);
     return NextResponse.json(
@@ -116,7 +175,8 @@ export async function DELETE(request: Request) {
 
 export async function PATCH(request: Request) {
   try {
-    const { id, is_hidden }: { id: number; is_hidden: boolean } = await request.json();
+    const { id, is_hidden }: { id: number; is_hidden: boolean } =
+      await request.json();
 
     const [updatedExperience] = await db
       .update(experience)
