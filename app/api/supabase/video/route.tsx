@@ -10,7 +10,7 @@ import { db } from "@/app/db/index";
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    console.log("Received body:", body); // Debug log
+    console.log("Received body:", body);
 
     const { experienceId, index, filePath } = body;
 
@@ -31,41 +31,63 @@ export async function POST(request: Request) {
       );
     }
 
+    // Get the company bucket name by joining necessary tables
+    const result = await db
+      .select({
+        video_path: ExperienceVideo.videoPath,
+        bucket_name: company_table.bucket_name,
+      })
+      .from(experience)
+      .leftJoin(profiles, eq(experience.user_id, profiles.id))
+      .leftJoin(company_table, eq(profiles.company_id, company_table.id))
+      .leftJoin(
+        ExperienceVideo,
+        and(
+          eq(ExperienceVideo.experienceId, experience.id),
+          eq(ExperienceVideo.index, index)
+        )
+      )
+      .where(eq(experience.id, parseInt(experienceId)))
+      .limit(1);
+
+    if (result.length === 0) {
+      return NextResponse.json(
+        { error: "Experience not found" },
+        { status: 404 }
+      );
+    }
+
+    const bucketName = result[0].bucket_name || "experience-videos";
+    const existingVideoPath = result[0].video_path;
+
     const supabase = await createClient();
 
-    // Check for existing video
-    const { data: existingVideo } = await supabase
-      .from("experience_videos")
-      .select("video_path")
-      .eq("experience_id", experienceId)
-      .eq("index", index)
-      .single();
+    // If exists, delete old file
+    if (existingVideoPath) {
+      await supabase.storage.from(bucketName).remove([existingVideoPath]);
 
-    // If exists, delete old file and record
-    if (existingVideo?.video_path) {
-      await supabase.storage
-        .from("experience-videos")
-        .remove([existingVideo.video_path]);
-
-      await supabase
-        .from("experience_videos")
-        .delete()
-        .eq("experience_id", experienceId)
-        .eq("index", index);
+      // Delete the database record
+      await db
+        .delete(ExperienceVideo)
+        .where(
+          and(
+            eq(ExperienceVideo.experienceId, parseInt(experienceId)),
+            eq(ExperienceVideo.index, index)
+          )
+        );
     }
 
     // Insert new database record
-    const { error: dbError } = await supabase.from("experience_videos").insert({
-      experience_id: experienceId,
+    await db.insert(ExperienceVideo).values({
+      experienceId: parseInt(experienceId),
       index: index,
-      video_path: filePath,
+      videoPath: filePath,
     });
-
-    if (dbError) throw dbError;
 
     return NextResponse.json({
       success: true,
       videoPath: filePath,
+      bucket_name: bucketName,
     });
   } catch (error) {
     console.error("Error handling video:", error);
@@ -88,7 +110,6 @@ export async function GET(request: Request) {
         { status: 400 }
       );
     }
-
 
     // Join experience with profiles and company to get the bucket name
     const result = await db

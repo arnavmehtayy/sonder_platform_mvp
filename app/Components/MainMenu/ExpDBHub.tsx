@@ -140,6 +140,7 @@ export const ExpDBHub = ({
     if (!experienceToDelete) return;
 
     try {
+      console.log("Deleting experience with ID:", experienceToDelete);
       const response = await fetch(
         `/api/supabase/experiences?id=${experienceToDelete}`,
         {

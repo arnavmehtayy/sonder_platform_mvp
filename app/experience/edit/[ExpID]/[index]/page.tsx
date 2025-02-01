@@ -396,22 +396,30 @@ export default function ExperienceEditPage() {
   const handleVideoUpload = async (
     event: React.ChangeEvent<HTMLInputElement>
   ) => {
+    console.log("Uploading video");
     const file = event.target.files?.[0];
     if (!file) return;
 
     try {
-      // First get the bucket name for this experience
-      const bucketResponse = await fetch(
-        `/api/supabase/video?experienceId=${expId}&index=${currentIndex}`
-      );
-      const bucketData = await bucketResponse.json();
-      const bucketName = bucketData.bucket_name || "experience-videos";
-
       const supabase = createClient();
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+
+      // Get bucket name from new route with userId
+      const bucketResponse = await fetch(
+        `/api/supabase/bucket?experienceId=${expId}&userId=${user?.id}`
+      );
+      const { bucket_name } = await bucketResponse.json();
+      const bucketName = bucket_name || "experience-videos";
+
       const timestamp = Date.now();
       const fileExtension = file.name.split(".").pop();
       const fileName = `video_${timestamp}.${fileExtension}`;
       const filePath = `${expId}/${currentIndex}/${fileName}`;
+
+      console.log("Using bucket:", bucketName);
+      console.log("Attempting to upload to path:", filePath);
 
       const { error: uploadError } = await supabase.storage
         .from(bucketName)

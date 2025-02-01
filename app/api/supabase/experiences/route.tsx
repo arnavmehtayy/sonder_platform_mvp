@@ -1,7 +1,13 @@
 import { db } from "@/app/db/index";
-import { experience, profiles } from "@/app/db/schema";
+import {
+  experience,
+  profiles,
+  company_table,
+  ExperienceVideo,
+} from "@/app/db/schema";
 import { NextResponse } from "next/server";
 import { eq, or, and, isNull } from "drizzle-orm";
+import { createClient } from "@/app/utils/supabase/server";
 
 export async function POST(request: Request) {
   try {
@@ -134,7 +140,6 @@ export async function GET(request: Request) {
 
 export async function DELETE(request: Request) {
   try {
-    // Get the ID from the URL
     const url = new URL(request.url);
     const id = url.searchParams.get("id");
 
@@ -147,7 +152,59 @@ export async function DELETE(request: Request) {
 
     const experienceId = parseInt(id);
 
-    // Delete the experience
+    // First get the experience with its creator's profile and company info
+    const [experienceWithCreator] = await db
+      .select({
+        id: experience.id,
+        bucket_name: company_table.bucket_name,
+      })
+      .from(experience)
+      .leftJoin(profiles, eq(experience.user_id, profiles.id))
+      .leftJoin(company_table, eq(profiles.company_id, company_table.id))
+      .where(eq(experience.id, experienceId));
+
+    if (!experienceWithCreator) {
+      return NextResponse.json(
+        { error: "Experience not found" },
+        { status: 404 }
+      );
+    }
+
+    // Get all videos associated with this experience
+    const videos = await db
+      .select({
+        videoPath: ExperienceVideo.videoPath,
+      })
+      .from(ExperienceVideo)
+      .where(eq(ExperienceVideo.experienceId, experienceId));
+
+    const bucketName = experienceWithCreator.bucket_name || "experience-videos";
+    // Create server-side client that has access to auth cookies
+    const supabase = await createClient();
+
+    // Delete each video from storage
+    const filePaths = videos.map((video) => video.videoPath);
+    if (filePaths.length > 0) {
+      console.log("Attempting to delete videos:", filePaths);
+
+      // Add error handling and logging for storage deletion
+      const { data, error: deleteError } = await supabase.storage
+        .from(bucketName)
+        .remove(filePaths);
+
+      if (deleteError) {
+        console.error("Error deleting videos from storage:", deleteError);
+        return NextResponse.json(
+          { error: "Failed to delete videos from storage" },
+          { status: 500 }
+        );
+      }
+
+      console.log("Storage deletion response:", data);
+    }
+
+    // Delete the experience from the database
+    // This will cascade delete the ExperienceVideo records due to the foreign key constraint
     const [deletedExperience] = await db
       .delete(experience)
       .where(eq(experience.id, experienceId))
@@ -161,7 +218,7 @@ export async function DELETE(request: Request) {
     }
 
     return NextResponse.json({
-      message: "Experience deleted successfully",
+      message: "Experience and associated files deleted successfully",
       id: deletedExperience.id,
     });
   } catch (error) {
