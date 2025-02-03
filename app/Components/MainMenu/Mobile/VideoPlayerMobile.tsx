@@ -126,17 +126,16 @@ export function MobileVideoPlayer({
   };
 
   const handleSkipVideo = () => {
-    if (videoRef.current) {
-      track("video_skipped", {
-        experienceId,
-        index,
-        timeWatched: videoRef.current.currentTime,
-        totalDuration: videoRef.current.duration,
-      });
-
-      videoRef.current.currentTime = videoRef.current.duration - 0.1;
-      videoRef.current.play();
-    }
+    // if (videoRef.current) {
+    //   track("video_skipped", {
+    //     experienceId,
+    //     index,
+    //     timeWatched: videoRef.current.currentTime,
+    //     totalDuration: videoRef.current.duration,
+    //   });
+    //   videoRef.current.currentTime = videoRef.current.duration - 0.1;
+    //   videoRef.current.play();
+    // }
   };
 
   const handleReplay = () => {
@@ -167,31 +166,21 @@ export function MobileVideoPlayer({
   const handleProgressBarInteraction = (
     event: React.MouseEvent | React.TouchEvent
   ) => {
-    if (videoRef.current && progressBarRef.current) {
-      // Get the progress bar dimensions
-      const rect = progressBarRef.current.getBoundingClientRect();
-
-      // Get the x position of the interaction
-      const clientX =
-        "touches" in event ? event.touches[0].clientX : event.clientX;
-
-      // Calculate the new position as a percentage
-      const position = Math.max(
-        0,
-        Math.min(1, (clientX - rect.left) / rect.width)
-      );
-
-      // Update video time
-      videoRef.current.currentTime = position * videoRef.current.duration;
-
-      // Update progress state
-      setProgress(position * 100);
-
-      // Reset video ended state if user drags back
-      if (isVideoEnded && position < 1) {
-        setIsVideoEnded(false);
-      }
-    }
+    // Disable interaction with progress bar
+    // if (videoRef.current && progressBarRef.current) {
+    //   const rect = progressBarRef.current.getBoundingClientRect();
+    //   const clientX =
+    //     "touches" in event ? event.touches[0].clientX : event.clientX;
+    //   const position = Math.max(
+    //     0,
+    //     Math.min(1, (clientX - rect.left) / rect.width)
+    //   );
+    //   videoRef.current.currentTime = position * videoRef.current.duration;
+    //   setProgress(position * 100);
+    //   if (isVideoEnded && position < 1) {
+    //     setIsVideoEnded(false);
+    //   }
+    // }
   };
 
   const handleLoadedMetadata = () => {
@@ -247,20 +236,13 @@ export function MobileVideoPlayer({
 
       {/* Mobile-optimized controls */}
       <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/60 to-transparent pb-[calc(env(safe-area-inset-bottom)+1rem)] px-4">
-        {/* Progress bar */}
-        <div
-          ref={progressBarRef}
-          className="w-full h-8 flex items-center cursor-pointer touch-none mb-2"
-          onTouchStart={handleProgressBarInteraction}
-          onTouchMove={handleProgressBarInteraction}
-          onClick={handleProgressBarInteraction}
-        >
+        {/* Progress bar - Keep this but remove interaction handlers */}
+        <div ref={progressBarRef} className="w-full h-8 flex items-center mb-2">
           <div className="w-full h-1 bg-white/30 rounded-full relative">
             <div
               className="absolute h-full bg-white rounded-full transition-all duration-100"
               style={{ width: `${progress}%` }}
             />
-            {/* Draggable thumb */}
             <div
               className="absolute h-3 w-3 bg-sky-500 rounded-full -mt-1 shadow-sm transform -translate-x-1/2"
               style={{ left: `${progress}%` }}
@@ -293,9 +275,9 @@ export function MobileVideoPlayer({
             )}
           </AnimatePresence>
 
-          {/* Skip/Replay button */}
+          {/* Keep only Replay button, remove Skip button */}
           <AnimatePresence mode="wait">
-            {isVideoEnded ? (
+            {isVideoEnded && (
               <div className="flex flex-col items-center z-[100]">
                 <motion.button
                   key="replay"
@@ -313,27 +295,6 @@ export function MobileVideoPlayer({
                   exit={{ opacity: 0 }}
                   className="text-white/80 text-xs mt-1"
                 />
-              </div>
-            ) : (
-              <div className="flex flex-col items-center z-[100]">
-                <motion.button
-                  key="skip"
-                  initial={{ opacity: 0, scale: 0.8 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0, scale: 0.8 }}
-                  onClick={handleSkipVideo}
-                  className="bg-black/50 backdrop-blur-sm rounded-full p-6"
-                >
-                  <FastForward className="w-8 h-8 text-white" />
-                </motion.button>
-                <motion.span
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  exit={{ opacity: 0 }}
-                  className="text-white/80 text-xs mt-1"
-                >
-                  Skip to questions
-                </motion.span>
               </div>
             )}
           </AnimatePresence>

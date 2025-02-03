@@ -533,7 +533,7 @@ export default function ExperienceEditPage() {
       <EditBar />
 
       <div className="relative flex flex-row h-screen bg-gray-100">
-        {/* Left Sidebar with collapse animation */}
+        {/* Comment out Left Sidebar
         <div
           className={`transition-all duration-300 ease-in-out ${
             isLeftSidebarCollapsed ? "w-0" : "w-64"
@@ -543,9 +543,7 @@ export default function ExperienceEditPage() {
             <ObjectTreeManager />
             <div className="absolute -right-6 top-1/2 transform -translate-y-1/2 z-50">
               <Button
-                onClick={() =>
-                  setIsLeftSidebarCollapsed(!isLeftSidebarCollapsed)
-                }
+                onClick={() => setIsLeftSidebarCollapsed(!isLeftSidebarCollapsed)}
                 className={`h-12 w-12 rounded-full bg-white hover:bg-gray-50 border border-gray-200 shadow-lg flex items-center justify-center transition-all duration-300 ${
                   isLeftSidebarCollapsed ? "translate-x-3" : ""
                 }`}
@@ -559,6 +557,7 @@ export default function ExperienceEditPage() {
             </div>
           </div>
         </div>
+        */}
 
         {/* Main Experience Area */}
         <div className="flex-grow bg-black h-full relative min-w-0">
@@ -566,7 +565,7 @@ export default function ExperienceEditPage() {
             <CurvedBackButton />
           </div>
 
-          {/* Video Upload Button - Positioned in top-right corner */}
+          {/* Video Upload Button */}
           <div className="absolute top-4 right-4 z-50">
             <input
               type="file"
@@ -589,62 +588,21 @@ export default function ExperienceEditPage() {
             </label>
           </div>
 
-          {/* Video Player with key prop */}
+          {/* Video Player */}
           <VideoPlayer
             experienceId={expId}
             index={currentIndex}
             key={videoKey}
+            isEditMode={true}
           />
 
-          {/* Skip Video Button */}
-
-          {/* Experience will only show after video ends */}
-          <AnimatePresence>
-            {isVideoEnded && !isVideoPlaying && (
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                className="absolute inset-0 z-10"
-              >
-                <Experience />
-              </motion.div>
-            )}
-          </AnimatePresence>
-
-          {/* Validation Panel - Only increased z-index */}
+          {/* Experience always visible in edit mode */}
           <div
-            className={`absolute bottom-32 left-1/2 transform -translate-x-1/2 w-[calc(100%-2rem)] md:w-96 bg-white rounded-lg shadow-xl transition-all duration-300 ${
-              showValidation
-                ? "opacity-100 translate-y-0"
-                : "opacity-0 translate-y-full pointer-events-none"
-            } z-[60]`}
+            className={`absolute inset-0 ${"pointer-events-none"}`}
+            style={{ zIndex: 10 }}
           >
-            <div className="p-4 max-h-[30vh] md:max-h-[calc(100vh-400px)] overflow-y-auto">
-              <ValidationComponent
-                validations={validationInstance}
-                updater={handleValidationUpdate}
-                isChecked={showValidationResults}
-              />
-            </div>
+            <Experience />
           </div>
-
-          {/* Toggle button - Only increased z-index */}
-          <button
-            onClick={() => setShowValidation(!showValidation)}
-            className={`absolute bottom-20 left-1/2 transform -translate-x-1/2 flex items-center space-x-2 px-4 py-2 rounded-md shadow-lg transition-all duration-300 z-[60] ${
-              allValidationsValid
-                ? "bg-green-500 hover:bg-green-600"
-                : "bg-blue-500 hover:bg-blue-600"
-            }`}
-          >
-            {allValidationsValid && (
-              <CheckCircle className="text-white" size={20} />
-            )}
-            <span className="text-white font-semibold">
-              {showValidation ? "Hide Autograder" : "Show Autograder"}
-            </span>
-          </button>
         </div>
 
         {/* Right Sidebar */}
@@ -667,56 +625,10 @@ export default function ExperienceEditPage() {
               </Dialog>
             </div>
 
-            {/* OrderHandlerDB */}
+            {/* OrderHandlerDB - Always visible in edit mode */}
             <div className="relative">
               <OrderHandlerDB isEditMode={true} />
             </div>
-
-            {/* Skip Video Button */}
-            <AnimatePresence>
-              {!isVideoEnded && (
-                <motion.button
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: 20 }}
-                  onClick={handleSkipVideo}
-                  className="w-full mt-6 mb-6 px-4 py-3 bg-blue-50 hover:bg-blue-100 
-                    border border-blue-200 rounded-xl shadow-sm transition-all duration-300 
-                    flex flex-col items-center gap-2"
-                >
-                  <div className="flex flex-col items-center text-center space-y-1">
-                    <span className="text-blue-700 text-lg font-medium">
-                      Skip to the end of the video
-                    </span>
-                    <span className="text-blue-600/80 text-sm">
-                      to apply your learning
-                    </span>
-                  </div>
-                  <FastForward className="w-6 h-6 text-blue-500" />
-                </motion.button>
-              )}
-            </AnimatePresence>
-
-            {/* Verify button */}
-            <AnimatePresence>
-              {isVideoEnded &&
-                !isVideoPlaying &&
-                validationInstance.length > 0 && (
-                  <motion.button
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: 20 }}
-                    onClick={handleValidationUpdate}
-                    className="w-full mt-6 mb-12 px-4 py-3 bg-green-600 text-white rounded-lg 
-                    shadow-md transition-all duration-300 hover:bg-green-700 hover:shadow-lg 
-                    active:bg-green-800"
-                  >
-                    <span className="text-lg font-semibold">
-                      Verify Answers
-                    </span>
-                  </motion.button>
-                )}
-            </AnimatePresence>
           </div>
         </div>
       </div>

@@ -36,10 +36,21 @@ import {
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { DropDownMenu } from "@/app/Components/EditMode/DropDownMenu";
-import { 
-  Sliders, List, MousePointerClick, Calculator, ArrowRightLeft,
-  PencilLine, Circle, LineChart, Axis3D, Type, Variable,
-  Table, Hash, ListChecks
+import {
+  Sliders,
+  List,
+  MousePointerClick,
+  Calculator,
+  ArrowRightLeft,
+  PencilLine,
+  Circle,
+  LineChart,
+  Axis3D,
+  Type,
+  Variable,
+  Table,
+  Hash,
+  ListChecks,
 } from "lucide-react";
 import { ObjectCreator } from "@/app/Components/EditMode/ObjectCreator";
 import { ObjectType } from "../EditMode/EditBar";
@@ -52,7 +63,12 @@ import { Question } from "@/classes/Question";
 import { MultiChoiceClass } from "@/classes/Controls/MultiChoiceClass";
 import { TableControl } from "@/classes/Controls/TableControl";
 import { InputNumber } from "@/classes/Controls/InputNumber";
-import { DropdownMenu, DropdownMenuTrigger, DropdownMenuItem, DropdownMenuContent } from "@/components/ui/dropdown-menu"
+import {
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuItem,
+  DropdownMenuContent,
+} from "@/components/ui/dropdown-menu";
 
 /*
  * This component is responsible for rendering the order of components in the sidebar
@@ -61,57 +77,52 @@ import { DropdownMenu, DropdownMenuTrigger, DropdownMenuItem, DropdownMenuConten
  */
 
 // Add SortableItem component
-function SortableItem({ 
-  id, 
-  children, 
+function SortableItem({
+  id,
+  children,
   isEditMode,
-  onDelete 
-}: { 
-  id: string; 
+  onDelete,
+}: {
+  id: string;
   children: React.ReactNode;
   isEditMode: boolean;
   onDelete?: () => void;
 }) {
-  const {
-    attributes,
-    listeners,
-    setNodeRef,
-    transform,
-    transition,
-  } = useSortable({ id });
+  const { attributes, listeners, setNodeRef, transform, transition } =
+    useSortable({ id });
 
   const style = {
     transform: CSS.Transform.toString(transform),
     transition,
   };
 
-  const isTextItem = id.startsWith('question-');
-  const containerClass = isTextItem 
-    ? "mb-2" 
+  const isTextItem = id.startsWith("question-");
+  const containerClass = isTextItem
+    ? "mb-2"
     : "bg-white rounded-lg shadow-sm mb-2";
 
   if (!isEditMode) {
     return (
       <div className={containerClass}>
-        <div className="flex-1">
-          {children}
-        </div>
+        <div className="flex-1">{children}</div>
       </div>
     );
   }
 
   return (
-    <div 
-      ref={setNodeRef} 
-      style={style} 
+    <div
+      ref={setNodeRef}
+      style={style}
       className={`flex items-center ${containerClass}`}
     >
-      <div {...attributes} {...listeners} className="cursor-move p-2 text-gray-400 hover:text-gray-600">
+      <div
+        {...attributes}
+        {...listeners}
+        className="cursor-move p-2 text-gray-400 hover:text-gray-600"
+      >
         <GripVertical size={16} />
       </div>
-      <div className="flex-1">
-        {children}
-      </div>
+      <div className="flex-1">{children}</div>
       {onDelete && (
         <Button
           variant="ghost"
@@ -126,7 +137,11 @@ function SortableItem({
   );
 }
 
-export const OrderHandlerDB = ({ isEditMode = false }: { isEditMode?: boolean }) => {
+export const OrderHandlerDB = ({
+  isEditMode = false,
+}: {
+  isEditMode?: boolean;
+}) => {
   const state = useStore();
   const get_questions = useStore(getQuestionsSelector);
   const title = useStore(getTitleSelector);
@@ -154,7 +169,8 @@ export const OrderHandlerDB = ({ isEditMode = false }: { isEditMode?: boolean })
   const [isTitleEditing, setIsTitleEditing] = useState(false);
 
   // Add new state for object creation
-  const [selectedObjectType, setSelectedObjectType] = useState<ObjectType | null>(null);
+  const [selectedObjectType, setSelectedObjectType] =
+    useState<ObjectType | null>(null);
 
   // Add DnD sensors
   const sensors = useSensors(
@@ -247,7 +263,9 @@ export const OrderHandlerDB = ({ isEditMode = false }: { isEditMode?: boolean })
                 {editingId === item.id ? (
                   <div className="space-y-3 bg-white rounded-lg shadow-md p-4">
                     <div>
-                      <Label className="text-xs text-gray-500">Question Text</Label>
+                      <Label className="text-xs text-gray-500">
+                        Question Text
+                      </Label>
                       <Textarea
                         value={editedText}
                         onChange={(e) => setEditedText(e.target.value)}
@@ -306,14 +324,13 @@ export const OrderHandlerDB = ({ isEditMode = false }: { isEditMode?: boolean })
     deleteOrderItem(id, type);
 
     // Handle specific type deletions
-    if (type === 'control') {
+    if (type === "control") {
       deleteControl(id);
-    } else if (type === 'placement') {
+    } else if (type === "placement") {
       deletePlacement(id);
-    } else if (type === 'question') {
+    } else if (type === "question") {
       deleteQuestion(id);
-    }
-    else if (type === 'score') {
+    } else if (type === "score") {
       deleteScore(id);
     }
   };
@@ -324,8 +341,9 @@ export const OrderHandlerDB = ({ isEditMode = false }: { isEditMode?: boolean })
 
   return (
     <div className="space-y-4 md:space-y-6">
+      {/* Title section - always visible */}
       <div className="p-4">
-        {isTitleEditing ? (
+        {isTitleEditing && isEditMode ? (
           <div className="space-y-3 bg-white rounded-lg shadow-md p-4">
             <div>
               <Label className="text-xs text-gray-500">Title</Label>
@@ -375,8 +393,10 @@ export const OrderHandlerDB = ({ isEditMode = false }: { isEditMode?: boolean })
         )}
       </div>
 
-      {isVideoEnded && !isVideoPlaying && (
+      {/* Main content - show based on conditions */}
+      {(isEditMode || (isVideoEnded && !isVideoPlaying)) && (
         <>
+          {/* Content area */}
           {isEditMode ? (
             <DndContext
               sensors={sensors}
@@ -384,7 +404,7 @@ export const OrderHandlerDB = ({ isEditMode = false }: { isEditMode?: boolean })
               onDragEnd={handleDragEnd}
             >
               <SortableContext
-                items={state.order.map(item => `${item.type}-${item.id}`)}
+                items={state.order.map((item) => `${item.type}-${item.id}`)}
                 strategy={verticalListSortingStrategy}
               >
                 {state.order.map((item, index) => (
@@ -413,6 +433,7 @@ export const OrderHandlerDB = ({ isEditMode = false }: { isEditMode?: boolean })
             </div>
           )}
 
+          {/* Add Component button - only in edit mode */}
           {isEditMode && (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
@@ -420,12 +441,14 @@ export const OrderHandlerDB = ({ isEditMode = false }: { isEditMode?: boolean })
                   <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 bg-transparent hover:border-blue-300 hover:bg-blue-50 transform transition-all duration-200 hover:scale-[1.02] cursor-pointer group overflow-visible">
                     <div className="flex flex-col items-center justify-center">
                       <Plus className="h-8 w-8 text-gray-400 group-hover:text-blue-500 mb-2" />
-                      <h3 className="text-lg font-medium text-gray-600 group-hover:text-gray-700 mb-2">Add Sidebar Component</h3>
+                      <h3 className="text-lg font-medium text-gray-600 group-hover:text-gray-700 mb-2">
+                        Add Sidebar Component
+                      </h3>
                     </div>
                   </div>
                 </div>
               </DropdownMenuTrigger>
-              <DropdownMenuContent 
+              <DropdownMenuContent
                 className="bg-white rounded-lg shadow-xl p-2 mt-2 w-56 border border-gray-100 z-[100]"
                 align="center"
                 sideOffset={5}
@@ -438,14 +461,17 @@ export const OrderHandlerDB = ({ isEditMode = false }: { isEditMode?: boolean })
                     className="flex items-center space-x-3 px-4 py-3 hover:bg-blue-50 rounded-md transition-all duration-200 cursor-pointer group"
                   >
                     <objectType.icon className="h-5 w-5 text-blue-600 group-hover:text-blue-700" />
-                    <span className="text-gray-700 font-medium group-hover:text-gray-900">{objectType.name}</span>
+                    <span className="text-gray-700 font-medium group-hover:text-gray-900">
+                      {objectType.name}
+                    </span>
                   </DropdownMenuItem>
                 ))}
               </DropdownMenuContent>
             </DropdownMenu>
           )}
 
-          {selectedObjectType && (
+          {/* Object Creator - only in edit mode */}
+          {selectedObjectType && isEditMode && (
             <ObjectCreator
               ObjectType={selectedObjectType.type}
               onClose={() => setSelectedObjectType(null)}

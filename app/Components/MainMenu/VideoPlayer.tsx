@@ -13,6 +13,7 @@ import Image from "next/image";
 interface VideoPlayerProps {
   experienceId: number;
   index: number;
+  isEditMode?: boolean;
 }
 
 const VideoLoadingFallback = () => (
@@ -26,7 +27,11 @@ const VideoLoadingFallback = () => (
   </div>
 );
 
-export function VideoPlayer({ experienceId, index }: VideoPlayerProps) {
+export function VideoPlayer({
+  experienceId,
+  index,
+  isEditMode = false,
+}: VideoPlayerProps) {
   const [videoUrl, setVideoUrl] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [showPlayButton, setShowPlayButton] = useState(false);
@@ -120,16 +125,16 @@ export function VideoPlayer({ experienceId, index }: VideoPlayerProps) {
   };
 
   const handleSkip = (seconds: number) => {
-    if (videoRef.current) {
-      const newTime = videoRef.current.currentTime + seconds;
-      videoRef.current.currentTime = Math.min(
-        Math.max(0, newTime),
-        videoRef.current.duration
-      );
-      setProgress(
-        (videoRef.current.currentTime / videoRef.current.duration) * 100
-      );
-    }
+    // if (videoRef.current) {
+    //   const newTime = videoRef.current.currentTime + seconds;
+    //   videoRef.current.currentTime = Math.min(
+    //     Math.max(0, newTime),
+    //     videoRef.current.duration
+    //   );
+    //   setProgress(
+    //     (videoRef.current.currentTime / videoRef.current.duration) * 100
+    //   );
+    // }
   };
 
   const handleVideoEnd = () => {
@@ -205,27 +210,23 @@ export function VideoPlayer({ experienceId, index }: VideoPlayerProps) {
   };
 
   const handleSkipVideo = () => {
-    if (videoRef.current) {
-      // First pause the video
-      videoRef.current.pause();
-
-      // Mute the video to prevent audio artifacts
-      const wasMuted = videoRef.current.muted;
-      videoRef.current.muted = true;
-
-      // Set time to end
-      videoRef.current.currentTime = videoRef.current.duration;
-
-      // Reset muted state
-      setTimeout(() => {
-        if (videoRef.current) {
-          videoRef.current.muted = wasMuted;
-        }
-      }, 100);
-
-      // Trigger ended event manually if needed
-      handleVideoEnd();
-    }
+    // if (videoRef.current) {
+    //   // First pause the video
+    //   videoRef.current.pause();
+    //   // Mute the video to prevent audio artifacts
+    //   const wasMuted = videoRef.current.muted;
+    //   videoRef.current.muted = true;
+    //   // Set time to end
+    //   videoRef.current.currentTime = videoRef.current.duration;
+    //   // Reset muted state
+    //   setTimeout(() => {
+    //     if (videoRef.current) {
+    //       videoRef.current.muted = wasMuted;
+    //     }
+    //   }, 100);
+    //   // Trigger ended event manually if needed
+    //   handleVideoEnd();
+    // }
   };
 
   const resetControlsTimeout = () => {
@@ -300,24 +301,21 @@ export function VideoPlayer({ experienceId, index }: VideoPlayerProps) {
   }, []);
 
   const handleProgressBarInteraction = (e: React.MouseEvent) => {
-    if (videoRef.current && progressBarRef.current) {
-      const rect = progressBarRef.current.getBoundingClientRect();
-      const position = Math.max(
-        0,
-        Math.min(1, (e.clientX - rect.left) / rect.width)
-      );
-
-      // Update video time
-      videoRef.current.currentTime = position * videoRef.current.duration;
-
-      // Update progress state
-      setProgress(position * 100);
-
-      // Reset video ended state if user drags back
-      if (isVideoEnded && position < 1) {
-        setIsVideoEnded(false);
-      }
-    }
+    // if (videoRef.current && progressBarRef.current) {
+    //   const rect = progressBarRef.current.getBoundingClientRect();
+    //   const position = Math.max(
+    //     0,
+    //     Math.min(1, (e.clientX - rect.left) / rect.width)
+    //   );
+    //   // Update video time
+    //   videoRef.current.currentTime = position * videoRef.current.duration;
+    //   // Update progress state
+    //   setProgress(position * 100);
+    //   // Reset video ended state if user drags back
+    //   if (isVideoEnded && position < 1) {
+    //     setIsVideoEnded(false);
+    //   }
+    // }
   };
 
   useEffect(() => {
@@ -413,32 +411,36 @@ export function VideoPlayer({ experienceId, index }: VideoPlayerProps) {
 
         {!isVideoEnded && (
           <div
-            className={`absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/60 to-transparent p-4 transition-opacity duration-300 ${
+            className={`absolute ${
+              isEditMode ? "bottom-20" : "bottom-0"
+            } left-0 right-0 bg-gradient-to-t from-black/60 to-transparent p-4 transition-opacity duration-300 ${
               showControls ? "opacity-100" : "opacity-0"
             }`}
+            style={{ zIndex: 25 }}
           >
             <div className="flex items-center gap-4 mb-1">
               <div
                 ref={progressBarRef}
-                className="w-full relative h-8 flex items-center cursor-pointer"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  handleProgressBarInteraction(e);
-                }}
+                className={`w-full relative h-8 flex items-center ${
+                  isEditMode ? "cursor-pointer" : "cursor-default"
+                }`}
+                onClick={isEditMode ? handleSeek : undefined}
               >
                 <div className="w-full h-1 bg-white/30 rounded-full relative">
                   <div
                     className="absolute h-full bg-white rounded-full transition-all duration-100"
                     style={{ width: `${progress}%` }}
                   />
-                  <div
-                    className="absolute h-3 w-3 bg-sky-500 rounded-full -mt-1 shadow-sm transform -translate-x-1/2"
-                    style={{ left: `${progress}%` }}
-                    onMouseDown={(e) => {
-                      e.stopPropagation();
-                      setIsDragging(true);
-                    }}
-                  />
+                  {isEditMode && (
+                    <div
+                      className="absolute h-3 w-3 bg-sky-500 rounded-full -mt-1 shadow-sm transform -translate-x-1/2"
+                      style={{ left: `${progress}%` }}
+                      onMouseDown={(e) => {
+                        e.stopPropagation();
+                        setIsDragging(true);
+                      }}
+                    />
+                  )}
                 </div>
               </div>
             </div>
@@ -478,6 +480,7 @@ export function VideoPlayer({ experienceId, index }: VideoPlayerProps) {
                 )}
               </button>
 
+              {/* Comment out skip buttons
               <button
                 onClick={(e) => {
                   e.stopPropagation();
@@ -511,6 +514,7 @@ export function VideoPlayer({ experienceId, index }: VideoPlayerProps) {
                 </svg>
                 <span className="text-xs font-medium">5</span>
               </button>
+              */}
             </div>
           </div>
         )}

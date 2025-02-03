@@ -149,47 +149,45 @@ export function MinigameDB({
     }
   }, [isVideoEnded, isVideoPlaying, experienceID, index]);
 
-  // Update skip video handler with analytics
+  // Comment out skip video handler
   const handleSkipVideo = () => {
-    const videoElement = document.querySelector("video");
-    if (videoElement) {
-      track("video_completed", {
-        experienceId: experienceID,
-        index: index,
-        timeWatched: videoElement.currentTime,
-        totalDuration: videoElement.duration,
-        percentageWatched:
-          (videoElement.currentTime / videoElement.duration) * 100,
-      });
-
-      // Check if the video is actually loaded and has a duration
-      if (videoElement.readyState >= 2 && videoElement.duration) {
-        // Set time to slightly before the end (e.g., 0.1 seconds before)
-        videoElement.currentTime = Math.max(0, videoElement.duration - 0.1);
-
-        // Use a promise to handle the seek operation
-        const playPromise = videoElement.play();
-        if (playPromise !== undefined) {
-          playPromise
-            .then(() => {
-              // Playback started successfully
-            })
-            .catch((error) => {
-              console.log("Error playing video:", error);
-            });
-        }
-      } else {
-        // If video isn't loaded, wait for it
-        videoElement.addEventListener(
-          "loadedmetadata",
-          () => {
-            videoElement.currentTime = Math.max(0, videoElement.duration - 0.1);
-            videoElement.play();
-          },
-          { once: true }
-        );
-      }
-    }
+    // const videoElement = document.querySelector("video");
+    // if (videoElement) {
+    //   track("video_completed", {
+    //     experienceId: experienceID,
+    //     index: index,
+    //     timeWatched: videoElement.currentTime,
+    //     totalDuration: videoElement.duration,
+    //     percentageWatched:
+    //       (videoElement.currentTime / videoElement.duration) * 100,
+    //   });
+    //   // Check if the video is actually loaded and has a duration
+    //   if (videoElement.readyState >= 2 && videoElement.duration) {
+    //     // Set time to slightly before the end (e.g., 0.1 seconds before)
+    //     videoElement.currentTime = Math.max(0, videoElement.duration - 0.1);
+    //     // Use a promise to handle the seek operation
+    //     const playPromise = videoElement.play();
+    //     if (playPromise !== undefined) {
+    //       playPromise
+    //         .then(() => {
+    //           // Playback started successfully
+    //         })
+    //         .catch((error) => {
+    //           console.log("Error playing video:", error);
+    //         });
+    //     }
+    //   } else {
+    //     // If video isn't loaded, wait for it
+    //     videoElement.addEventListener(
+    //       "loadedmetadata",
+    //       () => {
+    //         videoElement.currentTime = Math.max(0, videoElement.duration - 0.1);
+    //         videoElement.play();
+    //       },
+    //       { once: true }
+    //     );
+    //   }
+    // }
   };
 
   return (
@@ -198,7 +196,6 @@ export function MinigameDB({
       <div className="flex-grow bg-black h-1/2 md:h-full md:flex-1 relative">
         <VideoPlayer experienceId={experienceID} index={index} />
         <Experience />
-        {/* <Experience /> */}
       </div>
 
       {/* Sidebar */}
@@ -210,7 +207,7 @@ export function MinigameDB({
         <div className="space-y-8">
           <OrderHandlerDB />
 
-          {/* Skip Video Button */}
+          {/* Remove Skip Video Button
           <AnimatePresence>
             {!isVideoEnded && (
               <motion.button
@@ -234,6 +231,7 @@ export function MinigameDB({
               </motion.button>
             )}
           </AnimatePresence>
+          */}
 
           {/* Validation Section */}
           <div className="space-y-6">
