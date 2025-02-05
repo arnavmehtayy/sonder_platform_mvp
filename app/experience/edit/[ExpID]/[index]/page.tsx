@@ -128,7 +128,7 @@ export default function ExperienceEditPage() {
   const reset = useStore((state) => state.reset);
   const setIsEditMode = useStore(setIsEditModeSelector);
 
-  const [showValidation, setShowValidation] = useState(true);
+  const [showValidation, setShowValidation] = useState(false);
   const [allValidationsValid, setAllValidationsValid] = useState(false);
   const validationInstance = useStore((state) => state.validations);
   const updateValidation = useStore(UpdateValidationSelector);
@@ -603,6 +603,40 @@ export default function ExperienceEditPage() {
           >
             <Experience />
           </div>
+
+          {/* Validation Panel with fixed positioning */}
+          <div
+            className={`fixed bottom-32 left-1/3 transform -translate-x-1/2 w-[calc(100%-2rem)] md:w-96 bg-white rounded-lg shadow-xl transition-all duration-300 ${
+              showValidation
+                ? "opacity-100 translate-y-0"
+                : "opacity-0 translate-y-full pointer-events-none"
+            } z-[60]`}
+          >
+            <div className="p-4 max-h-[30vh] overflow-y-auto">
+              <ValidationComponent
+                validations={validationInstance}
+                updater={handleValidationUpdate}
+                isChecked={showValidationResults}
+              />
+            </div>
+          </div>
+
+          {/* Toggle button with fixed positioning */}
+          <button
+            onClick={() => setShowValidation(!showValidation)}
+            className={`fixed bottom-20 left-1/3 transform -translate-x-1/2 flex items-center space-x-2 px-4 py-2 rounded-md shadow-lg transition-all duration-300 z-[60] ${
+              allValidationsValid
+                ? "bg-green-500 hover:bg-green-600"
+                : "bg-blue-500 hover:bg-blue-600"
+            }`}
+          >
+            {allValidationsValid && (
+              <CheckCircle className="text-white" size={20} />
+            )}
+            <span className="text-white font-semibold">
+              {showValidation ? "Hide Autograder" : "Show Autograder"}
+            </span>
+          </button>
         </div>
 
         {/* Right Sidebar */}
@@ -626,9 +660,23 @@ export default function ExperienceEditPage() {
             </div>
 
             {/* OrderHandlerDB - Always visible in edit mode */}
-            <div className="relative">
+            <div className="relative mb-8">
               <OrderHandlerDB isEditMode={true} />
             </div>
+            {/* Verify Button */}
+            {validationInstance.length > 0 && (
+              <motion.button
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: 20 }}
+                onClick={handleValidationUpdate}
+                className="w-full px-4 py-3 mb-6 bg-green-600 text-white rounded-xl shadow-md 
+                  transition-all duration-300 hover:bg-green-700 hover:shadow-lg 
+                  active:bg-green-800"
+              >
+                <span className="text-lg font-semibold">Verify Answers</span>
+              </motion.button>
+            )}
           </div>
         </div>
       </div>
