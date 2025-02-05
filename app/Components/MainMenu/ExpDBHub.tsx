@@ -67,6 +67,10 @@ export const ExpDBHub = ({
     null
   );
   const [isEditor, setIsEditor] = useState(false);
+  const [companyInfo, setCompanyInfo] = useState({
+    title: "A Visual Interactive Experience",
+    description: "Change the way you engage with educational content",
+  });
 
   const supabase = createClient();
   const router = useRouter();
@@ -81,6 +85,31 @@ export const ExpDBHub = ({
   useEffect(() => {
     checkAuth();
     fetchExperiences();
+  }, [userId]);
+
+  useEffect(() => {
+    const fetchCompanyInfo = async () => {
+      if (userId) {
+        try {
+          const response = await fetch(
+            `/api/supabase/company?userId=${userId}`
+          );
+          if (response.ok) {
+            const data = await response.json();
+            if (data.title && data.description) {
+              setCompanyInfo({
+                title: data.title,
+                description: data.description,
+              });
+            }
+          }
+        } catch (error) {
+          console.error("Error fetching company info:", error);
+        }
+      }
+    };
+
+    fetchCompanyInfo();
   }, [userId]);
 
   const checkAuth = async () => {
@@ -232,7 +261,7 @@ export const ExpDBHub = ({
             transition={{ duration: 0.5 }}
             className="text-4xl font-extrabold text-center text-white mb-4"
           >
-            A Visual Interactive Experience
+            {companyInfo.title}
           </motion.h1>
           <motion.p
             initial={{ opacity: 0, y: -20 }}
@@ -240,7 +269,7 @@ export const ExpDBHub = ({
             transition={{ duration: 0.5, delay: 0.2 }}
             className="text-xl text-center text-white mb-12"
           >
-            Change the way you engage with educational content
+            {companyInfo.description}
           </motion.p>
 
           {loading && (

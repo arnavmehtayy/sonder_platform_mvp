@@ -1,0 +1,2 @@
+ALTER TABLE "company_table" ADD COLUMN "title" text DEFAULT 'A Visual Interactive Experience' NOT NULL;--> statement-breakpoint
+ALTER TABLE "company_table" ADD COLUMN "description" text DEFAULT 'Change the way you engage with educational content' NOT NULL;

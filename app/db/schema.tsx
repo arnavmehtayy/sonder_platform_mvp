@@ -47,6 +47,10 @@ export const profiles = pgTable("profiles", {
 export const company_table = pgTable("company_table", {
   id: serial("id").primaryKey(),
   name: text("name").notNull(),
+  title: text("title").notNull().default("A Visual Interactive Experience"),
+  description: text("description")
+    .notNull()
+    .default("Change the way you engage with educational content"),
   bucket_name: text("bucket_name").default("experience-videos"),
   date_created: timestamp("date_created").notNull().defaultNow(),
   date_updated: timestamp("date_updated")
