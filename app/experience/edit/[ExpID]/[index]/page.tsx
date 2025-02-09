@@ -326,6 +326,7 @@ export default function ExperienceEditPage() {
         throw new Error("Failed to save state");
       }
 
+
       toast.success("State saved successfully");
     } catch (error) {
       console.error("Error saving state:", error);
@@ -334,12 +335,34 @@ export default function ExperienceEditPage() {
   };
 
   const handleNextSlide = () => {
-    // handleSave();
+    handleSave(); // save the state before going to the next slide
+    useStore.setState({
+      order: [],
+      vizobjs: {},
+      title: "",
+      questions: {},
+      controls: {},
+      placement: {},
+      scores: {},
+      validations: [],
+      influenceAdvIndex: {},
+    }); // reset the state before going back to the main menu
     router.push(`/experience/edit/${expId}/${currentIndex + 1}`);
   };
 
   const handleEndExperience = () => {
     handleSave();
+    useStore.setState({
+      order: [],
+      vizobjs: {},
+      title: "",
+      questions: {},
+      controls: {},
+      placement: {},
+      scores: {},
+      validations: [],
+      influenceAdvIndex: {},
+    }); // reset the state before going back to the main menu
     router.push("/");
   };
 
@@ -530,7 +553,7 @@ export default function ExperienceEditPage() {
 
   return (
     <>
-      <EditBar />
+      {/* <EditBar /> */}
 
       <div className="relative flex flex-row h-screen bg-gray-100">
         {/* Comment out Left Sidebar
@@ -565,36 +588,67 @@ export default function ExperienceEditPage() {
             <CurvedBackButton />
           </div>
 
-          {/* Video Upload Button */}
-          <div className="absolute top-4 right-4 z-50">
-            <input
-              type="file"
-              accept="video/*"
-              onChange={handleVideoUpload}
-              className="hidden"
-              id="video-upload"
-            />
-            <label htmlFor="video-upload">
-              <Button
-                variant="outline"
-                className="cursor-pointer bg-black/50 hover:bg-black/70 text-white border-none"
-                asChild
+          {/* Video Player or Upload UI */}
+          {videoUrl ? (
+            <>
+              <VideoPlayer
+                experienceId={expId}
+                index={currentIndex}
+                key={videoKey}
+                isEditMode={true}
+              />
+              {/* Replace Video Button for existing video */}
+              <div className="absolute top-4 right-4 z-50 flex items-center gap-2">
+                <input
+                  type="file"
+                  accept="video/*"
+                  onChange={handleVideoUpload}
+                  className="hidden"
+                  id="video-upload"
+                />
+                <label htmlFor="video-upload">
+                  <Button
+                    variant="outline"
+                    className="cursor-pointer bg-white/90 hover:bg-white text-gray-800 border-gray-200 shadow-md transition-all duration-200 backdrop-blur-sm"
+                    asChild
+                  >
+                    <div className="flex items-center gap-2 px-4 py-2">
+                      <RefreshCw size={16} className="text-blue-600" />
+                      <span className="font-medium">Replace Video</span>
+                    </div>
+                  </Button>
+                </label>
+              </div>
+            </>
+          ) : (
+            <div className="absolute inset-0 flex items-center justify-center bg-gray-900/5">
+              <input
+                type="file"
+                accept="video/*"
+                onChange={handleVideoUpload}
+                className="hidden"
+                id="video-upload-initial"
+              />
+              <label
+                htmlFor="video-upload-initial"
+                className="cursor-pointer group"
               >
-                <div className="flex items-center gap-2">
-                  <RefreshCw size={16} />
-                  Replace Video
+                <div className="flex flex-col items-center gap-4 p-12 rounded-xl bg-white/90 shadow-lg border-2 border-dashed border-gray-300 hover:border-blue-400 transition-all duration-200">
+                  <div className="p-6 rounded-full bg-blue-50 group-hover:bg-blue-100 transition-colors">
+                    <RefreshCw size={48} className="text-blue-500" />
+                  </div>
+                  <div className="text-center">
+                    <h3 className="text-2xl font-semibold text-gray-800 mb-2">
+                      Upload Video
+                    </h3>
+                    <p className="text-gray-600 mb-4">
+                      Click to add a video for this step
+                    </p>
+                  </div>
                 </div>
-              </Button>
-            </label>
-          </div>
-
-          {/* Video Player */}
-          <VideoPlayer
-            experienceId={expId}
-            index={currentIndex}
-            key={videoKey}
-            isEditMode={true}
-          />
+              </label>
+            </div>
+          )}
 
           {/* Experience always visible in edit mode */}
           <div
