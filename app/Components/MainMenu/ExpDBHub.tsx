@@ -241,6 +241,41 @@ export const ExpDBHub = ({
     }
   };
 
+  const handleUpdateExperience = async (
+    id: number,
+    title: string,
+    desc: string
+  ) => {
+    try {
+      const response = await fetch("/api/supabase/experiences", {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          id,
+          title,
+          desc,
+        }),
+      });
+
+      if (response.ok) {
+        setExperiences(
+          experiences.map((exp) =>
+            exp.id === id ? { ...exp, title, desc } : exp
+          )
+        );
+        toast.success("Experience updated successfully");
+      } else {
+        throw new Error("Failed to update experience");
+      }
+    } catch (err) {
+      toast.error(
+        err instanceof Error ? err.message : "Failed to update experience"
+      );
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-neutral-800 to-neutral-800 overflow-auto">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -297,6 +332,7 @@ export const ExpDBHub = ({
                 userId={experience.userId}
                 currentUserId={userId}
                 onDelete={handleDeleteExperience}
+                onUpdate={handleUpdateExperience}
                 is_hidden={experience.is_hidden}
                 onToggleHidden={handleToggleHidden}
               />
@@ -419,6 +455,7 @@ export const ExperienceCardDB = ({
   onDelete,
   is_hidden,
   onToggleHidden,
+  onUpdate,
 }: {
   name: string;
   description: string;
@@ -430,11 +467,15 @@ export const ExperienceCardDB = ({
   onDelete: (id: number) => void;
   is_hidden: boolean;
   onToggleHidden: (id: number, isHidden: boolean) => Promise<void>;
+  onUpdate: (id: number, title: string, desc: string) => Promise<void>;
 }) => {
   const [isHovered, setIsHovered] = useState(false);
   const [showActions, setShowActions] = useState(false);
   const actionRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
+  const [isEditing, setIsEditing] = useState(false);
+  const [editTitle, setEditTitle] = useState(name);
+  const [editDesc, setEditDesc] = useState(description);
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -452,32 +493,32 @@ export const ExperienceCardDB = ({
   }, []);
 
   const handleClick = async (e: React.MouseEvent) => {
-    // Only navigate if we're not clicking the menu
-    if (!actionRef.current?.contains(e.target as Node)) {
-      try {
-        // Check if next experience exists
-        const response = await fetch(
-          `/api/supabase/check-next?experienceId=${experienceId}&index=${0}`
-        );
-        const data = await response.json();
+    // Don't navigate if we're in editing mode or clicking the menu
+    if (isEditing || actionRef.current?.contains(e.target as Node)) {
+      return;
+    }
 
-        if (data.hasNext) {
-          router.push(`/experience/data/${experienceId}/${0}`);
-        } else {
-          // Show popup for empty experience
-          toast.warning("This experience is empty");
-          return;
-        }
-      } catch (error) {
-        console.error("Error checking experience:", error);
-        alert("Error checking experience. Please try again.");
+    try {
+      const response = await fetch(
+        `/api/supabase/check-next?experienceId=${experienceId}&index=${0}`
+      );
+      const data = await response.json();
+
+      if (data.hasNext) {
+        router.push(`/experience/data/${experienceId}/${0}`);
+      } else {
+        toast.warning("This experience is empty");
+        return;
       }
+    } catch (error) {
+      console.error("Error checking experience:", error);
+      alert("Error checking experience. Please try again.");
     }
   };
 
-  const handleEdit = (e: React.MouseEvent) => {
+  const handleEditClick = (e: React.MouseEvent) => {
     e.stopPropagation();
-    router.push(`/experience/edit/${experienceId}/0`);
+    setIsEditing(true);
   };
 
   const handleDelete = (e: React.MouseEvent) => {
@@ -485,11 +526,16 @@ export const ExperienceCardDB = ({
     onDelete(experienceId);
   };
 
+  const handleSave = async () => {
+    await onUpdate(experienceId, editTitle, editDesc);
+    setIsEditing(false);
+  };
+
   return (
     <motion.div
       whileHover={{ scale: 1.05 }}
       whileTap={
-        actionRef.current?.contains(document.activeElement as Node)
+        actionRef.current?.contains(document.activeElement as Node) || isEditing
           ? {}
           : { scale: 0.95 }
       }
@@ -528,7 +574,7 @@ export const ExperienceCardDB = ({
               >
                 <div className="relative">
                   <button
-                    onClick={handleEdit}
+                    onClick={handleEditClick}
                     className="w-full px-4 py-3 text-left text-sm hover:bg-[#01A9B2]/5 flex items-center gap-2 transition-colors duration-200"
                   >
                     <Edit2 size={16} className="text-[#01A9B2]" />
@@ -575,13 +621,65 @@ export const ExperienceCardDB = ({
         )}
 
         <div className="bg-gradient-to-r from-[#01A9B2] to-[#7AE5EC] text-white p-6">
-          <h3 className="text-2xl font-bold mb-2">{name}</h3>
-          <div className="flex items-center text-sm">
-            <User size={16} className="mr-2" />
-            <span>
-              Created by {firstName} {lastName}
-            </span>
-          </div>
+          {isEditing ? (
+            <div
+              className="space-y-4"
+              onClick={(e) => e.stopPropagation()} // Prevent card click when editing
+            >
+              <Input
+                value={editTitle}
+                onChange={(e) => setEditTitle(e.target.value)}
+                className="bg-white text-black"
+                placeholder="Enter title"
+              />
+              <Textarea
+                value={editDesc}
+                onChange={(e) => setEditDesc(e.target.value)}
+                className="bg-white text-black"
+                placeholder="Enter description"
+              />
+              <div className="flex gap-2">
+                <Button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleSave();
+                  }}
+                  variant="secondary"
+                >
+                  Save
+                </Button>
+                <Button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setIsEditing(false);
+                  }}
+                  variant="ghost"
+                >
+                  Cancel
+                </Button>
+              </div>
+            </div>
+          ) : (
+            <>
+              <h3 className="text-2xl font-bold mb-2">{name}</h3>
+              <div className="flex items-center text-sm">
+                <User size={16} className="mr-2" />
+                <span>
+                  Created by {firstName} {lastName}
+                </span>
+              </div>
+              {currentUserId === userId && (
+                <Button
+                  onClick={handleEditClick}
+                  variant="ghost"
+                  className="text-white border border-white/30 hover:border-white/50 flex items-center gap-2 px-3 py-1.5 hover:bg-transparent transition-all duration-200 mt-4"
+                >
+                  <Edit2 size={16} className="mr-1" />
+                  Edit Details
+                </Button>
+              )}
+            </>
+          )}
         </div>
         <div className="p-6">
           <p className="text-gray-600 mb-4">{description}</p>

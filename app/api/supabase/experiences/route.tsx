@@ -232,12 +232,18 @@ export async function DELETE(request: Request) {
 
 export async function PATCH(request: Request) {
   try {
-    const { id, is_hidden }: { id: number; is_hidden: boolean } =
-      await request.json();
+    const { id, is_hidden, title, desc } = await request.json();
+
+    // Build update object based on provided fields
+    const updateData: { is_hidden?: boolean; title?: string; desc?: string } =
+      {};
+    if (typeof is_hidden !== "undefined") updateData.is_hidden = is_hidden;
+    if (title) updateData.title = title;
+    if (desc) updateData.desc = desc;
 
     const [updatedExperience] = await db
       .update(experience)
-      .set({ is_hidden })
+      .set(updateData)
       .where(eq(experience.id, id))
       .returning();
 
