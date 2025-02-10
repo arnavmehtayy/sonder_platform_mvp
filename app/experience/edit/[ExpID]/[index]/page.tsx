@@ -334,8 +334,8 @@ export default function ExperienceEditPage() {
     }
   };
 
-  const handleNextSlide = () => {
-    handleSave(); // save the state before going to the next slide
+  const handleNextSlide = async () => {
+    await handleSave(); // save the state before going to the next slide
     useStore.setState({
       order: [],
       vizobjs: {},
@@ -350,8 +350,8 @@ export default function ExperienceEditPage() {
     router.push(`/experience/edit/${expId}/${currentIndex + 1}`);
   };
 
-  const handleEndExperience = () => {
-    handleSave();
+  const handleEndExperience = async () => {
+    await handleSave();
     useStore.setState({
       order: [],
       vizobjs: {},
