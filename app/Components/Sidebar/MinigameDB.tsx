@@ -258,7 +258,7 @@ export function MinigameDB({
               )}
 
             {/* Success Message */}
-            {allValidationsValid && (
+            {isVideoEnded && !isVideoPlaying && allValidationsValid && (
               <div className="p-4 bg-green-50 border border-green-100 rounded-xl">
                 <div className="flex items-center gap-3 mb-2">
                   <div className="bg-green-100 rounded-full p-1">
@@ -276,52 +276,17 @@ export function MinigameDB({
           </div>
 
           {/* Navigation Container */}
-          <div className="flex justify-between gap-4">
-            {/* Previous Button */}
-            {index > 0 && (
-              <Link
-                href={`/experience/data/${experienceID}/${index - 1}`}
-                className="flex-1 group relative overflow-hidden rounded-xl bg-blue-600 px-4 py-3 text-white shadow-md transition-all duration-300 hover:bg-blue-700 hover:shadow-lg active:bg-blue-800"
-              >
-                <span className="relative z-10 flex items-center justify-center text-lg font-semibold">
-                  <svg
-                    className="w-5 h-5 mr-2"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M15 19l-7-7 7-7"
-                    />
-                  </svg>
-                  Previous
-                </span>
-              </Link>
-            )}
-
-            {/* Next/Done Button */}
-            <Link
-              href={
-                hasNextExperience
-                  ? `/experience/data/${experienceID}/${index + 1}`
-                  : `/`
-              }
-              prefetch={hasNextExperience}
-              className={`flex-1 group relative overflow-hidden rounded-xl ${
-                allValidationsValid
-                  ? "bg-green-600 hover:bg-green-700 active:bg-green-800"
-                  : "bg-blue-600 hover:bg-blue-700 active:bg-blue-800"
-              } px-4 py-3 text-white shadow-md transition-all duration-300 hover:shadow-lg`}
-            >
-              <span className="relative z-10 flex items-center justify-center text-lg font-semibold">
-                {hasNextExperience ? (
-                  <>
-                    Next Challenge
+          {isVideoEnded && !isVideoPlaying && (
+            <div className="flex justify-between gap-4">
+              {/* Previous Button */}
+              {index > 0 && (
+                <Link
+                  href={`/experience/data/${experienceID}/${index - 1}`}
+                  className="flex-1 group relative overflow-hidden rounded-xl bg-blue-600 px-4 py-3 text-white shadow-md transition-all duration-300 hover:bg-blue-700 hover:shadow-lg active:bg-blue-800"
+                >
+                  <span className="relative z-10 flex items-center justify-center text-lg font-semibold">
                     <svg
-                      className="w-5 h-5 ml-2"
+                      className="w-5 h-5 mr-2"
                       fill="none"
                       stroke="currentColor"
                       viewBox="0 0 24 24"
@@ -330,16 +295,49 @@ export function MinigameDB({
                         strokeLinecap="round"
                         strokeLinejoin="round"
                         strokeWidth={2}
-                        d="M9 5l7 7-7 7"
+                        d="M15 19l-7-7 7-7"
                       />
                     </svg>
-                  </>
-                ) : (
-                  "Home Page"
-                )}
-              </span>
-            </Link>
-          </div>
+                    Previous
+                  </span>
+                </Link>
+              )}
+
+              {/* Next/Done Button */}
+              <Link
+                href={
+                  hasNextExperience
+                    ? `/experience/data/${experienceID}/${index + 1}`
+                    : `/`
+                }
+                prefetch={hasNextExperience}
+                className="flex-1 group relative overflow-hidden rounded-xl bg-blue-600 px-4 py-3 text-white shadow-md transition-all duration-300 hover:bg-blue-700 hover:shadow-lg active:bg-blue-800"
+              >
+                <span className="relative z-10 flex items-center justify-center text-lg font-semibold">
+                  {hasNextExperience ? (
+                    <>
+                      Next Challenge
+                      <svg
+                        className="w-5 h-5 ml-2"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M9 5l7 7-7 7"
+                        />
+                      </svg>
+                    </>
+                  ) : (
+                    "Home Page"
+                  )}
+                </span>
+              </Link>
+            </div>
+          )}
         </div>
 
         {/* Scroll indicator */}
