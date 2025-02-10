@@ -518,6 +518,11 @@ export const ExperienceCardDB = ({
 
   const handleEditClick = (e: React.MouseEvent) => {
     e.stopPropagation();
+    router.push(`/experience/edit/${experienceId}/0`);
+  };
+
+  const handleEditDetailsClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
     setIsEditing(true);
   };
 
@@ -670,7 +675,7 @@ export const ExperienceCardDB = ({
               </div>
               {currentUserId === userId && (
                 <Button
-                  onClick={handleEditClick}
+                  onClick={handleEditDetailsClick}
                   variant="ghost"
                   className="text-white border border-white/30 hover:border-white/50 flex items-center gap-2 px-3 py-1.5 hover:bg-transparent transition-all duration-200 mt-4"
                 >
