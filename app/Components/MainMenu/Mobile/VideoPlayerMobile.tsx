@@ -167,21 +167,22 @@ export function MobileVideoPlayer({
   };
 
   // Add these new functions for edit mode progress bar interaction
-  const handleProgressBarInteraction = (
-    event: React.MouseEvent | React.TouchEvent
-  ) => {
-    if (editMode && videoRef.current && progressBarRef.current) {
+  const handleProgressBarInteraction = (clientX: number) => {
+    if (videoRef.current && progressBarRef.current) {
       const rect = progressBarRef.current.getBoundingClientRect();
-      const clientX =
-        "touches" in event ? event.touches[0].clientX : event.clientX;
-      const position = Math.max(
-        0,
-        Math.min(1, (clientX - rect.left) / rect.width)
+      const position = Math.min(
+        1,
+        Math.max(0, (clientX - rect.left) / rect.width)
       );
-      videoRef.current.currentTime = position * videoRef.current.duration;
-      setProgress(position * 100);
-      if (isVideoEnded && position < 1) {
-        setIsVideoEnded(false);
+
+      if (videoRef.current.duration && isFinite(videoRef.current.duration)) {
+        videoRef.current.currentTime = position * videoRef.current.duration;
+        setProgress(position * 100);
+        if (isVideoEnded && position < 1) {
+          setIsVideoEnded(false);
+        }
+      } else {
+        console.warn("Video duration is not available or not finite");
       }
     }
   };
@@ -189,13 +190,13 @@ export function MobileVideoPlayer({
   const handleTouchStart = (event: React.TouchEvent) => {
     if (editMode) {
       setIsDragging(true);
-      handleProgressBarInteraction(event);
+      handleProgressBarInteraction(event.touches[0].clientX);
     }
   };
 
   const handleTouchMove = (event: React.TouchEvent) => {
     if (editMode && isDragging) {
-      handleProgressBarInteraction(event);
+      handleProgressBarInteraction(event.touches[0].clientX);
     }
   };
 
@@ -206,13 +207,13 @@ export function MobileVideoPlayer({
   const handleMouseDown = (event: React.MouseEvent) => {
     if (editMode) {
       setIsDragging(true);
-      handleProgressBarInteraction(event);
+      handleProgressBarInteraction(event.clientX);
     }
   };
 
   const handleMouseMove = (event: React.MouseEvent) => {
     if (editMode && isDragging) {
-      handleProgressBarInteraction(event);
+      handleProgressBarInteraction(event.clientX);
     }
   };
 

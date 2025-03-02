@@ -88,3 +88,26 @@
     padding-right: env(safe-area-inset-right);
   }
 }
+
+@media screen and (max-width: 768px) {
+  input,
+  textarea,
+  select {
+    font-size: 16px !important; /* Minimum font size to prevent zoom on iOS */
+  }
+
+  /* This helps prevent zoom on Safari specifically */
+  input[type="text"],
+  input[type="email"],
+  input[type="password"],
+  textarea {
+    font-size: 16px !important;
+  }
+
+  /* For any custom input components you might have */
+  .input-field,
+  .text-input,
+  .form-control {
+    font-size: 16px !important;
+  }
+}
