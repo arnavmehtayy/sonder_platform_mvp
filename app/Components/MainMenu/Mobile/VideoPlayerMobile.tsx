@@ -13,9 +13,11 @@ import { track } from "@vercel/analytics";
 export function MobileVideoPlayer({
   experienceId,
   index,
+  editMode = false,
 }: {
   experienceId: number;
   index: number;
+  editMode?: boolean;
 }) {
   const [videoUrl, setVideoUrl] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -27,6 +29,7 @@ export function MobileVideoPlayer({
   const isVideoEnded = useStore(getIsVideoEndedSelector);
   const progressBarRef = useRef<HTMLDivElement>(null);
   const [isVerticalVideo, setIsVerticalVideo] = useState(false);
+  const [isDragging, setIsDragging] = useState(false);
 
   useEffect(() => {
     setIsVideoEnded(false);
@@ -163,37 +166,77 @@ export function MobileVideoPlayer({
     }
   };
 
+  // Add these new functions for edit mode progress bar interaction
   const handleProgressBarInteraction = (
     event: React.MouseEvent | React.TouchEvent
   ) => {
-    // Disable interaction with progress bar
-    // if (videoRef.current && progressBarRef.current) {
-    //   const rect = progressBarRef.current.getBoundingClientRect();
-    //   const clientX =
-    //     "touches" in event ? event.touches[0].clientX : event.clientX;
-    //   const position = Math.max(
-    //     0,
-    //     Math.min(1, (clientX - rect.left) / rect.width)
-    //   );
-    //   videoRef.current.currentTime = position * videoRef.current.duration;
-    //   setProgress(position * 100);
-    //   if (isVideoEnded && position < 1) {
-    //     setIsVideoEnded(false);
-    //   }
-    // }
+    if (editMode && videoRef.current && progressBarRef.current) {
+      const rect = progressBarRef.current.getBoundingClientRect();
+      const clientX =
+        "touches" in event ? event.touches[0].clientX : event.clientX;
+      const position = Math.max(
+        0,
+        Math.min(1, (clientX - rect.left) / rect.width)
+      );
+      videoRef.current.currentTime = position * videoRef.current.duration;
+      setProgress(position * 100);
+      if (isVideoEnded && position < 1) {
+        setIsVideoEnded(false);
+      }
+    }
   };
+
+  const handleTouchStart = (event: React.TouchEvent) => {
+    if (editMode) {
+      setIsDragging(true);
+      handleProgressBarInteraction(event);
+    }
+  };
+
+  const handleTouchMove = (event: React.TouchEvent) => {
+    if (editMode && isDragging) {
+      handleProgressBarInteraction(event);
+    }
+  };
+
+  const handleTouchEnd = () => {
+    setIsDragging(false);
+  };
+
+  const handleMouseDown = (event: React.MouseEvent) => {
+    if (editMode) {
+      setIsDragging(true);
+      handleProgressBarInteraction(event);
+    }
+  };
+
+  const handleMouseMove = (event: React.MouseEvent) => {
+    if (editMode && isDragging) {
+      handleProgressBarInteraction(event);
+    }
+  };
+
+  const handleMouseUp = () => {
+    setIsDragging(false);
+  };
+
+  useEffect(() => {
+    if (editMode && isDragging) {
+      document.addEventListener("mousemove", handleMouseMove as any);
+      document.addEventListener("mouseup", handleMouseUp);
+    }
+
+    return () => {
+      document.removeEventListener("mousemove", handleMouseMove as any);
+      document.removeEventListener("mouseup", handleMouseUp);
+    };
+  }, [editMode, isDragging]);
 
   const handleLoadedMetadata = () => {
     if (videoRef.current) {
       const { videoWidth, videoHeight } = videoRef.current;
       const aspectRatio = videoWidth / videoHeight;
       setIsVerticalVideo(aspectRatio < 1);
-      //   console.log("Video dimensions:", {
-      //     videoWidth,
-      //     videoHeight,
-      //     aspectRatio,
-      //     isVertical: aspectRatio < 1,
-      //   });
     }
   };
 
@@ -236,15 +279,24 @@ export function MobileVideoPlayer({
 
       {/* Mobile-optimized controls */}
       <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/60 to-transparent pb-[calc(env(safe-area-inset-bottom)+1rem)] px-4">
-        {/* Progress bar - Keep this but remove interaction handlers */}
-        <div ref={progressBarRef} className="w-full h-8 flex items-center mb-2">
+        {/* Progress bar - Enable interaction in edit mode */}
+        <div
+          ref={progressBarRef}
+          className="w-full h-8 flex items-center mb-2"
+          onMouseDown={editMode ? handleMouseDown : undefined}
+          onTouchStart={editMode ? handleTouchStart : undefined}
+          onTouchMove={editMode ? handleTouchMove : undefined}
+          onTouchEnd={editMode ? handleTouchEnd : undefined}
+        >
           <div className="w-full h-1 bg-white/30 rounded-full relative">
             <div
               className="absolute h-full bg-white rounded-full transition-all duration-100"
               style={{ width: `${progress}%` }}
             />
             <div
-              className="absolute h-3 w-3 bg-sky-500 rounded-full -mt-1 shadow-sm transform -translate-x-1/2"
+              className={`absolute h-3 w-3 bg-sky-500 rounded-full -mt-1 shadow-sm transform -translate-x-1/2 ${
+                editMode ? "h-5 w-5 -mt-2 border-2 border-white" : ""
+              }`}
               style={{ left: `${progress}%` }}
             />
           </div>
@@ -254,31 +306,36 @@ export function MobileVideoPlayer({
         <div className="flex justify-center gap-4 mb-safe">
           {/* Play/Pause button */}
           <AnimatePresence>
-            {showPlayButton && !isVideoEnded && (
-              <div className="flex flex-col items-center">
-                <motion.button
-                  initial={{ opacity: 0, scale: 0.8 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0, scale: 0.8 }}
-                  onClick={togglePlay}
-                  className="bg-black/50 backdrop-blur-sm rounded-full p-6"
-                >
-                  <Play className="w-8 h-8 text-white" />
-                </motion.button>
-                <motion.span
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  exit={{ opacity: 0 }}
-                  className="text-white/80 text-xs mt-1"
-                />
-              </div>
-            )}
+            <div className="flex flex-col items-center">
+              {showPlayButton && !isVideoEnded && (
+                <>
+                  <motion.button
+                    initial={{ opacity: 0, scale: 0.8 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0, scale: 0.8 }}
+                    onClick={togglePlay}
+                    className="bg-black/50 backdrop-blur-sm rounded-full p-6"
+                  >
+                    <Play className="w-8 h-8 text-white" />
+                  </motion.button>
+                  <motion.span
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    className="text-white/80 text-xs mt-1"
+                  />
+                </>
+              )}
+              {(!showPlayButton || isVideoEnded) && editMode && (
+                <div className="w-20 h-20" />
+              )}
+            </div>
           </AnimatePresence>
 
-          {/* Keep only Replay button, remove Skip button */}
+          {/* Replay button */}
           <AnimatePresence mode="wait">
             {isVideoEnded && (
-              <div className="flex flex-col items-center z-[100]">
+              <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 flex flex-col items-center z-[100]">
                 <motion.button
                   key="replay"
                   initial={{ opacity: 0, scale: 0.8 }}

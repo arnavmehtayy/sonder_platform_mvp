@@ -91,43 +91,15 @@ import { AnimatePresence } from "framer-motion";
 import { VideoPlayer } from "@/app/Components/MainMenu/VideoPlayer";
 import { motion } from "framer-motion";
 import { FastForward } from "lucide-react";
-import { DesktopEditExperience } from "@/app/Components/EditMode/DesktopEditExp";
-import { MobileEditExperience } from "@/app/Components/EditMode/MobileEditExp";
-import { useMediaQuery } from "@/app/Components/MainMenu/useMediaQuery";
 
-const SortableItem: React.FC<{ id: string; children: React.ReactNode }> = ({
-  id,
-  children,
-}) => {
-  const { attributes, listeners, setNodeRef, transform, transition } =
-    useSortable({ id: id });
+interface DesktopEditExperienceProps {
+  expId: number;
+  currentIndex: number;
+}
 
-  const style = {
-    transform: CSS.Transform.toString(transform),
-    transition,
-  };
-
-  return (
-    <li
-      ref={setNodeRef}
-      style={style}
-      className="flex items-center bg-gray-100 p-2 rounded"
-    >
-      <div {...attributes} {...listeners} className="cursor-move mr-2">
-        <GripVertical size={20} />
-      </div>
-      {children}
-    </li>
-  );
-};
-
-export default function ExperienceEditPage() {
+export function DesktopEditExperience({ expId, currentIndex }: DesktopEditExperienceProps) {
   const router = useRouter();
-  const params = useParams();
-  const expId = parseInt(params.ExpID as string);
-  const currentIndex = parseInt(params.index as string);
-  const [isLoading, setIsLoading] = useState(true);
-  const isMobile = useMediaQuery("(max-width: 768px)");
+  // const [isLoading, setIsLoading] = useState(true);
 
   const reset = useStore((state) => state.reset);
   const setIsEditMode = useStore(setIsEditModeSelector);
@@ -213,70 +185,7 @@ export default function ExperienceEditPage() {
     toast.success("State has been reset");
   };
 
-  useEffect(() => {
-    const initializeState = async () => {
-      setIsLoading(true);
-      try {
-        // Auth check
-        const supabase = createClient();
-        const {
-          data: { user },
-          error,
-        } = await supabase.auth.getUser();
 
-        if (error || !user) {
-          router.push("/login");
-          return;
-        }
-
-        // Check experience permissions
-        const response = await fetch(
-          `/api/supabase/experiences/${expId}/permissions`
-        );
-        const { hasAccess, isEditor } = await response.json();
-
-        if (!hasAccess) {
-          toast.error("You don't have permission to access this experience");
-          router.push("/");
-          return;
-        }
-
-        if (!isEditor) {
-          toast.error("Only editors can access the experience editor");
-          router.push("/");
-          return;
-        }
-
-        // Load state if authorized
-        const checkResponse = await fetch(
-          `/api/supabase/check-next?experienceId=${expId}&index=${currentIndex}`
-        );
-        const checkData = await checkResponse.json();
-
-        if (checkData.hasNext) {
-          const response = await fetch(
-            `/api/supabase/DataBaseAPI?experienceId=${expId}&index=${currentIndex}`
-          );
-
-          if (response.ok) {
-            const serializedState = await response.json();
-            const loadedState = deserializeState(serializedState);
-            if (loadedState) {
-              useStore.setState(loadedState);
-            }
-          }
-        }
-      } catch (error) {
-        console.error("Error:", error);
-        toast.error("Failed to load experience");
-        router.push("/");
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    initializeState();
-  }, [expId, currentIndex, reset, router]);
 
   useEffect(() => {
     const checkAllValidations = () => {
@@ -329,6 +238,7 @@ export default function ExperienceEditPage() {
       if (!response.ok) {
         throw new Error("Failed to save state");
       }
+
 
       toast.success("State saved successfully");
     } catch (error) {
@@ -387,11 +297,11 @@ export default function ExperienceEditPage() {
     return () => setIsEditMode(false); // Clean up when leaving the page
   }, [setIsEditMode]);
 
-  const [isLeftSidebarCollapsed, setIsLeftSidebarCollapsed] = useState(false);
+  // const [isLeftSidebarCollapsed, setIsLeftSidebarCollapsed] = useState(false);
   const [videoUrl, setVideoUrl] = useState<string | null>(null);
   const [videoKey, setVideoKey] = useState(0);
-  const isVideoPlaying = useStore(getIsVideoPlayingSelector);
-  const isVideoEnded = useStore(getIsVideoEndedSelector);
+  // const isVideoPlaying = useStore(getIsVideoPlayingSelector);
+  // const isVideoEnded = useStore(getIsVideoEndedSelector);
 
   const loadVideo = async () => {
     try {
@@ -489,89 +399,298 @@ export default function ExperienceEditPage() {
     loadVideo();
   }, [expId, currentIndex]);
 
-  const [progress, setProgress] = useState(0);
-  const [isPlaying, setIsPlaying] = useState(false);
-  const [showPlayButton, setShowPlayButton] = useState(true);
-  const videoRef = useRef<HTMLVideoElement>(null);
+  // const [progress, setProgress] = useState(0);
+  // const [isPlaying, setIsPlaying] = useState(false);
+  // const [showPlayButton, setShowPlayButton] = useState(true);
+  // const videoRef = useRef<HTMLVideoElement>(null);
 
-  const handleTimeUpdate = () => {
-    if (videoRef.current) {
-      const progress =
-        (videoRef.current.currentTime / videoRef.current.duration) * 100;
-      setProgress(progress);
-    }
-  };
+  // const handleTimeUpdate = () => {
+  //   if (videoRef.current) {
+  //     const progress =
+  //       (videoRef.current.currentTime / videoRef.current.duration) * 100;
+  //     setProgress(progress);
+  //   }
+  // };
 
-  const handleSeek = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (videoRef.current) {
-      const bar = e.currentTarget;
-      const rect = bar.getBoundingClientRect();
-      const percentage = (e.clientX - rect.left) / rect.width;
-      const newTime = videoRef.current.duration * percentage;
-      videoRef.current.currentTime = newTime;
-      setProgress(percentage * 100);
-    }
-  };
+  // const handleSeek = (e: React.MouseEvent<HTMLDivElement>) => {
+  //   if (videoRef.current) {
+  //     const bar = e.currentTarget;
+  //     const rect = bar.getBoundingClientRect();
+  //     const percentage = (e.clientX - rect.left) / rect.width;
+  //     const newTime = videoRef.current.duration * percentage;
+  //     videoRef.current.currentTime = newTime;
+  //     setProgress(percentage * 100);
+  //   }
+  // };
 
-  const togglePlay = () => {
-    if (videoRef.current) {
-      if (isPlaying) {
-        videoRef.current.pause();
-        setIsPlaying(false);
-        setShowPlayButton(true);
-      } else {
-        videoRef.current
-          .play()
-          .then(() => {
-            setIsPlaying(true);
-            setShowPlayButton(false);
-          })
-          .catch((error) => {
-            console.log("Play failed:", error);
-            setIsPlaying(false);
-            setShowPlayButton(true);
-          });
-      }
-    }
-  };
+  // const togglePlay = () => {
+  //   if (videoRef.current) {
+  //     if (isPlaying) {
+  //       videoRef.current.pause();
+  //       setIsPlaying(false);
+  //       setShowPlayButton(true);
+  //     } else {
+  //       videoRef.current
+  //         .play()
+  //         .then(() => {
+  //           setIsPlaying(true);
+  //           setShowPlayButton(false);
+  //         })
+  //         .catch((error) => {
+  //           console.log("Play failed:", error);
+  //           setIsPlaying(false);
+  //           setShowPlayButton(true);
+  //         });
+  //     }
+  //   }
+  // };
 
-  const handleSkipVideo = () => {
-    const videoElement = document.querySelector("video");
-    if (videoElement) {
-      videoElement.currentTime = videoElement.duration;
-      videoElement.play();
-    }
-  };
+  // const handleSkipVideo = () => {
+  //   const videoElement = document.querySelector("video");
+  //   if (videoElement) {
+  //     videoElement.currentTime = videoElement.duration;
+  //     videoElement.play();
+  //   }
+  // };
 
   const [showValidationResults, setShowValidationResults] = useState(false);
 
-  if (isLoading) {
-    return (
-      <LoadingScreen
-        message="Loading Experience Editor"
-        description="Please wait while we prepare your experience editor..."
-      />
-    );
-  }
+  // if (isLoading) {
+  //   return (
+  //     <LoadingScreen
+  //       message="Loading Experience Editor"
+  //       description="Please wait while we prepare your experience editor..."
+  //     />
+  //   );
+  // }
+
+  // ... other handlers and effects ...
 
   return (
     <>
-      <div className="relative flex flex-row h-screen bg-gray-100">
-        <div className="flex-grow bg-black h-full relative min-w-0">
-          <div className="absolute top-4 left-4 z-[60]">
-            <CurvedBackButton />
-          </div>
+      {/* <EditBar /> */}
 
-          {isMobile ? (
-            <MobileEditExperience expId={expId} currentIndex={currentIndex} />
-          ) : (
-            <div className="relative h-full" style={{ zIndex: 1 }}>
-              <DesktopEditExperience
-                expId={expId}
-                currentIndex={currentIndex}
+      <div className="relative flex flex-row h-screen bg-gray-100">
+        {/* Comment out Left Sidebar
+        <div
+          className={`transition-all duration-300 ease-in-out ${
+            isLeftSidebarCollapsed ? "w-0" : "w-64"
+          } flex-shrink-0 relative`}
+        >
+          <div className="relative h-full">
+            <ObjectTreeManager />
+            <div className="absolute -right-6 top-1/2 transform -translate-y-1/2 z-50">
+              <Button
+                onClick={() => setIsLeftSidebarCollapsed(!isLeftSidebarCollapsed)}
+                className={`h-12 w-12 rounded-full bg-white hover:bg-gray-50 border border-gray-200 shadow-lg flex items-center justify-center transition-all duration-300 ${
+                  isLeftSidebarCollapsed ? "translate-x-3" : ""
+                }`}
+              >
+                {isLeftSidebarCollapsed ? (
+                  <ChevronRight className="h-5 w-5 text-gray-600" />
+                ) : (
+                  <ChevronLeft className="h-5 w-5 text-gray-600" />
+                )}
+              </Button>
+            </div>
+          </div>
+        </div>
+        */}
+
+        {/* Main Experience Area */}
+        <div className="flex-grow bg-black h-full relative min-w-0">
+
+          {/* Video Player or Upload UI */}
+          {videoUrl ? (
+            <>
+              <VideoPlayer
+                experienceId={expId}
+                index={currentIndex}
+                key={videoKey}
+                isEditMode={true}
               />
+              {/* Replace Video Button for existing video */}
+              <div className="absolute top-4 right-4 z-50 flex items-center gap-2">
+                <input
+                  type="file"
+                  accept="video/*"
+                  onChange={handleVideoUpload}
+                  className="hidden"
+                  id="video-upload"
+                />
+                <label htmlFor="video-upload">
+                  <Button
+                    variant="outline"
+                    className="cursor-pointer bg-white/90 hover:bg-white text-gray-800 border-gray-200 shadow-md transition-all duration-200 backdrop-blur-sm"
+                    asChild
+                  >
+                    <div className="flex items-center gap-2 px-4 py-2">
+                      <RefreshCw size={16} className="text-blue-600" />
+                      <span className="font-medium">Replace Video</span>
+                    </div>
+                  </Button>
+                </label>
+              </div>
+            </>
+          ) : (
+            <div className="absolute inset-0 flex items-center justify-center bg-gray-900/5">
+              <input
+                type="file"
+                accept="video/*"
+                onChange={handleVideoUpload}
+                className="hidden"
+                id="video-upload-initial"
+              />
+              <label
+                htmlFor="video-upload-initial"
+                className="cursor-pointer group"
+              >
+                <div className="flex flex-col items-center gap-4 p-12 rounded-xl bg-white/90 shadow-lg border-2 border-dashed border-gray-300 hover:border-blue-400 transition-all duration-200">
+                  <div className="p-6 rounded-full bg-blue-50 group-hover:bg-blue-100 transition-colors">
+                    <RefreshCw size={48} className="text-blue-500" />
+                  </div>
+                  <div className="text-center">
+                    <h3 className="text-2xl font-semibold text-gray-800 mb-2">
+                      Upload Video
+                    </h3>
+                    <p className="text-gray-600 mb-4">
+                      Click to add a video for this step
+                    </p>
+                  </div>
+                </div>
+              </label>
             </div>
           )}
+
+          {/* Experience always visible in edit mode */}
+          <div
+            className={`absolute inset-0 ${"pointer-events-none"}`}
+            style={{ zIndex: 10 }}
+          >
+            <Experience />
+          </div>
+
+          {/* Validation Panel with fixed positioning */}
+          <div
+            className={`fixed bottom-32 left-1/3 transform -translate-x-1/2 w-[calc(100%-2rem)] md:w-96 bg-white rounded-lg shadow-xl transition-all duration-300 ${
+              showValidation
+                ? "opacity-100 translate-y-0"
+                : "opacity-0 translate-y-full pointer-events-none"
+            } z-[30]`}
+          >
+            <div className="p-4 max-h-[30vh] overflow-y-auto">
+              <ValidationComponent
+                validations={validationInstance}
+                updater={handleValidationUpdate}
+                isChecked={showValidationResults}
+              />
+            </div>
+          </div>
+
+          {/* Toggle button with fixed positioning */}
+          <button
+            onClick={() => setShowValidation(!showValidation)}
+            className={`fixed bottom-20 left-1/3 transform -translate-x-1/2 flex items-center space-x-2 px-4 py-2 rounded-md shadow-lg transition-all duration-300 z-[30] ${
+              allValidationsValid
+                ? "bg-green-500 hover:bg-green-600"
+                : "bg-blue-500 hover:bg-blue-600"
+            }`}
+          >
+            {allValidationsValid && (
+              <CheckCircle className="text-white" size={20} />
+            )}
+            <span className="text-white font-semibold">
+              {showValidation ? "Hide Autograder" : "Show Autograder"}
+            </span>
+          </button>
+        </div>
+
+        {/* Right Sidebar */}
+        <div className="w-full md:w-1/3 md:min-w-[300px] md:max-w-md bg-blue-50 h-full flex-shrink-0">
+          <div className="h-full overflow-y-auto overflow-x-visible p-4 pb-24">
+            {/* Scene Manager Button */}
+            <div className="mb-6 relative z-10">
+              <Dialog>
+                <DialogTrigger asChild>
+                  <Button className="w-full flex items-center justify-center gap-2 bg-blue-500 text-white hover:bg-blue-600 transition-all shadow-md">
+                    <GripVertical size={18} />
+                    <span className="font-medium">Scene Manager</span>
+                  </Button>
+                </DialogTrigger>
+                <SceneManager
+                  sensors={sensors}
+                  handleDragEnd={handleDragEnd}
+                  handleDeleteItem={handleDeleteItem}
+                />
+              </Dialog>
+            </div>
+
+            {/* OrderHandlerDB - Always visible in edit mode */}
+            <div className="relative mb-8">
+              <OrderHandlerDB isEditMode={true} />
+            </div>
+            {/* Verify Button */}
+            {validationInstance.length > 0 && (
+              <motion.button
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: 20 }}
+                onClick={handleValidationUpdate}
+                className="w-full px-4 py-3 mb-6 bg-green-600 text-white rounded-xl shadow-md 
+                  transition-all duration-300 hover:bg-green-700 hover:shadow-lg 
+                  active:bg-green-800"
+              >
+                <span className="text-lg font-semibold">Verify Answers</span>
+              </motion.button>
+            )}
+          </div>
+        </div>
+      </div>
+
+      {/* Navigation Controls */}
+      <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 px-6 py-4 flex justify-between items-center z-20 shadow-lg">
+        <div className="flex items-center gap-4">
+          {!isPreviousDisabled && (
+            <Button
+              onClick={handlePreviousSlide}
+              className="flex items-center gap-2 bg-gray-100 hover:bg-gray-200 text-gray-700"
+            >
+              <ChevronLeft size={16} />
+              Previous Step
+            </Button>
+          )}
+          <Button
+            onClick={handleSave}
+            className="flex items-center gap-2 bg-blue-100 hover:bg-blue-200 text-blue-700"
+          >
+            <Save size={16} />
+            Save Progress
+          </Button>
+          <Button
+            onClick={handleResetState}
+            className="flex items-center gap-2 bg-red-100 hover:bg-red-200 text-red-700"
+          >
+            <RefreshCw size={16} />
+            Reset State
+          </Button>
+        </div>
+
+        <div className="flex items-center gap-4">
+          <Button
+            onClick={handleEndExperience}
+            variant="outline"
+            className="flex items-center gap-2 border-red-200 text-red-600 hover:bg-red-50"
+          >
+            <X size={16} />
+            Exit Editor
+          </Button>
+          <Button
+            onClick={handleNextSlide}
+            className="flex items-center gap-2 bg-blue-500 hover:bg-blue-600 text-white min-w-[140px]"
+          >
+            Next Step
+            <ChevronRight size={16} />
+          </Button>
         </div>
       </div>
     </>

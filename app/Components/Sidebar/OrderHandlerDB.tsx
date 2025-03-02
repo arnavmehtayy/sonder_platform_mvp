@@ -339,6 +339,21 @@ export const OrderHandlerDB = ({
   const isVideoPlaying = useStore(getIsVideoPlayingSelector);
   const isVideoEnded = useStore(getIsVideoEndedSelector);
 
+  // Add cleanup function
+  const handleObjectCreatorClose = () => {
+    setSelectedObjectType(null);
+    // Reset any stuck dialog states
+    requestAnimationFrame(() => {
+      document.body.style.pointerEvents = "";
+      const dialogs = document.querySelectorAll('[role="dialog"]');
+      dialogs.forEach((dialog) => {
+        if (dialog.parentElement) {
+          dialog.parentElement.style.pointerEvents = "";
+        }
+      });
+    });
+  };
+
   return (
     <div className="space-y-4 md:space-y-6">
       {/* Title section - always visible */}
@@ -474,7 +489,7 @@ export const OrderHandlerDB = ({
           {selectedObjectType && isEditMode && (
             <ObjectCreator
               ObjectType={selectedObjectType.type}
-              onClose={() => setSelectedObjectType(null)}
+              onClose={handleObjectCreatorClose}
             />
           )}
         </>
