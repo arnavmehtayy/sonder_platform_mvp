@@ -13,10 +13,10 @@ export function CameraRecorder({ onSave, onCancel }: CameraRecorderProps) {
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const [isRecording, setIsRecording] = useState(false);
   const [recordedChunks, setRecordedChunks] = useState<Blob[]>([]);
-  const [countdown, setCountdown] = useState<number | null>(null);
   const [recordingTime, setRecordingTime] = useState(0);
   const [facingMode, setFacingMode] = useState<"user" | "environment">("user");
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [isUploading, setIsUploading] = useState(false);
   const timerRef = useRef<number | null>(null);
   const recordedBlobRef = useRef<Blob | null>(null);
   const startTimeRef = useRef<number | null>(null);
@@ -54,9 +54,9 @@ export function CameraRecorder({ onSave, onCancel }: CameraRecorderProps) {
     try {
       stopMediaTracks();
 
-      // Match device aspect ratio
+      // Only request video for preview (no audio)
       const constraints = {
-        audio: true,
+        audio: false, // Don't request audio when just previewing
         video: {
           facingMode: facingMode,
           width: { ideal: window.innerWidth },
@@ -83,87 +83,103 @@ export function CameraRecorder({ onSave, onCancel }: CameraRecorderProps) {
   };
 
   const startRecording = () => {
-    setCountdown(3);
-
-    const countdownInterval = setInterval(() => {
-      setCountdown((prev) => {
-        if (prev === null || prev <= 1) {
-          clearInterval(countdownInterval);
-          initiateRecording();
-          return null;
-        }
-        return prev - 1;
-      });
-    }, 1000);
+    initiateRecording();
   };
 
-  const initiateRecording = () => {
+  const initiateRecording = async () => {
     if (!videoRef.current?.srcObject) return;
 
-    setRecordedChunks([]);
-    setRecordingTime(0);
-    setIsRecording(true);
-    startTimeRef.current = Date.now();
-
-    const stream = videoRef.current.srcObject as MediaStream;
-
-    // Try to use a widely supported format
-    let options;
-    if (MediaRecorder.isTypeSupported("video/webm")) {
-      options = { mimeType: "video/webm" };
-    } else if (MediaRecorder.isTypeSupported("video/mp4")) {
-      options = { mimeType: "video/mp4" };
-    }
+    // Stop the preview-only stream
+    stopMediaTracks();
 
     try {
-      mediaRecorderRef.current = options
-        ? new MediaRecorder(stream, options)
-        : new MediaRecorder(stream);
+      // Request both audio and video for recording
+      const constraints = {
+        audio: true,
+        video: {
+          facingMode: facingMode,
+          width: { ideal: window.innerWidth },
+          height: { ideal: window.innerHeight },
+          aspectRatio: { ideal: window.innerWidth / window.innerHeight },
+        },
+      };
 
-      console.log(
-        "Recording with MIME type:",
-        mediaRecorderRef.current.mimeType
-      );
-    } catch (e) {
-      console.error("Failed to create MediaRecorder", e);
-      return;
-    }
+      const stream = await navigator.mediaDevices.getUserMedia(constraints);
 
-    // Store all chunks
-    const chunks: Blob[] = [];
-
-    mediaRecorderRef.current.ondataavailable = (event) => {
-      if (event.data && event.data.size > 0) {
-        chunks.push(event.data);
-        setRecordedChunks(chunks);
+      if (videoRef.current) {
+        videoRef.current.srcObject = stream;
       }
-    };
 
-    mediaRecorderRef.current.onstop = () => {
-      if (chunks.length > 0) {
-        const mimeType = mediaRecorderRef.current?.mimeType || "video/webm";
-        const blob = new Blob(chunks, { type: mimeType });
-        recordedBlobRef.current = blob;
+      setRecordedChunks([]);
+      setRecordingTime(0);
+      setIsRecording(true);
+      startTimeRef.current = Date.now();
 
-        const url = URL.createObjectURL(blob);
-        setPreviewUrl(url);
+      // Try to use a widely supported format
+      let options;
+      if (MediaRecorder.isTypeSupported("video/webm")) {
+        options = { mimeType: "video/webm" };
+      } else if (MediaRecorder.isTypeSupported("video/mp4")) {
+        options = { mimeType: "video/mp4" };
       }
-    };
 
-    // Start recording with frequent data collection
-    mediaRecorderRef.current.start(1000);
+      try {
+        mediaRecorderRef.current = options
+          ? new MediaRecorder(stream, options)
+          : new MediaRecorder(stream);
 
-    // Use window.setInterval for more accurate timing
-    if (timerRef.current) {
-      window.clearInterval(timerRef.current);
+        console.log(
+          "Recording with MIME type:",
+          mediaRecorderRef.current.mimeType
+        );
+      } catch (e) {
+        console.error("Failed to create MediaRecorder", e);
+        return;
+      }
+
+      // Store all chunks
+      const chunks: Blob[] = [];
+
+      mediaRecorderRef.current.ondataavailable = (event) => {
+        if (event.data && event.data.size > 0) {
+          chunks.push(event.data);
+          setRecordedChunks(chunks);
+        }
+      };
+
+      mediaRecorderRef.current.onstop = () => {
+        if (chunks.length > 0) {
+          const mimeType = mediaRecorderRef.current?.mimeType || "video/webm";
+          const blob = new Blob(chunks, { type: mimeType });
+          recordedBlobRef.current = blob;
+
+          const url = URL.createObjectURL(blob);
+          setPreviewUrl(url);
+        }
+
+        // Restart camera without audio after recording stops
+        startCamera();
+      };
+
+      // Start recording with frequent data collection
+      mediaRecorderRef.current.start(1000);
+
+      // Use window.setInterval for more accurate timing
+      if (timerRef.current) {
+        window.clearInterval(timerRef.current);
+      }
+
+      timerRef.current = window.setInterval(() => {
+        const elapsedSeconds = Math.floor(
+          (Date.now() - (startTimeRef.current || 0)) / 1000
+        );
+        setRecordingTime(elapsedSeconds);
+      }, 1000);
+    } catch (err) {
+      console.error("Error starting recording:", err);
+      // If recording fails, restart the preview camera
+      startCamera();
     }
-
-    timerRef.current = window.setInterval(() => {
-      const elapsedSeconds = Math.floor(
-        (Date.now() - (startTimeRef.current || 0)) / 1000
-      );
-      setRecordingTime(elapsedSeconds);
-    }, 1000);
   };
 
   const stopRecording = () => {
@@ -185,6 +201,10 @@ export function CameraRecorder({ onSave, onCancel }: CameraRecorderProps) {
   };
 
   const handleSave = () => {
+    if (isUploading) return; // Prevent multiple uploads
+
+    setIsUploading(true);
+
     if (recordedBlobRef.current) {
       onSave(recordedBlobRef.current);
     } else if (recordedChunks.length > 0) {
@@ -193,6 +213,7 @@ export function CameraRecorder({ onSave, onCancel }: CameraRecorderProps) {
       onSave(blob);
     } else {
       console.error("No recorded data available to save");
+      setIsUploading(false);
     }
   };
 
@@ -249,13 +270,6 @@ export function CameraRecorder({ onSave, onCancel }: CameraRecorderProps) {
           />
         )}
 
-        {/* Countdown overlay */}
-        {countdown !== null && (
-          <div className="absolute inset-0 flex items-center justify-center bg-black/50 z-10">
-            <div className="text-white text-7xl font-bold">{countdown}</div>
-          </div>
-        )}
-
         {/* Recording indicator */}
         {isRecording && (
           <div className="absolute top-6 left-0 right-0 flex justify-center items-center z-10">
@@ -277,18 +291,30 @@ export function CameraRecorder({ onSave, onCancel }: CameraRecorderProps) {
             <button
               onClick={resetRecording}
               className="p-3 rounded-full bg-white/20"
+              disabled={isUploading}
             >
               <RefreshCw className="w-6 h-6 text-white" />
             </button>
 
             <button
               onClick={handleSave}
-              className="p-4 rounded-full bg-green-500 flex items-center justify-center"
+              className={`p-4 rounded-full ${
+                isUploading ? "bg-gray-500" : "bg-green-500"
+              } flex items-center justify-center`}
+              disabled={isUploading}
             >
-              <CheckCircle className="w-8 h-8 text-white" />
+              {isUploading ? (
+                <div className="w-8 h-8 border-4 border-white border-t-transparent rounded-full animate-spin"></div>
+              ) : (
+                <CheckCircle className="w-8 h-8 text-white" />
+              )}
             </button>
 
-            <button onClick={onCancel} className="p-3 rounded-full bg-white/20">
+            <button
+              onClick={onCancel}
+              className="p-3 rounded-full bg-white/20"
+              disabled={isUploading}
+            >
               <X className="w-6 h-6 text-white" />
             </button>
           </>
@@ -324,15 +350,6 @@ export function CameraRecorder({ onSave, onCancel }: CameraRecorderProps) {
           </>
         )}
       </div>
-
-      {/* Preview mode labels */}
-      {previewUrl && (
-        <div className="absolute bottom-20 left-0 right-0 flex justify-between px-8">
-          <span className="text-white text-xs font-medium">Try Again</span>
-          <span className="text-white text-xs font-medium">Upload</span>
-          <span className="text-white text-xs font-medium">Cancel</span>
-        </div>
-      )}
     </div>
   );
 }

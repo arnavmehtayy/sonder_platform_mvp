@@ -375,33 +375,48 @@ export function MobileEditExperience({
                 </div>
               </div>
             ) : (
-              <div className="absolute inset-0 flex items-center justify-center z-50">
-                <div className="flex flex-col gap-4">
-                  <input
-                    type="file"
-                    accept="video/*"
-                    onChange={handleVideoUpload}
-                    className="hidden"
-                    id="video-upload-initial"
-                  />
-                  <label
-                    htmlFor="video-upload-initial"
-                    className="cursor-pointer"
-                  >
-                    <div className="p-8 rounded-xl bg-white/90 text-center">
-                      <Plus className="h-12 w-12 mx-auto mb-4 text-blue-500" />
-                      <span className="font-medium">Upload Video</span>
+              <div className="absolute inset-0 flex flex-col items-center justify-center z-50">
+                {/* Loading indicator when fetching video */}
+                {videoUrl === null && (
+                  <div className="flex flex-col items-center gap-4 mb-8">
+                    <div className="w-20 h-20 bg-black/50 rounded-full flex items-center justify-center backdrop-blur-sm">
+                      <div className="w-12 h-12 border-4 border-white/30 border-t-white rounded-full animate-spin" />
                     </div>
-                  </label>
+                    <p className="text-white/80 text-sm font-medium">
+                      Loading video...
+                    </p>
+                  </div>
+                )}
 
-                  <button
-                    onClick={() => setShowCameraRecorder(true)}
-                    className="p-8 rounded-xl bg-white/90 text-center"
-                  >
-                    <Camera className="h-12 w-12 mx-auto mb-4 text-red-500" />
-                    <span className="font-medium">Record Video</span>
-                  </button>
-                </div>
+                {/* Upload options - only show after we've determined there's no video */}
+                {videoUrl === null && (
+                  <div className="flex flex-col gap-4 mt-4">
+                    <input
+                      type="file"
+                      accept="video/*"
+                      onChange={handleVideoUpload}
+                      className="hidden"
+                      id="video-upload-initial"
+                    />
+                    <label
+                      htmlFor="video-upload-initial"
+                      className="cursor-pointer"
+                    >
+                      <div className="p-8 rounded-xl bg-white/90 text-center">
+                        <Plus className="h-12 w-12 mx-auto mb-4 text-blue-500" />
+                        <span className="font-medium">Upload Video</span>
+                      </div>
+                    </label>
+
+                    <button
+                      onClick={() => setShowCameraRecorder(true)}
+                      className="p-8 rounded-xl bg-white/90 text-center"
+                    >
+                      <Camera className="h-12 w-12 mx-auto mb-4 text-red-500" />
+                      <span className="font-medium">Record Video</span>
+                    </button>
+                  </div>
+                )}
               </div>
             )}
 
