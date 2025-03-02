@@ -20,6 +20,21 @@ export function CameraRecorder({ onSave, onCancel }: CameraRecorderProps) {
   const timerRef = useRef<number | null>(null);
   const recordedBlobRef = useRef<Blob | null>(null);
   const startTimeRef = useRef<number | null>(null);
+  const [deviceOrientation, setDeviceOrientation] = useState<
+    "portrait" | "landscape"
+  >(window.innerHeight > window.innerWidth ? "portrait" : "landscape");
+
+  // Detect device orientation
+  useEffect(() => {
+    const handleResize = () => {
+      setDeviceOrientation(
+        window.innerHeight > window.innerWidth ? "portrait" : "landscape"
+      );
+    };
+
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
   // Initialize camera
   useEffect(() => {
@@ -33,22 +48,35 @@ export function CameraRecorder({ onSave, onCancel }: CameraRecorderProps) {
         window.clearInterval(timerRef.current);
       }
     };
-  }, [facingMode]);
+  }, [facingMode, deviceOrientation]);
 
-  // Effect to handle preview video
-  useEffect(() => {
-    if (previewUrl && previewVideoRef.current) {
-      previewVideoRef.current.src = previewUrl;
-      previewVideoRef.current.load();
-
-      const playPromise = previewVideoRef.current.play();
-      if (playPromise !== undefined) {
-        playPromise.catch((error) => {
-          console.error("Error playing preview:", error);
-        });
-      }
+  const getVideoConstraints = () => {
+    // For mobile phones (portrait mode)
+    if (deviceOrientation === "portrait") {
+      return {
+        facingMode: facingMode,
+        width: { ideal: 1080 },
+        height: { ideal: 1920 },
+        aspectRatio: { ideal: 9 / 16 },
+      };
     }
-  }, [previewUrl]);
+    // For laptops/desktops (landscape mode)
+    else {
+      return {
+        facingMode: facingMode,
+        width: { ideal: 1920 },
+        height: { ideal: 1080 },
+        aspectRatio: { ideal: 16 / 9 },
+      };
+    }
+  };
+
+  const stopMediaTracks = () => {
+    if (videoRef.current && videoRef.current.srcObject) {
+      const stream = videoRef.current.srcObject as MediaStream;
+      stream.getTracks().forEach((track) => track.stop());
+    }
+  };
 
   const startCamera = async () => {
     try {
@@ -56,13 +84,8 @@ export function CameraRecorder({ onSave, onCancel }: CameraRecorderProps) {
 
       // Only request video for preview (no audio)
       const constraints = {
-        audio: false, // Don't request audio when just previewing
-        video: {
-          facingMode: facingMode,
-          width: { ideal: window.innerWidth },
-          height: { ideal: window.innerHeight },
-          aspectRatio: { ideal: window.innerWidth / window.innerHeight },
-        },
+        audio: false,
+        video: getVideoConstraints(),
       };
 
       const stream = await navigator.mediaDevices.getUserMedia(constraints);
@@ -72,13 +95,6 @@ export function CameraRecorder({ onSave, onCancel }: CameraRecorderProps) {
       }
     } catch (err) {
       console.error("Error accessing camera:", err);
-    }
-  };
-
-  const stopMediaTracks = () => {
-    if (videoRef.current && videoRef.current.srcObject) {
-      const stream = videoRef.current.srcObject as MediaStream;
-      stream.getTracks().forEach((track) => track.stop());
     }
   };
 
@@ -96,12 +112,7 @@ export function CameraRecorder({ onSave, onCancel }: CameraRecorderProps) {
       // Request both audio and video for recording
       const constraints = {
         audio: true,
-        video: {
-          facingMode: facingMode,
-          width: { ideal: window.innerWidth },
-          height: { ideal: window.innerHeight },
-          aspectRatio: { ideal: window.innerWidth / window.innerHeight },
-        },
+        video: getVideoConstraints(),
       };
 
       const stream = await navigator.mediaDevices.getUserMedia(constraints);
@@ -155,6 +166,12 @@ export function CameraRecorder({ onSave, onCancel }: CameraRecorderProps) {
 
           const url = URL.createObjectURL(blob);
           setPreviewUrl(url);
+
+          // Make sure the preview video loads the URL
+          if (previewVideoRef.current) {
+            previewVideoRef.current.src = url;
+            previewVideoRef.current.load();
+          }
         }
 
         // Restart camera without audio after recording stops
@@ -247,6 +264,7 @@ export function CameraRecorder({ onSave, onCancel }: CameraRecorderProps) {
           <div className="w-full h-full">
             <video
               ref={previewVideoRef}
+              src={previewUrl}
               className="absolute inset-0 w-full h-full object-contain"
               autoPlay
               loop
@@ -263,7 +281,7 @@ export function CameraRecorder({ onSave, onCancel }: CameraRecorderProps) {
         ) : (
           <video
             ref={videoRef}
-            className="absolute inset-0 w-full h-full object-cover"
+            className="absolute inset-0 w-full h-full object-contain"
             autoPlay
             playsInline
             muted
