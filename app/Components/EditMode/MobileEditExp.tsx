@@ -46,6 +46,7 @@ export function MobileEditExperience({
   const validationInstance = useStore((state) => state.validations);
   const [showValidationResults, setShowValidationResults] = useState(false);
   const setIsEditMode = useStore(setIsEditModeSelector);
+  const [isLoadingVideo, setIsLoadingVideo] = useState(true);
 
   useEffect(() => {
     setIsEditMode(true);
@@ -54,6 +55,8 @@ export function MobileEditExperience({
 
   const loadVideo = async () => {
     try {
+      setIsLoadingVideo(true);
+
       const response = await fetch(
         `/api/supabase/video?experienceId=${expId}&index=${currentIndex}`
       );
@@ -68,9 +71,14 @@ export function MobileEditExperience({
           .getPublicUrl(data.video_path);
         setVideoUrl(publicUrl);
         setVideoKey((prev) => prev + 1);
+      } else {
+        setVideoUrl(null);
       }
     } catch (error) {
       console.error("Error loading video:", error);
+      setVideoUrl(null);
+    } finally {
+      setIsLoadingVideo(false);
     }
   };
 
@@ -128,6 +136,9 @@ export function MobileEditExperience({
 
       await loadVideo();
       toast.success("Video replaced successfully");
+
+      // Automatically save state after successful video upload
+      await handleSave();
     } catch (error) {
       console.error("Error uploading video:", error);
       toast.error("Failed to replace video");
@@ -178,6 +189,9 @@ export function MobileEditExperience({
       await loadVideo();
       setShowCameraRecorder(false);
       toast.success("Video recorded and saved successfully");
+
+      // Automatically save state after successful video recording
+      await handleSave();
     } catch (error) {
       console.error("Error saving recorded video:", error);
       toast.error("Failed to save recorded video");
@@ -376,8 +390,8 @@ export function MobileEditExperience({
               </div>
             ) : (
               <div className="absolute inset-0 flex flex-col items-center justify-center z-50">
-                {/* Loading indicator when fetching video */}
-                {videoUrl === null && (
+                {/* Loading indicator - only show when actually loading */}
+                {isLoadingVideo && (
                   <div className="flex flex-col items-center gap-4 mb-8">
                     <div className="w-20 h-20 bg-black/50 rounded-full flex items-center justify-center backdrop-blur-sm">
                       <div className="w-12 h-12 border-4 border-white/30 border-t-white rounded-full animate-spin" />
@@ -388,8 +402,8 @@ export function MobileEditExperience({
                   </div>
                 )}
 
-                {/* Upload options - only show after we've determined there's no video */}
-                {videoUrl === null && (
+                {/* Upload options - only show when finished loading and no video found */}
+                {!isLoadingVideo && videoUrl === null && (
                   <div className="flex flex-col gap-4 mt-4">
                     <input
                       type="file"
