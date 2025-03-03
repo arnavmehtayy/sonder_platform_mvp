@@ -71,6 +71,7 @@ export const ExpDBHub = ({
     title: "A Visual Interactive Experience",
     description: "Change the way you engage with educational content",
   });
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const supabase = createClient();
   const router = useRouter();
@@ -130,9 +131,10 @@ export const ExpDBHub = ({
   };
 
   const handleCreateExperience = async () => {
-    if (!userId) return;
+    if (!userId || isSubmitting) return;
 
     try {
+      setIsSubmitting(true);
       const response = await fetch("/api/supabase/experiences", {
         method: "POST",
         headers: {
@@ -149,14 +151,18 @@ export const ExpDBHub = ({
 
       if (response.ok) {
         // Redirect to the new experience
+        // Note: We don't reset isSubmitting here to prevent double clicks
+        // during navigation
         router.push(`/experience/edit/${experience.id}/0`);
       } else {
         throw new Error(experience.error);
+        // isSubmitting will be reset in the finally block if there's an error
       }
     } catch (err) {
       setError(
         err instanceof Error ? err.message : "Failed to create experience"
       );
+      setIsSubmitting(false); // Reset only on error
     }
   };
 
@@ -351,7 +357,7 @@ export const ExpDBHub = ({
                         className="text-[#01A9B2]/70 group-hover:text-[#01A9B2] transition-colors duration-300 mb-3"
                       />
                       <p className="text-[#01A9B2]/70 group-hover:text-[#01A9B2] text-lg font-medium transition-colors duration-300">
-                        Add New Experience
+                        Add New Module
                       </p>
                     </div>
                   </motion.div>
@@ -359,7 +365,7 @@ export const ExpDBHub = ({
                 <DialogContent className="sm:max-w-[425px]">
                   <DialogHeader>
                     <DialogTitle className="text-lg font-semibold text-gray-900">
-                      Create New Experience
+                      Create New Knowledge Module
                     </DialogTitle>
                   </DialogHeader>
                   <div className="space-y-4 mt-4">
@@ -372,7 +378,7 @@ export const ExpDBHub = ({
                       </Label>
                       <Input
                         id="title"
-                        placeholder="Enter experience title"
+                        placeholder="Enter module title"
                         className="mt-1"
                         value={newExperience.title}
                         onChange={(e) =>
@@ -392,7 +398,7 @@ export const ExpDBHub = ({
                       </Label>
                       <Textarea
                         id="description"
-                        placeholder="What is this experience about?"
+                        placeholder="What is this module about?"
                         className="mt-1"
                         value={newExperience.desc}
                         onChange={(e) =>
@@ -406,8 +412,9 @@ export const ExpDBHub = ({
                     <Button
                       onClick={handleCreateExperience}
                       className="w-full bg-[#01A9B2] hover:bg-[#018A91] transition-colors duration-300"
+                      disabled={isSubmitting}
                     >
-                      Create Experience
+                      {isSubmitting ? "Creating..." : "Create Module"}
                     </Button>
                   </div>
                 </DialogContent>
@@ -476,6 +483,8 @@ export const ExperienceCardDB = ({
   const [isEditing, setIsEditing] = useState(false);
   const [editTitle, setEditTitle] = useState(name);
   const [editDesc, setEditDesc] = useState(description);
+  const [isEditLoading, setIsEditLoading] = useState(false);
+  const [isStarting, setIsStarting] = useState(false);
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -493,12 +502,17 @@ export const ExperienceCardDB = ({
   }, []);
 
   const handleClick = async (e: React.MouseEvent) => {
-    // Don't navigate if we're in editing mode or clicking the menu
-    if (isEditing || actionRef.current?.contains(e.target as Node)) {
+    // Don't navigate if we're in editing mode or clicking the menu or already starting
+    if (
+      isEditing ||
+      actionRef.current?.contains(e.target as Node) ||
+      isStarting
+    ) {
       return;
     }
 
     try {
+      setIsStarting(true);
       const response = await fetch(
         `/api/supabase/check-next?experienceId=${experienceId}&index=${0}`
       );
@@ -506,19 +520,24 @@ export const ExperienceCardDB = ({
 
       if (data.hasNext) {
         router.push(`/experience/data/${experienceId}/${0}`);
+        // We don't reset isStarting to keep the loading state during navigation
       } else {
         toast.warning("This experience is empty");
+        setIsStarting(false);
         return;
       }
     } catch (error) {
       console.error("Error checking experience:", error);
       alert("Error checking experience. Please try again.");
+      setIsStarting(false);
     }
   };
 
-  const handleEditClick = (e: React.MouseEvent) => {
+  const handleEditClick = async (e: React.MouseEvent) => {
     e.stopPropagation();
+    setIsEditLoading(true);
     router.push(`/experience/edit/${experienceId}/0`);
+    // We don't reset isEditLoading since we want the button to remain in loading state during navigation
   };
 
   const handleEditDetailsClick = (e: React.MouseEvent) => {
@@ -540,7 +559,9 @@ export const ExperienceCardDB = ({
     <motion.div
       whileHover={{ scale: 1.05 }}
       whileTap={
-        actionRef.current?.contains(document.activeElement as Node) || isEditing
+        actionRef.current?.contains(document.activeElement as Node) ||
+        isEditing ||
+        isStarting
           ? {}
           : { scale: 0.95 }
       }
@@ -550,7 +571,7 @@ export const ExperienceCardDB = ({
         onClick={handleClick}
         className={`bg-white rounded-lg shadow-lg overflow-hidden h-full transition-all duration-300 hover:shadow-xl cursor-pointer relative group ${
           is_hidden ? "opacity-60" : ""
-        }`}
+        } ${isStarting ? "opacity-70" : ""}`}
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
       >
@@ -580,14 +601,24 @@ export const ExperienceCardDB = ({
                 <div className="relative">
                   <button
                     onClick={handleEditClick}
-                    className="w-full px-4 py-3 text-left text-sm hover:bg-[#01A9B2]/5 flex items-center gap-2 transition-colors duration-200"
+                    disabled={isEditLoading}
+                    className="w-full px-4 py-3 text-left text-sm hover:bg-[#01A9B2]/5 flex items-center gap-2 transition-colors duration-200 disabled:opacity-70"
                   >
-                    <Edit2 size={16} className="text-[#01A9B2]" />
-                    <div>
-                      <p className="font-medium text-gray-700">
-                        Edit Experience
-                      </p>
-                    </div>
+                    {isEditLoading ? (
+                      <>
+                        <div className="w-4 h-4 border-2 border-t-transparent border-[#01A9B2] rounded-full animate-spin mr-2"></div>
+                        <p className="font-medium text-gray-700">Loading...</p>
+                      </>
+                    ) : (
+                      <>
+                        <Edit2 size={16} className="text-[#01A9B2]" />
+                        <div>
+                          <p className="font-medium text-gray-700">
+                            Edit Module
+                          </p>
+                        </div>
+                      </>
+                    )}
                   </button>
                   <button
                     onClick={(e) => {
@@ -604,7 +635,7 @@ export const ExperienceCardDB = ({
                     )}
                     <div>
                       <p className="font-medium text-gray-700">
-                        {is_hidden ? "Show Experience" : "Hide Experience"}
+                        {is_hidden ? "Show Module" : "Hide Module"}
                       </p>
                     </div>
                   </button>
@@ -614,9 +645,7 @@ export const ExperienceCardDB = ({
                   >
                     <Trash2 size={16} className="text-red-500" />
                     <div>
-                      <p className="font-medium text-red-600">
-                        Delete Experience
-                      </p>
+                      <p className="font-medium text-red-600">Delete Module</p>
                     </div>
                   </button>
                 </div>
@@ -690,13 +719,22 @@ export const ExperienceCardDB = ({
           <p className="text-gray-600 mb-4">{description}</p>
           <div className="flex justify-between items-center">
             <span className="text-[#257276] font-semibold flex items-center">
-              Start Experience
-              <ChevronRight
-                size={20}
-                className={`ml-1 transition-transform duration-300 ${
-                  isHovered ? "translate-x-1" : ""
-                }`}
-              />
+              {isStarting ? (
+                <>
+                  <div className="w-4 h-4 border-2 border-t-transparent border-[#257276] rounded-full animate-spin mr-2"></div>
+                  Loading...
+                </>
+              ) : (
+                <>
+                  Launch Module
+                  <ChevronRight
+                    size={20}
+                    className={`ml-1 transition-transform duration-300 ${
+                      isHovered ? "translate-x-1" : ""
+                    }`}
+                  />
+                </>
+              )}
             </span>
             <Activity size={24} className="text-[#18D9E4]" />
           </div>
