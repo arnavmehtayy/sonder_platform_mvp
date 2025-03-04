@@ -736,7 +736,7 @@ export const ExperienceCardDB = ({
                 </>
               )}
             </span>
-            <Activity size={24} className="text-[#18D9E4]" />
+            
           </div>
         </div>
       </div>

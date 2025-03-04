@@ -182,12 +182,12 @@ export const OrderHandlerDB = ({
 
   const controlTypes: ObjectType[] = [
     { name: "Text", type: Question, icon: Type },
-    { name: "SliderControl", type: SliderControlAdvanced, icon: Sliders },
+    { name: "Slider", type: SliderControlAdvanced, icon: Sliders },
     // { name: "Object Picker", type: SelectControl, icon: List },
     // { name: "Object Placer", type: Placement, icon: MousePointerClick },
     // { name: "Score", type: FunctionScore, icon: Calculator },
     { name: "MCQ", type: MultiChoiceClass, icon: ListChecks },
-    { name: "Table Question", type: TableControl, icon: Table },
+    // { name: "Table Question", type: TableControl, icon: Table },
     { name: "Number Input", type: InputNumber, icon: Hash },
   ];
 
