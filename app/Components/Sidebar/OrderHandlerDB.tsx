@@ -452,13 +452,16 @@ export const OrderHandlerDB = ({
           {isEditMode && (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button
-                  className="mx-auto flex items-center gap-2 mt-4"
-                  variant="outline"
-                >
-                  <Plus className="h-4 w-4" />
-                  Add Sidebar Component
-                </Button>
+                <div className="mt-8 relative">
+                  <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 bg-transparent hover:border-blue-300 hover:bg-blue-50 transform transition-all duration-200 hover:scale-[1.02] cursor-pointer group overflow-visible">
+                    <div className="flex flex-col items-center justify-center">
+                      <Plus className="h-8 w-8 text-gray-400 group-hover:text-blue-500 mb-2" />
+                      <h3 className="text-lg font-medium text-gray-600 group-hover:text-gray-700 mb-2">
+                        Add Sidebar Component
+                      </h3>
+                    </div>
+                  </div>
+                </div>
               </DropdownMenuTrigger>
               <DropdownMenuContent
                 className="bg-white rounded-lg shadow-xl p-2 mt-2 w-56 border border-gray-100 z-[100]"
