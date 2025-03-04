@@ -1,6 +1,6 @@
 "use client";
 import { useState, useRef, useEffect } from "react";
-import { Camera, X, RefreshCw, CheckCircle } from "lucide-react";
+import { Camera, X, RefreshCw, CheckCircle, SwitchCamera } from "lucide-react";
 
 interface CameraRecorderProps {
   onSave: (recordedBlob: Blob) => void;
@@ -22,9 +22,12 @@ export function CameraRecorder({ onSave, onCancel }: CameraRecorderProps) {
 
   // Initialize camera on mount and when camera direction changes
   useEffect(() => {
-    startCamera();
+    // Only start camera if we're not in preview mode
+    if (!previewUrl) {
+      startCamera();
+    }
     return cleanupResources;
-  }, [facingMode]);
+  }, [facingMode, previewUrl]);
 
   const cleanupResources = () => {
     stopMediaTracks();
@@ -187,6 +190,11 @@ export function CameraRecorder({ onSave, onCancel }: CameraRecorderProps) {
       .padStart(2, "0")}`;
   };
 
+  const toggleCameraFacing = () => {
+    if (isRecording) return; // Don't switch camera while recording
+    setFacingMode((prev) => (prev === "user" ? "environment" : "user"));
+  };
+
   return (
     <div className="relative w-full h-full bg-black flex flex-col">
       {/* Camera preview or recorded video */}
@@ -287,16 +295,16 @@ export function CameraRecorder({ onSave, onCancel }: CameraRecorderProps) {
               </button>
             )}
 
-            <button
-              onClick={() =>
-                setFacingMode((prev) =>
-                  prev === "user" ? "environment" : "user"
-                )
-              }
-              className="p-3 rounded-full bg-white/20"
-            >
-              <Camera className="w-6 h-6 text-white" />
-            </button>
+            {!isRecording ? (
+              <button
+                onClick={toggleCameraFacing}
+                className="p-3 rounded-full bg-white/20"
+              >
+                <SwitchCamera className="w-6 h-6 text-white" />
+              </button>
+            ) : (
+              <div className="w-12 h-12"></div> // Empty div to maintain spacing when recording
+            )}
           </>
         )}
       </div>
