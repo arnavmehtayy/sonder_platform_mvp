@@ -26,7 +26,7 @@ export default function RootLayout({
       </head>
       <body className={`${inter.className} touch-none`}>
         {children}
-        <Toaster duration={2500} />
+        <Toaster duration={1000} />
       </body>
     </html>
   );

@@ -97,7 +97,10 @@ interface DesktopEditExperienceProps {
   currentIndex: number;
 }
 
-export function DesktopEditExperience({ expId, currentIndex }: DesktopEditExperienceProps) {
+export function DesktopEditExperience({
+  expId,
+  currentIndex,
+}: DesktopEditExperienceProps) {
   const router = useRouter();
   // const [isLoading, setIsLoading] = useState(true);
 
@@ -185,8 +188,6 @@ export function DesktopEditExperience({ expId, currentIndex }: DesktopEditExperi
     toast.success("State has been reset");
   };
 
-
-
   useEffect(() => {
     const checkAllValidations = () => {
       const allValid = validationInstance.every((validation) =>
@@ -238,7 +239,6 @@ export function DesktopEditExperience({ expId, currentIndex }: DesktopEditExperi
       if (!response.ok) {
         throw new Error("Failed to save state");
       }
-
 
       toast.success("State saved successfully");
     } catch (error) {
@@ -329,12 +329,18 @@ export function DesktopEditExperience({ expId, currentIndex }: DesktopEditExperi
     }
   };
 
+  // Add a new state for tracking upload progress
+  const [isUploading, setIsUploading] = useState(false);
+
   const handleVideoUpload = async (
     event: React.ChangeEvent<HTMLInputElement>
   ) => {
     console.log("Uploading video");
     const file = event.target.files?.[0];
     if (!file) return;
+
+    // Set uploading state to true to show feedback
+    setIsUploading(true);
 
     try {
       const supabase = createClient();
@@ -389,9 +395,15 @@ export function DesktopEditExperience({ expId, currentIndex }: DesktopEditExperi
 
       await loadVideo();
       toast.success("Video replaced successfully");
+
+      // Automatically save state after successful video upload
+      await handleSave();
     } catch (error) {
       console.error("Error uploading video:", error);
       toast.error("Failed to replace video");
+    } finally {
+      // Reset uploading state regardless of success or failure
+      setIsUploading(false);
     }
   };
 
@@ -499,7 +511,6 @@ export function DesktopEditExperience({ expId, currentIndex }: DesktopEditExperi
 
         {/* Main Experience Area */}
         <div className="flex-grow bg-black h-full relative min-w-0">
-
           {/* Video Player or Upload UI */}
           {videoUrl ? (
             <>
@@ -517,16 +528,29 @@ export function DesktopEditExperience({ expId, currentIndex }: DesktopEditExperi
                   onChange={handleVideoUpload}
                   className="hidden"
                   id="video-upload"
+                  disabled={isUploading}
                 />
                 <label htmlFor="video-upload">
                   <Button
                     variant="outline"
-                    className="cursor-pointer bg-white/90 hover:bg-white text-gray-800 border-gray-200 shadow-md transition-all duration-200 backdrop-blur-sm"
+                    className={`cursor-pointer bg-white/90 hover:bg-white text-gray-800 border-gray-200 shadow-md transition-all duration-200 backdrop-blur-sm ${
+                      isUploading ? "opacity-50 cursor-not-allowed" : ""
+                    }`}
                     asChild
+                    disabled={isUploading}
                   >
                     <div className="flex items-center gap-2 px-4 py-2">
-                      <RefreshCw size={16} className="text-blue-600" />
-                      <span className="font-medium">Replace Video</span>
+                      {isUploading ? (
+                        <>
+                          <div className="w-4 h-4 border-2 border-blue-600 border-t-transparent rounded-full animate-spin mr-2"></div>
+                          <span className="font-medium">Uploading...</span>
+                        </>
+                      ) : (
+                        <>
+                          <RefreshCw size={16} className="text-blue-600" />
+                          <span className="font-medium">Replace Video</span>
+                        </>
+                      )}
                     </div>
                   </Button>
                 </label>
@@ -540,21 +564,32 @@ export function DesktopEditExperience({ expId, currentIndex }: DesktopEditExperi
                 onChange={handleVideoUpload}
                 className="hidden"
                 id="video-upload-initial"
+                disabled={isUploading}
               />
               <label
                 htmlFor="video-upload-initial"
-                className="cursor-pointer group"
+                className={`cursor-pointer group ${
+                  isUploading ? "opacity-50 cursor-not-allowed" : ""
+                }`}
               >
                 <div className="flex flex-col items-center gap-4 p-12 rounded-xl bg-white/90 shadow-lg border-2 border-dashed border-gray-300 hover:border-blue-400 transition-all duration-200">
-                  <div className="p-6 rounded-full bg-blue-50 group-hover:bg-blue-100 transition-colors">
-                    <RefreshCw size={48} className="text-blue-500" />
-                  </div>
+                  {isUploading ? (
+                    <div className="p-6 rounded-full bg-blue-50">
+                      <div className="w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+                    </div>
+                  ) : (
+                    <div className="p-6 rounded-full bg-blue-50 group-hover:bg-blue-100 transition-colors">
+                      <RefreshCw size={48} className="text-blue-500" />
+                    </div>
+                  )}
                   <div className="text-center">
                     <h3 className="text-2xl font-semibold text-gray-800 mb-2">
-                      Upload Video
+                      {isUploading ? "Uploading Video..." : "Upload Video"}
                     </h3>
                     <p className="text-gray-600 mb-4">
-                      Click to add a video for this step
+                      {isUploading
+                        ? "Please wait while your video uploads"
+                        : "Click to add a video for this step"}
                     </p>
                   </div>
                 </div>

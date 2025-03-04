@@ -34,7 +34,7 @@ export function CameraRecorder({ onSave, onCancel }: CameraRecorderProps) {
 
   const stopMediaTracks = () => {
     if (streamRef.current) {
-      streamRef.current.getTracks().forEach(track => track.stop());
+      streamRef.current.getTracks().forEach((track) => track.stop());
       streamRef.current = null;
     }
   };
@@ -42,7 +42,7 @@ export function CameraRecorder({ onSave, onCancel }: CameraRecorderProps) {
   const startCamera = async () => {
     try {
       stopMediaTracks();
-      
+
       const constraints = {
         audio: false, // No audio needed for preview
         video: {
@@ -50,13 +50,13 @@ export function CameraRecorder({ onSave, onCancel }: CameraRecorderProps) {
           // Use standard 16:9 aspect ratio for better compatibility
           width: { ideal: 1280 },
           height: { ideal: 720 },
-          aspectRatio: { ideal: 16/9 }
-        }
+          aspectRatio: { ideal: 16 / 9 },
+        },
       };
 
       const stream = await navigator.mediaDevices.getUserMedia(constraints);
       streamRef.current = stream;
-      
+
       if (videoRef.current) {
         videoRef.current.srcObject = stream;
       }
@@ -67,7 +67,7 @@ export function CameraRecorder({ onSave, onCancel }: CameraRecorderProps) {
 
   const startRecording = async () => {
     stopMediaTracks();
-    
+
     try {
       // Request both audio and video for recording
       const stream = await navigator.mediaDevices.getUserMedia({
@@ -76,10 +76,10 @@ export function CameraRecorder({ onSave, onCancel }: CameraRecorderProps) {
           facingMode,
           width: { ideal: 1280 },
           height: { ideal: 720 },
-          aspectRatio: { ideal: 16/9 }
-        }
+          aspectRatio: { ideal: 16 / 9 },
+        },
       });
-      
+
       streamRef.current = stream;
       if (videoRef.current) {
         videoRef.current.srcObject = stream;
@@ -89,16 +89,18 @@ export function CameraRecorder({ onSave, onCancel }: CameraRecorderProps) {
       setRecordedChunks([]);
       setRecordingTime(0);
       setIsRecording(true);
-      
+
       // Try to use a widely supported format
-      const options = MediaRecorder.isTypeSupported("video/webm;codecs=vp9,opus") 
-        ? { mimeType: "video/webm;codecs=vp9,opus" } 
-        : MediaRecorder.isTypeSupported("video/webm") 
-          ? { mimeType: "video/webm" } 
-          : undefined;
-      
+      const options = MediaRecorder.isTypeSupported(
+        "video/webm;codecs=vp9,opus"
+      )
+        ? { mimeType: "video/webm;codecs=vp9,opus" }
+        : MediaRecorder.isTypeSupported("video/webm")
+        ? { mimeType: "video/webm" }
+        : undefined;
+
       mediaRecorderRef.current = new MediaRecorder(stream, options);
-      
+
       const chunks: Blob[] = [];
       mediaRecorderRef.current.ondataavailable = (event) => {
         if (event.data && event.data.size > 0) {
@@ -113,20 +115,20 @@ export function CameraRecorder({ onSave, onCancel }: CameraRecorderProps) {
           const blob = new Blob(chunks, { type: mimeType });
           const url = URL.createObjectURL(blob);
           setPreviewUrl(url);
-          
+
           if (previewVideoRef.current) {
             previewVideoRef.current.src = url;
             previewVideoRef.current.load();
           }
         }
-        
+
         // Restart camera preview
         startCamera();
       };
 
       // Start recording
       mediaRecorderRef.current.start(1000);
-      
+
       // Update timer
       const startTime = Date.now();
       timerRef.current = window.setInterval(() => {
@@ -139,24 +141,27 @@ export function CameraRecorder({ onSave, onCancel }: CameraRecorderProps) {
   };
 
   const stopRecording = () => {
-    if (!mediaRecorderRef.current || mediaRecorderRef.current.state === "inactive") {
+    if (
+      !mediaRecorderRef.current ||
+      mediaRecorderRef.current.state === "inactive"
+    ) {
       return;
     }
 
     setIsRecording(false);
-    
+
     if (timerRef.current) {
       window.clearInterval(timerRef.current);
       timerRef.current = null;
     }
-    
+
     mediaRecorderRef.current.stop();
   };
 
   const handleSave = () => {
     if (isUploading) return;
     setIsUploading(true);
-    
+
     if (recordedChunks.length > 0) {
       const mimeType = mediaRecorderRef.current?.mimeType || "video/webm";
       const blob = new Blob(recordedChunks, { type: mimeType });
@@ -177,7 +182,9 @@ export function CameraRecorder({ onSave, onCancel }: CameraRecorderProps) {
   const formatTime = (seconds: number) => {
     const mins = Math.floor(seconds / 60);
     const secs = seconds % 60;
-    return `${mins.toString().padStart(2, "0")}:${secs.toString().padStart(2, "0")}`;
+    return `${mins.toString().padStart(2, "0")}:${secs
+      .toString()
+      .padStart(2, "0")}`;
   };
 
   return (
@@ -196,7 +203,9 @@ export function CameraRecorder({ onSave, onCancel }: CameraRecorderProps) {
               controls
             />
             <div className="absolute top-0 left-0 right-0 bg-gradient-to-b from-black/70 to-transparent p-4">
-              <h2 className="text-white font-medium text-center">Preview Recording</h2>
+              <h2 className="text-white font-medium text-center">
+                Preview Recording
+              </h2>
             </div>
           </div>
         ) : (
@@ -214,7 +223,9 @@ export function CameraRecorder({ onSave, onCancel }: CameraRecorderProps) {
           <div className="absolute top-6 left-0 right-0 flex justify-center items-center z-10">
             <div className="bg-black/70 px-4 py-2 rounded-full flex items-center gap-2">
               <div className="w-3 h-3 rounded-full bg-red-500 animate-pulse"></div>
-              <span className="text-white font-medium">{formatTime(recordingTime)}</span>
+              <span className="text-white font-medium">
+                {formatTime(recordingTime)}
+              </span>
             </div>
           </div>
         )}
@@ -234,7 +245,9 @@ export function CameraRecorder({ onSave, onCancel }: CameraRecorderProps) {
 
             <button
               onClick={handleSave}
-              className={`p-4 rounded-full ${isUploading ? "bg-gray-500" : "bg-green-500"} flex items-center justify-center`}
+              className={`p-4 rounded-full ${
+                isUploading ? "bg-gray-500" : "bg-green-500"
+              } flex items-center justify-center`}
               disabled={isUploading}
             >
               {isUploading ? (
@@ -275,7 +288,11 @@ export function CameraRecorder({ onSave, onCancel }: CameraRecorderProps) {
             )}
 
             <button
-              onClick={() => setFacingMode(prev => prev === "user" ? "environment" : "user")}
+              onClick={() =>
+                setFacingMode((prev) =>
+                  prev === "user" ? "environment" : "user"
+                )
+              }
               className="p-3 rounded-full bg-white/20"
             >
               <Camera className="w-6 h-6 text-white" />

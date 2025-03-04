@@ -47,6 +47,7 @@ export function MobileEditExperience({
   const [showValidationResults, setShowValidationResults] = useState(false);
   const setIsEditMode = useStore(setIsEditModeSelector);
   const [isLoadingVideo, setIsLoadingVideo] = useState(true);
+  const [isUploading, setIsUploading] = useState(false);
 
   useEffect(() => {
     setIsEditMode(true);
@@ -92,6 +93,9 @@ export function MobileEditExperience({
     console.log("handleVideoUpload CLICKED");
     const file = event.target.files?.[0];
     if (!file) return;
+
+    // Set uploading state to true to show feedback
+    setIsUploading(true);
 
     try {
       const supabase = createClient();
@@ -142,6 +146,9 @@ export function MobileEditExperience({
     } catch (error) {
       console.error("Error uploading video:", error);
       toast.error("Failed to replace video");
+    } finally {
+      // Reset uploading state regardless of success or failure
+      setIsUploading(false);
     }
   };
 
@@ -344,12 +351,17 @@ export function MobileEditExperience({
                             }}
                             className="hidden"
                             id="video-upload"
+                            disabled={isUploading}
                           />
                           <label
                             htmlFor="video-upload"
-                            className="block w-full px-4 py-3 text-white hover:bg-white/10 cursor-pointer"
+                            className={`block w-full px-4 py-3 text-white hover:bg-white/10 cursor-pointer ${
+                              isUploading ? "opacity-50 cursor-not-allowed" : ""
+                            }`}
                           >
-                            Upload from device
+                            {isUploading
+                              ? "Uploading..."
+                              : "Upload from device"}
                           </label>
                           <button
                             onClick={() => {
@@ -359,6 +371,7 @@ export function MobileEditExperience({
                               setShowCameraRecorder(true);
                             }}
                             className="block w-full px-4 py-3 text-white hover:bg-white/10 text-left"
+                            disabled={isUploading}
                           >
                             Record with camera
                           </button>
@@ -403,7 +416,7 @@ export function MobileEditExperience({
                 )}
 
                 {/* Upload options - only show when finished loading and no video found */}
-                {!isLoadingVideo && videoUrl === null && (
+                {!isLoadingVideo && videoUrl === null && !isUploading && (
                   <div className="flex flex-col gap-4 mt-4">
                     <input
                       type="file"
@@ -411,6 +424,7 @@ export function MobileEditExperience({
                       onChange={handleVideoUpload}
                       className="hidden"
                       id="video-upload-initial"
+                      disabled={isUploading}
                     />
                     <label
                       htmlFor="video-upload-initial"
@@ -425,10 +439,23 @@ export function MobileEditExperience({
                     <button
                       onClick={() => setShowCameraRecorder(true)}
                       className="p-8 rounded-xl bg-white/90 text-center"
+                      disabled={isUploading}
                     >
                       <Camera className="h-12 w-12 mx-auto mb-4 text-red-500" />
                       <span className="font-medium">Record Video</span>
                     </button>
+                  </div>
+                )}
+
+                {/* Upload progress indicator */}
+                {isUploading && (
+                  <div className="flex flex-col items-center gap-4 mb-8">
+                    <div className="w-20 h-20 bg-black/50 rounded-full flex items-center justify-center backdrop-blur-sm">
+                      <div className="w-12 h-12 border-4 border-blue-500/30 border-t-blue-500 rounded-full animate-spin" />
+                    </div>
+                    <p className="text-white/80 text-sm font-medium">
+                      Uploading video...
+                    </p>
                   </div>
                 )}
               </div>
