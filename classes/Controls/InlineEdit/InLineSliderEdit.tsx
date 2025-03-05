@@ -146,7 +146,7 @@ export const InlineSliderEdit: React.FC<InlineSliderEditProps> = ({ control, onC
         {/* Preview Slider */}
         <div className="w-full">
           <Label className="text-xs text-gray-500">Preview</Label>
-          <div className="px-2">
+          <div className="flex items-center gap-2">
             <input
               type="range"
               min={editedValues.range[0]}
@@ -154,20 +154,93 @@ export const InlineSliderEdit: React.FC<InlineSliderEditProps> = ({ control, onC
               step={editedValues.step_size}
               value={getValue}
               onChange={(e) => setValue(Number(e.target.value))}
-              className="w-full h-2 bg-blue-200 rounded-lg appearance-none cursor-pointer"
+              className="flex-1"
             />
-            <div className="flex justify-between text-sm text-gray-600 mt-1">
-              <span>{editedValues.range[0]}</span>
-              <span className="font-medium text-blue-600">{getValue.toFixed(2)}</span>
-              <span>{editedValues.range[1]}</span>
-            </div>
+            <span className="text-gray-700 font-medium">{getValue}</span>
           </div>
+          <style jsx>{`
+            input[type="range"] {
+              -webkit-appearance: none;
+              margin: 10px 0;
+              width: 100%;
+            }
+            input[type="range"]:focus {
+              outline: none;
+            }
+            input[type="range"]::-webkit-slider-runnable-track {
+              width: 100%;
+              height: 8px;
+              cursor: pointer;
+              animate: 0.2s;
+              background: #bfdbfe;
+              border-radius: 4px;
+            }
+            input[type="range"]::-webkit-slider-thumb {
+              border: 2px solid #3b82f6;
+              height: 24px;
+              width: 24px;
+              border-radius: 50%;
+              background: #ffffff;
+              cursor: pointer;
+              -webkit-appearance: none;
+              margin-top: -8px;
+              transition: all 0.15s ease-in-out;
+            }
+            input[type="range"]:focus::-webkit-slider-runnable-track {
+              background: #93c5fd;
+            }
+            input[type="range"]::-moz-range-track {
+              width: 100%;
+              height: 8px;
+              cursor: pointer;
+              animate: 0.2s;
+              background: #bfdbfe;
+              border-radius: 4px;
+            }
+            input[type="range"]::-moz-range-thumb {
+              border: 2px solid #3b82f6;
+              height: 24px;
+              width: 24px;
+              border-radius: 50%;
+              background: #ffffff;
+              cursor: pointer;
+              transition: all 0.15s ease-in-out;
+            }
+            input[type="range"]:hover::-webkit-slider-thumb,
+            input[type="range"]:hover::-moz-range-thumb {
+              transform: scale(1.1);
+              box-shadow: 0 0 10px rgba(59, 130, 246, 0.5);
+            }
+            input[type="range"]:active::-webkit-slider-thumb,
+            input[type="range"]:active::-moz-range-thumb {
+              background: #3b82f6;
+            }
+            input[type="range"]:disabled {
+              cursor: not-allowed;
+              opacity: 0.5;
+            }
+            input[type="range"]:disabled::-webkit-slider-thumb {
+              background: #ccc;
+              border-color: #999;
+              cursor: not-allowed;
+            }
+            input[type="range"]:disabled::-moz-range-thumb {
+              background: #ccc;
+              border-color: #999;
+              cursor: not-allowed;
+            }
+            input[type="range"]:disabled:hover::-webkit-slider-thumb,
+            input[type="range"]:disabled:hover::-moz-range-thumb {
+              transform: none;
+              box-shadow: none;
+            }
+          `}</style>
         </div>
       </div>
 
-      <Separator />
+      {/* <Separator />
 
-      {/* Object Control Section */}
+      {/* Object Control Section *//*}
       <Collapsible open={showAttributes} onOpenChange={setShowAttributes}>
         <CollapsibleTrigger asChild>
           <Button
@@ -180,7 +253,7 @@ export const InlineSliderEdit: React.FC<InlineSliderEditProps> = ({ control, onC
           </Button>
         </CollapsibleTrigger>
         <CollapsibleContent className="space-y-4 pt-4">
-          {/* Object Selection */}
+          {/* Object Selection *//*}
           <div>
             <Label className="text-xs text-gray-500">Control Object</Label>
             <Select
@@ -204,7 +277,7 @@ export const InlineSliderEdit: React.FC<InlineSliderEditProps> = ({ control, onC
             </Select>
           </div>
 
-          {/* Attribute Pairs */}
+          {/* Attribute Pairs *//*}
           {editedValues.obj_id !== -1 && (
             <div className="space-y-2">
               {editedValues.attribute_pairs.map((pair, index) => (
@@ -241,7 +314,7 @@ export const InlineSliderEdit: React.FC<InlineSliderEditProps> = ({ control, onC
                     </SelectContent>
                   </Select>
 
-                  {/* Transform Function */}
+                  {/* Transform Function *//*}
                   <Collapsible>
                     <CollapsibleTrigger asChild>
                       <Button variant="ghost" size="sm" className="w-full flex justify-between items-center">
@@ -275,7 +348,7 @@ export const InlineSliderEdit: React.FC<InlineSliderEditProps> = ({ control, onC
             </div>
           )}
         </CollapsibleContent>
-      </Collapsible>
+      </Collapsible> */}
 
       {/* Save/Cancel Buttons */}
       <div className="flex justify-end space-x-2 mt-4">

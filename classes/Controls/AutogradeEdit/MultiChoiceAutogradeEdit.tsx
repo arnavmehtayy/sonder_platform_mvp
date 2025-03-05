@@ -71,7 +71,7 @@ export const MultiChoiceAutograderEdit: React.FC<
     const newValidation = new ValidationMultiChoice({
       answer: autograderAnswers,
       control_id: control.id,
-      desc: existingValidation ? existingValidation.desc : `${control.desc}`,
+      desc: `${control.desc}`,
     });
 
     addElementFn(newValidation);

@@ -308,25 +308,26 @@ export class MultiChoiceClass extends Control {
         const newObj = new MultiChoiceClass(updatedObject);
         onSave(newObj, validation);
       },
-      title: `Create New Multiple Choice Question`,
+      title: `Multiple Choice Question`,
       fields: [
         { key: "desc", label: "Title", type: "title" },
         { key: "text", label: "Description", type: "textarea" },
-        { key: "options", label: "Options", type: "addoptions" },
         {
           key: "isMultiSelect",
           label: "Allow Multiple Selections",
           type: "checkbox",
         },
+        { key: "options", label: "Options", type: "addoptions" },
+        
       ],
-      additionalContent: (
-        <MultiChoiceEditor
-          onChange={(newValidation) => setValidation(newValidation)}
-          value={editedObject}
-          options={editedObject.options}
-          id={editedObject.id}
-        />
-      ),
+      // additionalContent: (
+      //   <MultiChoiceEditor
+      //     onChange={(newValidation) => setValidation(newValidation)}
+      //     value={editedObject}
+      //     options={editedObject.options}
+      //     id={editedObject.id}
+      //   />
+      // ),
     };
 
     return <EditableObjectPopup {...popupProps} />;

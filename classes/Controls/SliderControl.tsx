@@ -36,56 +36,74 @@ export interface SliderControlConstructor<T extends obj>
 
 export function ShowSliderControl({
   control,
-  onEdit
+  onEdit,
+  onSetAutograder,
 }: {
   control: SliderControl<any>;
   onEdit?: () => void;
+  onSetAutograder?: () => void;
 }) {
   const setValue = useStore(setSliderControlValueSelector(control.id));
-  const getValue = useStore(getSliderControlValueSelector(control.id));
-  const isEditMode = useStore(state => state.isEditMode);
+  const value = useStore(getSliderControlValueSelector(control.id));
+  const isEditMode = useStore((state) => state.isEditMode);
 
   return (
-    <div
-      className={`bg-white rounded-lg shadow-md p-4 ${
-        !control.isClickable ? "opacity-50" : ""
-      } relative`}
-    >
-      {isEditMode && onEdit && (
-        <Button 
-          variant="ghost" 
-          size="icon"
-          className="absolute right-2 top-2 hover:opacity-100 transition-opacity z-10" 
-          onClick={onEdit}
-        >
-          <Pencil className="h-4 w-4" />
-        </Button>
-      )}
-
-      <h3 className="text-lg font-semibold text-blue-800 mb-2">
+    <div className="bg-white rounded-lg shadow-lg p-6 relative">
+      <h3 className="text-lg font-semibold text-blue-800 mb-1">
         <Latex>{control.desc}</Latex>
       </h3>
-      <p className="text-gray-600 mb-2">
+
+      {isEditMode && (
+        <div className="flex mt-2 mb-3 space-x-2">
+          {onEdit && (
+            <button
+              onClick={onEdit}
+              className="flex items-center px-3 py-1 bg-blue-50 hover:bg-blue-100 text-blue-700 rounded border border-blue-200 text-sm transition-colors"
+            >
+              <Pencil className="h-3.5 w-3.5 mr-1" />
+              Edit
+            </button>
+          )}
+
+          {onSetAutograder && (
+            <button
+              onClick={onSetAutograder}
+              disabled={onEdit === undefined}
+              className="flex items-center px-3 py-1 bg-green-50 hover:bg-green-100 text-green-700 rounded border border-green-200 text-sm transition-colors disabled:opacity-50"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                className="h-3.5 w-3.5 mr-1"
+              >
+                <path d="M9 11l3 3L22 4" />
+                <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11" />
+              </svg>
+              Autograder
+            </button>
+          )}
+        </div>
+      )}
+
+      <p className="text-gray-600 mb-4">
         <Latex>{control.text}</Latex>
       </p>
-      <div className="relative pt-1">
+      <div className="flex items-center gap-2">
         <input
           type="range"
           min={control.range[0]}
           max={control.range[1]}
           step={control.step_size}
-          value={getValue}
-          onChange={(e) => setValue(Number(e.target.value))}
-          className="w-full h-2 bg-blue-200 rounded-lg appearance-none cursor-pointer"
-          disabled={!control.isClickable}
+          value={value}
+          onChange={(e) => setValue(parseFloat(e.target.value))}
+          className="flex-1"
         />
-        <div className="flex justify-between items-center mt-2">
-          <span className="text-sm text-gray-600">{control.range[0]}</span>
-          <span className="text-sm font-medium text-blue-600">
-            {getValue.toFixed(2)}
-          </span>
-          <span className="text-sm text-gray-600">{control.range[1]}</span>
-        </div>
+        <span className="text-gray-700 font-medium">{value}</span>
       </div>
       <style jsx>{`
         input[type="range"] {

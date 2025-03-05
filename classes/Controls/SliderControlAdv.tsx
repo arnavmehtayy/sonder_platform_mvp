@@ -23,11 +23,23 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
-import { atts, dict_get_attributes} from "../vizobjects/get_set_obj_attributes";
-import { FunctionStr, FunctionStrEditor } from './FunctionStr';
-import Validation_sliderAdv, { Validation_sliderAdv_constructor, ValidationSliderAdvEditor } from "../Validation/Validation_sliderAdv";
-import { AttributePairsInsert, AttributePairsSelect, SliderControlAdvancedInsert, SliderControlAdvancedSelect } from "@/app/db/schema";
+import {
+  atts,
+  dict_get_attributes,
+} from "../vizobjects/get_set_obj_attributes";
+import { FunctionStr, FunctionStrEditor } from "./FunctionStr";
+import Validation_sliderAdv, {
+  Validation_sliderAdv_constructor,
+  ValidationSliderAdvEditor,
+} from "../Validation/Validation_sliderAdv";
+import {
+  AttributePairsInsert,
+  AttributePairsSelect,
+  SliderControlAdvancedInsert,
+  SliderControlAdvancedSelect,
+} from "@/app/db/schema";
 import { InlineSliderEdit } from "./InlineEdit/InLineSliderEdit";
+import { SliderAutograderEdit } from "./AutogradeEdit/SliderAutograderEdit";
 
 export interface AttributePairSet {
   transform_function: FunctionStr;
@@ -45,21 +57,39 @@ export interface SliderControlAdvancedConstructor<T extends obj>
   attribute_pairs: AttributePairSet_json[];
 }
 
-function SliderControlRenderer({ control }: { control: SliderControlAdvanced<any> }) {
+function SliderControlRenderer({
+  control,
+}: {
+  control: SliderControlAdvanced<any>;
+}) {
   const [isEditing, setIsEditing] = React.useState(false);
-  const isEditMode = useStore(state => state.isEditMode);
-  
-  if (isEditing && isEditMode) {
-    return <InlineSliderEdit 
-      control={control} 
-      onClose={() => setIsEditing(false)} 
-    />;
+  const [isSettingAutograder, setIsSettingAutograder] = React.useState(false);
+  const isEditMode = useStore((state) => state.isEditMode);
+
+  if (isSettingAutograder && isEditMode) {
+    return (
+      <SliderAutograderEdit
+        control={control}
+        onClose={() => setIsSettingAutograder(false)}
+      />
+    );
   }
 
-  return <ShowSliderControl 
-    control={control} 
-    onEdit={isEditMode ? () => setIsEditing(true) : undefined}
-  />;
+  if (isEditing && isEditMode) {
+    return (
+      <InlineSliderEdit control={control} onClose={() => setIsEditing(false)} />
+    );
+  }
+
+  return (
+    <ShowSliderControl
+      control={control}
+      onEdit={isEditMode ? () => setIsEditing(true) : undefined}
+      onSetAutograder={
+        isEditMode ? () => setIsSettingAutograder(true) : undefined
+      }
+    />
+  );
 }
 
 export class SliderControlAdvanced<T extends obj> extends SliderControl<T> {
@@ -91,17 +121,21 @@ export class SliderControlAdvanced<T extends obj> extends SliderControl<T> {
       (pair: AttributePairSet_json) => {
         return {
           transform_function: pair.transform_function,
-          set_attribute: atts[pair.obj_type]!["number"][pair.func].set_attribute
-        }
+          set_attribute:
+            atts[pair.obj_type]!["number"][pair.func].set_attribute,
+        };
       }
     );
     this.attribute_JSON = attribute_pairs;
-    
+
     this.localValue = (range[0] + range[1]) / 2;
   }
 
-  serialize(): [Omit<SliderControlAdvancedInsert, 'stateId'>, Omit<AttributePairsInsert, 'stateId'>[] ] {
-    const sliderControlData: Omit<SliderControlAdvancedInsert, 'stateId'> = {
+  serialize(): [
+    Omit<SliderControlAdvancedInsert, "stateId">,
+    Omit<AttributePairsInsert, "stateId">[]
+  ] {
+    const sliderControlData: Omit<SliderControlAdvancedInsert, "stateId"> = {
       id: this.id,
       controlId: this.id,
       desc: this.desc,
@@ -111,24 +145,33 @@ export class SliderControlAdvanced<T extends obj> extends SliderControl<T> {
       step_size: this.step_size,
     };
 
-    const attributePairs: Omit<AttributePairsInsert, 'stateId'>[] = this.attribute_JSON.map(pair => ({
-      ControlId: this.id,
-      trans_functionStr: pair.transform_function.functionString,
-      trans_symbols: pair.transform_function.symbols,
-      get_func: pair.func,
-      obj_type: pair.obj_type
-    }));
+    const attributePairs: Omit<AttributePairsInsert, "stateId">[] =
+      this.attribute_JSON.map((pair) => ({
+        ControlId: this.id,
+        trans_functionStr: pair.transform_function.functionString,
+        trans_symbols: pair.transform_function.symbols,
+        get_func: pair.func,
+        obj_type: pair.obj_type,
+      }));
 
     return [sliderControlData, attributePairs];
   }
 
-  static deserialize(data: SliderControlAdvancedSelect, attributePairs: AttributePairsSelect[]): SliderControlAdvanced<any> {
-    const attribute_pairs: AttributePairSet_json[] = attributePairs.map(pair => ({
-      transform_function: new FunctionStr(pair.trans_functionStr, pair.trans_symbols),
-      func: pair.get_func,
-      obj_type: pair.obj_type
-    }));
-  
+  static deserialize(
+    data: SliderControlAdvancedSelect,
+    attributePairs: AttributePairsSelect[]
+  ): SliderControlAdvanced<any> {
+    const attribute_pairs: AttributePairSet_json[] = attributePairs.map(
+      (pair) => ({
+        transform_function: new FunctionStr(
+          pair.trans_functionStr,
+          pair.trans_symbols
+        ),
+        func: pair.get_func,
+        obj_type: pair.obj_type,
+      })
+    );
+
     return new SliderControlAdvanced({
       id: data.controlId,
       obj_id: data.obj_id,
@@ -136,7 +179,7 @@ export class SliderControlAdvanced<T extends obj> extends SliderControl<T> {
       step_size: data.step_size,
       desc: data.desc,
       text: data.text,
-      attribute_pairs: attribute_pairs
+      attribute_pairs: attribute_pairs,
     });
   }
 
@@ -144,7 +187,10 @@ export class SliderControlAdvanced<T extends obj> extends SliderControl<T> {
     this.localValue = value;
     if (obj) {
       return this.attribute_pairs.reduce((updatedObj, pair) => {
-        const transformedValue = pair.transform_function.get_function()(value, useStore.getState);
+        const transformedValue = pair.transform_function.get_function()(
+          value,
+          useStore.getState
+        );
         return pair.set_attribute(updatedObj, transformedValue);
       }, obj);
     } else {
@@ -180,7 +226,10 @@ export class SliderControlAdvanced<T extends obj> extends SliderControl<T> {
   }: {
     isOpen: boolean;
     onClose: () => void;
-    onSave: (obj: SliderControlAdvanced<any>, validation?: Validation_sliderAdv) => void;
+    onSave: (
+      obj: SliderControlAdvanced<any>,
+      validation?: Validation_sliderAdv
+    ) => void;
   }) {
     const [editedObject, setEditedObject] = React.useState<
       SliderControlAdvancedConstructor<any>
@@ -193,7 +242,9 @@ export class SliderControlAdvanced<T extends obj> extends SliderControl<T> {
     });
 
     const [useSliderControl, setUseSliderControl] = React.useState(false);
-    const [validation, setValidation] = React.useState<Validation_sliderAdv_constructor| undefined>(undefined);
+    const [validation, setValidation] = React.useState<
+      Validation_sliderAdv_constructor | undefined
+    >(undefined);
 
     const popupProps: EditableObjectPopupProps<
       SliderControlAdvancedConstructor<any>
@@ -204,57 +255,59 @@ export class SliderControlAdvanced<T extends obj> extends SliderControl<T> {
       set_object: setEditedObject,
       onSave: (updatedObject: SliderControlAdvancedConstructor<any>) => {
         const newObj = new SliderControlAdvanced(updatedObject);
-        const newVal = validation ? new Validation_sliderAdv(validation): undefined;
+        const newVal = validation
+          ? new Validation_sliderAdv(validation)
+          : undefined;
         onSave(newObj, newVal);
       },
-      title: `Create New Slider Control`,
+      title: `Slider`,
       fields: [
         { key: "desc", label: "Title", type: "title" },
         { key: "text", label: "Desc", type: "textarea" },
         { key: "step_size", label: "Step Size", type: "number" },
         { key: "range", label: "Range", type: "arraynum", length_of_array: 2 },
-        {
-          label: "",
-          type: "custom",
-          render: (_, onChange) => (
-            <div className="flex items-center mb-4">
-              <input
-                type="checkbox"
-                id="useSliderControl"
-                checked={useSliderControl}
-                onChange={(e) => setUseSliderControl(e.target.checked)}
-                className="mr-2"
-              />
-              <label htmlFor="useSliderControl">Enable Object Control</label>
-            </div>
-          ),
-        },
-        {
-          key: "obj_id",
-          label: "Object ID",
-          type: "vizObjSelect",
-          showIf: () => useSliderControl,
-        },
-        {
-          key: "attribute_pairs",
-          label: "Controlled Attributes",
-          type: "custom",
-          showIf: () => useSliderControl,
-          render: (value, onChange) => (
-            <AttributePairsEditor
-              pairs={value}
-              onChange={onChange}
-              objectId={editedObject.obj_id}
-            />
-          ),
-        },
+        // {
+        //   label: "",
+        //   type: "custom",
+        //   render: (_, onChange) => (
+        //     <div className="flex items-center mb-4">
+        //       <input
+        //         type="checkbox"
+        //         id="useSliderControl"
+        //         checked={useSliderControl}
+        //         onChange={(e) => setUseSliderControl(e.target.checked)}
+        //         className="mr-2"
+        //       />
+        //       <label htmlFor="useSliderControl">Enable Object Control</label>
+        //     </div>
+        //   ),
+        // },
+        // {
+        //   key: "obj_id",
+        //   label: "Object ID",
+        //   type: "vizObjSelect",
+        //   showIf: () => useSliderControl,
+        // },
+        // {
+        //   key: "attribute_pairs",
+        //   label: "Controlled Attributes",
+        //   type: "custom",
+        //   showIf: () => useSliderControl,
+        //   render: (value, onChange) => (
+        //     <AttributePairsEditor
+        //       pairs={value}
+        //       onChange={onChange}
+        //       objectId={editedObject.obj_id}
+        //     />
+        //   ),
+        // },
       ],
-      additionalContent: (
-        <ValidationSliderAdvEditor
-          onChange={(newValidation) => setValidation(newValidation)}
-          controlId={editedObject.id}
-        />
-      ),
+      // additionalContent: (
+      //   <ValidationSliderAdvEditor
+      //     onChange={(newValidation) => setValidation(newValidation)}
+      //     controlId={editedObject.id}
+      //   />
+      // ),
     };
 
     return <EditableObjectPopup {...popupProps} />;
@@ -273,20 +326,26 @@ export function AttributePairsEditor({
   objectId,
 }: AttributePairsEditorProps) {
   const object = useStore(getObjectSelector(objectId));
-  const type = object ? object.type : 'Obj';
+  const type = object ? object.type : "Obj";
   const setAttributeOptions = object
     ? object.get_set_att_selector("number")
     : {};
   const [showAdvanced, setShowAdvanced] = React.useState(false);
 
   React.useEffect(() => {
-    if (object && pairs.length === 0 && Object.keys(setAttributeOptions).length > 0) {
+    if (
+      object &&
+      pairs.length === 0 &&
+      Object.keys(setAttributeOptions).length > 0
+    ) {
       const firstKey = Object.keys(setAttributeOptions)[0];
-      onChange([{
-        transform_function: new FunctionStr("x", []),
-        func: firstKey,
-        obj_type: type
-      }]);
+      onChange([
+        {
+          transform_function: new FunctionStr("x", []),
+          func: firstKey,
+          obj_type: type,
+        },
+      ]);
     }
   }, [object, pairs.length]);
 
@@ -296,9 +355,9 @@ export function AttributePairsEditor({
       onChange([
         ...pairs,
         {
-          transform_function: new FunctionStr( "x", []),
+          transform_function: new FunctionStr("x", []),
           func: firstKey,
-          obj_type: type
+          obj_type: type,
         },
       ]);
     }
@@ -336,7 +395,9 @@ export function AttributePairsEditor({
             {showAdvanced && (
               <FunctionStrEditor
                 value={pair.transform_function}
-                onChange={(value) => updatePair(index, "transform_function", value)}
+                onChange={(value) =>
+                  updatePair(index, "transform_function", value)
+                }
               />
             )}
             <Select
