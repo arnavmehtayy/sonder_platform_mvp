@@ -452,21 +452,50 @@ export const OrderHandlerDB = ({
           {isEditMode && (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <div className="mt-8 relative">
-                  <button
-                    type="button"
-                    className="w-full text-left"
-                    onClick={(e) => e.currentTarget.focus()}
+                <div
+                  className="mt-8 relative"
+                  data-prevent-scroll-trigger="true"
+                >
+                  <div
+                    className="border-2 border-dashed border-gray-300 rounded-lg p-6 bg-transparent hover:border-blue-300 hover:bg-blue-50 transform transition-all duration-200 hover:scale-[1.02] cursor-pointer group overflow-visible"
+                    onClick={(e) => {
+                      // Only trigger if it's a mouse click or a deliberate tap
+                      if (
+                        e.type === "click" &&
+                        !e.currentTarget.getAttribute("data-scrolling")
+                      ) {
+                        // Normal click behavior
+                      }
+                    }}
+                    onTouchStart={(e) => {
+                      e.currentTarget.setAttribute(
+                        "data-touch-start-y",
+                        e.touches[0].clientY.toString()
+                      );
+                      e.currentTarget.setAttribute("data-scrolling", "false");
+                    }}
+                    onTouchMove={(e) => {
+                      const startY = parseInt(
+                        e.currentTarget.getAttribute("data-touch-start-y") ||
+                          "0"
+                      );
+                      const currentY = e.touches[0].clientY;
+
+                      // If moved more than 10px, consider it scrolling
+                      if (Math.abs(currentY - startY) > 10) {
+                        e.currentTarget.setAttribute("data-scrolling", "true");
+                        // Stop propagation to prevent dropdown from opening
+                        e.stopPropagation();
+                      }
+                    }}
                   >
-                    <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 bg-transparent hover:border-blue-300 hover:bg-blue-50 transform transition-all duration-200 hover:scale-[1.02] cursor-pointer group overflow-visible">
-                      <div className="flex flex-col items-center justify-center">
-                        <Plus className="h-8 w-8 text-gray-400 group-hover:text-blue-500 mb-2" />
-                        <h3 className="text-lg font-medium text-gray-600 group-hover:text-gray-700 mb-2">
-                          Add Sidebar Component
-                        </h3>
-                      </div>
+                    <div className="flex flex-col items-center justify-center">
+                      <Plus className="h-8 w-8 text-gray-400 group-hover:text-blue-500 mb-2" />
+                      <h3 className="text-lg font-medium text-gray-600 group-hover:text-gray-700 mb-2">
+                        Add Sidebar Component
+                      </h3>
                     </div>
-                  </button>
+                  </div>
                 </div>
               </DropdownMenuTrigger>
               <DropdownMenuContent
