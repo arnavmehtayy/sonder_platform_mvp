@@ -13,12 +13,11 @@ import { OrderHandlerDB } from "../Sidebar/OrderHandlerDB";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   ChevronUp,
-  Save,
-  RefreshCw,
   Menu,
   Plus,
   ChevronDown,
   Camera,
+  RefreshCw,
 } from "lucide-react";
 import { createClient } from "@/app/utils/supabase/client";
 import { toast } from "sonner";
@@ -143,6 +142,9 @@ export function MobileEditExperience({
 
       // Automatically save state after successful video upload
       await handleSave();
+
+      // Automatically show the edit questions panel
+      setShowControls(true);
     } catch (error) {
       console.error("Error uploading video:", error);
       toast.error("Failed to replace video");
@@ -199,6 +201,9 @@ export function MobileEditExperience({
 
       // Automatically save state after successful video recording
       await handleSave();
+
+      // Automatically show the edit questions panel
+      setShowControls(true);
     } catch (error) {
       console.error("Error saving recorded video:", error);
       toast.error("Failed to save recorded video");
@@ -252,21 +257,6 @@ export function MobileEditExperience({
       console.error("Error saving state:", error);
       toast.error("Failed to save state");
     }
-  };
-
-  const handleResetState = () => {
-    useStore.setState({
-      order: [],
-      vizobjs: {},
-      title: "",
-      questions: {},
-      controls: {},
-      placement: {},
-      scores: {},
-      validations: [],
-      influenceAdvIndex: {},
-    });
-    toast.success("State has been reset");
   };
 
   const handleValidationUpdate = () => {
@@ -485,25 +475,6 @@ export function MobileEditExperience({
 
                   {/* Content */}
                   <div className="px-4 space-y-6">
-                    {/* Action Buttons */}
-                    <div className="flex gap-3">
-                      <Button
-                        onClick={handleSave}
-                        className="flex-1 bg-blue-600 hover:bg-blue-700"
-                      >
-                        <Save className="w-4 h-4 mr-2" />
-                        Save
-                      </Button>
-                      <Button
-                        onClick={handleResetState}
-                        variant="destructive"
-                        className="flex-1"
-                      >
-                        <RefreshCw className="w-4 h-4 mr-2" />
-                        Reset
-                      </Button>
-                    </div>
-
                     {/* Order Handler */}
                     <OrderHandlerDB isEditMode />
 
