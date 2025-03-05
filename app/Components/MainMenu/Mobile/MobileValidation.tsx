@@ -2,7 +2,7 @@ import React from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { CheckCircle, XCircle, ChevronDown, ChevronUp } from "lucide-react";
 import Validation from "@/classes/Validation/Validation";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 interface MobileValidationProps {
   validations: Validation[];
@@ -17,6 +17,13 @@ export function MobileValidation({
   const overallValidity = validations.every(
     (validation) => validation.is_valid
   );
+
+  // Automatically show details when results are first displayed
+  useEffect(() => {
+    if (showResults) {
+      setShowDetails(true);
+    }
+  }, [showResults]);
 
   if (!showResults) return null;
 

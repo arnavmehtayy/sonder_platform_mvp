@@ -291,7 +291,7 @@ export function MobileEditExperience({
           {/* Video and Experience Section */}
           <div
             className={`w-full ${
-              showControls ? "h-1/2" : "h-full"
+              showControls ? "h-[30%]" : "h-full"
             } transition-all duration-500 relative`}
           >
             {videoUrl ? (
@@ -465,7 +465,7 @@ export function MobileEditExperience({
                 animate={{ y: "0%" }}
                 exit={{ y: "100%" }}
                 transition={{ type: "spring", damping: 30, stiffness: 300 }}
-                className="absolute bottom-0 left-0 right-0 h-1/2 bg-white rounded-t-3xl overflow-hidden shadow-2xl"
+                className="absolute bottom-0 left-0 right-0 h-[70%] bg-white rounded-t-3xl overflow-hidden shadow-2xl"
               >
                 <div className="h-full overflow-y-auto pb-[calc(env(safe-area-inset-bottom)+4rem)]">
                   {/* Pull indicator */}
