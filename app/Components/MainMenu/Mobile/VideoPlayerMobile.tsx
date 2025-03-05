@@ -307,7 +307,7 @@ export function MobileVideoPlayer({
         <div className="flex justify-center gap-4 mb-safe">
           {/* Play/Pause button */}
           <AnimatePresence>
-            <div className="flex flex-col items-center">
+            <div className="flex flex-col items-center z-[50]">
               {showPlayButton && !isVideoEnded && (
                 <>
                   <motion.button
@@ -336,7 +336,7 @@ export function MobileVideoPlayer({
           {/* Replay button */}
           <AnimatePresence mode="wait">
             {isVideoEnded && (
-              <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 flex flex-col items-center z-[100]">
+              <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 flex flex-col items-center z-[50]">
                 <motion.button
                   key="replay"
                   initial={{ opacity: 0, scale: 0.8 }}

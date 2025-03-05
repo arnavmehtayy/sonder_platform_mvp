@@ -18,6 +18,8 @@ import {
 import { InlineMultiChoiceEdit } from "./InlineEdit/InLineMultiChoiceEdit";
 import { Pencil } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { MultiChoiceAutograderEdit } from "./AutogradeEdit/MultiChoiceAutogradeEdit";
+
 /*
  * This class is responsible for storing information about a multiple choice question
  * the attributes of this class are: options, isMultiSelect, selectedOptions
@@ -32,16 +34,23 @@ export interface MultiChoiceConstructor extends ControlConstructor {
   options: Option[];
   isMultiSelect?: boolean;
 }
-function ShowMultiChoice({ control, onEdit }: { control: MultiChoiceClass, onEdit?: () => void }) {
+function ShowMultiChoice({
+  control,
+  onEdit,
+}: {
+  control: MultiChoiceClass;
+  onEdit?: () => void;
+}) {
   const setSelectedOptions = useStore(setMultiChoiceOptionsSelector);
   const selectedOptions = control.selectedOptions;
+  const [isSettingAutograder, setIsSettingAutograder] = React.useState(false);
+  const isEditMode = useStore((state) => state.isEditMode);
 
   const title = control.desc;
   const description = control.text;
   const options = control.options;
   const isMultiSelect = control.isMultiSelect;
   const isClickable = control.isClickable;
-  const isEditMode = useStore(state => state.isEditMode);
 
   const handleOptionClick = (optionId: number) => {
     if (!isClickable) return;
@@ -57,25 +66,62 @@ function ShowMultiChoice({ control, onEdit }: { control: MultiChoiceClass, onEdi
     setSelectedOptions(control.id, new_options);
   };
 
+  if (isSettingAutograder && isEditMode) {
+    return (
+      <MultiChoiceAutograderEdit
+        control={control}
+        onClose={() => setIsSettingAutograder(false)}
+      />
+    );
+  }
+
   return (
     <div
       className={`bg-white rounded-lg shadow-lg p-6 relative ${
         !isClickable ? "opacity-70" : ""
       }`}
     >
-      {isEditMode && onEdit && (
-        <Button 
-          variant="ghost" 
-          size="icon"
-          className="absolute right-2 top-2 z-10" 
-          onClick={onEdit}
-        >
-          <Pencil className="h-4 w-4" />
-        </Button>
-      )}
-      <h3 className="text-lg font-semibold text-blue-800 mb-2">
-        <Latex>{title}</Latex>
-      </h3>
+      <div className="mb-4">
+        <h3 className="text-lg font-semibold text-blue-800 mb-1">
+          <Latex>{title}</Latex>
+        </h3>
+
+        {isEditMode && (
+          <div className="flex mt-2 mb-3 space-x-2">
+            {onEdit && (
+              <button
+                onClick={onEdit}
+                className="flex items-center px-3 py-1 bg-blue-50 hover:bg-blue-100 text-blue-700 rounded border border-blue-200 text-sm transition-colors"
+              >
+                <Pencil className="h-3.5 w-3.5 mr-1" />
+                Edit
+              </button>
+            )}
+
+            <button
+              onClick={() => setIsSettingAutograder(true)}
+              disabled={onEdit === undefined}
+              className="flex items-center px-3 py-1 bg-green-50 hover:bg-green-100 text-green-700 rounded border border-green-200 text-sm transition-colors disabled:opacity-50"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                className="h-3.5 w-3.5 mr-1"
+              >
+                <path d="M9 11l3 3L22 4" />
+                <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11" />
+              </svg>
+              Autograder
+            </button>
+          </div>
+        )}
+      </div>
+
       <p className="text-gray-600 mb-4">
         <Latex>{description}</Latex>
       </p>
@@ -102,7 +148,7 @@ function ShowMultiChoice({ control, onEdit }: { control: MultiChoiceClass, onEdi
                 className={`
                 w-5 h-5 mr-3 flex-shrink-0
                 transition-all duration-200 ease-out
-                ${isMultiSelect ? 'rounded' : 'rounded-full'}
+                ${isMultiSelect ? "rounded" : "rounded-full"}
                 ${
                   selectedOptions.includes(option.id)
                     ? "border-white bg-white scale-110"
@@ -179,7 +225,7 @@ export class MultiChoiceClass extends Control {
     data: MultiChoiceControlSelect,
     options: MultiChoiceOptionSelect[]
   ): MultiChoiceClass {
-    return new MultiChoiceClass({
+    const mcq = new MultiChoiceClass({
       id: data.controlId,
       desc: data.desc,
       text: data.text,
@@ -189,6 +235,11 @@ export class MultiChoiceClass extends Control {
         label: opt.label,
       })),
     });
+
+    // Ensure selectedOptions is always empty when deserializing
+    mcq.selectedOptions = [];
+
+    return mcq;
   }
 
   // change the selected options of the multiple choice question used by the storage system
@@ -288,17 +339,21 @@ export class MultiChoiceClass extends Control {
 
 function MultiChoiceRenderer({ control }: { control: MultiChoiceClass }) {
   const [isEditing, setIsEditing] = React.useState(false);
-  const isEditMode = useStore(state => state.isEditMode);
-  
+  const isEditMode = useStore((state) => state.isEditMode);
+
   if (isEditing && isEditMode) {
-    return <InlineMultiChoiceEdit 
-      control={control} 
-      onClose={() => setIsEditing(false)} 
-    />;
+    return (
+      <InlineMultiChoiceEdit
+        control={control}
+        onClose={() => setIsEditing(false)}
+      />
+    );
   }
 
-  return <ShowMultiChoice 
-    control={control} 
-    onEdit={isEditMode ? () => setIsEditing(true) : undefined}
-  />;
+  return (
+    <ShowMultiChoice
+      control={control}
+      onEdit={isEditMode ? () => setIsEditing(true) : undefined}
+    />
+  );
 }
