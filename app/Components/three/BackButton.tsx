@@ -1,22 +1,87 @@
-import React from "react";
+import React, { useState } from "react";
 import Link from "next/link";
 import { useStore } from "@/app/store";
+import { createClient } from "@/app/utils/supabase/client";
+import { serializeState } from "@/classes/database/stateSerializer";
+import { toast } from "sonner";
+import { useParams } from "next/navigation";
 
 // A curved back button that takes the user back to the experiences page from each slide of a viztool
 
 const CurvedBackButton = () => {
-  const handleBack = () => {
-    useStore.setState({
-      order: [],
-      vizobjs: {},
-      title: "",
-      questions: {},
-      controls: {},
-      placement: {},
-      scores: {},
-      validations: [],
-      influenceAdvIndex: {},
-    });
+  const [isSaving, setIsSaving] = useState(false);
+  const params = useParams();
+  const isEditMode = useStore((state) => state.isEditMode);
+
+  const handleBack = async () => {
+    // Navigate first, then save in the background
+    // We don't need to set isSaving since we're navigating away immediately
+
+    try {
+      // Only save if in edit mode
+      if (isEditMode) {
+        // Get the experience ID and index from URL params
+        const experienceId = Number(params.ExpID);
+        const index = Number(params.index);
+
+        // Save state in the background
+        const supabase = createClient();
+        const {
+          data: { user },
+          error: userError,
+        } = await supabase.auth.getUser();
+
+        if (userError || !user) {
+          console.log("User not logged in, skipping save");
+        } else {
+          // Fetch profile using the user ID
+          const profileResponse = await fetch(
+            `/api/supabase/profile?userId=${user.id}`
+          );
+
+          if (profileResponse.ok) {
+            const profile = await profileResponse.json();
+            const state = useStore.getState();
+            const serializedState = serializeState(state);
+
+            const response = await fetch("/api/supabase/DataBaseAPI", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({
+                state: serializedState,
+                profileId: profile.id,
+                experienceId: experienceId,
+                index: index,
+              }),
+            });
+
+            if (!response.ok) {
+              throw new Error("Failed to save state");
+            }
+
+            toast.success("State saved successfully");
+          }
+        }
+      }
+
+      // Clear the state
+      useStore.setState({
+        order: [],
+        vizobjs: {},
+        title: "",
+        questions: {},
+        controls: {},
+        placement: {},
+        scores: {},
+        validations: [],
+        influenceAdvIndex: {},
+      });
+    } catch (error) {
+      console.error("Error saving state:", error);
+      toast.error("Failed to save state");
+    }
   };
 
   return (
