@@ -80,10 +80,10 @@ export const InlineInputEdit: React.FC<InlineInputEditProps> = ({ control, onClo
         </div>
       </div>
 
-      <Separator />
+      {/* <Separator />
 
       {/* Input Configuration */}
-      <div className="space-y-4">
+      {/* <div className="space-y-4">
         <div className="grid grid-cols-2 gap-4">
           <div>
             <Label className="text-xs text-gray-500">Placeholder Text</Label>
@@ -107,12 +107,12 @@ export const InlineInputEdit: React.FC<InlineInputEditProps> = ({ control, onClo
             />
           </div>
         </div>
-      </div>
+      </div> */}
 
-      <Separator />
+      {/* <Separator /> */}
 
       {/* Object Control Section */}
-      <Collapsible open={showAttributes} onOpenChange={setShowAttributes}>
+      {/* <Collapsible open={showAttributes} onOpenChange={setShowAttributes}>
         <CollapsibleTrigger asChild>
           <Button
             variant="ghost"
@@ -124,7 +124,6 @@ export const InlineInputEdit: React.FC<InlineInputEditProps> = ({ control, onClo
           </Button>
         </CollapsibleTrigger>
         <CollapsibleContent className="space-y-4 pt-4">
-          {/* Object Selection */}
           <div>
             <Label className="text-xs text-gray-500">Control Object</Label>
             <Select
@@ -132,7 +131,7 @@ export const InlineInputEdit: React.FC<InlineInputEditProps> = ({ control, onClo
               onValueChange={(value) => setEditedValues(prev => ({ 
                 ...prev, 
                 obj_id: Number(value),
-                attribute_pairs: [] // Reset attributes when object changes
+                attribute_pairs: []
               }))}
             >
               <SelectTrigger>
@@ -156,7 +155,7 @@ export const InlineInputEdit: React.FC<InlineInputEditProps> = ({ control, onClo
             />
           )}
         </CollapsibleContent>
-      </Collapsible>
+      </Collapsible> */}
 
       {/* Save/Cancel Buttons */}
       <div className="flex justify-end space-x-2 pt-4">

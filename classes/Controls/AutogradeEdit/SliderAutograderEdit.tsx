@@ -7,13 +7,6 @@ import { useStore, getValidationsSelector } from "@/app/store";
 import Latex from "react-latex-next";
 import { Label } from "@/components/ui/label";
 import { relation } from "@/classes/Validation/Validation_obj";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 
 interface SliderAutograderEditProps {
   control: SliderControlAdvanced<any>;
@@ -36,27 +29,11 @@ export const SliderAutograderEdit: React.FC<SliderAutograderEditProps> = ({
   const [targetValue, setTargetValue] = React.useState<number>(
     existingValidation ? existingValidation.target_value : control.localValue
   );
-  const [relation, setRelation] = React.useState<relation>(
-    existingValidation ? existingValidation.relation : "=="
-  );
 
   const title = control.desc;
   const description = control.text;
   const range = control.range;
   const step = control.step_size;
-
-  const getRelationLabel = () => {
-    switch (relation) {
-      case "<":
-        return "Less than";
-      case ">":
-        return "Greater than";
-      case "==":
-        return "Equal to";
-      default:
-        return "";
-    }
-  };
 
   const saveAutograder = () => {
     const addElementFn = useStore.getState().addElement;
@@ -78,7 +55,7 @@ export const SliderAutograderEdit: React.FC<SliderAutograderEditProps> = ({
       control_id: control.id,
       target_value: targetValue,
       error: 0,
-      relation: relation,
+      relation: "==",
       desc: `${control.desc}`,
     });
 
@@ -89,7 +66,7 @@ export const SliderAutograderEdit: React.FC<SliderAutograderEditProps> = ({
   return (
     <div className="bg-white rounded-lg shadow-lg p-6 relative ring-2 ring-green-500 bg-green-50">
       <div className="absolute top-0 left-0 w-full bg-green-600 text-white text-xs px-4 py-1 rounded-t-lg">
-        Set the target value and condition for autograding
+        Set the target value for autograding
       </div>
 
       <h3 className="text-lg font-semibold text-blue-800 mb-2 mt-4">
@@ -100,25 +77,8 @@ export const SliderAutograderEdit: React.FC<SliderAutograderEditProps> = ({
       </p>
 
       <div className="space-y-4 mt-6">
-        <div className="flex items-center gap-2 mb-4">
-          <Label className="text-sm font-medium">Condition:</Label>
-          <Select
-            value={relation}
-            onValueChange={(value) => setRelation(value as relation)}
-          >
-            <SelectTrigger className="w-[200px]">
-              <SelectValue placeholder="Select condition" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="==">Equal to</SelectItem>
-              <SelectItem value=">">Greater than</SelectItem>
-              <SelectItem value="<">Less than</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
-
         <div className="text-sm text-green-700 font-medium mb-1">
-          Value should be {getRelationLabel()} {targetValue}
+          Target value: {targetValue}
         </div>
 
         <div className="relative">
