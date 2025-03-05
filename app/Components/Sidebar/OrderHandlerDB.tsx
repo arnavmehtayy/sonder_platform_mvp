@@ -448,76 +448,32 @@ export const OrderHandlerDB = ({
             </div>
           )}
 
-          {/* Add Component button - only in edit mode */}
+          {/* Replace dropdown with direct component buttons - improved UI with clearer purpose */}
           {isEditMode && (
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <div
-                  className="mt-8 relative"
-                  data-prevent-scroll-trigger="true"
-                >
-                  <div
-                    className="border-2 border-dashed border-gray-300 rounded-lg p-6 bg-transparent hover:border-blue-300 hover:bg-blue-50 transform transition-all duration-200 hover:scale-[1.02] cursor-pointer group overflow-visible"
-                    onClick={(e) => {
-                      // Only trigger if it's a mouse click or a deliberate tap
-                      if (
-                        e.type === "click" &&
-                        !e.currentTarget.getAttribute("data-scrolling")
-                      ) {
-                        // Normal click behavior
-                      }
-                    }}
-                    onTouchStart={(e) => {
-                      e.currentTarget.setAttribute(
-                        "data-touch-start-y",
-                        e.touches[0].clientY.toString()
-                      );
-                      e.currentTarget.setAttribute("data-scrolling", "false");
-                    }}
-                    onTouchMove={(e) => {
-                      const startY = parseInt(
-                        e.currentTarget.getAttribute("data-touch-start-y") ||
-                          "0"
-                      );
-                      const currentY = e.touches[0].clientY;
-
-                      // If moved more than 10px, consider it scrolling
-                      if (Math.abs(currentY - startY) > 10) {
-                        e.currentTarget.setAttribute("data-scrolling", "true");
-                        // Stop propagation to prevent dropdown from opening
-                        e.stopPropagation();
-                      }
-                    }}
-                  >
-                    <div className="flex flex-col items-center justify-center">
-                      <Plus className="h-8 w-8 text-gray-400 group-hover:text-blue-500 mb-2" />
-                      <h3 className="text-lg font-medium text-gray-600 group-hover:text-gray-700 mb-2">
-                        Add Sidebar Component
-                      </h3>
-                    </div>
-                  </div>
+            <div className="mt-4">
+              <div className="bg-blue-50 rounded-lg p-3 border border-blue-200 shadow-sm">
+                <div className="flex items-center mb-2">
+                  <Plus className="h-4 w-4 text-blue-500 mr-2" />
+                  <h3 className="text-sm font-medium text-blue-700">
+                    Add a Component
+                  </h3>
                 </div>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent
-                className="bg-white rounded-lg shadow-xl p-2 mt-2 w-56 border border-gray-100 z-[100]"
-                align="center"
-                sideOffset={5}
-                alignOffset={0}
-              >
-                {controlTypes.map((objectType) => (
-                  <DropdownMenuItem
-                    key={objectType.type.name}
-                    onSelect={() => setSelectedObjectType(objectType)}
-                    className="flex items-center space-x-3 px-4 py-3 hover:bg-blue-50 rounded-md transition-all duration-200 cursor-pointer group"
-                  >
-                    <objectType.icon className="h-5 w-5 text-blue-600 group-hover:text-blue-700" />
-                    <span className="text-gray-700 font-medium group-hover:text-gray-900">
-                      {objectType.name}
-                    </span>
-                  </DropdownMenuItem>
-                ))}
-              </DropdownMenuContent>
-            </DropdownMenu>
+                <div className="grid grid-cols-2 gap-2">
+                  {controlTypes.map((objectType) => (
+                    <button
+                      key={objectType.type.name}
+                      onClick={() => setSelectedObjectType(objectType)}
+                      className="flex items-center p-3 bg-white rounded-md border border-gray-100 hover:border-blue-300 hover:bg-blue-100 transition-all duration-200"
+                    >
+                      <objectType.icon className="h-5 w-5 text-blue-600 mr-2 flex-shrink-0" />
+                      <span className="text-xs text-gray-700 font-medium">
+                        {objectType.name}
+                      </span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </div>
           )}
 
           {/* Object Creator - only in edit mode */}
