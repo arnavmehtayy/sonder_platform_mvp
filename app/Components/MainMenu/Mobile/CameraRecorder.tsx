@@ -116,13 +116,48 @@ export function CameraRecorder({ onSave, onCancel }: CameraRecorderProps) {
         if (chunks.length > 0) {
           const mimeType = mediaRecorderRef.current?.mimeType || "video/webm";
           const blob = new Blob(chunks, { type: mimeType });
-          const url = URL.createObjectURL(blob);
-          setPreviewUrl(url);
 
-          if (previewVideoRef.current) {
-            previewVideoRef.current.src = url;
-            previewVideoRef.current.load();
-          }
+          // Create a temporary video element to ensure metadata is loaded
+          const tempVideo = document.createElement("video");
+          tempVideo.preload = "metadata";
+
+          // Create object URL for the blob
+          const url = URL.createObjectURL(blob);
+          tempVideo.src = url;
+
+          // Wait for metadata to load before showing preview
+          tempVideo.onloadedmetadata = () => {
+            // Now we know the video has valid metadata
+            setPreviewUrl(url);
+
+            if (previewVideoRef.current) {
+              previewVideoRef.current.src = url;
+              previewVideoRef.current.load();
+            }
+          };
+
+          // Fallback in case metadata loading takes too long
+          tempVideo.onerror = () => {
+            console.error("Error loading video metadata");
+            setPreviewUrl(url);
+
+            if (previewVideoRef.current) {
+              previewVideoRef.current.src = url;
+              previewVideoRef.current.load();
+            }
+          };
+
+          // Set a timeout in case metadata loading takes too long
+          setTimeout(() => {
+            if (!previewUrl) {
+              setPreviewUrl(url);
+
+              if (previewVideoRef.current) {
+                previewVideoRef.current.src = url;
+                previewVideoRef.current.load();
+              }
+            }
+          }, 1000);
         }
 
         // Restart camera preview
@@ -168,7 +203,32 @@ export function CameraRecorder({ onSave, onCancel }: CameraRecorderProps) {
     if (recordedChunks.length > 0) {
       const mimeType = mediaRecorderRef.current?.mimeType || "video/webm";
       const blob = new Blob(recordedChunks, { type: mimeType });
-      onSave(blob);
+
+      // Create a temporary video element to ensure metadata is loaded
+      const tempVideo = document.createElement("video");
+      tempVideo.preload = "metadata";
+
+      const tempUrl = URL.createObjectURL(blob);
+      tempVideo.src = tempUrl;
+
+      // Wait for metadata to load before saving
+      tempVideo.onloadedmetadata = () => {
+        URL.revokeObjectURL(tempUrl);
+        onSave(blob);
+      };
+
+      // Fallback in case metadata loading fails
+      tempVideo.onerror = () => {
+        console.error("Error loading video metadata");
+        URL.revokeObjectURL(tempUrl);
+        onSave(blob);
+      };
+
+      // Set a timeout in case metadata loading takes too long
+      setTimeout(() => {
+        URL.revokeObjectURL(tempUrl);
+        onSave(blob);
+      }, 1000);
     } else {
       console.error("No recorded data available to save");
       setIsUploading(false);
