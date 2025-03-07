@@ -288,8 +288,8 @@ export async function POST(request: Request) {
             label: option.label,
           })),
           correctAnswers: questionData.options
-            .filter((option: any, index: number) => option.correct)
-            .map((option: any, index: number) => index + 1), // Map to same sequential IDs
+          .map((option: any, index: number) => option.correct ? index + 1 : null)
+          .filter((index: number | null) => index !== null), // Map to same sequential IDs
           type: "multipleChoice",
         };
         break;
@@ -318,6 +318,7 @@ export async function POST(request: Request) {
         break;
     }
 
+    console.log(formattedQuestion);
     return NextResponse.json(formattedQuestion);
   } catch (error) {
     console.error("Error generating questions:", error);
