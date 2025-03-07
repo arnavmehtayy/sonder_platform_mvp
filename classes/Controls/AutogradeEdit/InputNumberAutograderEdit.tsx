@@ -27,7 +27,7 @@ export const InputNumberAutograderEdit: React.FC<
   // Initialize with existing validation values if available
   const [targetValue, setTargetValue] = React.useState<string>(
     existingValidation
-      ? existingValidation.answer.toString()
+      ? existingValidation.answer?.toString() || ""
       : (control.value as number)?.toString() || ""
   );
 

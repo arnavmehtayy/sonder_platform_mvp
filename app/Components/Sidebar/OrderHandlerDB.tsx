@@ -1,7 +1,16 @@
 "use client";
 import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Pencil, Check, X, GripVertical, Trash2, Plus } from "lucide-react";
+import {
+  Pencil,
+  Check,
+  X,
+  GripVertical,
+  Trash2,
+  Plus,
+  RefreshCw,
+  Sparkles,
+} from "lucide-react";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
@@ -69,6 +78,11 @@ import {
   DropdownMenuItem,
   DropdownMenuContent,
 } from "@/components/ui/dropdown-menu";
+import { toast } from "sonner";
+import { ValidationMultiChoice } from "@/classes/Validation/ValidationMultiChoice";
+import { useParams } from "next/navigation";
+import Validation_sliderAdv from "@/classes/Validation/Validation_sliderAdv";
+import { Validation_inputNumber } from "@/classes/Validation/Validation_inputNumber";
 
 /*
  * This component is responsible for rendering the order of components in the sidebar
@@ -156,6 +170,11 @@ export const OrderHandlerDB = ({
   const deleteOrderItem = useStore((state) => state.deleteOrderItem);
   const deleteInfluences = useStore((state) => state.deleteInfluences);
   const deleteScore = useStore((state) => state.deleteScore);
+
+  // Get params at component level
+  const params = useParams();
+  const expId = parseInt(params.ExpID as string);
+  const currentIndex = parseInt(params.index as string);
 
   // Title editing state
   const [localTitle, setLocalTitle] = useState(title);
@@ -354,6 +373,159 @@ export const OrderHandlerDB = ({
     });
   };
 
+  const [isGeneratingQuestions, setIsGeneratingQuestions] = useState(false);
+  const [questionDescription, setQuestionDescription] = useState("");
+  const [isDescriptionExpanded, setIsDescriptionExpanded] = useState(false);
+  const [selectedQuestionType, setSelectedQuestionType] =
+    useState<string>("multichoice");
+
+  // Update the handleGenerateQuestions function
+  const handleGenerateQuestions = async () => {
+    try {
+      setIsGeneratingQuestions(true);
+
+      // useStore.setState({
+      //   order: [],
+      //   vizobjs: {},
+      //   title: "",
+      //   questions: {},
+      //   controls: {},
+      //   placement: {},
+      //   scores: {},
+      //   validations: [],
+      //   influenceAdvIndex: {},
+      // }); // reset state
+
+      const response = await fetch("/api/supabase/generate-questions", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          experienceId: expId,
+          index: currentIndex,
+          description: questionDescription,
+          questionType: selectedQuestionType, // Pass the selected question type
+        }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(`Failed to generate questions: ${errorData.error}`);
+      }
+
+      const questionData = await response.json();
+      console.log(questionData);
+
+      // Set the title from the API response
+      if (questionData.title) {
+        setTitle(questionData.title.replace(/['"]/g, ''));
+        setLocalTitle(questionData.title.replace(/['"]/g, '')); // Update local title state too
+      }
+
+      // Handle different question types
+      if (selectedQuestionType === "multichoice") {
+        // Create a new MultiChoiceClass instance
+        const newMultiChoice = {
+          id: Date.now() % 10000,
+          desc: questionData.question,
+          text: "Select the correct answer:",
+          options: questionData.options,
+          isMultiSelect: false,
+          type: "MultiChoiceClass",
+        };
+
+        // Add the control to the state
+        const newControl = new MultiChoiceClass({
+          id: newMultiChoice.id,
+          desc: newMultiChoice.desc,
+          text: newMultiChoice.text,
+          options: newMultiChoice.options,
+          isMultiSelect: newMultiChoice.isMultiSelect,
+        });
+        useStore.getState().addElement(newControl);
+
+        // Create validation for the question
+        const newValidation = new ValidationMultiChoice({
+          answer: questionData.correctAnswers,
+          control_id: newMultiChoice.id,
+          desc: `${newMultiChoice.desc}`,
+        });
+        useStore.getState().addElement(newValidation);
+
+        console.log(newValidation, newMultiChoice);
+      } else if (selectedQuestionType === "slider") {
+        // Create a new SliderControlAdvanced instance
+        const newSlider = {
+          id: Date.now() % 10000,
+          desc: questionData.question,
+          text:
+            questionData.instructions ||
+            "Adjust the slider to the correct value:",
+          range: questionData.range || [0, 100],
+          step_size: questionData.stepSize || 1,
+          obj_id: -1,
+          attribute_pairs: [],
+        };
+
+        // Add the control to the state
+        const newControl = new SliderControlAdvanced(newSlider);
+        useStore.getState().addElement(newControl);
+
+        // Create validation for the question
+        const newValidation = new Validation_sliderAdv({
+          control_id: newSlider.id,
+          target_value: questionData.targetValue,
+          error: questionData.tolerance || 1,
+          relation: "==",
+          desc: `${newSlider.desc}`,
+        });
+        useStore.getState().addElement(newValidation);
+
+        console.log(newValidation, newControl);
+      } else if (selectedQuestionType === "number") {
+        // Create a new InputNumber instance
+        const newInput = {
+          id: Date.now() % 10000,
+          desc: questionData.question,
+          text:
+            questionData.instructions || "Enter the correct numerical answer:",
+          value: 0,
+          placeholder: "Enter your answer",
+          min: questionData.min,
+          max: questionData.max,
+          step: questionData.step || 0.01,
+        };
+
+        // Add the control to the state
+        const newControl = new InputNumber(newInput);
+        useStore.getState().addElement(newControl);
+
+        // Create validation for the question
+        const newValidation = new Validation_inputNumber({
+          answer: questionData.answer,
+          control_id: newInput.id,
+          error: questionData.tolerance || 0.1,
+          desc: `${newInput.desc}`,
+        });
+        useStore.getState().addElement(newValidation);
+
+        console.log(newValidation, newControl);
+      }
+
+      toast.success("Question generated successfully");
+
+      // Clear the description field and close the dropdown after successful generation
+      setQuestionDescription("");
+      setIsDescriptionExpanded(false);
+    } catch (error) {
+      console.error("Error generating questions:", error);
+      toast.error("Failed to generate questions");
+    } finally {
+      setIsGeneratingQuestions(false);
+    }
+  };
+
+  const [isAIMode, setIsAIMode] = useState(true);
+
   return (
     <div className="space-y-4 md:space-y-6">
       {/* Title section - always visible */}
@@ -450,34 +622,149 @@ export const OrderHandlerDB = ({
 
           {/* Replace dropdown with direct component buttons - improved UI with clearer purpose */}
           {isEditMode && (
-            <div className="mt-4">
-              <div className="bg-blue-50 rounded-lg p-3 border border-blue-200 shadow-sm">
-                <div className="flex items-center mb-2">
-                  <Plus className="h-4 w-4 text-blue-500 mr-2" />
-                  <h3 className="text-sm font-medium text-blue-700">
-                    Add a Component
-                  </h3>
-                </div>
-                <div className="grid grid-cols-2 gap-2">
-                  {controlTypes.map((objectType) => (
-                    <button
-                      key={objectType.type.name}
-                      onClick={() => setSelectedObjectType(objectType)}
-                      className="flex items-center p-3 bg-white rounded-md border border-gray-100 hover:border-blue-300 hover:bg-blue-100 transition-all duration-200"
+            <div className="mt-8 px-4">
+              <div className="bg-white rounded-lg p-4 border border-gray-200 shadow-sm">
+                <div className="flex items-center justify-between mb-3">
+                  <div className="flex items-center">
+                    <Plus
+                      className={`h-4 w-4 ${
+                        isAIMode ? "text-purple-200" : "text-blue-500"
+                      } mr-2`}
+                    />
+                    <h3
+                      className={`text-sm font-medium ${
+                        isAIMode ? "text-purple-700" : "text-blue-700"
+                      }`}
                     >
-                      <objectType.icon className="h-5 w-5 text-blue-600 mr-2 flex-shrink-0" />
-                      <span className="text-xs text-gray-700 font-medium">
-                        {objectType.name}
-                      </span>
+                      Add Question
+                    </h3>
+                  </div>
+
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm text-gray-600">AI Mode</span>
+                    <button
+                      onClick={() => setIsAIMode(!isAIMode)}
+                      className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
+                        isAIMode ? "bg-purple-500" : "bg-gray-300"
+                      }`}
+                    >
+                      <span
+                        className={`inline-block h-5 w-5 transform rounded-full bg-white transition-transform ${
+                          isAIMode ? "translate-x-5" : "translate-x-1"
+                        }`}
+                      />
                     </button>
-                  ))}
+                  </div>
                 </div>
+
+                {!isAIMode ? (
+                  <div className="grid grid-cols-2 gap-2">
+                    {controlTypes.map((objectType) => (
+                      <button
+                        key={objectType.type.name}
+                        onClick={() => setSelectedObjectType(objectType)}
+                        className="flex items-center p-3 bg-white rounded-md border border-gray-100 hover:border-blue-300 hover:bg-blue-100 transition-all duration-200"
+                      >
+                        <objectType.icon className="h-5 w-5 text-blue-600 mr-2 flex-shrink-0" />
+                        <span className="text-xs text-gray-700 font-medium">
+                          {objectType.name}
+                        </span>
+                      </button>
+                    ))}
+                  </div>
+                ) : (
+                  <div>
+                    <div className="grid grid-cols-3 gap-2 mb-3">
+                      <button
+                        onClick={() => setSelectedQuestionType("multichoice")}
+                        className={`p-1 rounded-md flex items-center justify-center gap-1 transition-colors ${
+                          selectedQuestionType === "multichoice"
+                            ? "bg-purple-100 text-purple-700 border border-purple-200"
+                            : "bg-gray-50 text-gray-700 border border-gray-200 hover:bg-gray-100"
+                        }`}
+                      >
+                        <ListChecks size={16} />
+                        <span>Multiple Choice</span>
+                      </button>
+                      <button
+                        onClick={() => setSelectedQuestionType("slider")}
+                        className={`p-1 rounded-md flex items-center justify-center gap-1 transition-colors ${
+                          selectedQuestionType === "slider"
+                            ? "bg-purple-100 text-purple-700 border border-purple-200"
+                            : "bg-gray-50 text-gray-700 border border-gray-200 hover:bg-gray-100"
+                        }`}
+                      >
+                        <Sliders size={16} />
+                        <span>Slider</span>
+                      </button>
+                      <button
+                        onClick={() => setSelectedQuestionType("number")}
+                        className={`p-1 rounded-md flex items-center justify-center gap-1 transition-colors ${
+                          selectedQuestionType === "number"
+                            ? "bg-purple-100 text-purple-700 border border-purple-200"
+                            : "bg-gray-50 text-gray-700 border border-gray-200 hover:bg-gray-100"
+                        }`}
+                      >
+                        <Hash size={16} />
+                        <span>Number</span>
+                      </button>
+                    </div>
+
+                    <Textarea
+                      placeholder={
+                        selectedQuestionType === "multichoice"
+                          ? "Describe the multiple choice question you want..."
+                          : selectedQuestionType === "slider"
+                          ? "Describe the slider question you want..."
+                          : "Describe the numerical question you want..."
+                      }
+                      value={questionDescription}
+                      onChange={(e) => setQuestionDescription(e.target.value)}
+                      className="min-h-[80px] border-gray-200 focus:border-purple-300 resize-none mb-3 w-full"
+                    />
+
+                    <button
+                      onClick={handleGenerateQuestions}
+                      disabled={isGeneratingQuestions}
+                      className="w-full flex items-center justify-center gap-2 p-3 bg-purple-600 text-white rounded-lg shadow-sm hover:bg-purple-700 transition-all duration-300 disabled:opacity-70"
+                    >
+                      {isGeneratingQuestions ? (
+                        <>
+                          <RefreshCw size={18} className="animate-spin" />
+                          <span>Generating Question...</span>
+                        </>
+                      ) : (
+                        <>
+                          <Sparkles size={18} />
+                          <span>Generate AI Question</span>
+                        </>
+                      )}
+                    </button>
+
+                    {isGeneratingQuestions && (
+                      <div className="mt-3 p-3 bg-gray-50 border border-gray-200 rounded-md">
+                        <div className="flex items-center gap-2">
+                          <div className="w-6 h-6 border-2 border-purple-200 border-t-purple-600 rounded-full animate-spin"></div>
+                          <p className="text-sm text-gray-600">
+                            Creating a{" "}
+                            {selectedQuestionType === "multichoice"
+                              ? "multiple choice"
+                              : selectedQuestionType === "slider"
+                              ? "slider"
+                              : "numerical"}{" "}
+                            question...
+                          </p>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                )}
               </div>
             </div>
           )}
 
           {/* Object Creator - only in edit mode */}
-          {selectedObjectType && isEditMode && (
+          {selectedObjectType && isEditMode && !isAIMode && (
             <ObjectCreator
               ObjectType={selectedObjectType.type}
               onClose={handleObjectCreatorClose}

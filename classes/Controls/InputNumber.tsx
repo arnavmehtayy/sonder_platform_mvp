@@ -75,7 +75,7 @@ function ShowInputNumber({
       } relative`}
     >
       <div className="mb-4">
-        <h3 className="text-base font-semibold text-blue-800 mb-1">
+        <h3 className="text-lg font-semibold text-blue-800 mb-1">
           <Latex>{control.desc}</Latex>
         </h3>
 
@@ -117,7 +117,7 @@ function ShowInputNumber({
         )}
       </div>
 
-      <p className="text-sm text-gray-600 mb-3">
+      <p className="text-gray-600 mb-3">
         <Latex>{control.text}</Latex>
       </p>
       <div className="relative">
