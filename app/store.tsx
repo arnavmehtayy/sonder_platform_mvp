@@ -874,7 +874,31 @@ export const useStore = create<State>((set, get) => ({
     set((state) => {
       const updatedControls = { ...state.controls };
       delete updatedControls[id];
-      return { controls: updatedControls };
+
+      // Remove any validations related to this control
+      const updatedValidations = state.validations.filter((validation) => {
+        if (validation instanceof Validation_select) {
+          return validation.control_id !== id;
+        }
+        if (validation instanceof Validation_inputNumber) {
+          return validation.control_id !== id;
+        }
+        if (validation instanceof ValidationMultiChoice) {
+          return validation.control_id !== id;
+        }
+        if (validation instanceof Validation_tableControl) {
+          return validation.control_id !== id;
+        }
+        if (validation instanceof Validation_sliderAdv) {
+          return validation.control_id !== id;
+        }
+        return true;
+      });
+
+      return { 
+        controls: updatedControls,
+        validations: updatedValidations
+      };
     });
   },
 
