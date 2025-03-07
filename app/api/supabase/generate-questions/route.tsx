@@ -283,13 +283,13 @@ export async function POST(request: Request) {
         formattedQuestion = {
           title: title,
           question: questionData.question,
-          options: questionData.options.map((option: any) => ({
-            id: option.id,
+          options: questionData.options.map((option: any, index: number) => ({
+            id: index + 1, // Generate sequential IDs starting from 1
             label: option.label,
           })),
           correctAnswers: questionData.options
-            .filter((option: any) => option.correct)
-            .map((option: any) => option.id),
+            .filter((option: any, index: number) => option.correct)
+            .map((option: any, index: number) => index + 1), // Map to same sequential IDs
           type: "multipleChoice",
         };
         break;
