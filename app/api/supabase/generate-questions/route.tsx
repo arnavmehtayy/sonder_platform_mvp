@@ -66,17 +66,60 @@ export async function POST(request: Request) {
       );
     }
 
-    // Convert the video to audio using Whisper API
-    const transcriptionResponse = await openai.audio.transcriptions.create({
-      file: new File([fileData], "audio.mp4", { type: "audio/mp4" }),
-      model: "whisper-1",
-    });
+    // Detect file extension to help with format identification
+    const fileExtension = video.video_path.split(".").pop()?.toLowerCase();
+    console.log(`File extension: ${fileExtension}`);
 
-    const transcript = transcriptionResponse.text;
+    // Try multiple formats to find one that works with Whisper
+    const formatsToTry = [
+      { name: "audio.mp3", type: "audio/mpeg" },
+      { name: "audio.mp4", type: "audio/mp4" },
+      { name: "audio.m4a", type: "audio/mp4" },
+      { name: "audio.webm", type: "audio/webm" },
+    ];
 
-    console.log(transcript);
+    // For QuickTime files, prioritize mp4 which is most likely to work
+    if (fileExtension === "mov" || fileExtension === "qt") {
+      formatsToTry.unshift({ name: "audio.mp4", type: "audio/mp4" });
+    }
 
-    // Generate a title based on the transcript
+    let transcript = ""; // Default to empty transcript
+
+    // Try each format until one works
+    for (const format of formatsToTry) {
+      try {
+        console.log(`Trying format: ${format.name} (${format.type})`);
+        const blob = new Blob([fileData], { type: format.type });
+        const file = new File([blob], format.name, { type: format.type });
+
+        console.log(`File created: ${format.name}, size: ${file.size} bytes`);
+
+        const transcriptionResponse = await openai.audio.transcriptions.create({
+          file: file,
+          model: "whisper-1",
+        });
+
+        transcript = transcriptionResponse.text;
+        console.log(`Transcription succeeded with format: ${format.name}`);
+        break; // Exit the loop if transcription succeeds
+      } catch (error) {
+        console.error(
+          `Transcription failed with format ${format.name}:`,
+          error
+        );
+        // Continue to the next format
+      }
+    }
+
+    // If all formats failed, continue with empty transcript
+    if (!transcript) {
+      console.log(
+        "All transcription formats failed. Continuing with empty transcript."
+      );
+      transcript = ""; // Ensure transcript is an empty string
+    }
+
+    // Generate a title based on the transcript (or a default if transcript is empty)
     const titleCompletion = await openai.chat.completions.create({
       model: "gpt-4o-mini",
       messages: [
@@ -86,12 +129,15 @@ export async function POST(request: Request) {
         },
         {
           role: "user",
-          content: `Here is the transcript of an educational video: "${transcript}". Please generate a title for this content. Please only return the title, no other text or quotations or markdown.`,
+          content: transcript
+            ? `Here is the transcript of an educational video: "${transcript}". Please generate a title for this content. Please only return the title, no other text or quotations or markdown.`
+            : `Please generate a generic title for an educational module. Please only return the title, no other text or quotations or markdown.`,
         },
       ],
     });
 
-    const title = titleCompletion.choices[0].message.content || "";
+    const title =
+      titleCompletion.choices[0].message.content || "Educational Module";
 
     // Define system prompt and tools based on question type
     let systemPrompt = "";
@@ -227,7 +273,7 @@ export async function POST(request: Request) {
       ];
     }
 
-    // Generate questions based on the transcript, user description, and question type
+    // Generate questions based on the transcript (or without it if empty)
     const completion = await openai.chat.completions.create({
       model: "gpt-4o-mini",
       messages: [
@@ -237,17 +283,27 @@ export async function POST(request: Request) {
         },
         {
           role: "user",
-          content: `Here is the transcript of an educational video: "${transcript}".
-          
-          ${description ? `Additional instructions: ${description}` : ""}
-          
-          Please generate a ${
-            questionType === "multichoice"
-              ? "multiple-choice question"
-              : questionType === "slider"
-              ? "slider question"
-              : "numerical input question"
-          } based on this content.`,
+          content: transcript
+            ? `Here is the transcript of an educational video: "${transcript}".
+              
+              ${description ? `Additional instructions: ${description}` : ""}
+              
+              Please generate a ${
+                questionType === "multichoice"
+                  ? "multiple-choice question"
+                  : questionType === "slider"
+                  ? "slider question"
+                  : "numerical input question"
+              } based on this content.`
+            : `Please generate a generic ${
+                questionType === "multichoice"
+                  ? "multiple-choice question"
+                  : questionType === "slider"
+                  ? "slider question"
+                  : "numerical input question"
+              } for an educational module.
+              
+              ${description ? `Additional instructions: ${description}` : ""}`,
         },
       ],
       tools: tools,
@@ -288,8 +344,10 @@ export async function POST(request: Request) {
             label: option.label,
           })),
           correctAnswers: questionData.options
-          .map((option: any, index: number) => option.correct ? index + 1 : null)
-          .filter((index: number | null) => index !== null), // Map to same sequential IDs
+            .map((option: any, index: number) =>
+              option.correct ? index + 1 : null
+            )
+            .filter((index: number | null) => index !== null), // Map to same sequential IDs
           type: "multipleChoice",
         };
         break;
