@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import {
   useStore,
@@ -18,6 +18,8 @@ import {
   ChevronDown,
   Camera,
   RefreshCw,
+  CheckCircle,
+  XCircle,
 } from "lucide-react";
 import { createClient } from "@/app/utils/supabase/client";
 import { toast } from "sonner";
@@ -47,6 +49,9 @@ export function MobileEditExperience({
   const setIsEditMode = useStore(setIsEditModeSelector);
   const [isLoadingVideo, setIsLoadingVideo] = useState(true);
   const [isUploading, setIsUploading] = useState(false);
+  const [showScrollIndicator, setShowScrollIndicator] = useState(false);
+  const [allValidationsValid, setAllValidationsValid] = useState(false);
+  const questionsRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     setIsEditMode(true);
@@ -259,9 +264,48 @@ export function MobileEditExperience({
     }
   };
 
+  // Check for validations
+  useEffect(() => {
+    const checkAllValidations = () => {
+      const allValid = validationInstance.every((validation) =>
+        validation.get_isValid()
+      );
+      setAllValidationsValid(allValid);
+    };
+    checkAllValidations();
+  }, [validationInstance]);
+
+  // Add scroll listener to hide indicator when user scrolls
+  useEffect(() => {
+    const handleScroll = () => {
+      if (showScrollIndicator) {
+        setShowScrollIndicator(false);
+      }
+    };
+
+    const questionsPanel = questionsRef.current;
+    if (questionsPanel) {
+      questionsPanel.addEventListener("scroll", handleScroll);
+    }
+
+    return () => {
+      if (questionsPanel) {
+        questionsPanel.removeEventListener("scroll", handleScroll);
+      }
+    };
+  }, [showScrollIndicator]);
+
   const handleValidationUpdate = () => {
     updateValidation();
     setShowValidationResults(true);
+    setShowScrollIndicator(true);
+  };
+
+  const scrollToValidationResults = () => {
+    document.getElementById("validation-results")?.scrollIntoView({
+      behavior: "smooth",
+      block: "center",
+    });
   };
 
   useEffect(() => {
@@ -467,38 +511,123 @@ export function MobileEditExperience({
                 transition={{ type: "spring", damping: 30, stiffness: 300 }}
                 className="absolute bottom-0 left-0 right-0 h-[70%] bg-white rounded-t-3xl overflow-hidden shadow-2xl"
               >
-                <div className="h-full overflow-y-auto pb-[calc(env(safe-area-inset-bottom)+4rem)]">
+                <div
+                  ref={questionsRef}
+                  className="h-full overflow-y-auto pb-[calc(env(safe-area-inset-bottom)+4rem)]"
+                >
                   {/* Pull indicator */}
                   <div className="sticky top-0 w-full bg-white pt-2 pb-4 flex justify-center z-10">
                     <div className="w-12 h-1.5 bg-gray-300 rounded-full" />
                   </div>
 
                   {/* Content */}
-                  <div className="px-4 space-y-6">
+                  <div className="px-4 space-y-6 mb-16">
                     {/* Order Handler */}
                     <OrderHandlerDB isEditMode />
 
                     {/* Validation Section */}
-                    <MobileValidation
-                      validations={validationInstance}
-                      showResults={showValidationResults}
-                    />
+                    <div id="validation-results" className="pt-4">
+                      <MobileValidation
+                        validations={validationInstance}
+                        showResults={showValidationResults}
+                      />
+                    </div>
 
-                    {/* Verify button */}
-                    {validationInstance.length > 0 && (
-                      <button
-                        onClick={handleValidationUpdate}
-                        className="w-full px-4 py-3 bg-green-600 text-white rounded-xl shadow-md 
-                                 transition-all duration-300 hover:bg-green-700 hover:shadow-lg 
-                                 active:bg-green-800"
-                      >
-                        <span className="text-lg font-semibold">
-                          Test Validations
-                        </span>
-                      </button>
+                    {/* Success Message */}
+                    {allValidationsValid && showValidationResults && (
+                      <div className="p-4 bg-green-50 border border-green-100 rounded-xl mb-2">
+                        <div className="flex items-center gap-3 mb-2">
+                          <div className="bg-green-100 rounded-full p-1">
+                            <CheckCircle className="h-5 w-5 text-green-600" />
+                          </div>
+                          <h3 className="text-green-800 font-semibold">
+                            Great work!
+                          </h3>
+                        </div>
+                        <p className="text-green-600 text-sm ml-9">
+                          All validations are passing!
+                        </p>
+                      </div>
                     )}
                   </div>
                 </div>
+
+                {/* Floating Scroll Indicator */}
+                <AnimatePresence>
+                  {showScrollIndicator && showValidationResults && (
+                    <motion.div
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -20 }}
+                      transition={{ duration: 0.3 }}
+                      className="absolute left-1/2 bottom-28 transform -translate-x-1/2 z-20"
+                      onClick={scrollToValidationResults}
+                    >
+                      <div
+                        className="bg-black bg-opacity-40 rounded-full p-3 cursor-pointer
+                                  hover:bg-opacity-60 transition-all duration-300 shadow-lg"
+                      >
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          width="24"
+                          height="24"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="white"
+                          strokeWidth="2"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        >
+                          <path d="M12 5v14M5 12l7 7 7-7" />
+                        </svg>
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+
+                {/* Smart Verify Button */}
+                {validationInstance.length > 0 && (
+                  <div className="absolute bottom-0 left-0 right-0 p-4 bg-white border-t border-gray-100 shadow-md">
+                    <button
+                      onClick={handleValidationUpdate}
+                      className={`w-full px-4 py-3 rounded-xl text-white font-semibold shadow-md 
+                                transition-all duration-300 flex items-center justify-center gap-2
+                                ${
+                                  showValidationResults
+                                    ? allValidationsValid
+                                      ? "bg-green-600 hover:bg-green-700 active:bg-green-800"
+                                      : "bg-amber-600 hover:bg-amber-700 active:bg-amber-800"
+                                    : "bg-blue-600 hover:bg-blue-700 active:bg-blue-800"
+                                }`}
+                    >
+                      {showValidationResults ? (
+                        <>
+                          {allValidationsValid ? (
+                            <>
+                              <CheckCircle className="h-5 w-5" />
+                              <span>All Correct!</span>
+                            </>
+                          ) : (
+                            <>
+                              <XCircle className="h-5 w-5" />
+                              <span>
+                                {
+                                  validationInstance.filter((v) =>
+                                    v.get_isValid()
+                                  ).length
+                                }{" "}
+                                of {validationInstance.length} Correct - Try
+                                Again!
+                              </span>
+                            </>
+                          )}
+                        </>
+                      ) : (
+                        <span>Test Validations</span>
+                      )}
+                    </button>
+                  </div>
+                )}
               </motion.div>
             )}
           </AnimatePresence>
