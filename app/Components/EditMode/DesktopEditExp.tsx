@@ -91,6 +91,8 @@ import { AnimatePresence } from "framer-motion";
 import { VideoPlayer } from "@/app/Components/MainMenu/VideoPlayer";
 import { motion } from "framer-motion";
 import { FastForward } from "lucide-react";
+import { CameraRecorder } from "@/app/Components/MainMenu/Mobile/CameraRecorder";
+import { Camera } from "lucide-react";
 
 interface DesktopEditExperienceProps {
   expId: number;
@@ -478,6 +480,66 @@ export function DesktopEditExperience({
 
   // ... other handlers and effects ...
 
+  const [showCameraRecorder, setShowCameraRecorder] = useState(false);
+
+  const handleCameraRecording = async (recordedBlob: Blob) => {
+    try {
+      // Set uploading state to true to show feedback
+      setIsUploading(true);
+
+      const supabase = createClient();
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+
+      // Get bucket name
+      const bucketResponse = await fetch(
+        `/api/supabase/bucket?experienceId=${expId}&userId=${user?.id}`
+      );
+      const { bucket_name } = await bucketResponse.json();
+      const bucketName = bucket_name || "experience-videos";
+
+      const timestamp = Date.now();
+      const fileName = `video_${timestamp}.webm`;
+      const filePath = `${expId}/${currentIndex}/${fileName}`;
+
+      const { error: uploadError } = await supabase.storage
+        .from(bucketName)
+        .upload(filePath, recordedBlob);
+
+      if (uploadError) throw uploadError;
+
+      const response = await fetch("/api/supabase/video", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          experienceId: expId.toString(),
+          index: currentIndex,
+          filePath: filePath,
+        }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(`Failed to update database: ${errorData.error}`);
+      }
+
+      await loadVideo();
+      setShowCameraRecorder(false);
+      toast.success("Video recorded and saved successfully");
+
+      // Automatically save state after successful video recording
+      await handleSave();
+    } catch (error) {
+      console.error("Error saving recorded video:", error);
+      toast.error("Failed to save recorded video");
+    } finally {
+      setIsUploading(false);
+    }
+  };
+
   return (
     <>
       {/* <EditBar /> */}
@@ -554,6 +616,19 @@ export function DesktopEditExperience({
                     </div>
                   </Button>
                 </label>
+
+                {/* Add new camera record button */}
+                <Button
+                  variant="outline"
+                  className="bg-white/90 hover:bg-white text-gray-800 border-gray-200 shadow-md transition-all duration-200 backdrop-blur-sm"
+                  onClick={() => setShowCameraRecorder(true)}
+                  disabled={isUploading}
+                >
+                  <div className="flex items-center gap-2 px-4 py-2">
+                    <Camera size={16} className="text-red-600" />
+                    <span className="font-medium">Record Video</span>
+                  </div>
+                </Button>
               </div>
             </>
           ) : (
@@ -566,34 +641,58 @@ export function DesktopEditExperience({
                 id="video-upload-initial"
                 disabled={isUploading}
               />
-              <label
-                htmlFor="video-upload-initial"
-                className={`cursor-pointer group ${
-                  isUploading ? "opacity-50 cursor-not-allowed" : ""
-                }`}
-              >
-                <div className="flex flex-col items-center gap-4 p-12 rounded-xl bg-white/90 shadow-lg border-2 border-dashed border-gray-300 hover:border-blue-400 transition-all duration-200">
-                  {isUploading ? (
-                    <div className="p-6 rounded-full bg-blue-50">
-                      <div className="w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+              <div className="flex flex-col gap-6 items-center w-full max-w-md px-4">
+                {/* Upload button - with consistent width and height */}
+                <label
+                  htmlFor="video-upload-initial"
+                  className={`w-full cursor-pointer ${
+                    isUploading ? "opacity-50 cursor-not-allowed" : ""
+                  }`}
+                >
+                  <div className="flex flex-col items-center justify-center gap-4 p-12 rounded-xl bg-white/90 shadow-lg border-2 border-dashed border-gray-300 hover:border-blue-400 transition-all duration-200 h-64">
+                    {isUploading ? (
+                      <div className="p-6 rounded-full bg-blue-50">
+                        <div className="w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+                      </div>
+                    ) : (
+                      <div className="p-6 rounded-full bg-blue-50 hover:bg-blue-100 transition-colors">
+                        <RefreshCw size={48} className="text-blue-500" />
+                      </div>
+                    )}
+                    <div className="text-center">
+                      <h3 className="text-2xl font-semibold text-gray-800 mb-2">
+                        {isUploading ? "Uploading Video..." : "Upload Video"}
+                      </h3>
+                      <p className="text-gray-600">
+                        {isUploading
+                          ? "Please wait while your video uploads"
+                          : "Click to add a video for this step"}
+                      </p>
                     </div>
-                  ) : (
-                    <div className="p-6 rounded-full bg-blue-50 group-hover:bg-blue-100 transition-colors">
-                      <RefreshCw size={48} className="text-blue-500" />
-                    </div>
-                  )}
-                  <div className="text-center">
-                    <h3 className="text-2xl font-semibold text-gray-800 mb-2">
-                      {isUploading ? "Uploading Video..." : "Upload Video"}
-                    </h3>
-                    <p className="text-gray-600 mb-4">
-                      {isUploading
-                        ? "Please wait while your video uploads"
-                        : "Click to add a video for this step"}
-                    </p>
                   </div>
-                </div>
-              </label>
+                </label>
+
+                {/* Record button - with matching width and height */}
+                <button
+                  onClick={() => setShowCameraRecorder(true)}
+                  className="w-full"
+                  disabled={isUploading}
+                >
+                  <div className="flex flex-col items-center justify-center gap-4 p-12 rounded-xl bg-white/90 shadow-lg border-2 border-dashed border-gray-300 hover:border-red-400 transition-all duration-200 h-64">
+                    <div className="p-6 rounded-full bg-red-50 hover:bg-red-100 transition-colors">
+                      <Camera size={48} className="text-red-500" />
+                    </div>
+                    <div className="text-center">
+                      <h3 className="text-2xl font-semibold text-gray-800 mb-2">
+                        Record Video
+                      </h3>
+                      <p className="text-gray-600">
+                        Use your camera to record a video for this step
+                      </p>
+                    </div>
+                  </div>
+                </button>
+              </div>
             </div>
           )}
 
@@ -728,6 +827,15 @@ export function DesktopEditExperience({
           </Button>
         </div>
       </div>
+
+      {showCameraRecorder && (
+        <div className="fixed inset-0 z-50 bg-black">
+          <CameraRecorder
+            onSave={handleCameraRecording}
+            onCancel={() => setShowCameraRecorder(false)}
+          />
+        </div>
+      )}
     </>
   );
 }
